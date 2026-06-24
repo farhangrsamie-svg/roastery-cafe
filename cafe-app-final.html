@@ -836,7 +836,7 @@ const BEANS = [
     name: 'Kenya AA',
     detail: 'Washed',
     origin: 'Kenya · 1400–2100 m',
-    flavors: ['Blackcurrant', 'Tomato', 'Raisin', 'Brown Sugar'],
+    flavors: ['Blackcurrant', 'Blackberry', 'Raisin', 'Brown Sugar'],
     roast: 'Light–Medium',
     brew: 'V60 / Kalita Wave',
     temp: '91–94 °C',
@@ -1145,8 +1145,8 @@ function recommend() {
       rwanda:      { v60:8,  frenchpress:4,  espresso:2,  aeropress:9,  coldbrew:4,  other:6 },
       sidama:      { v60:5,  frenchpress:9,  espresso:3,  aeropress:6,  coldbrew:9,  other:5 },
       colombia:    { v60:7,  frenchpress:7,  espresso:8,  aeropress:8,  coldbrew:5,  other:7 },
-      brazil:      { v60:2,  frenchpress:8,  espresso:10, aeropress:5,  coldbrew:7,  other:5 },
-      guatemala:   { v60:2,  frenchpress:7,  espresso:10, aeropress:4,  coldbrew:4,  other:5 },
+      brazil:      { v60:5,  frenchpress:8,  espresso:10, aeropress:5,  coldbrew:7,  other:5 },
+      guatemala:   { v60:5,  frenchpress:7,  espresso:10, aeropress:4,  coldbrew:4,  other:5 },
       sumatra:     { v60:1,  frenchpress:10, espresso:7,  aeropress:4,  coldbrew:9,  other:5 },
       harrar:      { v60:2,  frenchpress:9,  espresso:7,  aeropress:4,  coldbrew:5,  other:5 },
       tanzania:    { v60:9,  frenchpress:3,  espresso:3,  aeropress:8,  coldbrew:4,  other:5 },
@@ -1299,8 +1299,9 @@ function sendEmail() {
         btn.textContent = currentLang === 'fi' ? '✅ Lähetetty!' : '✅ Sent!';
         // اگه چک‌باکس ریمایندر تیک خورده، اطلاعات رو ذخیره کن
         const wantsReminder = document.getElementById('chk-reminder').checked;
-        if (wantsReminder && APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
-          saveForReminder(restDaysForEmail, reminderDays);
+        // همیشه دیتا رو ذخیره کن — مستقل از checkbox
+        if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
+          saveForReminder(restDaysForEmail, reminderDays, wantsReminder);
         }
       })
       .catch((err) => {
@@ -1319,7 +1320,7 @@ function sendEmail() {
   }
 }
 
-function saveForReminder(restDaysVal, reminderDaysVal) {
+function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
   // محاسبه reminder date
   const today = new Date();
   const reminderDate = new Date(today);
@@ -1327,14 +1328,15 @@ function saveForReminder(restDaysVal, reminderDaysVal) {
   const reminderDateStr = reminderDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
   const data = {
-    name:          name,
-    email:         email,
-    bean:          rec.name + ' (' + rec.detail + ')',
-    flavors:       rec.flavors.join(', '),
-    roast:         rec.roast,
-    brew:          rec.brew,
-    rest_days:     restDaysVal,
-    reminder_date: reminderDateStr,
+    name:             name,
+    email:            email,
+    bean:             rec.name + ' (' + rec.detail + ')',
+    flavors:          rec.flavors.join(', '),
+    roast:            rec.roast,
+    brew:             rec.brew,
+    rest_days:        restDaysVal,
+    reminder_date:    wantsReminder ? reminderDateStr : '',
+    reminder_wanted:  wantsReminder ? 'YES' : 'NO',
   };
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
