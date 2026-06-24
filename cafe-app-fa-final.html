@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="روستری کافه">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>روستری کافه — پروفایل قهوه</title>
+<title>هویت قهوه — سفر شخصی رست</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 :root {
@@ -380,6 +380,39 @@ body.lang-en .loading-fa { display: none !important; }
 /* RTL for Persian */
 body.lang-fa { direction: rtl; }
 body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
+/* Coffee Identity Badge */
+.identity-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0 4px;
+}
+.identity-tag {
+  background: var(--medium-brown);
+  color: var(--white);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.staff-toggle {
+  background: transparent;
+  border: 1px dashed var(--light-caramel);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--caramel);
+  cursor: pointer;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
 </style>
 </head>
 <body class="lang-en">
@@ -399,12 +432,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="logo">
     <div class="logo-icon">☕</div>
     <h1>Roastery Café</h1>
-    <div class="logo-sub">سفر قهوه شما</div>
+    <div class="logo-sub">سفر شخصی رست</div>
   </div>
 
   <div class="welcome-desc">
     <span class="en-only">Let us find your perfect coffee.</span>
-    <span class="fa-only">بیایید قهوه ایده‌آل شما را پیدا کنیم.</span>
+    <span class="fa-only">هویت قهوه خود را از طریق طعم، حال و تجربه رست بسازید.</span>
   </div>
 
   <div class="input-group">
@@ -511,7 +544,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
   <div class="q-header">
     <div class="q-text-en">What are you seeking right now?</div>
-    <div class="q-text-fa" style="text-align:right;direction:rtl">الان دنبال چه حسی هستید؟</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه قهوه‌ای هستید؟</div>
   </div>
   <div class="options cols-2">
     <div class="option-card" onclick="pick(this,'state','energised')">
@@ -706,6 +739,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="result-for" id="r-for"></div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
+    <div class="identity-badge" id="r-identity-badge"></div>
     <div id="r-alt-badge" style="display:none;margin-top:12px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
   </div>
 
@@ -738,7 +772,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <!-- Roast guide -->
-  <div class="card" id="roast-card">
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 نمای کارکنان: راهنمای رست ▼</button>
+  <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔥 Roast Guide</div>
     <div class="info-row">
       <span class="info-label">⬆️ Charge Temp</span>
@@ -785,6 +820,10 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </button>
   <div class="success-msg" id="success-msg">
     ✅ Sent! Check your inbox.
+  </div>
+  <div style="background:#FDF5E8;border:1px solid #E8C99A;border-radius:16px;padding:18px 20px;margin-bottom:14px;text-align:center;">
+    <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);margin-bottom:6px;direction:rtl">☕ هویت قهوه‌ات را ذخیره کن</div>
+    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;line-height:1.6;direction:rtl">دفعه بعد که آمدی، پروفایلت را اصلاح کن و ببین ذائقه‌ات چطور تغییر کرده.</div>
   </div>
   <button class="btn-primary btn-ghost" id="btn-reset" onclick="reset()" style="margin-top:12px;">
     Start Over
@@ -1206,6 +1245,28 @@ function render(b) {
     document.getElementById('r-dtr').textContent    = b.roastInfo.dtr;
   }
   document.getElementById('r-desc').textContent  = b.desc;
+
+  const identityBadge = document.getElementById('r-identity-badge');
+  if (identityBadge) {
+    identityBadge.innerHTML = '';
+    const stateLabel = {
+      energised:'پرانرژی', focused:'متمرکز', creative:'خلاق',
+      relaxed:'آرام', reflective:'تأملی'
+    }[ans.state] || '';
+    const tasteLabel = {
+      floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند'
+    }[ans.taste] || '';
+    const brewLabel = {
+      v60:'Pour Over', frenchpress:'فرنچ پرس', espresso:'اسپرسو',
+      aeropress:'ایروپرس', coldbrew:'کولد برو', other:'انعطاف‌پذیر'
+    }[ans.brew] || '';
+    [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean).forEach(tag => {
+      const span = document.createElement('span');
+      span.className = 'identity-tag';
+      span.textContent = tag;
+      identityBadge.appendChild(span);
+    });
+  }
   const tags = document.getElementById('r-flavors');
   tags.innerHTML = '';
   b.flavors.forEach(f => {
@@ -1295,16 +1356,18 @@ function sendEmail() {
     alt_bean:     rec._idealName  || '—',
   };
 
+  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
+    const wantsReminderEarly = document.getElementById('chk-reminder').checked;
+    saveForReminder(restDaysForEmail, reminderDays, wantsReminderEarly);
+  }
+
   if (EJS_SERVICE !== 'YOUR_SERVICE_ID') {
     emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params)
       .then(() => {
         document.getElementById('success-msg').classList.add('visible');
         btn.textContent = currentLang === 'fa' ? '✅ ارسال شد!' : '✅ Sent!';
         // اگه چک‌باکس ریمایندر تیک خورده، اطلاعات رو ذخیره کن
-        const wantsReminder = document.getElementById('chk-reminder').checked;
-        if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
-          saveForReminder(restDaysForEmail, reminderDays, wantsReminder);
-        }
+        // دیتا قبلاً ذخیره شده
       })
       .catch((err) => {
         // حتی اگه EmailJS خطا برگردوند، ایمیل ممکنه رفته باشه
@@ -1443,6 +1506,18 @@ function setLang(lang) {
 }
 
 /* ── RESET ── */
+function toggleRoastGuide() {
+  const card = document.getElementById('roast-card');
+  const btn  = document.querySelector('.staff-toggle');
+  if (card.style.display === 'none') {
+    card.style.display = 'block';
+    btn.textContent = '🔥 نمای کارکنان: راهنمای رست ▲';
+  } else {
+    card.style.display = 'none';
+    btn.textContent = '🔥 نمای کارکنان: راهنمای رست ▼';
+  }
+}
+
 function reset() {
   name = ''; email = '';
   ans  = { taste:null, body:null, state:null, context:null, brew:null, experience:null };
