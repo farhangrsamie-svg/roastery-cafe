@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Roastery Café">
   <link rel="apple-touch-icon" href="icon-192.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Roastery Café — Coffee Profile</title>
+<title>Coffee Identity — Personal Roast Journey</title>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <style>
 :root {
@@ -377,6 +377,40 @@ body.lang-fi .loading-en { display: none !important; }
 body.lang-en .option-fi,
 body.lang-en .q-text-fi,
 body.lang-en .loading-fi { display: none !important; }
+/* Coffee Identity Badge */
+.identity-badge {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin: 12px 0 4px;
+}
+.identity-tag {
+  background: var(--medium-brown);
+  color: var(--white);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+/* Roast Guide Toggle */
+.staff-toggle {
+  background: transparent;
+  border: 1px dashed var(--light-caramel);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--caramel);
+  cursor: pointer;
+  font-family: 'Arial', sans-serif;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
 </style>
 </head>
 <body class="lang-en">
@@ -396,11 +430,11 @@ body.lang-en .loading-fi { display: none !important; }
   <div class="logo">
     <div class="logo-icon">☕</div>
     <h1>Roastery Café</h1>
-    <div class="logo-sub">Your Coffee Journey</div>
+    <div class="logo-sub">Personal Roast Journey</div>
   </div>
 
   <div class="welcome-desc">
-    <span class="en-only">Let us find your perfect coffee.</span>
+    <span class="en-only">Create your coffee identity through taste, mood, context and roast experience.</span>
     <span class="fi-only">Löydämme sinulle täydellisen kahvin.</span>
   </div>
 
@@ -507,7 +541,7 @@ body.lang-en .loading-fi { display: none !important; }
     <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
   </div>
   <div class="q-header">
-    <div class="q-text-en">What are you seeking right now?</div>
+    <div class="q-text-en">What kind of coffee moment are you looking for today?</div>
     <div class="q-text-fi">Mitä etsit juuri nyt?</div>
   </div>
   <div class="options cols-2">
@@ -703,6 +737,7 @@ body.lang-en .loading-fi { display: none !important; }
     <div class="result-for" id="r-for"></div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
+    <div class="identity-badge" id="r-identity-badge"></div>
     <div id="r-alt-badge" style="display:none;margin-top:12px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
   </div>
 
@@ -735,7 +770,8 @@ body.lang-en .loading-fi { display: none !important; }
   </div>
 
   <!-- Roast guide -->
-  <div class="card" id="roast-card">
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 Staff View: Roast Guide ▼</button>
+  <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔥 Roast Guide</div>
     <div class="info-row">
       <span class="info-label">⬆️ Charge Temp</span>
@@ -782,6 +818,10 @@ body.lang-en .loading-fi { display: none !important; }
   </button>
   <div class="success-msg" id="success-msg">
     ✅ Sent! Check your inbox.
+  </div>
+  <div style="background:#FDF5E8;border:1px solid #E8C99A;border-radius:16px;padding:18px 20px;margin-bottom:14px;text-align:center;">
+    <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);margin-bottom:6px;">☕ Save this Coffee Identity</div>
+    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;line-height:1.6;">Next time you visit, refine your profile and discover how your taste evolves.</div>
   </div>
   <button class="btn-primary btn-ghost" id="btn-reset" onclick="reset()" style="margin-top:12px;">
     Start Over
@@ -1203,6 +1243,31 @@ function render(b) {
     document.getElementById('r-dtr').textContent    = b.roastInfo.dtr;
   }
   document.getElementById('r-desc').textContent  = b.desc;
+
+  // Coffee Identity Badge
+  const identityBadge = document.getElementById('r-identity-badge');
+  if (identityBadge) {
+    identityBadge.innerHTML = '';
+    // تعیین identity tags بر اساس پاسخ‌ها
+    const stateLabel = {
+      energised: 'Energised', focused: 'Focused', creative: 'Creative',
+      relaxed: 'Relaxed', reflective: 'Reflective'
+    }[ans.state] || '';
+    const tasteLabel = {
+      floral: 'Floral', sweet: 'Sweet', chocolatey: 'Chocolatey', bold: 'Bold'
+    }[ans.taste] || '';
+    const brewLabel = {
+      v60: 'Pour Over', frenchpress: 'French Press', espresso: 'Espresso',
+      aeropress: 'AeroPress', coldbrew: 'Cold Brew', other: 'Flexible'
+    }[ans.brew] || '';
+    const tags = [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean);
+    tags.forEach(tag => {
+      const span = document.createElement('span');
+      span.className = 'identity-tag';
+      span.textContent = tag;
+      identityBadge.appendChild(span);
+    });
+  }
   const tags = document.getElementById('r-flavors');
   tags.innerHTML = '';
   b.flavors.forEach(f => {
@@ -1292,17 +1357,19 @@ function sendEmail() {
     alt_bean:     rec._idealName  || '—',
   };
 
+  // ذخیره در شیت قبل از ارسال ایمیل — مستقل از نتیجه ایمیل
+  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
+    const wantsReminderEarly = document.getElementById('chk-reminder').checked;
+    saveForReminder(restDaysForEmail, reminderDays, wantsReminderEarly);
+  }
+
   if (EJS_SERVICE !== 'YOUR_SERVICE_ID') {
     emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params)
       .then(() => {
         document.getElementById('success-msg').classList.add('visible');
         btn.textContent = currentLang === 'fi' ? '✅ Lähetetty!' : '✅ Sent!';
         // اگه چک‌باکس ریمایندر تیک خورده، اطلاعات رو ذخیره کن
-        const wantsReminder = document.getElementById('chk-reminder').checked;
-        // همیشه دیتا رو ذخیره کن — مستقل از checkbox
-        if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
-          saveForReminder(restDaysForEmail, reminderDays, wantsReminder);
-        }
+        // دیتا قبلاً ذخیره شده
       })
       .catch((err) => {
         // حتی اگه EmailJS خطا برگردوند، ایمیل ممکنه رفته باشه
@@ -1374,7 +1441,7 @@ const STRINGS = {
     'rest-card-text':     '⏰ <strong>Important:</strong> Your freshly roasted beans need <strong>5–7 days to rest</strong> before they reach peak flavor. Take them home today — the best cup is worth the wait!',
     'chk-reminder-title': '☕ Remind me when it\'s ready',
     'chk-reminder-note':  'We\'ll email you in 6 days when your beans reach peak flavor',
-    'btn-email':          '📧 Send to My Email',
+    'btn-email':          '📧 Send My Coffee Identity',
     'success-msg':        '✅ Sent! Check your inbox.',
     'btn-reset':          'Start Over',
     'title-roast-guide':  'Roast Guide',
@@ -1440,6 +1507,18 @@ function setLang(lang) {
 }
 
 /* ── RESET ── */
+function toggleRoastGuide() {
+  const card = document.getElementById('roast-card');
+  const btn  = document.querySelector('.staff-toggle');
+  if (card.style.display === 'none') {
+    card.style.display = 'block';
+    btn.textContent = '🔥 Staff View: Roast Guide ▲';
+  } else {
+    card.style.display = 'none';
+    btn.textContent = '🔥 Staff View: Roast Guide ▼';
+  }
+}
+
 function reset() {
   name = ''; email = '';
   ans  = { taste:null, body:null, state:null, context:null, brew:null, experience:null };
