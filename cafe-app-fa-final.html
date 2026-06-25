@@ -880,8 +880,19 @@ const EJS_USER     = 'GOVImvvzS8G5A8wRF';
 
 emailjs.init(EJS_USER);
 
+// شناسایی لوکیشن مشتری
+fetch('https://ipapi.co/json/')
+  .then(r => r.json())
+  .then(d => {
+    userLocation.country      = d.country_name || '';
+    userLocation.city         = d.city         || '';
+    userLocation.country_code = d.country_code  || '';
+  })
+  .catch(() => {}); // silent fail
+
 /* ── APP STATE ── */
 let name = '', email = '';
+let userLocation = { country: '', city: '', country_code: '' };
 let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
 let rec = null;
 
@@ -1460,6 +1471,27 @@ function render(b) {
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
 
 function sendEmail() {
+  // چک کردن order intent
+  const intentSelected = document.querySelector('input[name="order_intent"]:checked');
+  if (!intentSelected) {
+    const card = document.getElementById('order-intent-card');
+    if (card) {
+      card.style.border = '2px solid #C0392B';
+      card.style.borderRadius = '16px';
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const title = card.querySelector('.card-title');
+      if (title) title.style.color = '#C0392B';
+    }
+    return;
+  }
+  // reset border
+  const card = document.getElementById('order-intent-card');
+  if (card) {
+    card.style.border = '';
+    const title = card.querySelector('.card-title');
+    if (title) title.style.color = '';
+  }
+
   const btn = document.getElementById('btn-email');
   btn.textContent = currentLang === 'fa' ? 'در حال ارسال…' : 'Sending…';
   btn.disabled = true;
@@ -1557,6 +1589,9 @@ function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
     order_status:     '',
     roastery_partner: '',
     order_intent:     (document.querySelector('input[name="order_intent"]:checked') || {}).value || 'not_answered',
+    country:          userLocation.country      || '',
+    city:             userLocation.city         || '',
+    country_code:     userLocation.country_code || '',
   };
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
