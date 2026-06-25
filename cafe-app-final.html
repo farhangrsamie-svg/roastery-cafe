@@ -1395,15 +1395,35 @@ function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
   const reminderDateStr = reminderDate.toISOString().split('T')[0]; // YYYY-MM-DD
 
   const data = {
+    // ─── اطلاعات پایه ───
     name:             name,
     email:            email,
+    language:         currentLang,
+
+    // ─── پاسخ‌های سوالات (raw) ───
+    q1_taste:         ans.taste      || '',
+    q2_body:          ans.body       || '',
+    q3_state:         ans.state      || '',
+    q4_context:       ans.context    || '',
+    q5_brew:          ans.brew       || '',
+    q6_experience:    ans.experience || '',
+
+    // ─── نتیجه توصیه ───
     bean:             rec.name + ' (' + rec.detail + ')',
+    is_blend:         rec._isBlend ? 'YES' : 'NO',
+    blend_name:       rec._blendName || '',
     flavors:          rec.flavors.join(', '),
     roast:            rec.roast,
-    brew:             rec.brew,
+    brew_method:      rec.brew,
     rest_days:        restDaysVal,
+
+    // ─── reminder ───
     reminder_date:    wantsReminder ? reminderDateStr : '',
     reminder_wanted:  wantsReminder ? 'YES' : 'NO',
+
+    // ─── برای آینده ───
+    order_status:     '',
+    roastery_partner: '',
   };
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
