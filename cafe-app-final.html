@@ -430,11 +430,11 @@ body.lang-en .loading-fi { display: none !important; }
   <div class="logo">
     <div class="logo-icon">☕</div>
     <h1>Roastery Café</h1>
-    <div class="logo-sub">Personal Roast Journey</div>
+    <div class="logo-sub">Personal Roast Profile</div>
   </div>
 
   <div class="welcome-desc">
-    <span class="en-only">Create your coffee identity through taste, mood, context and roast experience.</span>
+    <span class="en-only">Answer a few questions. Get your personal roast profile. A partner roastery can roast it fresh for you.</span>
     <span class="fi-only">Löydämme sinulle täydellisen kahvin.</span>
   </div>
 
@@ -770,7 +770,7 @@ body.lang-en .loading-fi { display: none !important; }
   </div>
 
   <!-- Roast guide -->
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 Staff View: Roast Guide ▼</button>
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 Roastery View: Roast Direction ▼</button>
   <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔥 Roast Guide</div>
     <div class="info-row">
@@ -821,13 +821,32 @@ body.lang-en .loading-fi { display: none !important; }
   </div>
   <!-- Blend suggestion -->
   <div class="card" id="blend-card" style="display:none;border:2px solid var(--light-caramel);">
-    <div class="card-title" id="blend-card-title">✨ Also Consider — Suggested Blend</div>
+    <div class="card-title" id="blend-card-title">🔄 Alternative Profile</div>
     <div style="font-size:18px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;" id="r-blend-name"></div>
     <div style="font-size:12px;color:var(--caramel);margin-bottom:12px;font-style:italic;" id="r-blend-detail"></div>
     <div class="flavor-tags" id="r-blend-flavors" style="margin-bottom:12px;"></div>
     <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;" id="r-blend-desc"></div>
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0EAE0;">
       <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;" id="r-blend-note"></div>
+    </div>
+  </div>
+
+  <!-- Order Intent -->
+  <div class="card" id="order-intent-card">
+    <div class="card-title">Would you like a roastery to prepare this for you?</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;" id="intent-yes-label">
+        <input type="radio" name="order_intent" value="yes" id="intent-yes" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">Yes, I'm interested</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">Connect me with a partner roastery</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;" id="intent-maybe-label">
+        <input type="radio" name="order_intent" value="maybe" id="intent-maybe" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">Maybe later</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">Send me my profile for now</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;" id="intent-explore-label">
+        <input type="radio" name="order_intent" value="exploring" id="intent-explore" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">Just exploring</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">I'm curious about my profile</div></div>
+      </label>
     </div>
   </div>
 
@@ -1384,7 +1403,7 @@ function render(b) {
       if (currentLang === 'fi') {
         restEl.innerHTML = '⏰ <strong>Valmis ' + days + ' päivässä.</strong> Muistutamme sinua 2 päivää ennen — ja meillä on pieni yllätys odottamassa! ☕';
       } else {
-        restEl.innerHTML = '⏰ <strong>Ready in ' + days + ' days.</strong> We\'ll remind you 2 days before — and we\'ll have a little surprise waiting for you at the café. ☕';
+        restEl.innerHTML = '⏰ <strong>Ready in ' + days + ' days</strong> after roasting. We can remind you when your beans reach their best drinking window. ☕';
       }
     }
     // reminder note
@@ -1539,6 +1558,7 @@ function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
     // ─── برای آینده ───
     order_status:     '',
     roastery_partner: '',
+    order_intent:     (document.querySelector('input[name="order_intent"]:checked') || {}).value || 'not_answered',
   };
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
@@ -1576,7 +1596,7 @@ const STRINGS = {
     'rest-card-text':     '⏰ <strong>Important:</strong> Your freshly roasted beans need <strong>5–7 days to rest</strong> before they reach peak flavor. Take them home today — the best cup is worth the wait!',
     'chk-reminder-title': '☕ Remind me when it\'s ready',
     'chk-reminder-note':  'We\'ll email you in 6 days when your beans reach peak flavor',
-    'btn-email':          '📧 Send My Coffee Identity',
+    'btn-email':          '📧 Request Fresh Roast',
     'success-msg':        '✅ Sent! Check your inbox.',
     'btn-reset':          'Start Over',
     'title-roast-guide':  'Roast Guide',
@@ -1642,15 +1662,24 @@ function setLang(lang) {
 }
 
 /* ── RESET ── */
+function selectIntent(radio) {
+  ['intent-yes-label','intent-maybe-label','intent-explore-label'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.border = '2px solid transparent';
+  });
+  const label = radio.closest('label');
+  if (label) label.style.border = '2px solid var(--caramel)';
+}
+
 function toggleRoastGuide() {
   const card = document.getElementById('roast-card');
   const btn  = document.querySelector('.staff-toggle');
   if (card.style.display === 'none') {
     card.style.display = 'block';
-    btn.textContent = '🔥 Staff View: Roast Guide ▲';
+    btn.textContent = '🔥 Roastery View: Roast Direction ▲';
   } else {
     card.style.display = 'none';
-    btn.textContent = '🔥 Staff View: Roast Guide ▼';
+    btn.textContent = '🔥 Roastery View: Roast Direction ▼';
   }
 }
 
