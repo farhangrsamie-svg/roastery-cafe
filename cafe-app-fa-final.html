@@ -866,7 +866,7 @@ const BEANS = [
     brew: 'V60 / Chemex',
     temp: '92–95 °C',
     ratio: '1g : 15–17g',
-    roastInfo: { charge: '187°C', drop: '205°C', dtr: '19%', time: '10 min' },
+    roastInfo: { charge: '187°C', drop: '198°C', dtr: '19%', time: '10 min' },
     restDays: { filter: 7, espresso: 4, coldbrew: 7, default: 7 },
     desc: 'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate. A coffee that surprises every sip.',
     s: { floral:10, sweet:4, chocolatey:0, bold:0, light:10, medium:5, full:0,
@@ -878,7 +878,7 @@ const BEANS = [
     name: 'Kenya AA',
     detail: 'Washed',
     origin: 'Kenya · 1400–2100 m',
-    flavors: ['Blackcurrant', 'Blackberry', 'Raisin', 'Brown Sugar'],
+    flavors: ['Blackcurrant', 'Red Currant', 'Pomegranate', 'Brown Sugar'],
     roast: 'Light–Medium',
     brew: 'V60 / Kalita Wave',
     temp: '91–94 °C',
@@ -1175,6 +1175,16 @@ function recommend() {
     if (ctx === 'friends'     && (b.id === 'colombia' || b.id === 'rwanda'))    score += 12;
     // State bonus: Kenya برای energised بهترینه
     if (ans.state === 'energised' && b.id === 'kenya')                          score += 8;
+    // تضاد: floral + full body
+    if (ans.taste === 'floral' && ans.body === 'full') {
+      if (b.id === 'yirgacheffe' || b.id === 'geisha')                         score -= 20;
+      if (b.id === 'colombia'    || b.id === 'rwanda')                          score += 10;
+    }
+    // تضاد: bold + light body
+    if (ans.taste === 'bold' && ans.body === 'light') {
+      if (b.id === 'sumatra' || b.id === 'harrar')                              score -= 20;
+      if (b.id === 'kenya'   || b.id === 'tanzania')                            score += 8;
+    }
     // Context bonuses — دانه‌های جدید
     if (ctx === 'afterdinner' && b.id === 'harrar')                             score += 16;
     if (ctx === 'morning'     && b.id === 'tanzania')                           score += 16;
@@ -1317,7 +1327,7 @@ function render(b) {
 /* ── EMAIL ── */
 // ── آدرس Google Apps Script ──
 // بعد از Deploy کردن، URL رو اینجا بذار
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzHHzftC_g78LiV1sGZu1mLKlbzlkLrSD_2btVeE7L1s9ZxtbAA6YO3mcvE7Bo_339K0g/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
 
 function sendEmail() {
   const btn = document.getElementById('btn-email');
