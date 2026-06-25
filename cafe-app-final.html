@@ -1467,6 +1467,9 @@ function sendEmail() {
     rest_days:    restDaysForEmail + ' days',
     reminder_in:  reminderDays + ' days',
     alt_bean:     rec._idealName  || '—',
+    blend_name:   rec._suggestedBlend ? rec._suggestedBlend.name : '—',
+    blend_detail: rec._suggestedBlend ? rec._suggestedBlend.detail : '—',
+    blend_flavors:rec._suggestedBlend ? rec._suggestedBlend.flavors.join(', ') : '—',
   };
 
   // ذخیره در شیت قبل از ارسال ایمیل — مستقل از نتیجه ایمیل
