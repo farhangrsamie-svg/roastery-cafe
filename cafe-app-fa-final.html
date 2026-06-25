@@ -432,12 +432,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="logo">
     <div class="logo-icon">☕</div>
     <h1>Roastery Café</h1>
-    <div class="logo-sub">سفر شخصی رست</div>
+    <div class="logo-sub">پروفایل رست شخصی</div>
   </div>
 
   <div class="welcome-desc">
     <span class="en-only">Let us find your perfect coffee.</span>
-    <span class="fa-only">هویت قهوه خود را از طریق طعم، حال و تجربه رست بسازید.</span>
+    <span class="fa-only">چند سوال پاسخ بده. پروفایل رست شخصی‌ات رو بگیر. یک رستری شریک می‌تواند آن را تازه برایت رست کند.</span>
   </div>
 
   <div class="input-group">
@@ -772,7 +772,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <!-- Roast guide -->
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 نمای کارکنان: راهنمای رست ▼</button>
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 نمای رستری: راهنمای رست ▼</button>
   <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔥 Roast Guide</div>
     <div class="info-row">
@@ -823,13 +823,32 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
   <!-- Blend suggestion -->
   <div class="card" id="blend-card" style="display:none;border:2px solid var(--light-caramel);">
-    <div class="card-title" id="blend-card-title">✨ پیشنهاد ترکیب — Suggested Blend</div>
+    <div class="card-title" id="blend-card-title">🔄 پروفایل جایگزین</div>
     <div style="font-size:18px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;" id="r-blend-name"></div>
     <div style="font-size:12px;color:var(--caramel);margin-bottom:12px;font-style:italic;" id="r-blend-detail"></div>
     <div class="flavor-tags" id="r-blend-flavors" style="margin-bottom:12px;"></div>
     <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;" id="r-blend-desc"></div>
     <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0EAE0;">
       <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;direction:rtl;" id="r-blend-note"></div>
+    </div>
+  </div>
+
+  <!-- Order Intent FA -->
+  <div class="card" id="order-intent-card">
+    <div class="card-title" style="direction:rtl">آیا می‌خواهی یک رستری این پروفایل را برایت آماده کند؟</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-yes-label">
+        <input type="radio" name="order_intent" value="yes" id="intent-yes" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">بله، علاقه‌مندم</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">با یک رستری شریک مرتبط شو</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-maybe-label">
+        <input type="radio" name="order_intent" value="maybe" id="intent-maybe" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">شاید بعداً</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">فعلاً پروفایلم را بفرست</div></div>
+      </label>
+      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-explore-label">
+        <input type="radio" name="order_intent" value="exploring" id="intent-explore" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
+        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">فقط کنجکاوم</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">می‌خواهم پروفایلم را ببینم</div></div>
+      </label>
     </div>
   </div>
 
@@ -1390,7 +1409,7 @@ function render(b) {
     const restEl = document.getElementById('rest-card-text');
     if (restEl) {
       if (currentLang === 'fa') {
-        restEl.innerHTML = '⏰ <strong>آماده در ' + days + ' روز.</strong> ۲ روز قبل یادت می‌اندازیم — و یه سورپرایز کوچیک داریم! ☕';
+        restEl.innerHTML = '⏰ <strong>' + days + ' روز</strong> بعد از رست آماده است. وقتی به بهترین پنجره نوشیدن رسید یادت می‌اندازیم. ☕';
       } else {
         restEl.innerHTML = '⏰ <strong>Ready in ' + days + ' days.</strong> We\'ll remind you 2 days before — and we\'ll have a little surprise waiting for you at the café. ☕';
       }
@@ -1537,6 +1556,7 @@ function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
     reminder_wanted:  wantsReminder ? 'YES' : 'NO',
     order_status:     '',
     roastery_partner: '',
+    order_intent:     (document.querySelector('input[name="order_intent"]:checked') || {}).value || 'not_answered',
   };
   fetch(APPS_SCRIPT_URL, {
     method: 'POST',
@@ -1597,7 +1617,7 @@ const STRINGS = {
     'rest-card-text':     '⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند. آن‌ها را امروز ببرید — بهترین فنجان ارزش انتظار را دارد!',
     'chk-reminder-title': '☕ وقتی آماده شد یادم بینداز',
     'chk-reminder-note':  'چند روز دیگر که دانه‌ها آماده شدند ایمیل می‌زنیم',
-    'btn-email':          '📧 ارسال به ایمیلم',
+    'btn-email':          '📧 درخواست رست تازه',
     'success-msg':        '✅ ارسال شد! صندوق ورودی را چک کنید.',
     'btn-reset':          'از اول شروع کن',
     'title-roast-guide':  'راهنمای رست',
@@ -1641,15 +1661,24 @@ function setLang(lang) {
 }
 
 /* ── RESET ── */
+function selectIntent(radio) {
+  ['intent-yes-label','intent-maybe-label','intent-explore-label'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.border = '2px solid transparent';
+  });
+  const label = radio.closest('label');
+  if (label) label.style.border = '2px solid var(--caramel)';
+}
+
 function toggleRoastGuide() {
   const card = document.getElementById('roast-card');
   const btn  = document.querySelector('.staff-toggle');
   if (card.style.display === 'none') {
     card.style.display = 'block';
-    btn.textContent = '🔥 نمای کارکنان: راهنمای رست ▲';
+    btn.textContent = '🔥 نمای رستری: راهنمای رست ▲';
   } else {
     card.style.display = 'none';
-    btn.textContent = '🔥 نمای کارکنان: راهنمای رست ▼';
+    btn.textContent = '🔥 نمای رستری: راهنمای رست ▼';
   }
 }
 
