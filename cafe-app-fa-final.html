@@ -821,6 +821,18 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="success-msg" id="success-msg">
     ✅ Sent! Check your inbox.
   </div>
+  <!-- Blend suggestion -->
+  <div class="card" id="blend-card" style="display:none;border:2px solid var(--light-caramel);">
+    <div class="card-title" id="blend-card-title">✨ پیشنهاد ترکیب — Suggested Blend</div>
+    <div style="font-size:18px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;" id="r-blend-name"></div>
+    <div style="font-size:12px;color:var(--caramel);margin-bottom:12px;font-style:italic;" id="r-blend-detail"></div>
+    <div class="flavor-tags" id="r-blend-flavors" style="margin-bottom:12px;"></div>
+    <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;" id="r-blend-desc"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0EAE0;">
+      <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;direction:rtl;" id="r-blend-note"></div>
+    </div>
+  </div>
+
   <div style="background:#FDF5E8;border:1px solid #E8C99A;border-radius:16px;padding:18px 20px;margin-bottom:14px;text-align:center;">
     <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);margin-bottom:6px;direction:rtl">☕ هویت قهوه‌ات را ذخیره کن</div>
     <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;line-height:1.6;direction:rtl">دفعه بعد که آمدی، پروفایلت را اصلاح کن و ببین ذائقه‌ات چطور تغییر کرده.</div>
@@ -1045,6 +1057,67 @@ const BEANS = [
   }
 ];
 
+/* ── BLENDS ── */
+const BLENDS = [
+  {
+    id: 'morning_ritual',
+    name: 'Morning Ritual',
+    detail: '60% Brazil · 40% Colombia',
+    origin: 'South America Blend',
+    flavors: ['Milk Chocolate', 'Caramel', 'Hazelnut', 'Brown Sugar'],
+    roast: 'Medium',
+    brew: 'Espresso / French Press / Moka Pot',
+    temp: '88–92 °C',
+    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
+    roastInfo: { charge: '193°C', drop: '214°C', dtr: '24%', time: '12 min' },
+    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
+    desc: 'A smooth, low-acid blend built for daily ritual. Brazil brings chocolate and nuts while Colombia adds sweetness and balance. Forgiving and comforting.',
+    _isBlend: true, _blendName: 'Morning Ritual',
+    s: { floral:0, sweet:7.8, chocolatey:9.2, bold:4, light:1.8, medium:7.8, full:7.4,
+         energised:3.8, focused:5.8, creative:3.8, relaxed:9.2, reflective:7,
+         beginner:9.4, regular:8.4, enthusiast:5.4 },
+    brewScores: { v60:4, frenchpress:8, espresso:10, aeropress:5, coldbrew:6, other:6 }
+  },
+  {
+    id: 'bright_explorer',
+    name: 'Bright Explorer',
+    detail: '50% Yirgacheffe · 50% Kenya',
+    origin: 'East Africa Blend',
+    flavors: ['Jasmine', 'Blackcurrant', 'Citrus', 'Peach', 'Red Currant'],
+    roast: 'Light–Medium',
+    brew: 'V60 / AeroPress / Chemex',
+    temp: '91–95 °C',
+    ratio: '1g : 15–16g',
+    roastInfo: { charge: '190°C', drop: '206°C', dtr: '20%', time: '10 min' },
+    restDays: { filter: 7, espresso: 4, coldbrew: 7, default: 7 },
+    desc: 'Two of Africa\'s finest united. Yirgacheffe\'s jasmine meets Kenya\'s bold fruit — the result is a sparkling, complex cup that changes with every sip.',
+    _isBlend: true, _blendName: 'Bright Explorer',
+    s: { floral:7.5, sweet:4.5, chocolatey:1, bold:2, light:8.5, medium:6.5, full:1,
+         energised:8, focused:8, creative:8, relaxed:3.5, reflective:5.5,
+         beginner:4.5, regular:8, enthusiast:9.5 },
+    brewScores: { v60:10, frenchpress:2, espresso:2, aeropress:9, coldbrew:4, other:5 }
+  },
+  {
+    id: 'velvet_balance',
+    name: 'Velvet Balance',
+    detail: '40% Sumatra · 30% Colombia · 30% Brazil',
+    origin: 'Asia & Americas Blend',
+    flavors: ['Dark Chocolate', 'Cedar', 'Caramel', 'Walnut', 'Earthy'],
+    roast: 'Medium–Dark',
+    brew: 'French Press / Espresso / Moka Pot',
+    temp: '86–90 °C',
+    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
+    roastInfo: { charge: '194°C', drop: '215°C', dtr: '26%', time: '12 min' },
+    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
+    desc: 'A bold, heavy blend for those who want depth. Sumatra\'s earth anchors Colombia\'s sweetness and Brazil\'s chocolate. Intense, warming, memorable.',
+    _isBlend: true, _blendName: 'Velvet Balance',
+    s: { floral:0.6, sweet:5.6, chocolatey:7.9, bold:6.4, light:1.2, medium:5.4, full:8.1,
+         energised:3.1, focused:5.4, creative:3.6, relaxed:8.1, reflective:8.5,
+         beginner:5.7, regular:7.3, enthusiast:7.2 },
+    brewScores: { v60:2, frenchpress:10, espresso:8, aeropress:4, coldbrew:7, other:5 }
+  },
+];
+
 /* ── AVAILABLE BEANS ── */
 // هر دانه‌ای که موجود داری اینجا باشه
 // برای حذف: فقط اسمش رو پاک کن
@@ -1220,6 +1293,22 @@ function recommend() {
 
   // اگه دانه ایده‌آل موجود نبود، نزدیک‌ترین رو با پیام مشخص کن
   pick._idealName = (pick.id !== ideal.id) ? ideal.name : null;
+  pick._isBlend   = false;
+  pick._blendName = null;
+
+  const blendScored = BLENDS.map(b => {
+    let s = 0;
+    s += (b.s[ans.taste]      || 0) * 4.5;
+    s += (b.s[ans.body]       || 0) * 2.5;
+    s += (b.s[ans.state]      || 0) * 2;
+    s += (b.s[ans.experience] || 0) * 1;
+    if (ans.brew && b.brewScores && b.brewScores[ans.brew] !== undefined) {
+      s += b.brewScores[ans.brew] * 3;
+    }
+    return { b, score: s };
+  });
+  blendScored.sort((a, b) => b.score - a.score);
+  pick._suggestedBlend = blendScored[0].b;
 
   return pick;
 }
@@ -1315,6 +1404,28 @@ function render(b) {
         noteEl.textContent = "We\'ll surprise you in " + reminderIn + ' days — save your spot at the café!';
       }
     }
+  }
+
+  // نمایش blend پیشنهادی
+  const blendCard = document.getElementById('blend-card');
+  if (blendCard && b._suggestedBlend) {
+    const bl = b._suggestedBlend;
+    blendCard.style.display = 'block';
+    document.getElementById('r-blend-name').textContent   = bl.name;
+    document.getElementById('r-blend-detail').textContent = bl.detail + ' · ' + bl.origin;
+    document.getElementById('r-blend-desc').textContent   = bl.desc;
+    const blendNote = currentLang === 'fa'
+      ? '⚗️ ترکیب جداگانه — هر دانه جداگانه رست می‌شود و سپس ترکیب می‌شود. حداقل سفارش: ۵۰ گرم از هر دانه.'
+      : '⚗️ Component Blend — each bean roasted separately, then combined. Min. order: 50g per bean.';
+    document.getElementById('r-blend-note').textContent = blendNote;
+    const blendFlavors = document.getElementById('r-blend-flavors');
+    blendFlavors.innerHTML = '';
+    bl.flavors.forEach(f => {
+      const t = document.createElement('span');
+      t.className = 'flavor-tag';
+      t.textContent = f;
+      blendFlavors.appendChild(t);
+    });
   }
 
   // Reset email button
