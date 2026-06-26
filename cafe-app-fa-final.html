@@ -377,6 +377,17 @@ body.lang-fa .loading-en { display: none !important; }
 body.lang-en .option-fa,
 body.lang-en .q-text-fa,
 body.lang-en .loading-fa { display: none !important; }
+/* ── RESULT V3 ── */
+.result-identity-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
+.result-identity-label { font-size: 10px; letter-spacing: 4px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; }
+.result-identity-name { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 12px; }
+.match-score-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; }
+.match-score-bar { flex: 1; max-width: 160px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+.match-score-fill { height: 100%; background: var(--caramel); border-radius: 4px; }
+.match-score-pct { font-size: 13px; color: var(--light-caramel); font-family: 'Arial', sans-serif; font-weight: bold; }
+.today-match-label { font-size: 10px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 4px; }
+.why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
 /* RTL for Persian */
 body.lang-fa { direction: rtl; }
 body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
@@ -734,13 +745,29 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-result">
 
-  <div class="result-hero">
-    <div class="logo-icon" style="font-size:38px; margin-bottom:8px;">✨</div>
-    <div class="result-for" id="r-for"></div>
+  <!-- Coffee Identity Header -->
+  <div class="result-identity-header">
+    <div class="result-identity-label">هویت قهوه شما</div>
+    <div class="result-identity-name" id="r-identity-name">—</div>
+    <div class="identity-badge" id="r-identity-badge" style="justify-content:center;margin-top:10px;"></div>
+    <div class="match-score-wrap">
+      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%;"></div></div>
+      <div class="match-score-pct"><span id="r-match-pct">—</span> تطابق</div>
+    </div>
+  </div>
+
+  <!-- Today's Match -->
+  <div style="text-align:center;padding:4px 0 16px;direction:rtl;">
+    <div class="today-match-label">پیشنهاد امروز</div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
-    <div class="identity-badge" id="r-identity-badge"></div>
-    <div id="r-alt-badge" style="display:none;margin-top:12px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
+    <div id="r-alt-badge" style="display:none;margin-top:10px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
+  </div>
+
+  <!-- Why this coffee -->
+  <div class="card" id="why-card">
+    <div class="card-title" style="direction:rtl">چرا این قهوه؟</div>
+    <div id="why-list"></div>
   </div>
 
   <!-- Flavors -->
@@ -1322,6 +1349,7 @@ function recommend() {
   const pick = available ? available.b : ideal;
 
   // اگه دانه ایده‌آل موجود نبود، نزدیک‌ترین رو با پیام مشخص کن
+  pick._rawScore  = scored[0].score;
   pick._idealName = (pick.id !== ideal.id) ? ideal.name : null;
   pick._isBlend   = false;
   pick._blendName = null;
@@ -1375,27 +1403,6 @@ function render(b) {
   }
   document.getElementById('r-desc').textContent  = b.desc;
 
-  const identityBadge = document.getElementById('r-identity-badge');
-  if (identityBadge) {
-    identityBadge.innerHTML = '';
-    const stateLabel = {
-      energised:'پرانرژی', focused:'متمرکز', creative:'خلاق',
-      relaxed:'آرام', reflective:'تأملی'
-    }[ans.state] || '';
-    const tasteLabel = {
-      floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند'
-    }[ans.taste] || '';
-    const brewLabel = {
-      v60:'Pour Over', frenchpress:'فرنچ پرس', espresso:'اسپرسو',
-      aeropress:'ایروپرس', coldbrew:'کولد برو', other:'انعطاف‌پذیر'
-    }[ans.brew] || '';
-    [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean).forEach(tag => {
-      const span = document.createElement('span');
-      span.className = 'identity-tag';
-      span.textContent = tag;
-      identityBadge.appendChild(span);
-    });
-  }
   const tags = document.getElementById('r-flavors');
   tags.innerHTML = '';
   b.flavors.forEach(f => {
@@ -1433,6 +1440,74 @@ function render(b) {
       } else {
         noteEl.textContent = "We\'ll surprise you in " + reminderIn + ' days — save your spot at the café!';
       }
+    }
+  }
+
+  // ─── Coffee Identity Name FA ───
+  const stateLabel = {
+    energised:'پرانرژی', focused:'متمرکز', creative:'خلاق',
+    relaxed:'آرام', reflective:'تأملی'
+  }[ans.state] || '';
+  const tasteLabel = {
+    floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند'
+  }[ans.taste] || '';
+  const brewLabel = {
+    v60:'Pour Over', frenchpress:'فرنچ پرس', espresso:'اسپرسو',
+    aeropress:'ایروپرس', coldbrew:'کولد برو', other:'انعطاف‌پذیر'
+  }[ans.brew] || '';
+
+  const IDENTITY_NAMES_FA = {
+    'floral+creative':'کاشف خلاق', 'floral+energised':'رویاپرداز صبحگاهی',
+    'floral+focused':'هنرمند متمرکز', 'floral+relaxed':'روح لطیف',
+    'floral+reflective':'متفکر آرام', 'sweet+creative':'خالق شادمان',
+    'sweet+energised':'آغازگر روشن', 'sweet+focused':'ذهن پایدار',
+    'sweet+relaxed':'نوشنده راحت', 'sweet+reflective':'رویاپرداز گرم',
+    'chocolatey+creative':'بینشور جسور', 'chocolatey+energised':'دمنوش قدرت',
+    'chocolatey+focused':'کارگر عمیق', 'chocolatey+relaxed':'دنباله‌رو آرامش',
+    'chocolatey+reflective':'جغد شب', 'bold+creative':'کاشف وحشی',
+    'bold+energised':'آغازگر قوی', 'bold+focused':'متفکر شدید',
+    'bold+relaxed':'عاشق طبیعت', 'bold+reflective':'فیلسوف عمیق',
+  };
+  const identityKey = (ans.taste||'')+'+' +(ans.state||'');
+  const idNameEl = document.getElementById('r-identity-name');
+  if (idNameEl) idNameEl.textContent = IDENTITY_NAMES_FA[identityKey] || 'کاشف قهوه';
+
+  const identityBadge = document.getElementById('r-identity-badge');
+  if (identityBadge) {
+    identityBadge.innerHTML = '';
+    [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean).forEach(tag => {
+      const span = document.createElement('span');
+      span.className = 'identity-tag';
+      span.textContent = tag;
+      identityBadge.appendChild(span);
+    });
+  }
+
+  const maxPossible = 10*4.5+10*2.5+10*2+10*1+30+20;
+  const matchPct = Math.min(Math.round((b._rawScore||80)/maxPossible*100+40),98);
+  const fillEl = document.getElementById('r-match-fill');
+  const pctEl  = document.getElementById('r-match-pct');
+  if (fillEl) fillEl.style.width = matchPct+'%';
+  if (pctEl)  pctEl.textContent  = matchPct+'%';
+
+  const whyCard = document.getElementById('why-card');
+  if (whyCard) {
+    const reasons = [];
+    if (ans.taste==='floral')     reasons.push('با ذائقه گلی شما مطابقت دارد');
+    if (ans.taste==='sweet')      reasons.push('با ذائقه شیرین شما مطابقت دارد');
+    if (ans.taste==='chocolatey') reasons.push('با ذائقه شکلاتی شما مطابقت دارد');
+    if (ans.taste==='bold')       reasons.push('با ذائقه تند شما مطابقت دارد');
+    if (ans.state) reasons.push('ایده‌آل برای لحظات ' + (stateLabel||ans.state));
+    if (ans.brew)  reasons.push('مناسب برای ' + (brewLabel||ans.brew));
+    if (ans.body==='light')  reasons.push('بدن سبک — مانند چای، شفاف');
+    if (ans.body==='medium') reasons.push('بدن متوسط — صاف و متعادل');
+    if (ans.body==='full')   reasons.push('بدن سنگین — غنی و پوشاننده');
+    const whyList = document.getElementById('why-list');
+    if (whyList) {
+      whyList.innerHTML = '';
+      reasons.slice(0,4).forEach(r => {
+        whyList.innerHTML += '<div class="why-item"><div class="why-check">✓</div><span>'+r+'</span></div>';
+      });
     }
   }
 
