@@ -1428,11 +1428,14 @@ function recommend() {
 }
 
 /* ── RENDER RESULT ── */
+function setEl(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
+function setHtml(id, val) { const e = document.getElementById(id); if(e) e.innerHTML = val; }
+
 function render(b) {
   const firstName = name.split(' ')[0];
   document.getElementById('r-for').textContent  = currentLang === 'fi' ? firstName + ' varten' : 'For ' + firstName;
-  document.getElementById('r-name').textContent = b.name;
-  document.getElementById('r-origin').textContent = b.detail + ' · ' + b.origin;
+  setEl('r-name', b.name);
+  setEl('r-origin', b.detail + ' · ' + b.origin);
 
   // اگه alternative هست، badge نشون بده
   const altBadge = document.getElementById('r-alt-badge');
@@ -1447,17 +1450,17 @@ function render(b) {
       altBadge.style.display = 'none';
     }
   }
-  document.getElementById('r-roast').textContent = b.roast;
-  document.getElementById('r-brew').textContent  = b.brew;
-  document.getElementById('r-temp').textContent  = b.temp;
-  document.getElementById('r-ratio').textContent  = b.ratio || '1g : 15g';
+  setEl('r-roast', b.roast);
+  setEl('r-brew', b.brew);
+  setEl('r-temp', b.temp);
+  setEl('r-ratio', b.ratio || '1g : 15g');
   if (b.roastInfo) {
-    document.getElementById('r-charge').textContent = b.roastInfo.charge;
-    document.getElementById('r-drop').textContent   = b.roastInfo.drop;
-    document.getElementById('r-time').textContent   = b.roastInfo.time;
-    document.getElementById('r-dtr').textContent    = b.roastInfo.dtr;
+    setEl('r-charge', b.roastInfo.charge);
+    setEl('r-drop', b.roastInfo.drop);
+    setEl('r-time', b.roastInfo.time);
+    setEl('r-dtr', b.roastInfo.dtr);
   }
-  document.getElementById('r-desc').textContent  = b.desc;
+  setEl('r-desc', b.desc);
 
   // ─── Coffee Identity Name ───
   const stateLabel = {
