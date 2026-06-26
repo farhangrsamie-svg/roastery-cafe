@@ -1431,9 +1431,12 @@ function recommend() {
 function setEl(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
 function setHtml(id, val) { const e = document.getElementById(id); if(e) e.innerHTML = val; }
 
+function setEl(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
+function setHtml(id, val) { const e = document.getElementById(id); if(e) e.innerHTML = val; }
+
 function render(b) {
   const firstName = name.split(' ')[0];
-  document.getElementById('r-for').textContent  = currentLang === 'fi' ? firstName + ' varten' : 'For ' + firstName;
+  setEl('r-for', currentLang === 'fi' ? firstName + ' varten' : 'For ' + firstName);
   setEl('r-name', b.name);
   setEl('r-origin', b.detail + ' · ' + b.origin);
 
