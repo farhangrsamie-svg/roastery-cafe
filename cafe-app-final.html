@@ -368,6 +368,84 @@ body {
   color: white;
 }
 
+/* ── RESULT V3 ── */
+.result-identity-header {
+  background: var(--medium-brown);
+  margin: 0 -28px;
+  padding: 24px 28px 20px;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.result-identity-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--caramel);
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 6px;
+}
+.result-identity-name {
+  font-size: 26px;
+  font-weight: bold;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+.match-score-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px 0 0;
+}
+.match-score-bar {
+  flex: 1;
+  max-width: 160px;
+  height: 5px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.match-score-fill {
+  height: 100%;
+  background: var(--caramel);
+  border-radius: 4px;
+}
+.match-score-pct {
+  font-size: 13px;
+  color: var(--light-caramel);
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+}
+.today-match-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--caramel);
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 4px;
+}
+.why-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  font-size: 13px;
+  color: var(--medium-brown);
+  font-family: 'Arial', sans-serif;
+}
+.why-check {
+  width: 20px;
+  height: 20px;
+  background: #E8F5E8;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  color: #3A7A3A;
+}
+
 /* CSS-driven language visibility */
 body.lang-fi .en-only { display: none !important; }
 body.lang-en .fi-only { display: none !important; }
@@ -732,13 +810,29 @@ body.lang-en .loading-fi { display: none !important; }
 ══════════════════════════════════════ -->
 <div class="screen" id="screen-result">
 
-  <div class="result-hero">
-    <div class="logo-icon" style="font-size:38px; margin-bottom:8px;">✨</div>
-    <div class="result-for" id="r-for"></div>
+  <!-- Coffee Identity Header -->
+  <div class="result-identity-header">
+    <div class="result-identity-label" id="lbl-your-identity">Your Coffee Identity</div>
+    <div class="result-identity-name" id="r-identity-name">—</div>
+    <div class="identity-badge" id="r-identity-badge" style="justify-content:center;margin-top:10px;"></div>
+    <div class="match-score-wrap">
+      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%;"></div></div>
+      <div class="match-score-pct"><span id="r-match-pct">—</span> Match</div>
+    </div>
+  </div>
+
+  <!-- Today's Match -->
+  <div style="text-align:center;padding:4px 0 16px;">
+    <div class="today-match-label" id="lbl-today-match">Today's Match</div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
-    <div class="identity-badge" id="r-identity-badge"></div>
-    <div id="r-alt-badge" style="display:none;margin-top:12px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
+    <div id="r-alt-badge" style="display:none;margin-top:10px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
+  </div>
+
+  <!-- Why this coffee -->
+  <div class="card" id="why-card">
+    <div class="card-title">Why this coffee?</div>
+    <div id="why-list"></div>
   </div>
 
   <!-- Flavors -->
@@ -1310,6 +1404,7 @@ function recommend() {
   const pick = available ? available.b : ideal;
 
   // اگه دانه ایده‌آل موجود نبود، نزدیک‌ترین رو با پیام مشخص کن
+  pick._rawScore  = scored[0].score;
   pick._idealName = (pick.id !== ideal.id) ? ideal.name : null;
   pick._isBlend   = false;
   pick._blendName = null;
@@ -1364,29 +1459,88 @@ function render(b) {
   }
   document.getElementById('r-desc').textContent  = b.desc;
 
-  // Coffee Identity Badge
+  // ─── Coffee Identity Name ───
+  const stateLabel = {
+    energised:'Energised', focused:'Focused', creative:'Creative',
+    relaxed:'Relaxed', reflective:'Reflective'
+  }[ans.state] || '';
+  const tasteLabel = {
+    floral:'Floral', sweet:'Sweet', chocolatey:'Chocolatey', bold:'Bold'
+  }[ans.taste] || '';
+  const brewLabel = {
+    v60:'Pour Over', frenchpress:'French Press', espresso:'Espresso',
+    aeropress:'AeroPress', coldbrew:'Cold Brew', other:'Flexible'
+  }[ans.brew] || '';
+
+  // نام هویت بر اساس ترکیب taste + state
+  const IDENTITY_NAMES = {
+    'floral+creative':   'The Creative Explorer',
+    'floral+energised':  'The Morning Dreamer',
+    'floral+focused':    'The Focused Artist',
+    'floral+relaxed':    'The Gentle Soul',
+    'floral+reflective': 'The Quiet Thinker',
+    'sweet+creative':    'The Joyful Creator',
+    'sweet+energised':   'The Bright Starter',
+    'sweet+focused':     'The Steady Mind',
+    'sweet+relaxed':     'The Easy Drinker',
+    'sweet+reflective':  'The Warm Dreamer',
+    'chocolatey+creative':   'The Bold Visionary',
+    'chocolatey+energised':  'The Power Brewer',
+    'chocolatey+focused':    'The Deep Worker',
+    'chocolatey+relaxed':    'The Comfort Seeker',
+    'chocolatey+reflective': 'The Night Owl',
+    'bold+creative':    'The Wild Explorer',
+    'bold+energised':   'The Strong Starter',
+    'bold+focused':     'The Intense Thinker',
+    'bold+relaxed':     'The Earth Lover',
+    'bold+reflective':  'The Deep Philosopher',
+  };
+  const identityKey = (ans.taste || '') + '+' + (ans.state || '');
+  const identityName = IDENTITY_NAMES[identityKey] || 'The Coffee Explorer';
+  const identityNameEl = document.getElementById('r-identity-name');
+  if (identityNameEl) identityNameEl.textContent = identityName;
+
+  // ─── Identity Badge ───
   const identityBadge = document.getElementById('r-identity-badge');
   if (identityBadge) {
     identityBadge.innerHTML = '';
-    // تعیین identity tags بر اساس پاسخ‌ها
-    const stateLabel = {
-      energised: 'Energised', focused: 'Focused', creative: 'Creative',
-      relaxed: 'Relaxed', reflective: 'Reflective'
-    }[ans.state] || '';
-    const tasteLabel = {
-      floral: 'Floral', sweet: 'Sweet', chocolatey: 'Chocolatey', bold: 'Bold'
-    }[ans.taste] || '';
-    const brewLabel = {
-      v60: 'Pour Over', frenchpress: 'French Press', espresso: 'Espresso',
-      aeropress: 'AeroPress', coldbrew: 'Cold Brew', other: 'Flexible'
-    }[ans.brew] || '';
-    const tags = [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean);
-    tags.forEach(tag => {
+    [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean).forEach(tag => {
       const span = document.createElement('span');
       span.className = 'identity-tag';
       span.textContent = tag;
       identityBadge.appendChild(span);
     });
+  }
+
+  // ─── Match Score ───
+  // محاسبه یه score نرمال‌شده برای نمایش به مشتری
+  const maxPossible = 10*4.5 + 10*2.5 + 10*2 + 10*1 + 30 + 20; // max theoretical
+  const matchPct = Math.min(Math.round((b._rawScore || 80) / maxPossible * 100 + 40), 98);
+  const fillEl = document.getElementById('r-match-fill');
+  const pctEl  = document.getElementById('r-match-pct');
+  if (fillEl) fillEl.style.width = matchPct + '%';
+  if (pctEl)  pctEl.textContent  = matchPct + '%';
+
+  // ─── Why this coffee? ───
+  const whyCard = document.getElementById('why-card');
+  if (whyCard) {
+    const reasons = [];
+    if (ans.taste === 'floral')      reasons.push('Matches your floral taste preference');
+    if (ans.taste === 'sweet')       reasons.push('Matches your sweet taste preference');
+    if (ans.taste === 'chocolatey')  reasons.push('Matches your chocolatey taste preference');
+    if (ans.taste === 'bold')        reasons.push('Matches your bold taste preference');
+    if (ans.state)  reasons.push('Ideal for ' + (stateLabel || ans.state).toLowerCase() + ' moments');
+    if (ans.brew)   reasons.push('Perfect for ' + (brewLabel || ans.brew));
+    if (ans.body === 'light')  reasons.push('Light body — tea-like and delicate');
+    if (ans.body === 'medium') reasons.push('Medium body — smooth and balanced');
+    if (ans.body === 'full')   reasons.push('Full body — rich and coating');
+    const whyList = document.getElementById('why-list');
+    if (whyList) {
+      whyList.innerHTML = '';
+      reasons.slice(0,4).forEach(r => {
+        whyList.innerHTML += '<div class="why-item"><div class="why-check">✓</div><span>' + r + '</span></div>';
+      });
+    }
   }
   const tags = document.getElementById('r-flavors');
   tags.innerHTML = '';
