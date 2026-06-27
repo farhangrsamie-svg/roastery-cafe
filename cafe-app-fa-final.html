@@ -2,17 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-  <!-- PWA -->
-  <link rel="manifest" href="manifest-fa.json">
-  <meta name="theme-color" content="#6B3F2A">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="روستری کافه">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>هویت قهوه — سفر شخصی رست</title>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>هویت قهوه — پلتفرم رست شخصی</title>
 <style>
 :root {
   --cream: #F5F0E8;
@@ -23,10 +14,10 @@
   --white: #FEFEFE;
   --shadow: rgba(44, 26, 14, 0.12);
   --shadow-strong: rgba(44, 26, 14, 0.25);
+  --green: #3A7A3A;
+  --green-bg: #EAF5EA;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
 body {
   font-family: 'Georgia', 'Times New Roman', serif;
   background: var(--cream);
@@ -34,350 +25,99 @@ body {
   color: var(--dark-brown);
   overflow-x: hidden;
 }
-
-.app-container {
-  max-width: 680px;
-  margin: 0 auto;
-  min-height: 100vh;
-}
+.app-container { max-width: 680px; margin: 0 auto; min-height: 100vh; }
 
 /* ── SCREENS ── */
 .screen {
-  display: none;
-  min-height: 100vh;
-  padding: 40px 28px 36px;
-  flex-direction: column;
-  animation: fadeUp 0.35s ease;
+  display: none; min-height: 100vh; padding: 40px 28px 36px;
+  flex-direction: column; animation: fadeUp 0.35s ease;
 }
 .screen.active { display: flex; }
-
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 .spacer { flex: 1; }
 
-/* ── LOGO / HEADER ── */
-.logo { text-align: center; margin-bottom: 36px; }
+/* ── LOGO ── */
+.logo { text-align: center; margin-bottom: 32px; }
 .logo-icon { font-size: 52px; margin-bottom: 10px; line-height: 1; }
-.logo h1 {
-  font-size: 26px;
-  color: var(--medium-brown);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  font-weight: normal;
-}
-.logo-sub {
-  font-size: 11px;
-  color: var(--caramel);
-  letter-spacing: 5px;
-  text-transform: uppercase;
-  margin-top: 6px;
-}
-
-/* ── WELCOME ── */
-.welcome-desc {
-  text-align: center;
-  font-size: 17px;
-  color: var(--medium-brown);
-  line-height: 1.7;
-  margin-bottom: 36px;
-}
-.welcome-desc em {
-  display: block;
-  font-size: 13px;
-  color: var(--caramel);
-  margin-top: 6px;
-}
+.logo h1 { font-size: 26px; color: var(--medium-brown); letter-spacing: 4px; text-transform: uppercase; font-weight: normal; }
+.logo-sub { font-size: 11px; color: var(--caramel); letter-spacing: 5px; text-transform: uppercase; margin-top: 6px; }
 
 /* ── INPUTS ── */
 .input-group { margin-bottom: 18px; }
-.input-label {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--caramel);
-  margin-bottom: 8px;
-  font-family: 'Arial', sans-serif;
-}
+.input-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 8px; font-family: 'Arial', sans-serif; }
 .input-field {
-  width: 100%;
-  padding: 16px 20px;
-  border: 2px solid #DDD5C2;
-  border-radius: 14px;
-  font-size: 17px;
-  background: var(--white);
-  color: var(--dark-brown);
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-  font-family: inherit;
-  -webkit-appearance: none;
+  width: 100%; padding: 16px 20px; border: 2px solid #DDD5C2; border-radius: 14px;
+  font-size: 17px; background: var(--white); color: var(--dark-brown); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; -webkit-appearance: none;
 }
-.input-field:focus {
-  border-color: var(--caramel);
-  box-shadow: 0 0 0 4px rgba(196,149,106,0.15);
-}
+.input-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
 .input-field.error { border-color: #C0392B; }
 
 /* ── PROGRESS ── */
 .progress-wrap { margin-bottom: 28px; }
-.progress-label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--caramel);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  font-family: 'Arial', sans-serif;
-  margin-bottom: 8px;
-}
-.progress-bar {
-  background: #DDD5C2;
-  border-radius: 4px;
-  height: 3px;
-  overflow: hidden;
-}
-.progress-fill {
-  background: var(--caramel);
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.4s ease;
-}
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--caramel); letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 8px; }
+.progress-bar { background: #DDD5C2; border-radius: 4px; height: 3px; overflow: hidden; }
+.progress-fill { background: var(--caramel); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 
-/* ── QUESTION HEADER ── */
+/* ── QUESTION ── */
 .q-header { margin-bottom: 28px; }
-.q-text-en {
-  font-size: 22px;
-  color: var(--dark-brown);
-  margin-bottom: 4px;
-  line-height: 1.3;
-}
-.q-text-fi {
-  font-size: 14px;
-  color: var(--medium-brown);
-  font-style: italic;
-}
+.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 4px; line-height: 1.3; }
+.q-text-fa { font-size: 14px; color: var(--medium-brown); font-style: italic; }
 
 /* ── OPTION CARDS ── */
 .options { display: grid; gap: 12px; }
 .options.cols-2 { grid-template-columns: 1fr 1fr; }
 .options.cols-1 { grid-template-columns: 1fr; }
-
 .option-card {
-  background: var(--white);
-  border: 2px solid transparent;
-  border-radius: 18px;
-  padding: 18px 14px;
-  cursor: pointer;
-  transition: all 0.18s ease;
-  box-shadow: 0 2px 10px var(--shadow);
-  text-align: center;
-  user-select: none;
-  -webkit-user-select: none;
+  background: var(--white); border: 2px solid transparent; border-radius: 18px;
+  padding: 18px 14px; cursor: pointer; transition: all 0.18s ease;
+  box-shadow: 0 2px 10px var(--shadow); text-align: center;
+  user-select: none; -webkit-user-select: none;
 }
 .option-card:active { transform: scale(0.96); }
-.option-card.selected {
-  border-color: var(--caramel);
-  background: #FDF5E8;
-  box-shadow: 0 4px 20px rgba(196,149,106,0.28);
-}
+.option-card.selected { border-color: var(--caramel); background: #FDF5E8; box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
 .option-card.full-row { grid-column: span 2; }
-
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
-.option-fi { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
+.option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
 .option-desc { font-size: 10px; color: #AAA; margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
 .btn-primary {
-  background: var(--medium-brown);
-  color: var(--white);
-  border: none;
-  border-radius: 50px;
-  padding: 17px 40px;
-  font-size: 14px;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  cursor: pointer;
-  width: 100%;
-  transition: all 0.2s;
-  box-shadow: 0 4px 18px rgba(107,63,42,0.30);
-  -webkit-appearance: none;
+  background: var(--medium-brown); color: var(--white); border: none; border-radius: 50px;
+  padding: 17px 40px; font-size: 14px; font-family: 'Arial', sans-serif;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer; width: 100%;
+  transition: all 0.2s; box-shadow: 0 4px 18px rgba(107,63,42,0.30); -webkit-appearance: none;
 }
 .btn-primary:hover:not(:disabled) { background: var(--dark-brown); transform: translateY(-1px); }
 .btn-primary:active:not(:disabled) { transform: scale(0.98); }
 .btn-primary:disabled { background: #C8BFB5; box-shadow: none; cursor: default; }
-
-.btn-ghost {
-  background: transparent;
-  color: var(--caramel);
-  border: 2px solid var(--light-caramel);
-  box-shadow: none;
-}
+.btn-ghost { background: transparent; color: var(--caramel); border: 2px solid var(--light-caramel); box-shadow: none; }
 .btn-ghost:hover:not(:disabled) { background: #FDF5E8; transform: none; }
-
-.btn-back {
-  background: transparent;
-  border: none;
-  color: var(--caramel);
-  font-size: 13px;
-  cursor: pointer;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 1px;
-  padding: 6px 0;
-  margin-bottom: 14px;
-  display: inline-block;
-}
+.btn-back { background: transparent; border: none; color: var(--caramel); font-size: 13px; cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; padding: 6px 0; margin-bottom: 14px; display: inline-block; }
 
 /* ── LOADING ── */
 #screen-loading {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: var(--cream);
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  animation: fadeUp 0.3s ease;
+  display: none; position: fixed; inset: 0; background: var(--cream);
+  flex-direction: column; align-items: center; justify-content: center; z-index: 100;
 }
 #screen-loading.visible { display: flex; }
 .spinner { font-size: 60px; animation: roast 1.8s ease-in-out infinite; }
 @keyframes roast {
-  0%   { transform: rotate(0deg) scale(1); }
-  25%  { transform: rotate(15deg) scale(1.05); }
-  50%  { transform: rotate(0deg) scale(1); }
-  75%  { transform: rotate(-15deg) scale(1.05); }
-  100% { transform: rotate(0deg) scale(1); }
+  0%,100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.05); }
+  75% { transform: rotate(-15deg) scale(1.05); }
 }
-.loading-en { font-size: 20px; color: var(--medium-brown); margin-top: 24px; }
-.loading-fi { font-size: 13px; color: var(--caramel); margin-top: 6px; font-style: italic; }
+.loading-text { font-size: 18px; color: var(--medium-brown); margin-top: 24px; text-align: center; }
+
+/* ── CARD ── */
+.card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; }
+.card-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
 
 /* ── RESULT ── */
-.result-hero {
-  text-align: center;
-  margin-bottom: 20px;
-}
-.result-for {
-  font-size: 11px;
-  letter-spacing: 4px;
-  color: var(--caramel);
-  text-transform: uppercase;
-  font-family: 'Arial', sans-serif;
-  margin-bottom: 4px;
-}
-.result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
-.result-origin { font-size: 13px; color: var(--caramel); margin-top: 4px; font-style: italic; }
-
-.card {
-  background: var(--white);
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 4px 20px var(--shadow);
-  margin-bottom: 14px;
-}
-.card-title {
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--caramel);
-  font-family: 'Arial', sans-serif;
-  margin-bottom: 14px;
-}
-
-.flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.flavor-tag {
-  background: #FDF5E8;
-  border: 1px solid var(--light-caramel);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 12px;
-  color: var(--medium-brown);
-  font-family: 'Arial', sans-serif;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 0;
-  border-bottom: 1px solid #F0EAE0;
-  font-family: 'Arial', sans-serif;
-}
-.info-row:last-child { border-bottom: none; }
-.info-label { font-size: 12px; color: #AAA; }
-.info-value { font-size: 13px; font-weight: bold; color: var(--dark-brown); text-align: right; max-width: 60%; }
-
-.result-desc { font-size: 14px; line-height: 1.75; color: var(--medium-brown); }
-
-.rest-card {
-  background: #FDF5E8;
-  border: 1px solid var(--light-caramel);
-  border-radius: 16px;
-  padding: 18px 20px;
-  margin-bottom: 14px;
-}
-.rest-card p { font-size: 13px; color: var(--medium-brown); line-height: 1.7; font-family: 'Arial', sans-serif; }
-
-.success-msg {
-  background: #EAF5EA;
-  border-radius: 12px;
-  padding: 14px 20px;
-  text-align: center;
-  color: #3A7A3A;
-  font-size: 13px;
-  margin-top: 10px;
-  display: none;
-  font-family: 'Arial', sans-serif;
-  border: 1px solid #C0DEC0;
-}
-.success-msg.visible { display: block; }
-
-/* ── DIVIDER ── */
-.divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
-
-/* ── LANGUAGE TOGGLE ── */
-.lang-toggle {
-  position: fixed;
-  top: 14px;
-  right: 14px;
-  z-index: 9999;
-  display: flex;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(44,26,14,0.18);
-  border: 1px solid var(--light-caramel);
-}
-.lang-btn {
-  padding: 7px 13px;
-  font-size: 13px;
-  font-family: 'Arial', sans-serif;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  background: var(--white);
-  color: var(--medium-brown);
-  transition: background 0.2s, color 0.2s;
-  line-height: 1;
-}
-.lang-btn.active {
-  background: var(--caramel);
-  color: white;
-}
-
-/* CSS-driven language visibility */
-body.lang-fa .en-only { display: none !important; }
-body.lang-en .fa-only { display: none !important; }
-body.lang-fa .option-en,
-body.lang-fa .q-text-en,
-body.lang-fa .loading-en { display: none !important; }
-body.lang-en .option-fa,
-body.lang-en .q-text-fa,
-body.lang-en .loading-fa { display: none !important; }
-/* ── RESULT V3 ── */
 .result-identity-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
 .result-identity-label { font-size: 10px; letter-spacing: 4px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; }
 .result-identity-name { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 12px; }
@@ -385,93 +125,225 @@ body.lang-en .loading-fa { display: none !important; }
 .match-score-bar { flex: 1; max-width: 160px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
 .match-score-fill { height: 100%; background: var(--caramel); border-radius: 4px; }
 .match-score-pct { font-size: 13px; color: var(--light-caramel); font-family: 'Arial', sans-serif; font-weight: bold; }
-.today-match-label { font-size: 10px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 4px; }
+.result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
+.result-origin { font-size: 13px; color: var(--caramel); margin-top: 4px; font-style: italic; }
+.flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.flavor-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 12px; color: #AAA; }
+.info-value { font-size: 13px; font-weight: bold; color: var(--dark-brown); text-align: right; max-width: 60%; }
+.result-desc { font-size: 14px; line-height: 1.75; color: var(--medium-brown); }
 .why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
-/* RTL for Persian */
+.identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+.identity-tag { background: var(--medium-brown); color: var(--white); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-family: 'Arial', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
+
+/* ── LANG TOGGLE ── */
+.lang-toggle { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 10px rgba(44,26,14,0.18); border: 1px solid var(--light-caramel); }
+.lang-btn { padding: 7px 13px; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; border: none; background: var(--white); color: var(--medium-brown); transition: background 0.2s, color 0.2s; line-height: 1; }
+.lang-btn.active { background: var(--caramel); color: white; }
+
+/* ── CSS LANG VISIBILITY ── */
+body.lang-fa .en-only { display: none !important; }
+body.lang-en .fa-only { display: none !important; }
+body.lang-fa .option-en, body.lang-fa .q-text-en, body.lang-fa .loading-en { display: none !important; }
+body.lang-en .option-fa, body.lang-en .q-text-fa, body.lang-fa .loading-fa { display: none !important; }
 body.lang-fa { direction: rtl; }
 body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
-/* Coffee Identity Badge */
-.identity-badge {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin: 12px 0 4px;
-}
-.identity-tag {
-  background: var(--medium-brown);
-  color: var(--white);
-  border-radius: 20px;
-  padding: 5px 14px;
-  font-size: 11px;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.staff-toggle {
-  background: transparent;
-  border: 1px dashed var(--light-caramel);
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 11px;
-  color: var(--caramel);
-  cursor: pointer;
-  font-family: 'Arial', sans-serif;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  display: block;
-  width: 100%;
-  text-align: center;
-}
+
+/* ── SUCCESS MSG ── */
+.success-msg { background: var(--green-bg); border-radius: 12px; padding: 14px 20px; text-align: center; color: var(--green); font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #C0DEC0; }
+.success-msg.visible { display: block; }
+.error-msg { background: #FFF0F0; border-radius: 12px; padding: 14px 20px; text-align: center; color: #C0392B; font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #F0C0C0; }
+.error-msg.visible { display: block; }
+
+/* ── AUTH SCREEN ── */
+.auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: 12px; overflow: hidden; border: 2px solid #DDD5C2; }
+.auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; background: var(--white); color: var(--caramel); border: none; transition: all 0.2s; }
+.auth-tab.active { background: var(--medium-brown); color: var(--white); }
+.otp-hint { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; text-align: center; margin-top: 8px; line-height: 1.6; }
+
+/* ── DASHBOARD ── */
+.dash-header { background: var(--medium-brown); margin: 0 -28px; padding: 28px 28px 24px; margin-bottom: 24px; }
+.dash-welcome { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 4px; }
+.dash-name { font-size: 22px; font-weight: bold; color: var(--white); }
+.dash-phone { font-size: 12px; color: var(--light-caramel); margin-top: 4px; font-family: 'Arial', sans-serif; direction: ltr; }
+.dash-logout { font-size: 11px; color: var(--caramel); background: transparent; border: 1px solid var(--caramel); border-radius: 20px; padding: 4px 12px; cursor: pointer; font-family: 'Arial', sans-serif; margin-top: 10px; }
+.dash-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
+.profile-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
+.profile-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
+.profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
+.profile-card-date { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; }
+.profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.profile-card-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 12px; padding: 3px 10px; font-size: 10px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
+.order-card-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: 'Arial', sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
+.status-paid { background: var(--green-bg); color: var(--green); border: 1px solid #C0DEC0; }
+.status-shipped { background: #E8F0FF; color: #3A5FBF; border: 1px solid #C0D0FF; }
+.empty-state { text-align: center; padding: 40px 20px; color: #AAA; font-family: 'Arial', sans-serif; font-size: 14px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ── ORDER SCREEN ── */
+.amount-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.amount-card { background: var(--white); border: 2px solid transparent; border-radius: 18px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px var(--shadow); }
+.amount-card.selected { border-color: var(--caramel); background: #FDF5E8; }
+.amount-card:active { transform: scale(0.96); }
+.amount-g { font-size: 28px; font-weight: bold; color: var(--dark-brown); }
+.amount-label { font-size: 11px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 4px; }
+.textarea-field { width: 100%; padding: 14px 18px; border: 2px solid #DDD5C2; border-radius: 14px; font-size: 15px; background: var(--white); color: var(--dark-brown); outline: none; transition: border-color 0.2s; font-family: inherit; resize: vertical; min-height: 90px; direction: rtl; }
+.textarea-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
+.order-summary { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
+.order-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; font-family: 'Arial', sans-serif; }
+.order-summary-label { color: #AAA; }
+.order-summary-value { font-weight: bold; color: var(--dark-brown); text-align: left; direction: ltr; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
 </style>
 </head>
-<body class="lang-en">
+<body class="lang-fa">
 
 <!-- Language Toggle -->
 <div class="lang-toggle">
-  <button class="lang-btn active" id="btn-lang-en" onclick="setLang('en')">🇬🇧 EN</button>
-  <button class="lang-btn"        id="btn-lang-fa" onclick="setLang('fa')">🇮🇷 FA</button>
+  <button class="lang-btn" id="btn-lang-en" onclick="setLang('en')">🇬🇧 EN</button>
+  <button class="lang-btn active" id="btn-lang-fa" onclick="setLang('fa')">🇮🇷 FA</button>
 </div>
 
 <div class="app-container">
 
-<!-- ══════════════════════════════════════
-     SCREEN: WELCOME
-══════════════════════════════════════ -->
-<div class="screen active" id="screen-welcome">
+<!-- ══════ SCREEN: AUTH ══════ -->
+<div class="screen active" id="screen-auth">
   <div class="logo">
     <div class="logo-icon">☕</div>
-    <h1>Roastery Café</h1>
-    <div class="logo-sub">پروفایل رست شخصی</div>
+    <h1>Roastery</h1>
+    <div class="logo-sub">پلتفرم رست شخصی</div>
   </div>
 
-  <div class="welcome-desc">
-    <span class="en-only">Let us find your perfect coffee.</span>
-    <span class="fa-only">چند سوال پاسخ بده. پروفایل رست شخصی‌ات رو بگیر. یک رستری شریک می‌تواند آن را تازه برایت رست کند.</span>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+      <span class="en-only">Login</span>
+      <span class="fa-only">ورود</span>
+    </button>
+    <button class="auth-tab" id="tab-register" onclick="switchTab('register')">
+      <span class="en-only">Register</span>
+      <span class="fa-only">ثبت‌نام</span>
+    </button>
   </div>
 
-  <div class="input-group">
-    <label class="input-label" id="lbl-name">Your Name</label>
-    <input class="input-field" id="inp-name" type="text" placeholder="Enter your name…" autocomplete="given-name" />
-  </div>
-  <div class="input-group">
-    <label class="input-label" id="lbl-email">Email</label>
-    <input class="input-field en-only" id="inp-email" type="email" placeholder="your@email.com" autocomplete="email" />
-    <input class="input-field fa-only" id="inp-phone" type="tel" placeholder="مثال: 09121234567" autocomplete="tel" dir="ltr" />
+  <!-- Login Form -->
+  <div id="login-form">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Mobile Number</span>
+        <span class="fa-only">شماره موبایل</span>
+      </label>
+      <input class="input-field" id="login-phone" type="tel" placeholder="09121234567" dir="ltr" autocomplete="tel" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fa-only">رمز عبور</span>
+      </label>
+      <input class="input-field" id="login-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">
+      <span class="en-only">Login →</span>
+      <span class="fa-only">ورود →</span>
+    </button>
   </div>
 
-  <div class="spacer"></div>
-  <button class="btn-primary" id="btn-start" onclick="startJourney()">Begin Your Journey →</button>
+  <!-- Register Form -->
+  <div id="register-form" style="display:none;">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Your Name</span>
+        <span class="fa-only">نام شما</span>
+      </label>
+      <input class="input-field" id="reg-name" type="text" placeholder="نام خود را وارد کنید" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Mobile Number</span>
+        <span class="fa-only">شماره موبایل</span>
+      </label>
+      <input class="input-field" id="reg-phone" type="tel" placeholder="09121234567" dir="ltr" autocomplete="tel" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fa-only">رمز عبور (حداقل ۶ کاراکتر)</span>
+      </label>
+      <input class="input-field" id="reg-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="reg-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-register" onclick="doRegister()">
+      <span class="en-only">Create Account →</span>
+      <span class="fa-only">ایجاد حساب →</span>
+    </button>
+  </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 1: TASTE
-══════════════════════════════════════ -->
+<!-- ══════ SCREEN: DASHBOARD ══════ -->
+<div class="screen" id="screen-dashboard">
+  <div class="dash-header">
+    <div class="dash-welcome">
+      <span class="en-only">Welcome back</span>
+      <span class="fa-only">خوش آمدی</span>
+    </div>
+    <div class="dash-name" id="dash-name">—</div>
+    <div class="dash-phone" id="dash-phone">—</div>
+    <button class="dash-logout" onclick="doLogout()">
+      <span class="en-only">Logout</span>
+      <span class="fa-only">خروج</span>
+    </button>
+  </div>
+
+  <!-- New Profile Button -->
+  <button class="btn-primary" onclick="startNewProfile()" style="margin-bottom:24px;">
+    <span class="en-only">✨ New Coffee Profile</span>
+    <span class="fa-only">✨ پروفایل قهوه جدید</span>
+  </button>
+
+  <!-- Profiles Section -->
+  <div class="dash-section-title">
+    <span class="en-only">My Coffee Profiles</span>
+    <span class="fa-only">پروفایل‌های قهوه من</span>
+  </div>
+  <div id="dash-profiles">
+    <div class="empty-state">
+      <div class="empty-icon">☕</div>
+      <div class="en-only">No profiles yet. Start your first journey!</div>
+      <div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div>
+    </div>
+  </div>
+
+  <hr class="divider" style="margin: 20px 0;">
+
+  <!-- Orders Section -->
+  <div class="dash-section-title">
+    <span class="en-only">My Orders</span>
+    <span class="fa-only">سفارش‌های من</span>
+  </div>
+  <div id="dash-orders">
+    <div class="empty-state">
+      <div class="empty-icon">📦</div>
+      <div class="en-only">No orders yet.</div>
+      <div class="fa-only">هنوز سفارشی نداری.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREENS 1–6: QUIZ ══════ -->
 <div class="screen" id="screen-1">
-  <button class="btn-back" id="back-1" onclick="goBack(1)">← Back</button>
+  <button class="btn-back" onclick="goBack(1)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 1 of 6</span><span style="direction:rtl">سوال 1 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 1 of 6</span><span class="fa-only">سوال ۱ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
   </div>
   <div class="q-header">
@@ -479,42 +351,19 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">چه طعم‌هایی شما را جذب می‌کند؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'taste','floral')">
-      <div class="option-icon">🌸</div>
-      <div class="option-en">Floral & Fruity</div>
-      <div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div>
-      <div class="option-desc">Jasmine, peach, citrus</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'taste','sweet')">
-      <div class="option-icon">🍯</div>
-      <div class="option-en">Sweet & Balanced</div>
-      <div class="option-fa" style="direction:rtl">شیرین و متعادل</div>
-      <div class="option-desc">Caramel, honey, cherry</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'taste','chocolatey')">
-      <div class="option-icon">🍫</div>
-      <div class="option-en">Chocolatey & Nutty</div>
-      <div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div>
-      <div class="option-desc">Dark chocolate, hazelnut</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'taste','bold')">
-      <div class="option-icon">⚡</div>
-      <div class="option-en">Bold & Earthy</div>
-      <div class="option-fa" style="direction:rtl">تند و خاکی</div>
-      <div class="option-desc">Strong, dark, intense</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon">🌸</div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
+    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon">🍯</div><div class="option-en">Sweet & Balanced</div><div class="option-fa" style="direction:rtl">شیرین و متعادل</div><div class="option-desc">Caramel, honey, cherry</div></div>
+    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon">🍫</div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
+    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon">⚡</div><div class="option-en">Bold & Earthy</div><div class="option-fa" style="direction:rtl">تند و خاکی</div><div class="option-desc">Strong, dark, intense</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-1" onclick="go(2)" disabled>Next →</button>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 2: BODY
-══════════════════════════════════════ -->
 <div class="screen" id="screen-2">
-  <button class="btn-back" id="back-2" onclick="goBack(2)">← Back</button>
+  <button class="btn-back" onclick="goBack(2)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 2 of 6</span><span style="direction:rtl">سوال 2 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 2 of 6</span><span class="fa-only">سوال ۲ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
   </div>
   <div class="q-header">
@@ -522,80 +371,39 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه‌تان را چگونه دوست دارید؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'body','light')">
-      <div class="option-icon">🍃</div>
-      <div class="option-en">Light & Delicate</div>
-      <div class="option-fa" style="direction:rtl">سبک و لطیف</div>
-      <div class="option-desc">Tea-like, clear, bright — like white wine</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'body','medium')">
-      <div class="option-icon">☕</div>
-      <div class="option-en">Medium & Smooth</div>
-      <div class="option-fa" style="direction:rtl">متوسط و روان</div>
-      <div class="option-desc">Balanced and comfortable — the classic cup</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'body','full')">
-      <div class="option-icon">🌊</div>
-      <div class="option-en">Rich & Full</div>
-      <div class="option-fa" style="direction:rtl">غنی و پرقدرت</div>
-      <div class="option-desc">Heavy, coating, intense — like cream</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon">🍃</div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
+    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon">☕</div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
+    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon">🌊</div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-2" onclick="go(3)" disabled>Next →</button>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 3: STATE
-══════════════════════════════════════ -->
 <div class="screen" id="screen-3">
-  <button class="btn-back" id="back-3" onclick="goBack(3)">← Back</button>
+  <button class="btn-back" onclick="goBack(3)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 3 of 6</span><span style="direction:rtl">سوال 3 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 3 of 6</span><span class="fa-only">سوال ۳ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">What are you seeking right now?</div>
-    <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه قهوه‌ای هستید؟</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه‌ای هستید؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'state','energised')">
-      <div class="option-icon">⚡</div>
-      <div class="option-en">Energised</div>
-      <div class="option-fa" style="direction:rtl">پرانرژی</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'state','focused')">
-      <div class="option-icon">🎯</div>
-      <div class="option-en">Focused</div>
-      <div class="option-fa" style="direction:rtl">متمرکز</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'state','creative')">
-      <div class="option-icon">🎨</div>
-      <div class="option-en">Creative</div>
-      <div class="option-fa" style="direction:rtl">خلاق</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'state','relaxed')">
-      <div class="option-icon">🌿</div>
-      <div class="option-en">Relaxed</div>
-      <div class="option-fa" style="direction:rtl">آرام</div>
-    </div>
-    <div class="option-card full-row" onclick="pick(this,'state','reflective')">
-      <div class="option-icon">🌙</div>
-      <div class="option-en">Reflective</div>
-      <div class="option-fa" style="direction:rtl">تأملی</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon">⚡</div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
+    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon">🎯</div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
+    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon">🎨</div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
+    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon">🌿</div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
+    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon">🌙</div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-3" onclick="go(4)" disabled>Next →</button>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 4: CONTEXT
-══════════════════════════════════════ -->
 <div class="screen" id="screen-4">
-  <button class="btn-back" id="back-4" onclick="goBack(4)">← Back</button>
+  <button class="btn-back" onclick="goBack(4)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 4 of 6</span><span style="direction:rtl">سوال 4 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 4 of 6</span><span class="fa-only">سوال ۴ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
   </div>
   <div class="q-header">
@@ -603,48 +411,21 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">این قهوه برای چه موقعیتی است؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'context','morning')">
-      <div class="option-icon">🌅</div>
-      <div class="option-en">Morning</div>
-      <div class="option-fa" style="direction:rtl">صبح</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'context','work')">
-      <div class="option-icon">💼</div>
-      <div class="option-en">Work Session</div>
-      <div class="option-fa" style="direction:rtl">جلسه کاری</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'context','reading')">
-      <div class="option-icon">📚</div>
-      <div class="option-en">Reading</div>
-      <div class="option-fa" style="direction:rtl">مطالعه</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'context','friends')">
-      <div class="option-icon">👥</div>
-      <div class="option-en">With Friends</div>
-      <div class="option-fa" style="direction:rtl">با دوستان</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'context','afterdinner')">
-      <div class="option-icon">🍽️</div>
-      <div class="option-en">After Dinner</div>
-      <div class="option-fa" style="direction:rtl">بعد از شام</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'context','weekend')">
-      <div class="option-icon">🌿</div>
-      <div class="option-en">Weekend Relax</div>
-      <div class="option-fa" style="direction:rtl">آخر هفته</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'context','morning')"><div class="option-icon">🌅</div><div class="option-en">Morning</div><div class="option-fa" style="direction:rtl">صبح</div></div>
+    <div class="option-card" onclick="pick(this,'context','work')"><div class="option-icon">💼</div><div class="option-en">Work Session</div><div class="option-fa" style="direction:rtl">جلسه کاری</div></div>
+    <div class="option-card" onclick="pick(this,'context','reading')"><div class="option-icon">📚</div><div class="option-en">Reading</div><div class="option-fa" style="direction:rtl">مطالعه</div></div>
+    <div class="option-card" onclick="pick(this,'context','friends')"><div class="option-icon">👥</div><div class="option-en">With Friends</div><div class="option-fa" style="direction:rtl">با دوستان</div></div>
+    <div class="option-card" onclick="pick(this,'context','afterdinner')"><div class="option-icon">🍽️</div><div class="option-en">After Dinner</div><div class="option-fa" style="direction:rtl">بعد از شام</div></div>
+    <div class="option-card" onclick="pick(this,'context','weekend')"><div class="option-icon">🌿</div><div class="option-en">Weekend Relax</div><div class="option-fa" style="direction:rtl">آخر هفته</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-4" onclick="go(5)" disabled>Next →</button>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 5: BREW METHOD
-══════════════════════════════════════ -->
 <div class="screen" id="screen-5">
-  <button class="btn-back" id="back-5" onclick="goBack(5)">← Back</button>
+  <button class="btn-back" onclick="goBack(5)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 5 of 6</span><span style="direction:rtl">سوال 5 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 5 of 6</span><span class="fa-only">سوال ۵ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:83%"></div></div>
   </div>
   <div class="q-header">
@@ -652,54 +433,21 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">روش دم‌آوری شما چیست؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'brew','v60')">
-      <div class="option-icon">☕</div>
-      <div class="option-en">Pour Over</div>
-      <div class="option-fi">Pour Over</div>
-      <div class="option-desc">V60, Chemex, Kalita</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'brew','frenchpress')">
-      <div class="option-icon">🫖</div>
-      <div class="option-en">French Press</div>
-      <div class="option-fa" style="direction:rtl">فرنچ پرس</div>
-      <div class="option-desc">Full immersion, rich body</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'brew','espresso')">
-      <div class="option-icon">⚡</div>
-      <div class="option-en">Espresso</div>
-      <div class="option-fi">Espresso</div>
-      <div class="option-desc">Machine or Moka Pot</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'brew','aeropress')">
-      <div class="option-icon">🔧</div>
-      <div class="option-en">AeroPress</div>
-      <div class="option-fi">AeroPress</div>
-      <div class="option-desc">Fast, versatile, forgiving</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'brew','coldbrew')">
-      <div class="option-icon">🧊</div>
-      <div class="option-en">Cold Brew</div>
-      <div class="option-fa" style="direction:rtl">کولد برو</div>
-      <div class="option-desc">12–24 hrs, smooth & low-acid</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'brew','other')">
-      <div class="option-icon">🌟</div>
-      <div class="option-en">Other / Flexible</div>
-      <div class="option-fa" style="direction:rtl">روش دیگر</div>
-      <div class="option-desc">Varies or just exploring</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon">☕</div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
+    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon">🫖</div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','espresso')"><div class="option-icon">⚡</div><div class="option-en">Espresso</div><div class="option-fa" style="direction:rtl">اسپرسو</div><div class="option-desc">Machine or Moka Pot</div></div>
+    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon">🔧</div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon">🧊</div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
+    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon">🌟</div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-5" onclick="go(6)" disabled>Next →</button>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN 6: EXPERIENCE
-══════════════════════════════════════ -->
 <div class="screen" id="screen-6">
-  <button class="btn-back" id="back-6" onclick="goBack(6)">← Back</button>
+  <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
-    <div class="progress-label"><span>Question 6 of 6</span><span style="direction:rtl">سوال 6 از ۶</span></div>
+    <div class="progress-label"><span class="en-only">Question 6 of 6</span><span class="fa-only">سوال ۶ از ۶</span></div>
     <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
   </div>
   <div class="q-header">
@@ -707,494 +455,388 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">تجربه شما با قهوه چقدر است؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'experience','beginner')">
-      <div class="option-icon">🌱</div>
-      <div class="option-en">I'm exploring coffee</div>
-      <div class="option-fa" style="direction:rtl">در حال کشف دنیای قهوه‌ام</div>
-      <div class="option-desc">This is new to me / برای من تازه است</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'experience','regular')">
-      <div class="option-icon">☕</div>
-      <div class="option-en">Regular coffee lover</div>
-      <div class="option-fa" style="direction:rtl">عاشق قهوه</div>
-      <div class="option-desc">I know what I enjoy / می‌دانم چه می‌خواهم</div>
-    </div>
-    <div class="option-card" onclick="pick(this,'experience','enthusiast')">
-      <div class="option-icon">🏆</div>
-      <div class="option-en">Coffee enthusiast</div>
-      <div class="option-fa" style="direction:rtl">متخصص قهوه</div>
-      <div class="option-desc">I love exploring origins & profiles / عاشق کشف خاستگاه‌ها هستم</div>
-    </div>
+    <div class="option-card" onclick="pick(this,'experience','beginner')"><div class="option-icon">🌱</div><div class="option-en">I'm exploring coffee</div><div class="option-fa" style="direction:rtl">در حال کشف دنیای قهوه‌ام</div></div>
+    <div class="option-card" onclick="pick(this,'experience','regular')"><div class="option-icon">☕</div><div class="option-en">Regular coffee lover</div><div class="option-fa" style="direction:rtl">عاشق قهوه</div></div>
+    <div class="option-card" onclick="pick(this,'experience','enthusiast')"><div class="option-icon">🏆</div><div class="option-en">Coffee enthusiast</div><div class="option-fa" style="direction:rtl">متخصص قهوه</div></div>
   </div>
   <div class="spacer"></div>
   <button class="btn-primary" id="btn-6" onclick="showLoading()" disabled>
-    Find My Coffee ✨
+    <span class="en-only">Find My Coffee ✨</span>
+    <span class="fa-only">قهوه من را پیدا کن ✨</span>
   </button>
 </div>
 
-<!-- ══════════════════════════════════════
-     LOADING OVERLAY
-══════════════════════════════════════ -->
+<!-- ══════ LOADING ══════ -->
 <div id="screen-loading">
   <div class="spinner">☕</div>
-  <div class="loading-en">Crafting your profile…</div>
-  <div class="loading-fa">در حال ساخت پروفایل قهوه شما…</div>
+  <div class="loading-text">
+    <span class="en-only">Crafting your profile…</span>
+    <span class="fa-only">در حال ساخت پروفایل قهوه شما…</span>
+  </div>
 </div>
 
-<!-- ══════════════════════════════════════
-     SCREEN: RESULT
-══════════════════════════════════════ -->
+<!-- ══════ SCREEN: RESULT ══════ -->
 <div class="screen" id="screen-result">
-
-  <!-- Coffee Identity Header -->
   <div class="result-identity-header">
     <div class="result-identity-label">هویت قهوه شما</div>
     <div class="result-identity-name" id="r-identity-name">—</div>
-    <div class="identity-badge" id="r-identity-badge" style="justify-content:center;margin-top:10px;"></div>
+    <div class="identity-badge" id="r-identity-badge"></div>
     <div class="match-score-wrap">
-      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%;"></div></div>
+      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%"></div></div>
       <div class="match-score-pct"><span id="r-match-pct">—</span> تطابق</div>
     </div>
   </div>
 
-  <!-- Today's Match -->
   <div style="text-align:center;padding:4px 0 16px;direction:rtl;">
-    <div class="today-match-label">پیشنهاد امروز</div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;">پیشنهاد امروز</div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
-    <div id="r-alt-badge" style="display:none;margin-top:10px;background:#FFF8EC;border:1px solid #E8C99A;border-radius:12px;padding:10px 16px;font-size:12px;color:#6B3F2A;font-family:Arial,sans-serif;line-height:1.6;text-align:center;"></div>
   </div>
 
-  <!-- Why this coffee -->
   <div class="card" id="why-card">
     <div class="card-title" style="direction:rtl">چرا این قهوه؟</div>
     <div id="why-list"></div>
   </div>
 
-  <!-- Flavors -->
   <div class="card">
-    <div class="card-title" id="title-flavors">Flavor Notes</div>
+    <div class="card-title">
+      <span class="en-only">Flavor Notes</span>
+      <span class="fa-only">نت‌های طعمی</span>
+    </div>
     <div class="flavor-tags" id="r-flavors"></div>
     <div class="result-desc" id="r-desc" style="margin-top:16px;"></div>
   </div>
 
-  <!-- Brew info -->
   <div class="card">
-    <div class="card-title" id="title-brew">How to Brew</div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-roast">🌡️ Roast Level</span>
-      <span class="info-value" id="r-roast"></span>
+    <div class="card-title">
+      <span class="en-only">How to Brew</span>
+      <span class="fa-only">روش دم‌آوری</span>
     </div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-brew-method">☕ Brew Method</span>
-      <span class="info-value" id="r-brew"></span>
-    </div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-temp">💧 Water Temp</span>
-      <span class="info-value" id="r-temp"></span>
-    </div>
-    <div class="info-row">
-      <span class="info-label" id="lbl-ratio">⚖️ Coffee : Water</span>
-      <span class="info-value" id="r-ratio"></span>
-    </div>
+    <div class="info-row"><span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span><span class="info-value" id="r-roast"></span></div>
+    <div class="info-row"><span class="info-label">☕ <span class="en-only">Brew</span><span class="fa-only">دم‌آوری</span></span><span class="info-value" id="r-brew"></span></div>
+    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
+    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
   </div>
 
-  <!-- Roast guide -->
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 نمای رستری: راهنمای رست ▼</button>
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 راهنمای رست ▼</button>
   <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔥 Roast Guide</div>
-    <div class="info-row">
-      <span class="info-label">⬆️ Charge Temp</span>
-      <span class="info-value" id="r-charge"></span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">⬇️ Drop Temp</span>
-      <span class="info-value" id="r-drop"></span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">⏱️ Total Time</span>
-      <span class="info-value" id="r-time"></span>
-    </div>
-    <div class="info-row">
-      <span class="info-label">📊 DTR</span>
-      <span class="info-value" id="r-dtr"></span>
-    </div>
+    <div class="info-row"><span class="info-label">⬆️ Charge Temp</span><span class="info-value" id="r-charge"></span></div>
+    <div class="info-row"><span class="info-label">⬇️ Drop Temp</span><span class="info-value" id="r-drop"></span></div>
+    <div class="info-row"><span class="info-label">⏱️ Total Time</span><span class="info-value" id="r-time"></span></div>
+    <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
   </div>
 
-  <!-- Rest note -->
-  <div class="rest-card">
-    <p id="rest-card-text">
-      ⏰ <strong>Important:</strong> Your freshly roasted beans need
-      <strong>5–7 days to rest</strong> before they reach peak flavor.
-      Take them home today — the best cup is worth the wait!
+  <div style="background:#FDF5E8;border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;direction:rtl;">
+    <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;">
+      ⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.
     </p>
   </div>
 
-  <!-- Reminder checkbox -->
-  <div style="background:var(--white);border-radius:16px;padding:18px 20px;margin-bottom:14px;box-shadow:0 2px 10px var(--shadow);display:flex;align-items:flex-start;gap:14px;cursor:pointer;" onclick="document.getElementById('chk-reminder').click()">
-    <input type="checkbox" id="chk-reminder" style="width:22px;height:22px;margin-top:2px;accent-color:var(--caramel);cursor:pointer;flex-shrink:0;" onclick="event.stopPropagation()">
-    <div>
-      <div id="chk-reminder-title" style="font-size:14px;font-weight:bold;color:var(--dark-brown);margin-bottom:3px;">
-        ☕ Remind me when it's ready
-      </div>
-      <div id="chk-reminder-note" style="font-size:11px;color:#AAA;margin-top:4px;font-family:Arial,sans-serif;line-height:1.5;">
-        We'll email you in 6 days when your beans reach peak flavor
-      </div>
-    </div>
-  </div>
+  <div class="success-msg" id="save-success">✅ پروفایل ذخیره شد!</div>
 
-  <button class="btn-primary" id="btn-email" onclick="sendEmail()" style="margin-bottom:10px;">
-    📧 Send to My Email
+  <!-- Order CTA -->
+  <button class="btn-primary" onclick="goToOrder()" style="margin-bottom:10px;">
+    <span class="en-only">🛒 Order This Bean</span>
+    <span class="fa-only">🛒 سفارش این دانه</span>
   </button>
-  <div class="success-msg" id="success-msg">
-    ✅ Sent! Check your inbox.
-  </div>
-  <!-- Blend suggestion -->
-  <div class="card" id="blend-card" style="display:none;border:2px solid var(--light-caramel);">
-    <div class="card-title" id="blend-card-title">🔄 پروفایل جایگزین</div>
-    <div style="font-size:18px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;" id="r-blend-name"></div>
-    <div style="font-size:12px;color:var(--caramel);margin-bottom:12px;font-style:italic;" id="r-blend-detail"></div>
-    <div class="flavor-tags" id="r-blend-flavors" style="margin-bottom:12px;"></div>
-    <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;" id="r-blend-desc"></div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #F0EAE0;">
-      <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;direction:rtl;" id="r-blend-note"></div>
-    </div>
-  </div>
-
-  <!-- Order Intent FA -->
-  <div class="card" id="order-intent-card">
-    <div class="card-title" style="direction:rtl">آیا می‌خواهی یک رستری این پروفایل را برایت آماده کند؟</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px;">
-      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-yes-label">
-        <input type="radio" name="order_intent" value="yes" id="intent-yes" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
-        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">بله، علاقه‌مندم</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">با یک رستری شریک مرتبط شو</div></div>
-      </label>
-      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-maybe-label">
-        <input type="radio" name="order_intent" value="maybe" id="intent-maybe" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
-        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">شاید بعداً</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">فعلاً پروفایلم را بفرست</div></div>
-      </label>
-      <label style="display:flex;align-items:center;gap:12px;cursor:pointer;padding:12px;border:2px solid transparent;border-radius:12px;transition:all 0.2s;flex-direction:row-reverse;" id="intent-explore-label">
-        <input type="radio" name="order_intent" value="exploring" id="intent-explore" style="accent-color:var(--caramel);width:18px;height:18px;" onchange="selectIntent(this)">
-        <div style="text-align:right"><div style="font-size:14px;font-weight:bold;color:var(--dark-brown);">فقط کنجکاوم</div><div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;">می‌خواهم پروفایلم را ببینم</div></div>
-      </label>
-    </div>
-  </div>
-
-  <div style="background:#FDF5E8;border:1px solid #E8C99A;border-radius:16px;padding:18px 20px;margin-bottom:14px;text-align:center;">
-    <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);margin-bottom:6px;direction:rtl">☕ هویت قهوه‌ات را ذخیره کن</div>
-    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;line-height:1.6;direction:rtl">دفعه بعد که آمدی، پروفایلت را اصلاح کن و ببین ذائقه‌ات چطور تغییر کرده.</div>
-  </div>
-  <button class="btn-primary btn-ghost" id="btn-reset" onclick="reset()" style="margin-top:12px;">
-    Start Over
+  <button class="btn-primary btn-ghost" onclick="show('screen-dashboard')" style="margin-bottom:10px;">
+    <span class="en-only">← Back to Dashboard</span>
+    <span class="fa-only">← برگشت به داشبورد</span>
   </button>
+</div>
+
+<!-- ══════ SCREEN: ORDER ══════ -->
+<div class="screen" id="screen-order">
+  <button class="btn-back" onclick="show('screen-result')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+
+  <div class="logo" style="margin-bottom:20px;">
+    <div class="logo-icon">📦</div>
+    <h1 style="font-size:20px;">
+      <span class="en-only">Place Your Order</span>
+      <span class="fa-only">ثبت سفارش</span>
+    </h1>
+  </div>
+
+  <!-- Bean Summary -->
+  <div class="order-summary" id="order-bean-summary">
+    <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;direction:rtl;">دانه انتخابی</div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
+    <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+  </div>
+
+  <!-- Amount Selector -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Amount</span>
+      <span class="fa-only">مقدار</span>
+    </label>
+    <div class="amount-selector">
+      <div class="amount-card" id="amt-50" onclick="selectAmount(50)">
+        <div class="amount-g">50g</div>
+        <div class="amount-label">
+          <span class="en-only">Small</span>
+          <span class="fa-only">کوچک</span>
+        </div>
+      </div>
+      <div class="amount-card" id="amt-100" onclick="selectAmount(100)">
+        <div class="amount-g">100g</div>
+        <div class="amount-label">
+          <span class="en-only">Medium</span>
+          <span class="fa-only">متوسط</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Delivery Address</span>
+      <span class="fa-only">آدرس تحویل</span>
+    </label>
+    <textarea class="textarea-field" id="order-address" placeholder="آدرس کامل خود را وارد کنید..."></textarea>
+  </div>
+
+  <!-- Notes -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Notes (optional)</span>
+      <span class="fa-only">توضیحات (اختیاری)</span>
+    </label>
+    <textarea class="textarea-field" id="order-notes" placeholder="هر توضیح اضافه‌ای..." style="min-height:70px;"></textarea>
+  </div>
+
+  <div class="error-msg" id="order-error"></div>
+  <div class="success-msg" id="order-success"></div>
+
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-submit-order" onclick="submitOrder()">
+    <span class="en-only">✅ Submit Order</span>
+    <span class="fa-only">✅ ثبت سفارش</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;direction:rtl;">
+    پس از ثبت سفارش، تیم رستری با شما تماس می‌گیرد.
+  </p>
 </div>
 
 </div><!-- /app-container -->
 
 <script>
-/* ============================================================
-   EMAILJS SETUP
-   ------------------------------------------------------------
-   1. Create a FREE account at https://www.emailjs.com
-   2. Add a service (Gmail works great)
-   3. Create a template — use these variables in the template body:
-      {{to_name}}, {{bean_name}}, {{origin}}, {{flavors}},
-      {{roast}}, {{brew}}, {{water_temp}}, {{description}}
-   4. Replace the three constants below with your IDs
-   ============================================================ */
-const EJS_SERVICE  = 'service_yw91k2a';
-const EJS_TEMPLATE = 'template_gsitxoe';
-const EJS_USER     = 'GOVImvvzS8G5A8wRF';
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
 
-emailjs.init(EJS_USER);
+/* ═══════════════════════════════════════════
+   SUPABASE HELPER
+═══════════════════════════════════════════ */
+async function sb(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Supabase error');
+  }
+  return res.status === 204 ? null : res.json();
+}
 
-// شناسایی لوکیشن مشتری
-fetch('https://ipapi.co/json/')
-  .then(r => r.json())
-  .then(d => {
-    userLocation.country      = d.country_name || '';
-    userLocation.city         = d.city         || '';
-    userLocation.country_code = d.country_code  || '';
-  })
-  .catch(() => {}); // silent fail
-
-/* ── APP STATE ── */
-let name = '', email = '';
-let userLocation = { country: '', city: '', country_code: '' };
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+let currentUser = null; // { id, name, phone }
 let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
 let rec = null;
+let currentProfileId = null;
+let selectedAmount = null;
+let currentLang = 'fa';
 
-/* ── BEAN DATABASE ── */
-const BEANS = [
-  {
-    id: 'yirgacheffe',
-    name: 'Ethiopia Yirgacheffe',
-    detail: 'Washed',
-    origin: 'Ethiopia · 1700–2200 m',
-    flavors: ['Jasmine', 'Peach', 'Green Tea', 'Citrus', 'Bergamot'],
-    roast: 'Light',
-    brew: 'V60 / Chemex',
-    temp: '92–95 °C',
-    ratio: '1g : 15–17g',
-    roastInfo: { charge: '187°C', drop: '198°C', dtr: '19%', time: '10 min' },
-    restDays: { filter: 7, espresso: 4, coldbrew: 7, default: 7 },
-    desc: 'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate. A coffee that surprises every sip.',
-    s: { floral:10, sweet:4, chocolatey:0, bold:0, light:10, medium:5, full:0,
-         energised:6, focused:6, creative:10, relaxed:4, reflective:7,
-         beginner:4, regular:7, enthusiast:10 }
-  },
-  {
-    id: 'kenya',
-    name: 'Kenya AA',
-    detail: 'Washed',
-    origin: 'Kenya · 1400–2100 m',
-    flavors: ['Blackcurrant', 'Red Currant', 'Pomegranate', 'Brown Sugar'],
-    roast: 'Light–Medium',
-    brew: 'V60 / Kalita Wave',
-    temp: '91–94 °C',
-    ratio: '1g : 15–16g',
-    roastInfo: { charge: '192°C', drop: '208°C', dtr: '20%', time: '10 min' },
-    restDays: { filter: 6, espresso: 3, coldbrew: 7, default: 6 },
-    desc: 'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish. Energizing and memorable.',
-    s: { floral:5, sweet:5, chocolatey:2, bold:4, light:7, medium:8, full:2,
-         energised:10, focused:10, creative:6, relaxed:3, reflective:4,
-         beginner:5, regular:9, enthusiast:9 }
-  },
-  {
-    id: 'rwanda',
-    name: 'Rwanda Bourbon',
-    detail: 'Washed',
-    origin: 'Rwanda · 1400–1800 m',
-    flavors: ['Peach', 'Apricot', 'Caramel', 'Red Berry'],
-    roast: 'Light–Medium',
-    brew: 'V60 / AeroPress',
-    temp: '90–94 °C',
-    ratio: '1g : 15–16g',
-    roastInfo: { charge: '190°C', drop: '210°C', dtr: '22%', time: '11 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 7, default: 5 },
-    desc: 'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee — complex enough to delight, gentle enough to welcome.',
-    s: { floral:6, sweet:10, chocolatey:3, bold:2, light:6, medium:8, full:3,
-         energised:5, focused:7, creative:7, relaxed:9, reflective:6,
-         beginner:10, regular:9, enthusiast:6 }
-  },
-  {
-    id: 'sidama',
-    name: 'Ethiopia Sidama',
-    detail: 'Natural',
-    origin: 'Ethiopia · 1500–2000 m',
-    flavors: ['Strawberry', 'Blueberry', 'Dark Chocolate', 'Red Wine'],
-    roast: 'Light–Medium',
-    brew: 'Chemex / French Press',
-    temp: '91–93 °C',
-    ratio: '1g : 15–16g',
-    roastInfo: { charge: '187°C', drop: '208°C', dtr: '22%', time: '11 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 7, default: 5 },
-    desc: 'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine in a heavier, more indulgent cup.',
-    s: { floral:5, sweet:9, chocolatey:4, bold:3, light:3, medium:8, full:7,
-         energised:4, focused:4, creative:8, relaxed:9, reflective:7,
-         beginner:5, regular:8, enthusiast:9 }
-  },
-  {
-    id: 'colombia',
-    name: 'Colombia Huila',
-    detail: 'Washed',
-    origin: 'Colombia · 1200–2100 m',
-    flavors: ['Dark Chocolate', 'Caramel', 'Cherry', 'Orange'],
-    roast: 'Medium',
-    brew: 'Any method',
-    temp: '88–92 °C',
-    ratio: '1g : 15g',
-    roastInfo: { charge: '192°C', drop: '212°C', dtr: '23%', time: '11 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body. Approachable for everyone — loved by all.',
-    s: { floral:2, sweet:8, chocolatey:7, bold:4, light:3, medium:9, full:5,
-         energised:5, focused:7, creative:5, relaxed:8, reflective:6,
-         beginner:10, regular:9, enthusiast:6 }
-  },
-  {
-    id: 'brazil',
-    name: 'Brazil Natural',
-    detail: 'Cerrado · Natural',
-    origin: 'Brazil · 700–1300 m',
-    flavors: ['Milk Chocolate', 'Hazelnut', 'Almond', 'Caramel', 'Vanilla'],
-    roast: 'Medium',
-    brew: 'Espresso / French Press / Moka Pot',
-    temp: '87–91 °C',
-    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
-    roastInfo: { charge: '195°C', drop: '215°C', dtr: '25%', time: '12 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness. The coffee that hugs you.',
-    s: { floral:0, sweet:7, chocolatey:10, bold:4, light:1, medium:7, full:9,
-         energised:3, focused:5, creative:3, relaxed:10, reflective:7,
-         beginner:9, regular:8, enthusiast:5 }
-  },
-  {
-    id: 'guatemala',
-    name: 'Guatemala Antigua',
-    detail: 'Washed',
-    origin: 'Guatemala · 1200–1800 m',
-    flavors: ['Dark Chocolate', 'Plum', 'Cinnamon', 'Walnut'],
-    roast: 'Medium–Dark',
-    brew: 'Espresso / Moka Pot / French Press',
-    temp: '87–91 °C',
-    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
-    roastInfo: { charge: '193°C', drop: '215°C', dtr: '25%', time: '12 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice notes — ideal after dinner or for espresso lovers.',
-    s: { floral:0, sweet:5, chocolatey:9, bold:7, light:1, medium:5, full:8,
-         energised:3, focused:5, creative:4, relaxed:7, reflective:9,
-         beginner:6, regular:8, enthusiast:7 }
-  },
-  {
-    id: 'sumatra',
-    name: 'Sumatra Mandheling',
-    detail: 'Wet-Hulled',
-    origin: 'Indonesia · 1000–1500 m',
-    flavors: ['Dark Chocolate', 'Cedar', 'Tobacco', 'Earth', 'Molasses'],
-    roast: 'Medium–Dark',
-    brew: 'French Press / Moka Pot / Espresso',
-    temp: '86–90 °C',
-    ratio: '1g : 15g',
-    roastInfo: { charge: '195°C', drop: '218°C', dtr: '27%', time: '13 min' },
-    restDays: { filter: 4, espresso: 3, coldbrew: 5, default: 4 },
-    desc: 'The heaviest, most earthy coffee in the world. Cedar, tobacco and dark chocolate in a syrupy, bold cup. Unmistakably unique.',
-    s: { floral:0, sweet:2, chocolatey:6, bold:10, light:0, medium:2, full:10,
-         energised:2, focused:4, creative:3, relaxed:7, reflective:10,
-         beginner:3, regular:6, enthusiast:9 }
-  },
-  {
-    id: 'harrar',
-    name: 'Ethiopia Harrar',
-    detail: 'Natural',
-    origin: 'Ethiopia · 1500–2100 m',
-    flavors: ['Wild Blueberry', 'Dark Chocolate', 'Red Wine', 'Tobacco', 'Spice'],
-    roast: 'Medium',
-    brew: 'French Press / Moka Pot / Espresso',
-    temp: '90–93 °C',
-    ratio: '1g : 15g',
-    roastInfo: { charge: '190°C', drop: '213°C', dtr: '24%', time: '12 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'The wildest and most unpredictable Ethiopian. Ancient natural processing gives intense berry and wine notes with a dark, leathery depth. Not for the faint-hearted.',
-    s: { floral:4, sweet:3, chocolatey:5, bold:8, light:0, medium:4, full:9,
-         energised:2, focused:3, creative:6, relaxed:6, reflective:9,
-         beginner:2, regular:5, enthusiast:10 }
-  },
-  {
-    id: 'tanzania',
-    name: 'Tanzania Peaberry',
-    detail: 'Washed',
-    origin: 'Tanzania · Kilimanjaro · 1400–1800 m',
-    flavors: ['Citrus', 'Mango', 'Grape', 'Milk Chocolate', 'Bright Acidity'],
-    roast: 'Light–Medium',
-    brew: 'V60 / Chemex / AeroPress',
-    temp: '90–94 °C',
-    ratio: '1g : 15–16g',
-    roastInfo: { charge: '191°C', drop: '210°C', dtr: '21%', time: '11 min' },
-    restDays: { filter: 6, espresso: 3, coldbrew: 7, default: 6 },
-    desc: 'A single dense bean grown at the foot of Kilimanjaro. Peaberry structure concentrates the flavors — juicy citrus and tropical fruit with a smooth milk chocolate finish. Kenya\'s gentler cousin.',
-    s: { floral:6, sweet:7, chocolatey:3, bold:3, light:6, medium:9, full:3,
-         energised:9, focused:7, creative:7, relaxed:5, reflective:4,
-         beginner:7, regular:9, enthusiast:8 }
-  },
-  {
-    id: 'geisha',
-    name: 'Panama Geisha',
-    detail: 'Washed',
-    origin: 'Panama · Boquete · 1400–1800 m',
-    flavors: ['Jasmine', 'Earl Grey', 'Meyer Lemon', 'Tropical Flowers', 'White Grape'],
-    roast: 'Light',
-    brew: 'V60 / Chemex',
-    temp: '91–94 °C',
-    ratio: '1g : 16–17g',
-    roastInfo: { charge: '185°C', drop: '203°C', dtr: '17%', time: '9 min' },
-    restDays: { filter: 7, espresso: 5, coldbrew: 7, default: 7 },
-    desc: 'The most celebrated coffee in the world. Pure jasmine and floral complexity that transcends what coffee is supposed to taste like. A once-in-a-lifetime cup — best shared slowly.',
-    s: { floral:10, sweet:5, chocolatey:0, bold:0, light:10, medium:3, full:0,
-         energised:4, focused:5, creative:10, relaxed:5, reflective:8,
-         beginner:1, regular:4, enthusiast:10 }
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.classList.remove('visible');
+
+  if (!name)  return showErr(errEl, 'نام را وارد کنید');
+  if (phone.length < 10) return showErr(errEl, 'شماره موبایل معتبر وارد کنید');
+  if (pass.length < 6)  return showErr(errEl, 'رمز عبور باید حداقل ۶ کاراکتر باشد');
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    // بررسی کاربر تکراری
+    const existing = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=id`);
+    if (existing && existing.length > 0) {
+      return showErr(errEl, 'این شماره قبلاً ثبت شده. لطفاً وارد شوید.');
+    }
+    // ذخیره کاربر (رمز رو به صورت ساده ذخیره می‌کنیم - در production باید hash بشه)
+    const users = await sb('POST', 'users', { phone, name, password_hash: btoa(pass) });
+    const user = users[0];
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, 'خطا: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Create Account →</span><span class="fa-only">ایجاد حساب →</span>';
+    setLang(currentLang);
   }
-];
+}
 
-/* ── BLENDS ── */
-const BLENDS = [
-  {
-    id: 'morning_ritual',
-    name: 'Morning Ritual',
-    detail: '60% Brazil · 40% Colombia',
-    origin: 'South America Blend',
-    flavors: ['Milk Chocolate', 'Caramel', 'Hazelnut', 'Brown Sugar'],
-    roast: 'Medium',
-    brew: 'Espresso / French Press / Moka Pot',
-    temp: '88–92 °C',
-    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
-    roastInfo: { charge: '193°C', drop: '214°C', dtr: '24%', time: '12 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'A smooth, low-acid blend built for daily ritual. Brazil brings chocolate and nuts while Colombia adds sweetness and balance. Forgiving and comforting.',
-    _isBlend: true, _blendName: 'Morning Ritual',
-    s: { floral:0, sweet:7.8, chocolatey:9.2, bold:4, light:1.8, medium:7.8, full:7.4,
-         energised:3.8, focused:5.8, creative:3.8, relaxed:9.2, reflective:7,
-         beginner:9.4, regular:8.4, enthusiast:5.4 },
-    brewScores: { v60:4, frenchpress:8, espresso:10, aeropress:5, coldbrew:6, other:6 }
-  },
-  {
-    id: 'bright_explorer',
-    name: 'Bright Explorer',
-    detail: '50% Yirgacheffe · 50% Kenya',
-    origin: 'East Africa Blend',
-    flavors: ['Jasmine', 'Blackcurrant', 'Citrus', 'Peach', 'Red Currant'],
-    roast: 'Light–Medium',
-    brew: 'V60 / AeroPress / Chemex',
-    temp: '91–95 °C',
-    ratio: '1g : 15–16g',
-    roastInfo: { charge: '190°C', drop: '206°C', dtr: '20%', time: '10 min' },
-    restDays: { filter: 7, espresso: 4, coldbrew: 7, default: 7 },
-    desc: 'Two of Africa\'s finest united. Yirgacheffe\'s jasmine meets Kenya\'s bold fruit — the result is a sparkling, complex cup that changes with every sip.',
-    _isBlend: true, _blendName: 'Bright Explorer',
-    s: { floral:7.5, sweet:4.5, chocolatey:1, bold:2, light:8.5, medium:6.5, full:1,
-         energised:8, focused:8, creative:8, relaxed:3.5, reflective:5.5,
-         beginner:4.5, regular:8, enthusiast:9.5 },
-    brewScores: { v60:10, frenchpress:2, espresso:2, aeropress:9, coldbrew:4, other:5 }
-  },
-  {
-    id: 'velvet_balance',
-    name: 'Velvet Balance',
-    detail: '40% Sumatra · 30% Colombia · 30% Brazil',
-    origin: 'Asia & Americas Blend',
-    flavors: ['Dark Chocolate', 'Cedar', 'Caramel', 'Walnut', 'Earthy'],
-    roast: 'Medium–Dark',
-    brew: 'French Press / Espresso / Moka Pot',
-    temp: '86–90 °C',
-    ratio: '1g : 2g (espresso) · 1g : 15g (filter)',
-    roastInfo: { charge: '194°C', drop: '215°C', dtr: '26%', time: '12 min' },
-    restDays: { filter: 5, espresso: 3, coldbrew: 6, default: 5 },
-    desc: 'A bold, heavy blend for those who want depth. Sumatra\'s earth anchors Colombia\'s sweetness and Brazil\'s chocolate. Intense, warming, memorable.',
-    _isBlend: true, _blendName: 'Velvet Balance',
-    s: { floral:0.6, sweet:5.6, chocolatey:7.9, bold:6.4, light:1.2, medium:5.4, full:8.1,
-         energised:3.1, focused:5.4, creative:3.6, relaxed:8.1, reflective:8.5,
-         beginner:5.7, regular:7.3, enthusiast:7.2 },
-    brewScores: { v60:2, frenchpress:10, espresso:8, aeropress:4, coldbrew:7, other:5 }
-  },
-];
+async function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
 
-/* ── AVAILABLE BEANS ── */
-// هر دانه‌ای که موجود داری اینجا باشه
-// برای حذف: فقط اسمش رو پاک کن
-// برای اضافه کردن: اسمش رو اضافه کن
-const AVAILABLE = [
-  'yirgacheffe',
-  'kenya',
-  'rwanda',
-  'sidama',
-  'colombia',
-  'brazil',
-  'guatemala',
-  'sumatra',
-  'harrar',
-  'tanzania',
-  'geisha',
-];
+  if (!phone) return showErr(errEl, 'شماره موبایل را وارد کنید');
+  if (!pass)  return showErr(errEl, 'رمز عبور را وارد کنید');
 
-/* ── INTERACTION ── */
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const users = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=*`);
+    if (!users || users.length === 0) return showErr(errEl, 'شماره موبایل یافت نشد');
+    const user = users[0];
+    if (user.password_hash !== btoa(pass)) return showErr(errEl, 'رمز عبور اشتباه است');
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, 'خطا: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Login →</span><span class="fa-only">ورود →</span>';
+    setLang(currentLang);
+  }
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('roastery_user', JSON.stringify(user));
+  showDashboard();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('roastery_user');
+  show('screen-auth');
+}
+
+function checkAutoLogin() {
+  const saved = localStorage.getItem('roastery_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showDashboard();
+    } catch(e) {
+      localStorage.removeItem('roastery_user');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+async function showDashboard() {
+  document.getElementById('dash-name').textContent = currentUser.name || '—';
+  document.getElementById('dash-phone').textContent = currentUser.phone || '—';
+  show('screen-dashboard');
+  loadProfiles();
+  loadOrders();
+}
+
+async function loadProfiles() {
+  const container = document.getElementById('dash-profiles');
+  try {
+    const profiles = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    if (!profiles || profiles.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
+      return;
+    }
+    container.innerHTML = profiles.map(p => `
+      <div class="profile-card" onclick="viewProfile('${p.id}')">
+        <div class="profile-card-bean">${p.recommended_bean || '—'}</div>
+        <div class="profile-card-date">${new Date(p.created_at).toLocaleDateString('fa-IR')}</div>
+        <div class="profile-card-tags">
+          <span class="profile-card-tag">${p.flavor || ''}</span>
+          <span class="profile-card-tag">${p.body || ''}</span>
+          <span class="profile-card-tag">${p.brew_method || ''}</span>
+        </div>
+      </div>
+    `).join('');
+    setLang(currentLang);
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+  }
+}
+
+async function loadOrders() {
+  const container = document.getElementById('dash-orders');
+  try {
+    const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    if (!orders || orders.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="fa-only">هنوز سفارشی نداری.</div><div class="en-only">No orders yet.</div></div>`;
+      return;
+    }
+    const statusFA = { pending: 'در انتظار تأیید', paid: 'پرداخت شده', shipped: 'ارسال شده' };
+    const statusClass = { pending: 'status-pending', paid: 'status-paid', shipped: 'status-shipped' };
+    container.innerHTML = orders.map(o => `
+      <div class="order-card">
+        <div class="order-card-status ${statusClass[o.status] || 'status-pending'}">${statusFA[o.status] || o.status}</div>
+        <div style="font-weight:bold;color:var(--dark-brown);font-size:15px;">${o.amount}g</div>
+        <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;">${new Date(o.created_at).toLocaleDateString('fa-IR')}</div>
+        ${o.address ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:8px;direction:rtl;">${o.address}</div>` : ''}
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+  }
+}
+
+function viewProfile(profileId) {
+  // TODO: نمایش جزئیات پروفایل — در نسخه بعد
+  alert('جزئیات پروفایل — به زودی');
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+function startNewProfile() {
+  ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
+  rec = null;
+  currentProfileId = null;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  show('screen-1');
+}
+
 function pick(el, category, value) {
   el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
@@ -1203,624 +845,260 @@ function pick(el, category, value) {
   if (btn) document.getElementById(btn).disabled = false;
 }
 
-function startJourney() {
-  name  = document.getElementById('inp-name').value.trim();
-  // در FA از شماره موبایل استفاده کن
-  const phoneEl = document.getElementById('inp-phone');
-  email = (currentLang === 'fa' && phoneEl)
-    ? phoneEl.value.trim()
-    : document.getElementById('inp-email').value.trim();
-  const nameEl  = document.getElementById('inp-name');
-  const emailEl = document.getElementById('inp-email');
-  nameEl.classList.remove('error');
-  emailEl.classList.remove('error');
-  const emailValid = currentLang === 'fa'
-    ? email.length >= 11
-    : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  if (!name)        { nameEl.classList.add('error');  nameEl.focus(); return; }
-  if (!emailValid)  { emailEl.classList.add('error'); emailEl.focus(); return; }
-  show('screen-1');
-}
-
 function go(n) { show('screen-' + n); }
-
 function goBack(n) {
-  if (n === 1) show('screen-welcome');
+  if (n === 1) show('screen-dashboard');
   else show('screen-' + (n - 1));
 }
 
 function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  restoreScreenState(id);
-}
-
-// نگاشت هر صفحه به category و btn مربوطه
-const SCREEN_MAP = {
-  'screen-1': { category: 'taste',      btn: 'btn-1' },
-  'screen-2': { category: 'body',       btn: 'btn-2' },
-  'screen-3': { category: 'state',      btn: 'btn-3' },
-  'screen-4': { category: 'context',    btn: 'btn-4' },
-  'screen-5': { category: 'brew',       btn: 'btn-5' },
-  'screen-6': { category: 'experience', btn: 'btn-6' },
-};
-
-function restoreScreenState(screenId) {
-  const map = SCREEN_MAP[screenId];
-  if (!map) return;                          // welcome یا result — کاری نکن
-
-  const savedValue = ans[map.category];
-  const screen     = document.getElementById(screenId);
-  const btn        = document.getElementById(map.btn);
-
-  // همه کارت‌ها رو deselect کن
-  screen.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-
-  if (savedValue) {
-    // کارتی که مقدارش با ans فعلی مطابقت داره رو highlight کن
-    const cards = screen.querySelectorAll('.option-card');
-    cards.forEach(card => {
-      const onclick = card.getAttribute('onclick') || '';
-      // مقدار رو از onclick="pick(this,'category','VALUE')" استخراج کن
-      const match = onclick.match(/pick\(this,'[^']+','([^']+)'\)/);
-      if (match && match[1] === savedValue) {
-        card.classList.add('selected');
-      }
-    });
-    // Next رو فعال کن چون قبلاً انتخاب داشتیم
-    if (btn) btn.disabled = false;
-  } else {
-    // هیچ انتخابی نبوده — Next باید غیرفعال بمونه
-    if (btn) btn.disabled = true;
-  }
+  window.scrollTo(0, 0);
 }
 
 function showLoading() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-loading').classList.add('visible');
-  setTimeout(() => {
+  setTimeout(async () => {
     rec = recommend();
     render(rec);
+    await saveProfile(rec);
     document.getElementById('screen-loading').classList.remove('visible');
     show('screen-result');
   }, 2000);
 }
 
-/* ── RECOMMENDATION ENGINE ── */
-function recommend() {
-  const scored = BEANS.map(b => {
-    let score = 0;
-    // Taste (45%)
-    score += (b.s[ans.taste]      || 0) * 4.5;
-    // Body (25%)
-    score += (b.s[ans.body]       || 0) * 2.5;
-    // State (20%)
-    score += (b.s[ans.state]      || 0) * 2;
-    // Experience (10%)
-    score += (b.s[ans.experience] || 0) * 1;
-    // Context bonuses
-    const ctx = ans.context;
-    if (ctx === 'afterdinner' && (b.id === 'guatemala' || b.id === 'sumatra'))  score += 20;
-    if (ctx === 'morning'     && b.id === 'kenya')                              score += 20;
-    if (ctx === 'morning'     && b.id === 'yirgacheffe')                        score += 14;
-    if (ctx === 'work'        && b.id === 'kenya')                              score += 18;
-    if (ctx === 'work'        && b.id === 'yirgacheffe')                        score += 12;
-    if (ctx === 'work'        && b.id === 'colombia')                           score += 8;
-    if (ctx === 'weekend'     && (b.id === 'brazil' || b.id === 'sidama'))      score += 14;
-    if (ctx === 'weekend'     && (b.id === 'colombia' || b.id === 'rwanda'))    score += 10;
-    if (ctx === 'reading'     && (b.id === 'rwanda' || b.id === 'yirgacheffe')) score += 14;
-    if (ctx === 'friends'     && (b.id === 'colombia' || b.id === 'rwanda'))    score += 12;
-    // State bonus: Kenya برای energised بهترینه
-    if (ans.state === 'energised' && b.id === 'kenya')                          score += 8;
-    // تضاد: floral + full body
-    if (ans.taste === 'floral' && ans.body === 'full') {
-      if (b.id === 'yirgacheffe' || b.id === 'geisha')                         score -= 20;
-      if (b.id === 'colombia'    || b.id === 'rwanda')                          score += 10;
-    }
-    // تضاد: bold + light body
-    if (ans.taste === 'bold' && ans.body === 'light') {
-      if (b.id === 'sumatra' || b.id === 'harrar')                              score -= 20;
-      if (b.id === 'kenya'   || b.id === 'tanzania')                            score += 8;
-    }
-    // Context bonuses — دانه‌های جدید
-    if (ctx === 'afterdinner' && b.id === 'harrar')                             score += 16;
-    if (ctx === 'morning'     && b.id === 'tanzania')                           score += 16;
-    if (ctx === 'reading'     && b.id === 'geisha')                             score += 12;
-    if (ans.state === 'energised' && b.id === 'tanzania')                       score += 6;
-    // Brew method bonus (وزن ۳۰ — معادل یه سوال مستقل)
-    const BREW_SCORES = {
-      yirgacheffe: { v60:10, frenchpress:2,  espresso:0,  aeropress:8,  coldbrew:4,  other:5 },
-      kenya:       { v60:9,  frenchpress:3,  espresso:4,  aeropress:8,  coldbrew:3,  other:5 },
-      rwanda:      { v60:8,  frenchpress:4,  espresso:2,  aeropress:9,  coldbrew:4,  other:6 },
-      sidama:      { v60:5,  frenchpress:9,  espresso:3,  aeropress:6,  coldbrew:9,  other:5 },
-      colombia:    { v60:7,  frenchpress:7,  espresso:8,  aeropress:8,  coldbrew:5,  other:7 },
-      brazil:      { v60:5,  frenchpress:8,  espresso:10, aeropress:5,  coldbrew:7,  other:5 },
-      guatemala:   { v60:5,  frenchpress:7,  espresso:10, aeropress:4,  coldbrew:4,  other:5 },
-      sumatra:     { v60:1,  frenchpress:10, espresso:7,  aeropress:4,  coldbrew:9,  other:5 },
-      harrar:      { v60:2,  frenchpress:9,  espresso:7,  aeropress:4,  coldbrew:5,  other:5 },
-      tanzania:    { v60:9,  frenchpress:3,  espresso:3,  aeropress:8,  coldbrew:4,  other:5 },
-      geisha:      { v60:10, frenchpress:1,  espresso:0,  aeropress:7,  coldbrew:3,  other:5 },
+/* ═══════════════════════════════════════════
+   SAVE PROFILE TO SUPABASE
+═══════════════════════════════════════════ */
+async function saveProfile(rec) {
+  if (!currentUser) return;
+  try {
+    const data = {
+      user_id: currentUser.id,
+      flavor: ans.taste,
+      body: ans.body,
+      mood: ans.state,
+      context: ans.context,
+      brew_method: ans.brew,
+      experience: ans.experience,
+      recommended_bean: rec.name + ' (' + rec.detail + ')'
     };
-    if (ans.brew && BREW_SCORES[b.id] && BREW_SCORES[b.id][ans.brew] !== undefined) {
-      score += BREW_SCORES[b.id][ans.brew] * 3;
-    }
-    return { b, score };
-  });
-  scored.sort((a, b) => b.score - a.score);
+    const result = await sb('POST', 'coffee_profiles', data);
+    if (result && result[0]) currentProfileId = result[0].id;
+    document.getElementById('save-success').classList.add('visible');
 
-  // ideal match — بهترین امتیاز بدون در نظر گرفتن موجودی
-  const ideal = scored[0].b;
-
-  // اولین دانه موجود رو پیدا کن
-  const available = scored.find(x => AVAILABLE.includes(x.b.id));
-  const pick = available ? available.b : ideal;
-
-  // اگه دانه ایده‌آل موجود نبود، نزدیک‌ترین رو با پیام مشخص کن
-  pick._rawScore  = scored[0].score;
-  pick._idealName = (pick.id !== ideal.id) ? ideal.name : null;
-  pick._isBlend   = false;
-  pick._blendName = null;
-
-  const blendScored = BLENDS.map(b => {
-    let s = 0;
-    s += (b.s[ans.taste]      || 0) * 4.5;
-    s += (b.s[ans.body]       || 0) * 2.5;
-    s += (b.s[ans.state]      || 0) * 2;
-    s += (b.s[ans.experience] || 0) * 1;
-    if (ans.brew && b.brewScores && b.brewScores[ans.brew] !== undefined) {
-      s += b.brewScores[ans.brew] * 3;
-    }
-    return { b, score: s };
-  });
-  blendScored.sort((a, b) => b.score - a.score);
-  pick._suggestedBlend = blendScored[0].b;
-
-  return pick;
+    // همزمان به Apps Script هم بفرست
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ ...data, name: currentUser.name, phone: currentUser.phone })
+    }).catch(() => {});
+  } catch(e) {
+    console.warn('Save profile error:', e);
+  }
 }
 
-/* ── RENDER RESULT ── */
-function setEl(id, val) { const e = document.getElementById(id); if(e) e.textContent = val; }
-function setHtml(id, val) { const e = document.getElementById(id); if(e) e.innerHTML = val; }
-
-function render(b) {
-  const firstName = name.split(' ')[0];
-  setEl('r-for', currentLang === 'fa' ? 'برای ' + firstName : 'For ' + firstName);
-  setEl('r-name', b.name);
-  setEl('r-origin', b.detail + ' · ' + b.origin);
-
-  // اگه alternative هست، badge نشون بده
-  const altBadge = document.getElementById('r-alt-badge');
-  if (altBadge) {
-    if (b._idealName) {
-      altBadge.style.display = 'block';
-      const msg = currentLang === 'fa'
-        ? '✨ انتخاب ایده‌آل شما <strong>' + b._idealName + '</strong> است — امروز نزدیک‌ترین گزینه موجود را پیشنهاد می‌دهیم.'
-        : '✨ Your ideal match is <strong>' + b._idealName + '</strong> — today we recommend the closest available profile.';
-      altBadge.innerHTML = msg;
-    } else {
-      altBadge.style.display = 'none';
-    }
-  }
-  setEl('r-roast', b.roast);
-  setEl('r-brew', b.brew);
-  setEl('r-temp', b.temp);
-  setEl('r-ratio', b.ratio || '1g : 15g');
-  if (b.roastInfo) {
-    setEl('r-charge', b.roastInfo.charge);
-    setEl('r-drop', b.roastInfo.drop);
-    setEl('r-time', b.roastInfo.time);
-    setEl('r-dtr', b.roastInfo.dtr);
-  }
-  setEl('r-desc', b.desc);
-
-  const tags = document.getElementById('r-flavors');
-  tags.innerHTML = '';
-  b.flavors.forEach(f => {
-    const t = document.createElement('span');
-    t.className = 'flavor-tag';
-    t.textContent = f;
-    tags.appendChild(t);
-  });
-  // Rest days — بر اساس روش brew انتخابی
-  if (b.restDays) {
-    const brew = ans.brew || 'default';
-    let days;
-    if      (brew === 'espresso')                                              days = b.restDays.espresso;
-    else if (brew === 'coldbrew')                                              days = b.restDays.coldbrew;
-    else if (['frenchpress','aeropress','v60','other'].includes(brew))         days = b.restDays.filter;
-    else                                                                       days = b.restDays.default;
-
-    // reminder 2 روز قبل از اولین روز قابل استفاده
-    const reminderIn = Math.max(days - 2, 1);
-
-    // rest card text
-    const restEl = document.getElementById('rest-card-text');
-    if (restEl) {
-      if (currentLang === 'fa') {
-        restEl.innerHTML = '⏰ <strong>' + days + ' روز</strong> بعد از رست آماده است. وقتی به بهترین پنجره نوشیدن رسید یادت می‌اندازیم. ☕';
-      } else {
-        restEl.innerHTML = '⏰ <strong>Ready in ' + days + ' days.</strong> We\'ll remind you 2 days before — and we\'ll have a little surprise waiting for you at the café. ☕';
-      }
-    }
-    // reminder note
-    const noteEl = document.getElementById('chk-reminder-note');
-    if (noteEl) {
-      if (currentLang === 'fa') {
-        noteEl.textContent = reminderIn + ' روز دیگر یه سورپرایز برات داریم — جاتو رزرو کن!';
-      } else {
-        noteEl.textContent = "We\'ll surprise you in " + reminderIn + ' days — save your spot at the café!';
-      }
-    }
-  }
-
-  // ─── Coffee Identity Name FA ───
-  const stateLabel = {
-    energised:'پرانرژی', focused:'متمرکز', creative:'خلاق',
-    relaxed:'آرام', reflective:'تأملی'
-  }[ans.state] || '';
-  const tasteLabel = {
-    floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند'
-  }[ans.taste] || '';
-  const brewLabel = {
-    v60:'Pour Over', frenchpress:'فرنچ پرس', espresso:'اسپرسو',
-    aeropress:'ایروپرس', coldbrew:'کولد برو', other:'انعطاف‌پذیر'
-  }[ans.brew] || '';
-
-  const IDENTITY_NAMES_FA = {
-    'floral+creative':'کاشف خلاق', 'floral+energised':'رویاپرداز صبحگاهی',
-    'floral+focused':'هنرمند متمرکز', 'floral+relaxed':'روح لطیف',
-    'floral+reflective':'متفکر آرام', 'sweet+creative':'خالق شادمان',
-    'sweet+energised':'آغازگر روشن', 'sweet+focused':'ذهن پایدار',
-    'sweet+relaxed':'نوشنده راحت', 'sweet+reflective':'رویاپرداز گرم',
-    'chocolatey+creative':'بینشور جسور', 'chocolatey+energised':'دمنوش قدرت',
-    'chocolatey+focused':'کارگر عمیق', 'chocolatey+relaxed':'دنباله‌رو آرامش',
-    'chocolatey+reflective':'جغد شب', 'bold+creative':'کاشف وحشی',
-    'bold+energised':'آغازگر قوی', 'bold+focused':'متفکر شدید',
-    'bold+relaxed':'عاشق طبیعت', 'bold+reflective':'فیلسوف عمیق',
-  };
-  const identityKey = (ans.taste||'')+'+' +(ans.state||'');
-  const idNameEl = document.getElementById('r-identity-name');
-  if (idNameEl) idNameEl.textContent = IDENTITY_NAMES_FA[identityKey] || 'کاشف قهوه';
-
-  const identityBadge = document.getElementById('r-identity-badge');
-  if (identityBadge) {
-    identityBadge.innerHTML = '';
-    [stateLabel, tasteLabel, b.roast, brewLabel].filter(Boolean).forEach(tag => {
-      const span = document.createElement('span');
-      span.className = 'identity-tag';
-      span.textContent = tag;
-      identityBadge.appendChild(span);
-    });
-  }
-
-  const maxPossible = 10*4.5+10*2.5+10*2+10*1+30+20;
-  const matchPct = Math.min(Math.round((b._rawScore||80)/maxPossible*100+40),98);
-  const fillEl = document.getElementById('r-match-fill');
-  const pctEl  = document.getElementById('r-match-pct');
-  if (fillEl) fillEl.style.width = matchPct+'%';
-  if (pctEl)  pctEl.textContent  = matchPct+'%';
-
-  const whyCard = document.getElementById('why-card');
-  if (whyCard) {
-    const reasons = [];
-    if (ans.taste==='floral')     reasons.push('با ذائقه گلی شما مطابقت دارد');
-    if (ans.taste==='sweet')      reasons.push('با ذائقه شیرین شما مطابقت دارد');
-    if (ans.taste==='chocolatey') reasons.push('با ذائقه شکلاتی شما مطابقت دارد');
-    if (ans.taste==='bold')       reasons.push('با ذائقه تند شما مطابقت دارد');
-    if (ans.state) reasons.push('ایده‌آل برای لحظات ' + (stateLabel||ans.state));
-    if (ans.brew)  reasons.push('مناسب برای ' + (brewLabel||ans.brew));
-    if (ans.body==='light')  reasons.push('بدن سبک — مانند چای، شفاف');
-    if (ans.body==='medium') reasons.push('بدن متوسط — صاف و متعادل');
-    if (ans.body==='full')   reasons.push('بدن سنگین — غنی و پوشاننده');
-    const whyList = document.getElementById('why-list');
-    if (whyList) {
-      whyList.innerHTML = '';
-      reasons.slice(0,4).forEach(r => {
-        whyList.innerHTML += '<div class="why-item"><div class="why-check">✓</div><span>'+r+'</span></div>';
-      });
-    }
-  }
-
-  // نمایش blend پیشنهادی
-  const blendCard = document.getElementById('blend-card');
-  if (blendCard && b._suggestedBlend) {
-    const bl = b._suggestedBlend;
-    blendCard.style.display = 'block';
-    document.getElementById('r-blend-name').textContent   = bl.name;
-    document.getElementById('r-blend-detail').textContent = bl.detail + ' · ' + bl.origin;
-    document.getElementById('r-blend-desc').textContent   = bl.desc;
-    const blendNote = currentLang === 'fa'
-      ? '⚗️ ترکیب جداگانه — هر دانه جداگانه رست می‌شود و سپس ترکیب می‌شود. حداقل سفارش: ۵۰ گرم از هر دانه.'
-      : '⚗️ Component Blend — each bean roasted separately, then combined. Min. order: 50g per bean.';
-    document.getElementById('r-blend-note').textContent = blendNote;
-    const blendFlavors = document.getElementById('r-blend-flavors');
-    blendFlavors.innerHTML = '';
-    bl.flavors.forEach(f => {
-      const t = document.createElement('span');
-      t.className = 'flavor-tag';
-      t.textContent = f;
-      blendFlavors.appendChild(t);
-    });
-  }
-
-  // Reset email button
-  const btn = document.getElementById('btn-email');
-  btn.textContent = currentLang === 'fa' ? '📧 ارسال به ایمیلم' : '📧 Send to My Email';
-  btn.disabled = false;
-  document.getElementById('success-msg').classList.remove('visible');
+/* ═══════════════════════════════════════════
+   ORDER
+═══════════════════════════════════════════ */
+function goToOrder() {
+  selectedAmount = null;
+  document.getElementById('amt-50').classList.remove('selected');
+  document.getElementById('amt-100').classList.remove('selected');
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-notes').value = '';
+  document.getElementById('order-error').classList.remove('visible');
+  document.getElementById('order-success').classList.remove('visible');
+  document.getElementById('order-bean-name').textContent = rec ? rec.name + ' (' + rec.detail + ')' : '—';
+  document.getElementById('order-bean-origin').textContent = rec ? rec.origin : '—';
+  show('screen-order');
 }
 
-/* ── EMAIL ── */
-// ── آدرس Google Apps Script ──
-// بعد از Deploy کردن، URL رو اینجا بذار
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
+function selectAmount(g) {
+  selectedAmount = g;
+  document.getElementById('amt-50').classList.toggle('selected', g === 50);
+  document.getElementById('amt-100').classList.toggle('selected', g === 100);
+}
 
-function sendEmail() {
-  // چک کردن order intent
-  const intentSelected = document.querySelector('input[name="order_intent"]:checked');
-  if (!intentSelected) {
-    const card = document.getElementById('order-intent-card');
-    if (card) {
-      card.style.border = '2px solid #C0392B';
-      card.style.borderRadius = '16px';
-      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const title = card.querySelector('.card-title');
-      if (title) title.style.color = '#C0392B';
-    }
-    return;
-  }
-  // reset border
-  const card = document.getElementById('order-intent-card');
-  if (card) {
-    card.style.border = '';
-    const title = card.querySelector('.card-title');
-    if (title) title.style.color = '';
-  }
+async function submitOrder() {
+  const errEl = document.getElementById('order-error');
+  const sucEl = document.getElementById('order-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
 
-  const btn = document.getElementById('btn-email');
-  btn.textContent = currentLang === 'fa' ? 'در حال ارسال…' : 'Sending…';
+  const address = document.getElementById('order-address').value.trim();
+  const notes   = document.getElementById('order-notes').value.trim();
+
+  if (!selectedAmount) return showErr(errEl, 'مقدار را انتخاب کنید (۵۰g یا ۱۰۰g)');
+  if (!address) return showErr(errEl, 'آدرس تحویل را وارد کنید');
+
+  const btn = document.getElementById('btn-submit-order');
   btn.disabled = true;
+  btn.textContent = '...';
 
-  // محاسبه rest days برای ایمیل
-  let restDaysForEmail = 5;
-  if (rec.restDays) {
-    const brew = ans.brew || 'default';
-    if      (brew === 'espresso')                                              restDaysForEmail = rec.restDays.espresso;
-    else if (brew === 'coldbrew')                                              restDaysForEmail = rec.restDays.coldbrew;
-    else if (['frenchpress','aeropress','v60','other'].includes(brew))         restDaysForEmail = rec.restDays.filter;
-    else                                                                       restDaysForEmail = rec.restDays.default;
-  }
-  const reminderDays = Math.max(restDaysForEmail - 2, 1);
+  try {
+    await sb('POST', 'orders', {
+      user_id: currentUser.id,
+      profile_id: currentProfileId || null,
+      amount: selectedAmount,
+      address,
+      notes,
+      status: 'pending',
+      payment_status: 'unpaid'
+    });
 
-  const params = {
-    to_name:      name,
-    to_email:     email,
-    bean_name:    rec.name + ' (' + rec.detail + ')',
-    origin:       rec.origin,
-    flavors:      rec.flavors.join(', '),
-    roast:        rec.roast,
-    brew_method:  rec.brew,
-    brew_chosen:  ans.brew || '—',
-    water_temp:   rec.temp,
-    ratio:        rec.ratio || '1g : 15g',
-    description:  rec.desc,
-    charge_temp:  rec.roastInfo ? rec.roastInfo.charge : '—',
-    drop_temp:    rec.roastInfo ? rec.roastInfo.drop   : '—',
-    roast_time:   rec.roastInfo ? rec.roastInfo.time   : '—',
-    dtr:          rec.roastInfo ? rec.roastInfo.dtr     : '—',
-    rest_days:    restDaysForEmail + ' days',
-    reminder_in:  reminderDays + ' days',
-    alt_bean:     rec._idealName  || '—',
-    blend_name:   rec._suggestedBlend ? rec._suggestedBlend.name : '—',
-    blend_detail: rec._suggestedBlend ? rec._suggestedBlend.detail : '—',
-    blend_flavors:rec._suggestedBlend ? rec._suggestedBlend.flavors.join(', ') : '—',
-  };
+    sucEl.textContent = '✅ سفارش شما ثبت شد! تیم رستری به زودی با شما تماس می‌گیرد.';
+    sucEl.classList.add('visible');
+    btn.textContent = '✅ ثبت شد';
 
-  if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
-    const wantsReminderEarly = document.getElementById('chk-reminder').checked;
-    saveForReminder(restDaysForEmail, reminderDays, wantsReminderEarly);
-  }
-
-  if (EJS_SERVICE !== 'YOUR_SERVICE_ID') {
-    emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params)
-      .then(() => {
-        document.getElementById('success-msg').classList.add('visible');
-        btn.textContent = currentLang === 'fa' ? '✅ ارسال شد!' : '✅ Sent!';
-        // اگه چک‌باکس ریمایندر تیک خورده، اطلاعات رو ذخیره کن
-        // دیتا قبلاً ذخیره شده
+    // اطلاع به Apps Script
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'order',
+        name: currentUser.name,
+        phone: currentUser.phone,
+        bean: rec ? rec.name : '—',
+        amount: selectedAmount + 'g',
+        address, notes
       })
-      .catch((err) => {
-        // حتی اگه EmailJS خطا برگردوند، ایمیل ممکنه رفته باشه
-        // success نشون بده و فقط در console log کن
-        console.warn('EmailJS response error (email may have sent):', err);
-        document.getElementById('success-msg').classList.add('visible');
-        btn.textContent = currentLang === 'fa' ? '✅ ارسال شد!' : '✅ Sent!';
-      });
-  } else {
-    fallbackMailto();
-    document.getElementById('success-msg').classList.add('visible');
-    document.getElementById('success-msg').textContent = currentLang === 'fi' ? '✅ Sähköpostiohjelma avautui!' : '✅ Email client opened!';
+    }).catch(() => {});
+
+  } catch(e) {
+    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
     btn.disabled = false;
-    btn.textContent = STRINGS[currentLang]['btn-email'];
+    btn.innerHTML = '<span class="en-only">✅ Submit Order</span><span class="fa-only">✅ ثبت سفارش</span>';
+    setLang(currentLang);
   }
 }
 
-function saveForReminder(restDaysVal, reminderDaysVal, wantsReminder) {
-  // محاسبه reminder date
-  const today = new Date();
-  const reminderDate = new Date(today);
-  reminderDate.setDate(today.getDate() + reminderDaysVal);
-  const reminderDateStr = reminderDate.toISOString().split('T')[0]; // YYYY-MM-DD
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.classList.add('visible');
+}
 
-  const data = {
-    name:             name,
-    email:            email,
-    language:         currentLang,
-    q1_taste:         ans.taste      || '',
-    q2_body:          ans.body       || '',
-    q3_state:         ans.state      || '',
-    q4_context:       ans.context    || '',
-    q5_brew:          ans.brew       || '',
-    q6_experience:    ans.experience || '',
-    bean:             rec.name + ' (' + rec.detail + ')',
-    is_blend:         rec._isBlend ? 'YES' : 'NO',
-    blend_name:       rec._blendName || '',
-    flavors:          rec.flavors.join(', '),
-    roast:            rec.roast,
-    brew_method:      rec.brew,
-    rest_days:        restDaysVal,
-    reminder_date:    wantsReminder ? reminderDateStr : '',
-    reminder_wanted:  wantsReminder ? 'YES' : 'NO',
-    order_status:     '',
-    roastery_partner: '',
-    order_intent:     (document.querySelector('input[name="order_intent"]:checked') || {}).value || 'not_answered',
-    country:          userLocation.country      || '',
-    city:             userLocation.city         || '',
-    country_code:     userLocation.country_code || '',
+/* ═══════════════════════════════════════════
+   BEAN DATABASE
+═══════════════════════════════════════════ */
+const BEANS = [
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', s:{floral:10,sweet:4,chocolatey:0,bold:0,light:10,medium:5,full:0,energised:6,focused:6,creative:10,relaxed:4,reflective:7,beginner:4,regular:7,enthusiast:10} },
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', s:{floral:5,sweet:5,chocolatey:2,bold:4,light:7,medium:8,full:2,energised:10,focused:10,creative:6,relaxed:3,reflective:4,beginner:5,regular:9,enthusiast:9} },
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', s:{floral:6,sweet:10,chocolatey:3,bold:2,light:6,medium:8,full:3,energised:5,focused:7,creative:7,relaxed:9,reflective:6,beginner:10,regular:9,enthusiast:6} },
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', s:{floral:5,sweet:9,chocolatey:4,bold:3,light:3,medium:8,full:7,energised:4,focused:4,creative:8,relaxed:9,reflective:7,beginner:5,regular:8,enthusiast:9} },
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', s:{floral:2,sweet:8,chocolatey:7,bold:4,light:3,medium:9,full:5,energised:5,focused:7,creative:5,relaxed:8,reflective:6,beginner:10,regular:9,enthusiast:6} },
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', s:{floral:0,sweet:7,chocolatey:10,bold:4,light:1,medium:7,full:9,energised:3,focused:5,creative:3,relaxed:10,reflective:7,beginner:9,regular:8,enthusiast:5} },
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', s:{floral:0,sweet:5,chocolatey:9,bold:7,light:1,medium:5,full:8,energised:3,focused:5,creative:4,relaxed:7,reflective:9,beginner:6,regular:8,enthusiast:7} },
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', s:{floral:0,sweet:2,chocolatey:6,bold:10,light:0,medium:2,full:10,energised:2,focused:4,creative:3,relaxed:7,reflective:10,beginner:3,regular:6,enthusiast:9} },
+];
+
+const AVAILABLE = ['yirgacheffe','kenya','rwanda','sidama','colombia','brazil','guatemala','sumatra'];
+
+/* ═══════════════════════════════════════════
+   RECOMMENDATION ENGINE
+═══════════════════════════════════════════ */
+function recommend() {
+  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  const scored = pool.map(b => {
+    let score = 0;
+    score += (b.s[ans.taste]      || 0) * 4.5;
+    score += (b.s[ans.body]       || 0) * 2.5;
+    score += (b.s[ans.state]      || 0) * 2;
+    score += (b.s[ans.experience] || 0) * 1;
+    return { ...b, _score: score };
+  });
+  scored.sort((a, b) => b._score - a._score);
+  const best = scored[0];
+  best._matchPct = Math.min(100, Math.round((best._score / 100) * 100));
+  return best;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+═══════════════════════════════════════════ */
+function render(r) {
+  // Identity name
+  const identityMap = {
+    floral: { en: 'The Floral Soul', fa: 'روح گل‌ها' },
+    sweet:  { en: 'The Sweet Wanderer', fa: 'دل‌شیفته شیرینی' },
+    chocolatey: { en: 'The Dark Roast Devotee', fa: 'عاشق تلخی' },
+    bold:   { en: 'The Bold Explorer', fa: 'کاوشگر جسور' }
   };
-  fetch(APPS_SCRIPT_URL, {
-    method: 'POST',
-    body: JSON.stringify(data)
-  }).catch(() => {}); // silent fail — reminder is optional
-}
+  const identity = identityMap[ans.taste] || { en: 'The Coffee Soul', fa: 'روح قهوه' };
+  document.getElementById('r-identity-name').textContent = currentLang === 'fa' ? identity.fa : identity.en;
 
-function fallbackMailto() {
-  const btn = document.getElementById('btn-email');
-  const msg = document.getElementById('success-msg');
-  msg.style.background = '#FFF0E0';
-  msg.style.color = '#8B4513';
-  msg.style.border = '1px solid #E8C99A';
-  msg.textContent = currentLang === 'fi' ? '⚠️ Lähetys epäonnistui. Tarkista EmailJS-asetukset.' : '⚠️ Could not send email. Please check your EmailJS settings.';
-  msg.classList.add('visible');
-  btn.textContent = STRINGS[currentLang]['btn-email'];
-  btn.disabled = false;
-}
+  // Badge tags
+  const badge = document.getElementById('r-identity-badge');
+  const tags = [ans.body, ans.state, ans.experience].filter(Boolean);
+  badge.innerHTML = tags.map(t => `<span class="identity-tag">${t}</span>`).join('');
 
-/* ── LANGUAGE ── */
-const STRINGS = {
-  en: {
-    'lbl-name':           'Your Name',
-    'lbl-email':          'Email',
-    'btn-start':          'Begin Your Journey →',
-    'back-1': '← Back', 'back-2': '← Back', 'back-3': '← Back', 'back-4': '← Back', 'back-5': '← Back', 'back-6': '← Back',
-    'btn-1': 'Next →', 'btn-2': 'Next →', 'btn-3': 'Next →', 'btn-4': 'Next →', 'btn-5': 'Next →',
-    'btn-6':              'Find My Coffee ✨',
-    'title-flavors':      'Flavor Notes',
-    'title-brew':         'How to Brew',
-    'lbl-roast':          '🌡️ Roast Level',
-    'lbl-brew-method':    '☕ Brew Method',
-    'lbl-temp':           '💧 Water Temp',
-    'lbl-ratio':          '⚖️ Coffee : Water',
-    'rest-card-text':     '⏰ <strong>Important:</strong> Your freshly roasted beans need <strong>5–7 days to rest</strong> before they reach peak flavor. Take them home today — the best cup is worth the wait!',
-    'chk-reminder-title': '☕ Remind me when it\'s ready',
-    'chk-reminder-note':  'We\'ll email you in 6 days when your beans reach peak flavor',
-    'btn-email':          '📧 Send to My Email',
-    'success-msg':        '✅ Sent! Check your inbox.',
-    'btn-reset':          'Start Over',
-    'title-roast-guide':  'Roast Guide',
-    'inp-name-ph':        'Enter your name…',
-    'inp-email-ph':       'your@email.com',
-  },
-  fa: {
-    'lbl-name':           'نام شما',
-    'lbl-email':          'شماره موبایل',
-    'btn-start':          'شروع سفر →',
-    'back-1': '← بازگشت', 'back-2': '← بازگشت', 'back-3': '← بازگشت', 'back-4': '← بازگشت', 'back-5': '← بازگشت', 'back-6': '← بازگشت',
-    'btn-1': 'بعدی →', 'btn-2': 'بعدی →', 'btn-3': 'بعدی →', 'btn-4': 'بعدی →', 'btn-5': 'بعدی →',
-    'btn-6':              'قهوه من را پیدا کن ✨',
-    'title-flavors':      'نت‌های طعمی',
-    'title-brew':         'روش دم‌آوری',
-    'lbl-roast':          '🌡️ سطح رست',
-    'lbl-brew-method':    '☕ روش دم‌آوری',
-    'lbl-temp':           '💧 دمای آب',
-    'lbl-ratio':          '⚖️ قهوه : آب',
-    'rest-card-text':     '⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند. آن‌ها را امروز ببرید — بهترین فنجان ارزش انتظار را دارد!',
-    'chk-reminder-title': '☕ وقتی آماده شد یادم بینداز',
-    'chk-reminder-note':  'چند روز دیگر که دانه‌ها آماده شدند ایمیل می‌زنیم',
-    'btn-email':          '📧 درخواست رست تازه',
-    'success-msg':        '✅ ارسال شد! صندوق ورودی را چک کنید.',
-    'btn-reset':          'از اول شروع کن',
-    'title-roast-guide':  'راهنمای رست',
-    'inp-name-ph':        'نام خود را وارد کنید…',
-    'inp-email-ph':       'مثال: 09121234567',
+  // Match score
+  const pct = r._matchPct || 85;
+  document.getElementById('r-match-pct').textContent = pct + '%';
+  document.getElementById('r-match-fill').style.width = pct + '%';
+
+  // Bean info
+  document.getElementById('r-name').textContent = r.name;
+  document.getElementById('r-origin').textContent = r.origin;
+  document.getElementById('r-roast').textContent = r.roast;
+  document.getElementById('r-brew').textContent = r.brew;
+  document.getElementById('r-temp').textContent = r.temp;
+  document.getElementById('r-ratio').textContent = r.ratio;
+  document.getElementById('r-desc').textContent = r.desc;
+
+  // Roast guide
+  if (r.roastInfo) {
+    document.getElementById('r-charge').textContent = r.roastInfo.charge;
+    document.getElementById('r-drop').textContent = r.roastInfo.drop;
+    document.getElementById('r-time').textContent = r.roastInfo.time;
+    document.getElementById('r-dtr').textContent = r.roastInfo.dtr;
   }
-};
 
-let currentLang = 'en';
+  // Flavors
+  const fl = document.getElementById('r-flavors');
+  fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${f}</span>`).join('');
 
-function setLang(lang) {
-  currentLang = lang;
-  document.body.className = 'lang-' + lang;
-  document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
-  document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
-  document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
-  const s = STRINGS[lang];
-  // Update text content
-  ['lbl-name','lbl-email','btn-start',
-   'back-1','back-2','back-3','back-4','back-5','back-6',
-   'btn-1','btn-2','btn-3','btn-4','btn-5','btn-6',
-   'title-flavors','title-brew',
-   'lbl-roast','lbl-brew-method','lbl-temp','lbl-ratio',
-   'chk-reminder-title','chk-reminder-note',
-   'btn-reset'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = s[id];
-  });
-  // innerHTML for elements with <strong>
-  const rct = document.getElementById('rest-card-text');
-  if (rct) rct.innerHTML = s['rest-card-text'];
-  // Success msg only if not currently showing an error
-  const sm = document.getElementById('success-msg');
-  if (sm && sm.style.background !== 'rgb(255, 240, 224)') sm.textContent = s['success-msg'];
-  // Placeholders
-  document.getElementById('inp-name').placeholder  = s['inp-name-ph'];
-  document.getElementById('inp-email').placeholder = s['inp-email-ph'];
-  // Email button — don't overwrite if mid-send
-  const eb = document.getElementById('btn-email');
-  if (eb && !eb.disabled) eb.textContent = s['btn-email'];
-}
-
-/* ── RESET ── */
-function selectIntent(radio) {
-  ['intent-yes-label','intent-maybe-label','intent-explore-label'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.border = '2px solid transparent';
-  });
-  const label = radio.closest('label');
-  if (label) label.style.border = '2px solid var(--caramel)';
+  // Why this coffee
+  const whyMap = {
+    floral: 'گلی و میوه‌ای بودن این دانه با ذائقه شما هماهنگ است',
+    sweet: 'شیرینی طبیعی این دانه دقیقاً چیزی است که دنبالش هستید',
+    chocolatey: 'نت‌های شکلاتی غنی این قهوه برای شما ایده‌آل است',
+    bold: 'قدرت و عمق این دانه با شخصیت قهوه‌ای شما می‌خواند'
+  };
+  const why = document.getElementById('why-list');
+  const reasons = [
+    whyMap[ans.taste] || '',
+    ans.body === 'light' ? 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد' :
+    ans.body === 'full'  ? 'قدرت و غنای این قهوه با خواسته شما هماهنگ است' : '',
+    ans.experience === 'enthusiast' ? 'پیچیدگی این دانه برای کسی مثل شما طراحی شده' : ''
+  ].filter(Boolean);
+  why.innerHTML = reasons.map(r => `<div class="why-item"><div class="why-check">✓</div>${r}</div>`).join('');
 }
 
 function toggleRoastGuide() {
   const card = document.getElementById('roast-card');
   const btn  = document.querySelector('.staff-toggle');
-  if (card.style.display === 'none') {
-    card.style.display = 'block';
-    btn.textContent = '🔥 نمای رستری: راهنمای رست ▲';
-  } else {
-    card.style.display = 'none';
-    btn.textContent = '🔥 نمای رستری: راهنمای رست ▼';
-  }
+  const visible = card.style.display !== 'none';
+  card.style.display = visible ? 'none' : 'block';
+  btn.textContent = (visible ? '🔥 راهنمای رست ▼' : '🔥 راهنمای رست ▲');
 }
 
-function reset() {
-  name = ''; email = '';
-  ans  = { taste:null, body:null, state:null, context:null, brew:null, experience:null };
-  rec  = null;
-  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
-  ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => document.getElementById(id).disabled = true);
-  document.getElementById('inp-name').value  = '';
-  document.getElementById('inp-email').value = '';
-  const phoneReset = document.getElementById('inp-phone');
-  if (phoneReset) phoneReset.value = '';
-  show('screen-welcome');
+/* ═══════════════════════════════════════════
+   LANGUAGE
+═══════════════════════════════════════════ */
+function setLang(lang) {
+  currentLang = lang;
+  document.body.className = 'lang-' + lang;
+  document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
+  document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
 }
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {});
-  });
-}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+setLang('fa');
+checkAutoLogin();
 </script>
 </body>
 </html>
