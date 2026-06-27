@@ -457,7 +457,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
   <div class="input-group">
     <label class="input-label" id="lbl-email">Email</label>
-    <input class="input-field" id="inp-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    <input class="input-field en-only" id="inp-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    <input class="input-field fa-only" id="inp-phone" type="tel" placeholder="مثال: 09121234567" autocomplete="tel" dir="ltr" />
   </div>
 
   <div class="spacer"></div>
@@ -1204,12 +1205,18 @@ function pick(el, category, value) {
 
 function startJourney() {
   name  = document.getElementById('inp-name').value.trim();
-  email = document.getElementById('inp-email').value.trim();
+  // در FA از شماره موبایل استفاده کن
+  const phoneEl = document.getElementById('inp-phone');
+  email = (currentLang === 'fa' && phoneEl)
+    ? phoneEl.value.trim()
+    : document.getElementById('inp-email').value.trim();
   const nameEl  = document.getElementById('inp-name');
   const emailEl = document.getElementById('inp-email');
   nameEl.classList.remove('error');
   emailEl.classList.remove('error');
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = currentLang === 'fa'
+    ? email.length >= 11
+    : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if (!name)        { nameEl.classList.add('error');  nameEl.focus(); return; }
   if (!emailValid)  { emailEl.classList.add('error'); emailEl.focus(); return; }
   show('screen-1');
@@ -1716,7 +1723,7 @@ const STRINGS = {
   },
   fa: {
     'lbl-name':           'نام شما',
-    'lbl-email':          'ایمیل',
+    'lbl-email':          'شماره موبایل',
     'btn-start':          'شروع سفر →',
     'back-1': '← بازگشت', 'back-2': '← بازگشت', 'back-3': '← بازگشت', 'back-4': '← بازگشت', 'back-5': '← بازگشت', 'back-6': '← بازگشت',
     'btn-1': 'بعدی →', 'btn-2': 'بعدی →', 'btn-3': 'بعدی →', 'btn-4': 'بعدی →', 'btn-5': 'بعدی →',
@@ -1735,7 +1742,7 @@ const STRINGS = {
     'btn-reset':          'از اول شروع کن',
     'title-roast-guide':  'راهنمای رست',
     'inp-name-ph':        'نام خود را وارد کنید…',
-    'inp-email-ph':       'email@example.com',
+    'inp-email-ph':       'مثال: 09121234567',
   }
 };
 
@@ -1803,6 +1810,8 @@ function reset() {
   ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => document.getElementById(id).disabled = true);
   document.getElementById('inp-name').value  = '';
   document.getElementById('inp-email').value = '';
+  const phoneReset = document.getElementById('inp-phone');
+  if (phoneReset) phoneReset.value = '';
   show('screen-welcome');
 }
 </script>
