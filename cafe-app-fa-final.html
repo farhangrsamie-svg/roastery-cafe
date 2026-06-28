@@ -979,19 +979,6 @@ async function submitOrder() {
     sucEl.classList.add('visible');
     btn.textContent = '✅ ثبت شد';
 
-    // اطلاع به Apps Script
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'order',
-        name: currentUser.name,
-        phone: currentUser.phone,
-        bean: rec ? rec.name : '—',
-        amount: selectedAmount + 'g',
-        address, notes
-      })
-    }).catch(() => {});
-
   } catch(e) {
     showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
     btn.disabled = false;
