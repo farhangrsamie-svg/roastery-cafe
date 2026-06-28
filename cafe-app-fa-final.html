@@ -1,4 +1,32 @@
 <!DOCTYPE html>
+<!-- 
+  ╔═══════════════════════════════════════════════════════╗
+  ║   هویت قهوه — Coffee Identity Platform               ║
+  ║   Version: 4.0 — Archive Build                       ║
+  ║   Date: 2026-06-28                                   ║
+  ║                                                       ║
+  ║   Stack:                                             ║
+  ║   • Hosting: GitHub Pages                            ║
+  ║   • Database: Supabase (qoxmkuivwpbdzmajplus)        ║
+  ║   • Sheet Log: Google Apps Script                    ║
+  ║   • Auth: Phone + Password (manual)                  ║
+  ║                                                       ║
+  ║   Screens:                                           ║
+  ║   1. Auth (Login / Register)                         ║
+  ║   2. Dashboard (Profiles + Orders)                   ║
+  ║   3. Quiz (6 questions)                              ║
+  ║   4. Result (Coffee profile)                         ║
+  ║   5. Order (50g / 100g + address)                    ║
+  ║   6. Payment (Manual card transfer)                  ║
+  ║   7. Profile Detail                                  ║
+  ║                                                       ║
+  ║   TODO (Next phases):                                ║
+  ║   • OTP via Kavenegar                               ║
+  ║   • IDPay payment gateway                           ║
+  ║   • Admin panel                                      ║
+  ║   • Multi-roastery support                          ║
+  ╚═══════════════════════════════════════════════════════╝
+-->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1546,6 +1574,12 @@ async function confirmDelete(profileId, overlay) {
   btn.textContent = '...';
   btn.disabled = true;
   try {
+    // اول profile_id در سفارش‌ها رو null کن تا foreign key مشکل نداشته باشه
+    await sb('PATCH', `orders?profile_id=eq.${profileId}`, { profile_id: null });
+  } catch(e) {
+    // اگه سفارشی نبود مشکلی نیست
+  }
+  try {
     await sb('DELETE', `coffee_profiles?id=eq.${profileId}`);
     overlay.remove();
     // انیمیشن حذف کارت
@@ -1559,7 +1593,8 @@ async function confirmDelete(profileId, overlay) {
   } catch(e) {
     btn.textContent = 'حذف کن';
     btn.disabled = false;
-    console.warn('Delete error:', e);
+    console.warn('Delete error:', e.message);
+    alert('خطا: ' + e.message);
   }
 }
 
