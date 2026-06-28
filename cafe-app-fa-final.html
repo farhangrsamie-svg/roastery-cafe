@@ -875,7 +875,7 @@ function showLoading() {
 async function saveProfile(rec) {
   if (!currentUser) return;
   try {
-    const data = {
+    const supaData = {
       user_id: currentUser.id,
       flavor: ans.taste,
       body: ans.body,
@@ -885,14 +885,41 @@ async function saveProfile(rec) {
       experience: ans.experience,
       recommended_bean: rec.name + ' (' + rec.detail + ')'
     };
-    const result = await sb('POST', 'coffee_profiles', data);
+    const result = await sb('POST', 'coffee_profiles', supaData);
     if (result && result[0]) currentProfileId = result[0].id;
     document.getElementById('save-success').classList.add('visible');
 
-    // همزمان به Apps Script هم بفرست
+    // ارسال کامل داده به Apps Script (همان فرمت v3)
+    const restDays = rec.restDays ? (rec.restDays[ans.brew] || rec.restDays.default || 5) : 5;
+    const scriptData = {
+      name:           currentUser.name || '',
+      email:          currentUser.phone || '',
+      language:       currentLang,
+      q1_taste:       ans.taste      || '',
+      q2_body:        ans.body       || '',
+      q3_state:       ans.state      || '',
+      q4_context:     ans.context    || '',
+      q5_brew:        ans.brew       || '',
+      q6_experience:  ans.experience || '',
+      bean:           rec.name + ' (' + rec.detail + ')',
+      is_blend:       rec._isBlend ? 'YES' : 'NO',
+      blend_name:     rec._blendName || '',
+      flavors:        (rec.flavors || []).join(', '),
+      roast:          rec.roast || '',
+      brew_method:    rec.brew  || '',
+      rest_days:      restDays,
+      reminder_date:  '',
+      reminder_wanted:'NO',
+      order_status:   '',
+      roastery_partner:'',
+      order_intent:   '',
+      country:        '',
+      city:           '',
+      country_code:   '',
+    };
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ ...data, name: currentUser.name, phone: currentUser.phone })
+      body: JSON.stringify(scriptData)
     }).catch(() => {});
   } catch(e) {
     console.warn('Save profile error:', e);
