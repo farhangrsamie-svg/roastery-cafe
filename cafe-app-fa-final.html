@@ -2,7 +2,7 @@
 <!-- 
   ╔═══════════════════════════════════════════════════════╗
   ║   هویت قهوه — Coffee Identity Platform               ║
-  ║   Version: 4.0 — Archive Build                       ║
+  ║   Version: 5.0 — Archive Build                       ║
   ║   Date: 2026-06-28                                   ║
   ║                                                       ║
   ║   Stack:                                             ║
@@ -11,27 +11,51 @@
   ║   • Sheet Log: Google Apps Script                    ║
   ║   • Auth: Phone + Password (manual)                  ║
   ║                                                       ║
+  ║   Supabase Tables:                                   ║
+  ║   • users (id, phone, name, password_hash)           ║
+  ║   • coffee_profiles (id, user_id, flavor, body,      ║
+  ║     mood, context, brew_method, experience,          ║
+  ║     recommended_bean, is_favorite)                   ║
+  ║   • orders (id, user_id, profile_id, amount,         ║
+  ║     address, notes, status, payment_status)          ║
+  ║                                                       ║
   ║   Screens:                                           ║
   ║   1. Auth (Login / Register)                         ║
-  ║   2. Dashboard (Profiles + Orders)                   ║
+  ║   2. Dashboard (Profiles + Orders + Stats)           ║
   ║   3. Quiz (6 questions)                              ║
-  ║   4. Result (Coffee profile)                         ║
-  ║   5. Order (50g / 100g + address)                    ║
-  ║   6. Payment (Manual card transfer)                  ║
-  ║   7. Profile Detail                                  ║
+  ║   4. Result (Coffee profile + match score)           ║
+  ║   5. Order (50g / 100g + address + notes)            ║
+  ║   6. Payment (Manual card + receipt upload)          ║
+  ║   7. Profile Detail (view + reorder)                 ║
+  ║                                                       ║
+  ║   Features:                                          ║
+  ║   ✅ Bilingual FA/EN                                 ║
+  ║   ✅ Auto-login (localStorage)                       ║
+  ║   ✅ 8-bean recommendation engine                    ║
+  ║   ✅ Favorite profiles (⭐)                          ║
+  ║   ✅ Delete profile (with cascade fix)               ║
+  ║   ✅ 30-min payment timer                            ║
+  ║   ✅ Receipt image upload                            ║
+  ║   ✅ Google Sheet logging                            ║
   ║                                                       ║
   ║   TODO (Next phases):                                ║
   ║   • OTP via Kavenegar                               ║
   ║   • IDPay payment gateway                           ║
-  ║   • Admin panel                                      ║
+  ║   • Admin panel (order management)                  ║
   ║   • Multi-roastery support                          ║
+  ║   • PWA / mobile app                                ║
+  ║                                                       ║
+  ║   Config to update before production:                ║
+  ║   • SHOP_CARD — real card number                    ║
+  ║   • SHOP_OWNER — real owner name                    ║
+  ║   • PRICES — real prices                            ║
   ╚═══════════════════════════════════════════════════════╝
 -->
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>هویت قهوه — پلتفرم رست شخصی</title>
+<title>هویت قهوه | Coffee Identity — v5.0</title>
 <style>
 :root {
   --cream: #F5F0E8;
@@ -1719,20 +1743,7 @@ async function confirmPayment() {
       });
     }
 
-    // ارسال به Apps Script برای اطلاع ادمین
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'payment_receipt',
-        name: currentUser.name,
-        phone: currentUser.phone,
-        bean: rec ? rec.name : '—',
-        amount: selectedAmount + 'g',
-        price: (PRICES[selectedAmount] || 0).toLocaleString(),
-        transaction_id: txId,
-        order_id: pendingOrderId || '—'
-      })
-    }).catch(() => {});
+    // اطلاع به ادمین — فقط در Supabase ذخیره میشه (Sheet جداگانه نمیره تا دوبل نشه)
 
     // توقف تایمر
     if (paymentTimer) clearInterval(paymentTimer);
