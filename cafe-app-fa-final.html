@@ -202,6 +202,137 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
 /* ── DIVIDER ── */
 .divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
+
+/* ── PAYMENT ── */
+.payment-step {
+  background: var(--white); border-radius: 20px; padding: 22px;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; direction: rtl;
+}
+.payment-step-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--caramel);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: bold; font-family: Arial,sans-serif;
+  float: right; margin-left: 12px; flex-shrink: 0;
+}
+.payment-step-content { overflow: hidden; }
+.payment-step-title { font-size: 14px; font-weight: bold; color: var(--dark-brown); margin-bottom: 6px; }
+.payment-step-desc { font-size: 12px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; }
+.card-number-box {
+  background: linear-gradient(135deg, var(--dark-brown), var(--medium-brown));
+  border-radius: 16px; padding: 20px 22px; margin: 12px 0; direction: ltr; text-align: center;
+}
+.card-number { font-size: 22px; font-weight: bold; color: white; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+.card-owner { font-size: 11px; color: var(--caramel); margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
+.copy-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; border-radius: 8px; padding: 6px 14px; font-size: 11px;
+  font-family: Arial,sans-serif; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.25); }
+.amount-due-box {
+  background: #FDF5E8; border: 2px solid var(--light-caramel);
+  border-radius: 14px; padding: 16px 20px; margin: 12px 0; direction: rtl;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.amount-due-label { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; }
+.amount-due-value { font-size: 22px; font-weight: bold; color: var(--dark-brown); }
+.amount-due-currency { font-size: 12px; color: var(--caramel); font-family: Arial,sans-serif; }
+.upload-area {
+  border: 2px dashed var(--light-caramel); border-radius: 16px;
+  padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;
+  background: #FFFAF5; margin: 12px 0;
+}
+.upload-area:hover { border-color: var(--caramel); background: #FDF5E8; }
+.upload-area input { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.upload-sub { font-size: 11px; color: #AAA; margin-top: 4px; font-family: Arial,sans-serif; }
+.upload-preview { max-width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
+.payment-timer {
+  background: #FFF8EC; border: 1px solid #F0C070; border-radius: 12px;
+  padding: 12px 16px; text-align: center; margin-bottom: 16px; direction: rtl;
+}
+.timer-text { font-size: 12px; color: #C4956A; font-family: Arial,sans-serif; }
+.timer-count { font-size: 20px; font-weight: bold; color: var(--medium-brown); font-family: 'Courier New', monospace; margin-top: 4px; }
+
+/* ── DASHBOARD NEW ── */
+.dash-header-new {
+  background: linear-gradient(145deg, var(--dark-brown) 0%, var(--medium-brown) 100%);
+  margin: 0 -28px; padding: 32px 28px 28px; margin-bottom: 0;
+  position: relative; overflow: hidden;
+}
+.dash-header-new::before {
+  content: '☕'; position: absolute; right: -10px; top: -10px;
+  font-size: 120px; opacity: 0.06; line-height: 1;
+}
+.dash-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.dash-user-info {}
+.dash-welcome-new { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: Arial,sans-serif; margin-bottom: 4px; }
+.dash-name-new { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 2px; }
+.dash-phone-new { font-size: 12px; color: rgba(255,255,255,0.5); font-family: Arial,sans-serif; direction: ltr; }
+.dash-logout-new { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-family: Arial,sans-serif; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dash-logout-new:hover { background: rgba(255,255,255,0.2); }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.dash-stat { background: rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.dash-stat-num { font-size: 22px; font-weight: bold; color: var(--white); line-height: 1; }
+.dash-stat-label { font-size: 9px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
+
+/* ── NEW PROFILE BTN ── */
+.new-profile-btn {
+  background: linear-gradient(135deg, var(--caramel), #D4A574);
+  color: var(--white); border: none; border-radius: 18px;
+  padding: 20px 24px; width: 100%; text-align: right; direction: rtl;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 24px rgba(196,149,106,0.35);
+  display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.new-profile-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(196,149,106,0.45); }
+.new-profile-btn:active { transform: scale(0.98); }
+.new-profile-icon { font-size: 32px; flex-shrink: 0; }
+.new-profile-text {}
+.new-profile-title { font-size: 15px; font-weight: bold; color: var(--white); font-family: Arial,sans-serif; }
+.new-profile-sub { font-size: 11px; color: rgba(255,255,255,0.75); font-family: Arial,sans-serif; margin-top: 2px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; margin-top: 8px; }
+.section-title-new { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); font-family: Arial,sans-serif; font-weight: bold; }
+.section-count { background: var(--light-caramel); color: var(--medium-brown); border-radius: 20px; padding: 2px 10px; font-size: 11px; font-family: Arial,sans-serif; font-weight: bold; }
+
+/* ── PROFILE CARD NEW ── */
+.profile-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  direction: rtl; position: relative; overflow: hidden;
+}
+.profile-card-new::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--caramel); border-radius: 0 4px 4px 0;
+}
+.profile-card-new:hover { transform: translateY(-2px); border-color: var(--light-caramel); box-shadow: 0 6px 24px rgba(196,149,106,0.2); }
+.profile-card-new:active { transform: scale(0.99); }
+.profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
+.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
+.profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
+.profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.profile-tag-new { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
+
+/* ── ORDER CARD NEW ── */
+.order-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  direction: rtl; border: 2px solid transparent;
+}
+.order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
+.order-bean-small { font-size: 12px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
+.order-address-new { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
+
+/* ── PROFILE DETAIL SCREEN ── */
+.detail-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
+.detail-bean-name { font-size: 22px; font-weight: bold; color: var(--white); margin-bottom: 6px; }
+.detail-origin { font-size: 12px; color: var(--caramel); font-style: italic; }
 </style>
 </head>
 <body class="lang-fa">
@@ -290,53 +421,101 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 </div>
 
 <!-- ══════ SCREEN: DASHBOARD ══════ -->
-<div class="screen" id="screen-dashboard">
-  <div class="dash-header">
-    <div class="dash-welcome">
-      <span class="en-only">Welcome back</span>
-      <span class="fa-only">خوش آمدی</span>
+<div class="screen" id="screen-dashboard" style="padding-top:0;">
+
+  <!-- Header -->
+  <div class="dash-header-new">
+    <div class="dash-header-top">
+      <div class="dash-user-info">
+        <div class="dash-welcome-new">
+          <span class="en-only">Welcome back</span>
+          <span class="fa-only">خوش آمدی</span>
+        </div>
+        <div class="dash-name-new" id="dash-name">—</div>
+        <div class="dash-phone-new" id="dash-phone">—</div>
+      </div>
+      <button class="dash-logout-new" onclick="doLogout()">
+        <span class="en-only">Logout</span>
+        <span class="fa-only">خروج ↗</span>
+      </button>
     </div>
-    <div class="dash-name" id="dash-name">—</div>
-    <div class="dash-phone" id="dash-phone">—</div>
-    <button class="dash-logout" onclick="doLogout()">
-      <span class="en-only">Logout</span>
-      <span class="fa-only">خروج</span>
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-profiles">0</div>
+        <div class="dash-stat-label"><span class="en-only">Profiles</span><span class="fa-only">پروفایل</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-orders">0</div>
+        <div class="dash-stat-label"><span class="en-only">Orders</span><span class="fa-only">سفارش</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num">☕</div>
+        <div class="dash-stat-label"><span class="en-only">Active</span><span class="fa-only">فعال</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 0 0 32px;">
+    <!-- New Profile Button -->
+    <button class="new-profile-btn" onclick="startNewProfile()">
+      <div class="new-profile-icon">✨</div>
+      <div class="new-profile-text">
+        <div class="new-profile-title">
+          <span class="en-only">New Coffee Profile</span>
+          <span class="fa-only">پروفایل قهوه جدید</span>
+        </div>
+        <div class="new-profile-sub">
+          <span class="en-only">Discover your perfect roast</span>
+          <span class="fa-only">دانه متناسب با شما رو پیدا کن</span>
+        </div>
+      </div>
     </button>
-  </div>
 
-  <!-- New Profile Button -->
-  <button class="btn-primary" onclick="startNewProfile()" style="margin-bottom:24px;">
-    <span class="en-only">✨ New Coffee Profile</span>
-    <span class="fa-only">✨ پروفایل قهوه جدید</span>
-  </button>
+    <!-- Profiles Section -->
+    <div class="section-header">
+      <div class="section-title-new">
+        <span class="en-only">My Coffee Profiles</span>
+        <span class="fa-only">پروفایل‌های قهوه من</span>
+      </div>
+      <div class="section-count" id="stat-profiles-badge">0</div>
+    </div>
+    <div id="dash-profiles">
+      <div class="empty-state">
+        <div class="empty-icon">☕</div>
+        <div class="en-only">No profiles yet. Start your first journey!</div>
+        <div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div>
+      </div>
+    </div>
 
-  <!-- Profiles Section -->
-  <div class="dash-section-title">
-    <span class="en-only">My Coffee Profiles</span>
-    <span class="fa-only">پروفایل‌های قهوه من</span>
-  </div>
-  <div id="dash-profiles">
-    <div class="empty-state">
-      <div class="empty-icon">☕</div>
-      <div class="en-only">No profiles yet. Start your first journey!</div>
-      <div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div>
+    <!-- Orders Section -->
+    <div class="section-header" style="margin-top:24px;">
+      <div class="section-title-new">
+        <span class="en-only">My Orders</span>
+        <span class="fa-only">سفارش‌های من</span>
+      </div>
+      <div class="section-count" id="stat-orders-badge">0</div>
+    </div>
+    <div id="dash-orders">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <div class="en-only">No orders yet.</div>
+        <div class="fa-only">هنوز سفارشی نداری.</div>
+      </div>
     </div>
   </div>
+</div>
 
-  <hr class="divider" style="margin: 20px 0;">
-
-  <!-- Orders Section -->
-  <div class="dash-section-title">
-    <span class="en-only">My Orders</span>
-    <span class="fa-only">سفارش‌های من</span>
-  </div>
-  <div id="dash-orders">
-    <div class="empty-state">
-      <div class="empty-icon">📦</div>
-      <div class="en-only">No orders yet.</div>
-      <div class="fa-only">هنوز سفارشی نداری.</div>
+<!-- ══════ SCREEN: PROFILE DETAIL ══════ -->
+<div class="screen" id="screen-profile-detail" style="padding-top:0;">
+  <div class="detail-header">
+    <button class="btn-back" onclick="show('screen-dashboard')" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;">
+      <span class="fa-only">پروفایل قهوه شما</span><span class="en-only">Your Coffee Profile</span>
     </div>
+    <div class="detail-bean-name" id="detail-bean-name">—</div>
+    <div class="detail-origin" id="detail-bean-origin">—</div>
   </div>
+  <div id="detail-content" style="padding-bottom:32px;"></div>
 </div>
 
 <!-- ══════ SCREENS 1–6: QUIZ ══════ -->
@@ -620,6 +799,95 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </p>
 </div>
 
+<!-- ══════ SCREEN: PAYMENT ══════ -->
+<div class="screen" id="screen-payment" style="padding-top:20px;">
+  <button class="btn-back" onclick="show('screen-order')">← <span class="fa-only">بازگشت</span><span class="en-only">Back</span></button>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:40px;">💳</div>
+    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
+      <span class="fa-only">پرداخت سفارش</span>
+      <span class="en-only">Order Payment</span>
+    </h2>
+    <p style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;direction:rtl;">مبلغ رو واریز کن و رسید بفرست</p>
+  </div>
+
+  <!-- Timer -->
+  <div class="payment-timer">
+    <div class="timer-text">⏰ لطفاً ظرف ۳۰ دقیقه پرداخت کنید</div>
+    <div class="timer-count" id="payment-timer">30:00</div>
+  </div>
+
+  <!-- Step 1: Amount -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۱</div>
+      <div class="payment-step-content">
+        <div class="payment-step-title">مبلغ قابل پرداخت</div>
+        <div class="amount-due-box">
+          <div>
+            <div class="amount-due-label">سفارش شما</div>
+            <div style="font-size:12px;color:var(--caramel);font-family:Arial,sans-serif;" id="pay-order-summary">—</div>
+          </div>
+          <div style="text-align:left;">
+            <div class="amount-due-value" id="pay-amount">—</div>
+            <div class="amount-due-currency">تومان</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Card Number -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۲</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title">واریز به شماره کارت</div>
+        <div class="card-number-box">
+          <div class="card-number" id="shop-card-number">6219 8619 xxxx xxxx</div>
+          <div class="card-owner" id="shop-card-owner">Roastery Platform</div>
+          <button class="copy-btn" onclick="copyCardNumber()">📋 کپی شماره کارت</button>
+        </div>
+        <div class="payment-step-desc">به نام صاحب حساب واریز کنید و شناسه پرداخت رو یادداشت کنید.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Upload Receipt -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۳</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title">ارسال تصویر رسید</div>
+        <div class="upload-area" onclick="document.getElementById('receipt-input').click()">
+          <input type="file" id="receipt-input" accept="image/*" onchange="handleReceiptUpload(this)">
+          <div class="upload-icon" id="upload-icon">🧾</div>
+          <div class="upload-text" id="upload-text">تصویر رسید را انتخاب کنید</div>
+          <div class="upload-sub">PNG, JPG تا ۵ مگابایت</div>
+          <img class="upload-preview" id="upload-preview" src="" alt="رسید">
+        </div>
+        <!-- Transaction ID -->
+        <div class="input-group" style="margin-top:10px;">
+          <label class="input-label">شناسه / کد پیگیری پرداخت</label>
+          <input class="input-field" id="transaction-id" type="text" placeholder="مثلاً: ۱۲۳۴۵۶۷۸" dir="rtl" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="payment-error"></div>
+  <div class="success-msg" id="payment-success"></div>
+
+  <button class="btn-primary" id="btn-confirm-payment" onclick="confirmPayment()">
+    <span class="fa-only">✅ تأیید و ارسال رسید</span>
+    <span class="en-only">✅ Confirm Payment</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;direction:rtl;">
+    بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.
+  </p>
+</div>
+
 </div><!-- /app-container -->
 
 <script>
@@ -640,7 +908,8 @@ async function sb(method, path, body = null) {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Prefer': method === 'POST' ? 'return=representation' : ''
+      'Prefer': method === 'POST' ? 'return=representation' : '',
+      ...(method === 'PATCH' ? { 'X-HTTP-Method-Override': 'PATCH' } : {})
     }
   };
   if (body) opts.body = JSON.stringify(body);
@@ -769,25 +1038,47 @@ async function showDashboard() {
   loadOrders();
 }
 
+const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
+const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
+const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+const stateFA = { energised:'پرانرژی', focused:'متمرکز', creative:'خلاق', relaxed:'آرام', reflective:'تأملی' };
+
 async function loadProfiles() {
   const container = document.getElementById('dash-profiles');
   try {
     const profiles = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
-    if (!profiles || profiles.length === 0) {
+    const count = profiles ? profiles.length : 0;
+    document.getElementById('stat-profiles').textContent = count;
+    document.getElementById('stat-profiles-badge').textContent = count;
+    if (!profiles || count === 0) {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
       return;
     }
-    container.innerHTML = profiles.map(p => `
-      <div class="profile-card" onclick="viewProfile('${p.id}')">
-        <div class="profile-card-bean">${p.recommended_bean || '—'}</div>
-        <div class="profile-card-date">${new Date(p.created_at).toLocaleDateString('fa-IR')}</div>
-        <div class="profile-card-tags">
-          <span class="profile-card-tag">${p.flavor || ''}</span>
-          <span class="profile-card-tag">${p.body || ''}</span>
-          <span class="profile-card-tag">${p.brew_method || ''}</span>
+    container.innerHTML = profiles.map(p => {
+      const beanFull = p.recommended_bean || '—';
+      const beanName = beanFull.split('(')[0].trim();
+      const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+      const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      const tags = [
+        p.flavor ? (tasteFA[p.flavor] || p.flavor) : null,
+        p.body   ? (bodyFA[p.body]   || p.body)   : null,
+        p.brew_method ? (brewFA[p.brew_method] || p.brew_method) : null,
+        p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
+      ].filter(Boolean);
+      return `<div class="profile-card-new" onclick="viewProfile(${JSON.stringify(p)})">
+        <div class="profile-card-top">
+          <div>
+            <div class="profile-bean-name">${beanName}</div>
+            ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
+          </div>
+          <div class="profile-date-badge">${dateFA}</div>
         </div>
-      </div>
-    `).join('');
+        <div class="profile-card-tags-new">
+          ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
+        </div>
+        <div class="profile-card-arrow">›</div>
+      </div>`;
+    }).join('');
     setLang(currentLang);
   } catch(e) {
     container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
@@ -798,28 +1089,69 @@ async function loadOrders() {
   const container = document.getElementById('dash-orders');
   try {
     const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
-    if (!orders || orders.length === 0) {
+    const count = orders ? orders.length : 0;
+    document.getElementById('stat-orders').textContent = count;
+    document.getElementById('stat-orders-badge').textContent = count;
+    if (!orders || count === 0) {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="fa-only">هنوز سفارشی نداری.</div><div class="en-only">No orders yet.</div></div>`;
       return;
     }
-    const statusFA = { pending: 'در انتظار تأیید', paid: 'پرداخت شده', shipped: 'ارسال شده' };
-    const statusClass = { pending: 'status-pending', paid: 'status-paid', shipped: 'status-shipped' };
-    container.innerHTML = orders.map(o => `
-      <div class="order-card">
-        <div class="order-card-status ${statusClass[o.status] || 'status-pending'}">${statusFA[o.status] || o.status}</div>
-        <div style="font-weight:bold;color:var(--dark-brown);font-size:15px;">${o.amount}g</div>
-        <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;">${new Date(o.created_at).toLocaleDateString('fa-IR')}</div>
-        ${o.address ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:8px;direction:rtl;">${o.address}</div>` : ''}
-      </div>
-    `).join('');
+    const statusFA   = { pending:'در انتظار تأیید', paid:'پرداخت شده', shipped:'ارسال شده' };
+    const statusIcon = { pending:'⏳', paid:'✅', shipped:'🚚' };
+    const statusClass= { pending:'status-pending', paid:'status-paid', shipped:'status-shipped' };
+    container.innerHTML = orders.map(o => {
+      const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      return `<div class="order-card-new">
+        <div class="order-card-top">
+          <div>
+            <div class="order-amount-big">${o.amount}g</div>
+            <div class="order-bean-small">${dateFA}</div>
+          </div>
+          <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusFA[o.status]||o.status}</div>
+        </div>
+        ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
+        ${o.notes ? `<div style="font-size:11px;color:#AAA;margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
+      </div>`;
+    }).join('');
   } catch(e) {
     container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
   }
 }
 
-function viewProfile(profileId) {
-  // TODO: نمایش جزئیات پروفایل — در نسخه بعد
-  alert('جزئیات پروفایل — به زودی');
+function viewProfile(p) {
+  if (typeof p === 'string') return;
+  const beanFull = p.recommended_bean || '—';
+  const beanName = beanFull.split('(')[0].trim();
+  const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+  document.getElementById('detail-bean-name').textContent = beanName;
+  document.getElementById('detail-bean-origin').textContent = beanDetail;
+  const tags = [
+    p.flavor ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
+    p.body   ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
+    p.brew_method ? `<span class="profile-tag-new">${brewFA[p.brew_method]||p.brew_method}</span>` : '',
+    p.mood   ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
+    p.experience ? `<span class="profile-tag-new">${p.experience}</span>` : '',
+  ].filter(Boolean).join('');
+  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  document.getElementById('detail-content').innerHTML = `
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">طعم‌شناسی</div>
+      <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">تاریخ ثبت</div>
+      <div style="font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
+    </div>
+    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:8px;">
+      🛒 <span class="fa-only">سفارش مجدد این دانه</span><span class="en-only">Reorder This Bean</span>
+    </button>
+  `;
+  setLang(currentLang);
+  show('screen-profile-detail');
+}
+
+function reorderProfile() {
+  show('screen-order');
 }
 
 /* ═══════════════════════════════════════════
@@ -975,7 +1307,9 @@ async function submitOrder() {
       payment_status: 'unpaid'
     });
 
-    sucEl.textContent = '✅ سفارش شما ثبت شد! تیم رستری به زودی با شما تماس می‌گیرد.';
+    // رفتن به صفحه پرداخت
+    setTimeout(() => goToPayment(), 800);
+    sucEl.textContent = '✅ سفارش ثبت شد! در حال انتقال به صفحه پرداخت...';
     sucEl.classList.add('visible');
     btn.textContent = '✅ ثبت شد';
 
@@ -1106,6 +1440,163 @@ function setLang(lang) {
   document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
   document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
   document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
+}
+
+/* ═══════════════════════════════════════════
+   PAYMENT
+═══════════════════════════════════════════ */
+// تنظیمات رستری — بعداً از پنل ادمین می‌آد
+const SHOP_CARD = '6219 8619 1234 5678'; // شماره کارت رستری
+const SHOP_OWNER = 'فرهنگ سامیه';        // نام صاحب حساب
+const PRICES = { 50: 85000, 100: 160000 }; // قیمت‌ها به تومان
+
+let paymentTimer = null;
+let receiptBase64 = null;
+let pendingOrderId = null;
+
+function goToPayment() {
+  // تنظیم شماره کارت
+  document.getElementById('shop-card-number').textContent = SHOP_CARD;
+  document.getElementById('shop-card-owner').textContent = SHOP_OWNER;
+
+  // مبلغ
+  const price = PRICES[selectedAmount] || 0;
+  document.getElementById('pay-amount').textContent = price.toLocaleString('fa-IR');
+  document.getElementById('pay-order-summary').textContent =
+    `${selectedAmount}g — ${rec ? rec.name : ''}`;
+
+  // پاک کردن فرم
+  document.getElementById('transaction-id').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-icon').style.display = 'block';
+  document.getElementById('upload-text').textContent = 'تصویر رسید را انتخاب کنید';
+  document.getElementById('payment-error').classList.remove('visible');
+  document.getElementById('payment-success').classList.remove('visible');
+  document.getElementById('btn-confirm-payment').disabled = false;
+  document.getElementById('btn-confirm-payment').innerHTML =
+    '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+  receiptBase64 = null;
+
+  // تایمر ۳۰ دقیقه
+  startPaymentTimer(30 * 60);
+
+  show('screen-payment');
+  setLang(currentLang);
+}
+
+function startPaymentTimer(seconds) {
+  if (paymentTimer) clearInterval(paymentTimer);
+  let remaining = seconds;
+  const el = document.getElementById('payment-timer');
+  paymentTimer = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    el.textContent = m + ':' + s;
+    if (remaining <= 0) {
+      clearInterval(paymentTimer);
+      el.textContent = '00:00';
+      el.style.color = '#C0392B';
+    }
+  }, 1000);
+}
+
+function copyCardNumber() {
+  navigator.clipboard.writeText(SHOP_CARD.replace(/\s/g, '')).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = SHOP_CARD.replace(/\s/g, '');
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  });
+}
+
+function handleReceiptUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showErr(document.getElementById('payment-error'), 'حجم فایل باید کمتر از ۵ مگابایت باشد');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    receiptBase64 = e.target.result;
+    const preview = document.getElementById('upload-preview');
+    preview.src = receiptBase64;
+    preview.style.display = 'block';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').textContent = '✅ رسید انتخاب شد';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function confirmPayment() {
+  const errEl = document.getElementById('payment-error');
+  const sucEl = document.getElementById('payment-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const txId = document.getElementById('transaction-id').value.trim();
+
+  if (!receiptBase64) return showErr(errEl, 'لطفاً تصویر رسید را آپلود کنید');
+  if (!txId) return showErr(errEl, 'لطفاً کد پیگیری پرداخت را وارد کنید');
+
+  const btn = document.getElementById('btn-confirm-payment');
+  btn.disabled = true;
+  btn.textContent = '...در حال ارسال';
+
+  try {
+    // آپدیت وضعیت سفارش در Supabase
+    if (pendingOrderId) {
+      await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+        payment_status: 'receipt_submitted',
+        status: 'pending_review'
+      });
+    }
+
+    // ارسال به Apps Script برای اطلاع ادمین
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        type: 'payment_receipt',
+        name: currentUser.name,
+        phone: currentUser.phone,
+        bean: rec ? rec.name : '—',
+        amount: selectedAmount + 'g',
+        price: (PRICES[selectedAmount] || 0).toLocaleString(),
+        transaction_id: txId,
+        order_id: pendingOrderId || '—'
+      })
+    }).catch(() => {});
+
+    // توقف تایمر
+    if (paymentTimer) clearInterval(paymentTimer);
+
+    sucEl.textContent = '✅ رسید شما ارسال شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
+    sucEl.classList.add('visible');
+    btn.textContent = '✅ ارسال شد';
+
+    // برگشت به داشبورد بعد از ۳ ثانیه
+    setTimeout(() => {
+      show('screen-dashboard');
+      showDashboard();
+    }, 3000);
+
+  } catch(e) {
+    showErr(errEl, 'خطا در ارسال: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span>';
+    setLang(currentLang);
+  }
 }
 
 /* ═══════════════════════════════════════════
