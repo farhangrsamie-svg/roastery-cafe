@@ -203,6 +203,43 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 /* ── DIVIDER ── */
 .divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
 
+/* ── FAVORITE & DELETE ── */
+.profile-card-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F0EAE0; }
+.btn-fav {
+  flex: 1; padding: 8px; border-radius: 12px; border: 1px solid var(--light-caramel);
+  background: transparent; color: var(--caramel); font-size: 12px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-fav.active { background: #FDF5E8; border-color: var(--caramel); color: var(--medium-brown); font-weight: bold; }
+.btn-fav:hover { background: #FDF5E8; }
+.btn-del {
+  padding: 8px 14px; border-radius: 12px; border: 1px solid #F0C0C0;
+  background: transparent; color: #C0392B; font-size: 12px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-del:hover { background: #FFF0F0; }
+.fav-badge {
+  position: absolute; top: 14px; left: 16px;
+  font-size: 16px; line-height: 1;
+}
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(44,26,14,0.5); z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.confirm-box {
+  background: var(--white); border-radius: 24px; padding: 28px 24px;
+  margin: 20px; max-width: 340px; width: 100%; text-align: center;
+  box-shadow: 0 20px 60px rgba(44,26,14,0.3);
+}
+.confirm-icon { font-size: 44px; margin-bottom: 12px; }
+.confirm-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 8px; }
+.confirm-desc { font-size: 13px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; direction: rtl; }
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
+.confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
+
 /* ── PAYMENT ── */
 .payment-step {
   background: var(--white); border-radius: 20px; padding: 22px;
@@ -1054,6 +1091,8 @@ async function loadProfiles() {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
       return;
     }
+    // مرتب‌سازی: علاقه‌مندها اول
+    profiles.sort((a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0));
     container.innerHTML = profiles.map(p => {
       const beanFull = p.recommended_bean || '—';
       const beanName = beanFull.split('(')[0].trim();
@@ -1065,18 +1104,27 @@ async function loadProfiles() {
         p.brew_method ? (brewFA[p.brew_method] || p.brew_method) : null,
         p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
       ].filter(Boolean);
-      return `<div class="profile-card-new" onclick="viewProfile(${JSON.stringify(p)})">
-        <div class="profile-card-top">
-          <div>
-            <div class="profile-bean-name">${beanName}</div>
-            ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
+      const pJson = JSON.stringify(p).replace(/'/g, "\'");
+      return `<div class="profile-card-new" id="pcard-${p.id}">
+        ${p.is_favorite ? '<div class="fav-badge">⭐</div>' : ''}
+        <div style="cursor:pointer;" onclick="viewProfile(${JSON.stringify(p)})">
+          <div class="profile-card-top">
+            <div>
+              <div class="profile-bean-name">${beanName}</div>
+              ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
+            </div>
+            <div class="profile-date-badge">${dateFA}</div>
           </div>
-          <div class="profile-date-badge">${dateFA}</div>
+          <div class="profile-card-tags-new">
+            ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
+          </div>
         </div>
-        <div class="profile-card-tags-new">
-          ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
+        <div class="profile-card-actions">
+          <button class="btn-fav ${p.is_favorite ? 'active' : ''}" onclick="toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)">
+            ${p.is_favorite ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی'}
+          </button>
+          <button class="btn-del" onclick="deleteProfile('${p.id}')">🗑️</button>
         </div>
-        <div class="profile-card-arrow">›</div>
       </div>`;
     }).join('');
     setLang(currentLang);
@@ -1440,6 +1488,79 @@ function setLang(lang) {
   document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
   document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
   document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
+}
+
+/* ═══════════════════════════════════════════
+   FAVORITE & DELETE
+═══════════════════════════════════════════ */
+async function toggleFavorite(profileId, currentFav, btn) {
+  const newFav = !currentFav;
+  btn.disabled = true;
+  try {
+    await sb('PATCH', `coffee_profiles?id=eq.${profileId}`, { is_favorite: newFav });
+    btn.classList.toggle('active', newFav);
+    btn.textContent = newFav ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی';
+    btn.onclick = () => toggleFavorite(profileId, newFav, btn);
+    // نمایش/حذف badge
+    const card = document.getElementById('pcard-' + profileId);
+    let badge = card.querySelector('.fav-badge');
+    if (newFav) {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'fav-badge';
+        badge.textContent = '⭐';
+        card.insertBefore(badge, card.firstChild);
+      }
+    } else {
+      if (badge) badge.remove();
+    }
+    // مرتب‌سازی مجدد
+    await loadProfiles();
+  } catch(e) {
+    console.warn('Toggle favorite error:', e);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function deleteProfile(profileId) {
+  // نمایش confirm dialog
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف پروفایل؟</div>
+      <div class="confirm-desc">این پروفایل قهوه برای همیشه حذف می‌شود و قابل بازیابی نیست.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDelete('${profileId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDelete(profileId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    await sb('DELETE', `coffee_profiles?id=eq.${profileId}`);
+    overlay.remove();
+    // انیمیشن حذف کارت
+    const card = document.getElementById('pcard-' + profileId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadProfiles(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    console.warn('Delete error:', e);
+  }
 }
 
 /* ═══════════════════════════════════════════
