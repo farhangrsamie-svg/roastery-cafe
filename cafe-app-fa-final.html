@@ -963,7 +963,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 ═══════════════════════════════════════════ */
 const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI-lBDN7fQJHESYHKxPmOwEyyLT06iTsZMRWaYIG6nY0fd931h1BTqnvhHL1Z1uAi37Q/exec';
 
 /* ═══════════════════════════════════════════
    SUPABASE HELPER
@@ -1177,9 +1177,33 @@ async function loadOrders() {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="fa-only">هنوز سفارشی نداری.</div><div class="en-only">No orders yet.</div></div>`;
       return;
     }
-    const statusFA   = { pending:'در انتظار تأیید', paid:'پرداخت شده', shipped:'ارسال شده' };
-    const statusIcon = { pending:'⏳', paid:'✅', shipped:'🚚' };
-    const statusClass= { pending:'status-pending', paid:'status-paid', shipped:'status-shipped' };
+    const statusFA   = { 
+      pending:'در انتظار پرداخت', 
+      receipt_submitted:'رسید ارسال شد — در انتظار تأیید',
+      pending_review:'در بررسی',
+      confirmed:'تأیید شد ✅',
+      paid:'پرداخت شده', 
+      shipped:'ارسال شده',
+      cancelled:'کنسل شد ❌'
+    };
+    const statusIcon = { 
+      pending:'⏳', 
+      receipt_submitted:'📋',
+      pending_review:'🔍',
+      confirmed:'✅',
+      paid:'💚', 
+      shipped:'🚚',
+      cancelled:'❌'
+    };
+    const statusClass= { 
+      pending:'status-pending', 
+      receipt_submitted:'status-pending',
+      pending_review:'status-pending',
+      confirmed:'status-paid',
+      paid:'status-paid', 
+      shipped:'status-shipped',
+      cancelled:'status-pending'
+    };
     container.innerHTML = orders.map(o => {
       const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
       return `<div class="order-card-new">
@@ -1775,6 +1799,8 @@ function startPaymentTimer(seconds) {
       clearInterval(paymentTimer);
       el.textContent = '00:00';
       el.style.color = '#C0392B';
+      // کنسل خودکار سفارش
+      autoCancelOrder();
     }
   }, 1000);
 }
@@ -1817,6 +1843,36 @@ function handleReceiptUpload(input) {
   reader.readAsDataURL(file);
 }
 
+async function autoCancelOrder() {
+  if (!pendingOrderId) return;
+  try {
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'cancelled',
+      payment_status: 'cancelled'
+    });
+    const errEl = document.getElementById('payment-error');
+    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
+    document.getElementById('btn-confirm-payment').disabled = true;
+  } catch(e) {
+    console.warn('Auto cancel error:', e);
+  }
+}
+
+async function autoCancelOrder() {
+  if (!pendingOrderId) return;
+  try {
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'cancelled',
+      payment_status: 'cancelled'
+    });
+    const errEl = document.getElementById('payment-error');
+    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
+    document.getElementById('btn-confirm-payment').disabled = true;
+  } catch(e) {
+    console.warn('Auto cancel error:', e);
+  }
+}
+
 async function confirmPayment() {
   const errEl = document.getElementById('payment-error');
   const sucEl = document.getElementById('payment-success');
@@ -1830,40 +1886,52 @@ async function confirmPayment() {
 
   const btn = document.getElementById('btn-confirm-payment');
   btn.disabled = true;
-  btn.textContent = '...در حال ارسال';
+  btn.textContent = '...در حال ارسال رسید';
 
   try {
-    // آپدیت وضعیت سفارش در Supabase
+    // ۱. ارسال رسید به Apps Script → Google Drive
+    const receiptData = {
+      type: 'payment_receipt',
+      order_id: pendingOrderId || '',
+      transaction_id: txId,
+      receipt_base64: receiptBase64,
+      name: currentUser ? currentUser.name : '',
+      phone: currentUser ? currentUser.phone : '',
+      bean: rec ? rec.name : '',
+      amount: selectedAmount ? selectedAmount + 'g' : '',
+      price: (PRICES[selectedAmount] || 0).toLocaleString()
+    };
+
+    let receiptUrl = '';
+    try {
+      btn.textContent = '...در حال آپلود تصویر';
+      const scriptRes = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(receiptData)
+      });
+      const scriptData = await scriptRes.json().catch(() => ({}));
+      receiptUrl = scriptData.receipt_url || '';
+    } catch(scriptErr) {
+      console.warn('Apps Script error:', scriptErr);
+    }
+
+    // ۲. آپدیت Supabase
     if (pendingOrderId) {
       await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+        status: 'receipt_submitted',
         payment_status: 'receipt_submitted',
-        status: 'pending_review'
+        transaction_id: txId,
+        receipt_url: receiptUrl
       });
     }
 
-    // ارسال به Apps Script برای اطلاع ادمین
-    fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({
-        type: 'payment_receipt',
-        name: currentUser.name,
-        phone: currentUser.phone,
-        bean: rec ? rec.name : '—',
-        amount: selectedAmount + 'g',
-        price: (PRICES[selectedAmount] || 0).toLocaleString(),
-        transaction_id: txId,
-        order_id: pendingOrderId || '—'
-      })
-    }).catch(() => {});
-
-    // توقف تایمر
+    // ۳. توقف تایمر
     if (paymentTimer) clearInterval(paymentTimer);
 
-    sucEl.textContent = '✅ رسید شما ارسال شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
+    sucEl.textContent = '✅ رسید شما با موفقیت ارسال و ذخیره شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
     sucEl.classList.add('visible');
     btn.textContent = '✅ ارسال شد';
 
-    // برگشت به داشبورد بعد از ۳ ثانیه
     setTimeout(() => {
       show('screen-dashboard');
       showDashboard();
@@ -1872,16 +1940,9 @@ async function confirmPayment() {
   } catch(e) {
     showErr(errEl, 'خطا در ارسال: ' + e.message);
     btn.disabled = false;
-    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span>';
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
     setLang(currentLang);
   }
 }
 
-/* ═══════════════════════════════════════════
-   INIT
-═══════════════════════════════════════════ */
-setLang('fa');
-checkAutoLogin();
-</script>
-</body>
-</html>
+
