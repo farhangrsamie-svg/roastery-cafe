@@ -757,7 +757,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">روش دم‌آوری</span>
     </div>
     <div class="info-row"><span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span><span class="info-value" id="r-roast"></span></div>
-    <div class="info-row"><span class="info-label">☕ <span class="en-only">Brew</span><span class="fa-only">دم‌آوری</span></span><span class="info-value" id="r-brew"></span></div>
+    <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
+    <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fa-only">روش دم‌آوری شما</span></span><span class="info-value" id="r-your-brew"></span></div>
+    <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
     <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
     <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
   </div>
@@ -1554,6 +1556,38 @@ function render(r) {
   document.getElementById('r-origin').textContent = r.origin;
   document.getElementById('r-roast').textContent = r.roast;
   document.getElementById('r-brew').textContent = r.brew;
+
+  // نمایش روش دم‌آوری مشتری در کنار روش پیشنهادی دانه
+  const brewNameFA = {
+    v60: 'پور اور (V60)',
+    frenchpress: 'فرنچ پرس',
+    espresso: 'اسپرسو',
+    aeropress: 'ایروپرس',
+    coldbrew: 'کولد برو',
+    other: 'روش دیگر'
+  };
+  if (ans.brew && r.brew) {
+    const yourBrewFA = brewNameFA[ans.brew] || ans.brew;
+    const beanBrewEN = r.brew.toLowerCase();
+    const yourBrewEN = ans.brew.replace('frenchpress','french press').replace('v60','pour over').replace('coldbrew','cold brew');
+    const isCompatible = beanBrewEN.includes(yourBrewEN) || beanBrewEN.includes(ans.brew);
+
+    document.getElementById('r-your-brew-row').style.display = 'flex';
+    document.getElementById('r-your-brew').textContent = yourBrewFA;
+
+    document.getElementById('r-brew-note-row').style.display = 'flex';
+    if (isCompatible) {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fa'
+          ? '✅ روش دم‌آوری شما با این دانه سازگار است.'
+          : '✅ Your brew method is compatible with this bean.';
+    } else {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fa'
+          ? `⚡ این دانه با ${r.brew} بهترین نتیجه رو میده، ولی با روش شما هم قابل استفاده‌ست — فقط پروفایل طعمی کمی متفاوت خواهد بود.`
+          : `⚡ This bean shines with ${r.brew}, but works with your method too — the flavor profile will be slightly different.`;
+    }
+  }
   document.getElementById('r-temp').textContent = r.temp;
   document.getElementById('r-ratio').textContent = r.ratio;
   document.getElementById('r-desc').textContent = r.desc;
