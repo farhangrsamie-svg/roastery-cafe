@@ -134,7 +134,7 @@ body {
 .option-card.full-row { grid-column: span 2; }
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
-.option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
+.option-fa { font-size: 13px; color: var(--caramel); margin-top: 3px; font-style: italic; }
 .option-desc { font-size: 10px; color: #AAA; margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
@@ -185,7 +185,7 @@ body {
 .info-row:last-child { border-bottom: none; }
 .info-label { font-size: 12px; color: #AAA; }
 .info-value { font-size: 13px; font-weight: bold; color: var(--dark-brown); text-align: right; max-width: 60%; }
-.result-desc { font-size: 14px; line-height: 1.75; color: var(--medium-brown); }
+.result-desc { font-size: 15px; line-height: 1.8; color: var(--medium-brown); }
 .why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
 .identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
@@ -364,7 +364,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 .dash-stat { background: rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
 .dash-stat-num { font-size: 22px; font-weight: bold; color: var(--white); line-height: 1; }
-.dash-stat-label { font-size: 9px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
+.dash-stat-label { font-size: 11px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
 
 /* ── NEW PROFILE BTN ── */
 .new-profile-btn {
@@ -401,10 +401,10 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card-new:active { transform: scale(0.99); }
 .profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
-.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
+.profile-bean-detail { font-size: 13px; color: var(--caramel); margin-top: 2px; font-style: italic; }
 .profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
 .profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.profile-tag-new { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.profile-tag-new { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 14px; font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
 .profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
 
 /* ── ORDER CARD NEW ── */
@@ -415,7 +415,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
-.order-bean-small { font-size: 12px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
+.order-bean-small { font-size: 14px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
 .order-address-new { font-size: 12px; color: #888; margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
 
 /* ── PROFILE DETAIL SCREEN ── */
@@ -1223,34 +1223,135 @@ function viewProfile(p) {
   const beanFull = p.recommended_bean || '—';
   const beanName = beanFull.split('(')[0].trim();
   const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+
+  // بازسازی rec از پروفایل ذخیره‌شده تا سفارش کار کنه
+  ans.taste      = p.flavor      || null;
+  ans.body       = p.body        || null;
+  ans.state      = p.mood        || null;
+  ans.context    = p.context     || null;
+  ans.brew       = p.brew_method || null;
+  ans.experience = p.experience  || null;
+  currentProfileId = p.id;
+
+  // پیدا کردن دانه از BEANS
+  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+  if (matchedBean) {
+    rec = { ...matchedBean, _matchPct: 90 };
+  } else {
+    rec = {
+      name: beanName, detail: beanDetail, origin: '', flavors: [],
+      roast: '', brew: '', temp: '', ratio: '', desc: '',
+      roastInfo: null, _matchPct: 90
+    };
+  }
+
   document.getElementById('detail-bean-name').textContent = beanName;
   document.getElementById('detail-bean-origin').textContent = beanDetail;
+
   const tags = [
-    p.flavor ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
-    p.body   ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
+    p.flavor      ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
+    p.body        ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
     p.brew_method ? `<span class="profile-tag-new">${brewFA[p.brew_method]||p.brew_method}</span>` : '',
-    p.mood   ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
-    p.experience ? `<span class="profile-tag-new">${p.experience}</span>` : '',
+    p.mood        ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
+    p.experience  ? `<span class="profile-tag-new">${p.experience}</span>` : '',
   ].filter(Boolean).join('');
-  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+
+  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR',
+    {year:'numeric', month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'});
+
   document.getElementById('detail-content').innerHTML = `
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">دانه پیشنهادی</div>
+      <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
+      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);font-style:italic;">${beanDetail}</div>` : ''}
+    </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title">طعم‌شناسی</div>
       <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
     </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title">تاریخ ثبت</div>
-      <div style="font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
+      <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
     </div>
-    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:8px;">
-      🛒 <span class="fa-only">سفارش مجدد این دانه</span><span class="en-only">Reorder This Bean</span>
+
+    <div class="card" style="direction:rtl;" id="review-card-${p.id}">
+      <div class="card-title">نظر و پیشنهاد شما</div>
+      <textarea class="textarea-field" id="review-text-${p.id}"
+        placeholder="تجربه‌ات از این قهوه رو بنویس... چه چیزی دوست داشتی؟ چی رو عوض می‌کردی؟"
+        style="min-height:100px;margin-bottom:10px;font-size:14px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:#888;font-family:Arial,sans-serif;">امتیاز:</span>
+        <div id="stars-${p.id}" style="display:flex;gap:4px;">
+          ${[1,2,3,4,5].map(i => `<span onclick="setRating('${p.id}',${i})"
+            style="font-size:26px;cursor:pointer;transition:transform 0.1s;"
+            id="star-${p.id}-${i}">☆</span>`).join('')}
+        </div>
+      </div>
+      <div class="success-msg" id="review-success-${p.id}"></div>
+      <button class="btn-primary" onclick="submitReview('${p.id}')" style="margin-top:4px;">
+        💬 <span class="fa-only">ثبت نظر</span><span class="en-only">Submit Review</span>
+      </button>
+    </div>
+
+    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
+      🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
     </button>
   `;
   setLang(currentLang);
   show('screen-profile-detail');
 }
 
+let currentRating = 0;
+function setRating(profileId, rating) {
+  currentRating = rating;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.getElementById(`star-${profileId}-${i}`);
+    if (star) {
+      star.textContent = i <= rating ? '⭐' : '☆';
+      star.style.transform = i === rating ? 'scale(1.3)' : 'scale(1)';
+    }
+  }
+}
+
+async function submitReview(profileId) {
+  const text = document.getElementById(`review-text-${profileId}`).value.trim();
+  const sucEl = document.getElementById(`review-success-${profileId}`);
+  if (!text && currentRating === 0) {
+    sucEl.textContent = 'لطفاً نظر یا امتیاز وارد کنید';
+    sucEl.style.background = '#FFF0F0';
+    sucEl.style.color = '#C0392B';
+    sucEl.style.border = '1px solid #F0C0C0';
+    sucEl.classList.add('visible');
+    return;
+  }
+  try {
+    await sb('PATCH', `coffee_profiles?id=eq.${profileId}`, {
+      review_text: text,
+      review_rating: currentRating || null
+    });
+    sucEl.textContent = '✅ نظر شما ثبت شد. ممنون!';
+    sucEl.style.background = '';
+    sucEl.style.color = '';
+    sucEl.style.border = '';
+    sucEl.classList.add('visible');
+  } catch(e) {
+    sucEl.textContent = 'خطا در ثبت نظر';
+    sucEl.classList.add('visible');
+  }
+}
+
 function reorderProfile() {
+  selectedAmount = null;
+  document.getElementById('amt-50').classList.remove('selected');
+  document.getElementById('amt-100').classList.remove('selected');
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-notes').value = '';
+  document.getElementById('order-error').classList.remove('visible');
+  document.getElementById('order-success').classList.remove('visible');
+  if (rec) {
+    document.getElementById('order-bean-name').textContent = rec.name + (rec.detail ? ' (' + rec.detail + ')' : '');
+    document.getElementById('order-bean-origin').textContent = rec.origin || '';
+  }
   show('screen-order');
 }
 
