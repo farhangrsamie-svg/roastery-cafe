@@ -1858,20 +1858,6 @@ async function autoCancelOrder() {
   }
 }
 
-async function autoCancelOrder() {
-  if (!pendingOrderId) return;
-  try {
-    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
-      status: 'cancelled',
-      payment_status: 'cancelled'
-    });
-    const errEl = document.getElementById('payment-error');
-    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
-    document.getElementById('btn-confirm-payment').disabled = true;
-  } catch(e) {
-    console.warn('Auto cancel error:', e);
-  }
-}
 
 async function confirmPayment() {
   const errEl = document.getElementById('payment-error');
@@ -1944,5 +1930,6 @@ async function confirmPayment() {
     setLang(currentLang);
   }
 }
-
-
+</script>
+</body>
+</html>
