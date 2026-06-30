@@ -1206,7 +1206,8 @@ async function loadOrders() {
     };
     container.innerHTML = orders.map(o => {
       const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
-      return `<div class="order-card-new">
+      const canDelete = o.status === 'cancelled';
+      return `<div class="order-card-new" id="ocard-${o.id}">
         <div class="order-card-top">
           <div>
             <div class="order-amount-big">${o.amount}g</div>
@@ -1216,10 +1217,50 @@ async function loadOrders() {
         </div>
         ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
         ${o.notes ? `<div style="font-size:11px;color:#AAA;margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
+        ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;direction:ltr;text-align:right;">🔖 کد پیگیری: ${o.transaction_id}</div>` : ''}
+        ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">🗑️ حذف این سفارش</button>` : ''}
       </div>`;
     }).join('');
   } catch(e) {
     container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+  }
+}
+
+async function deleteOrder(orderId) {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف سفارش؟</div>
+      <div class="confirm-desc">این سفارش کنسل‌شده برای همیشه حذف می‌شود.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDeleteOrder(orderId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    await sb('DELETE', `orders?id=eq.${orderId}`);
+    overlay.remove();
+    const card = document.getElementById('ocard-' + orderId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadOrders(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    alert('خطا در حذف: ' + e.message);
   }
 }
 
@@ -1874,41 +1915,52 @@ async function confirmPayment() {
   btn.disabled = true;
   btn.textContent = '...در حال ارسال رسید';
 
-  try {
-    // ۱. ارسال رسید به Apps Script → Google Drive
-    const receiptData = {
-      type: 'payment_receipt',
-      order_id: pendingOrderId || '',
-      transaction_id: txId,
-      receipt_base64: receiptBase64,
-      name: currentUser ? currentUser.name : '',
-      phone: currentUser ? currentUser.phone : '',
-      bean: rec ? rec.name : '',
-      amount: selectedAmount ? selectedAmount + 'g' : '',
-      price: (PRICES[selectedAmount] || 0).toLocaleString()
-    };
+  // اگه pendingOrderId نداریم، نباید ادامه بدیم
+  if (!pendingOrderId) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+    return showErr(errEl, 'خطا: شناسه سفارش یافت نشد. لطفاً دوباره سفارش بده.');
+  }
 
+  try {
+    // ۱. آپدیت Supabase — این مهم‌ترین قدمه، باید همیشه انجام بشه
+    btn.textContent = '...در حال ثبت اطلاعات';
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'receipt_submitted',
+      payment_status: 'receipt_submitted',
+      transaction_id: txId
+    });
+
+    // ۲. ارسال رسید به Apps Script → Google Drive (جداگانه، نباید کل فرآیند رو fail کنه)
+    btn.textContent = '...در حال آپلود تصویر';
     let receiptUrl = '';
     try {
-      btn.textContent = '...در حال آپلود تصویر';
+      const receiptData = {
+        type: 'payment_receipt',
+        order_id: pendingOrderId,
+        transaction_id: txId,
+        receipt_base64: receiptBase64,
+        name: currentUser ? currentUser.name : '',
+        phone: currentUser ? currentUser.phone : '',
+        bean: rec ? rec.name : '',
+        amount: selectedAmount ? selectedAmount + 'g' : '',
+        price: (PRICES[selectedAmount] || 0).toLocaleString()
+      };
       const scriptRes = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',
         body: JSON.stringify(receiptData)
       });
       const scriptData = await scriptRes.json().catch(() => ({}));
       receiptUrl = scriptData.receipt_url || '';
-    } catch(scriptErr) {
-      console.warn('Apps Script error:', scriptErr);
-    }
 
-    // ۲. آپدیت Supabase
-    if (pendingOrderId) {
-      await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
-        status: 'receipt_submitted',
-        payment_status: 'receipt_submitted',
-        transaction_id: txId,
-        receipt_url: receiptUrl
-      });
+      // اگه لینک Drive موفق گرفتیم، Supabase رو دوباره آپدیت کن
+      if (receiptUrl) {
+        await sb('PATCH', `orders?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
+      }
+    } catch(scriptErr) {
+      console.warn('Apps Script / Drive upload error:', scriptErr);
+      // مشکلی نیست — وضعیت سفارش از قبل در Supabase ثبت شده
     }
 
     // ۳. توقف تایمر
@@ -1924,7 +1976,7 @@ async function confirmPayment() {
     }, 3000);
 
   } catch(e) {
-    showErr(errEl, 'خطا در ارسال: ' + e.message);
+    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
     btn.disabled = false;
     btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
     setLang(currentLang);
