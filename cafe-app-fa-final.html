@@ -573,7 +573,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <!-- ══════ SCREEN: PROFILE DETAIL ══════ -->
 <div class="screen" id="screen-profile-detail" style="padding-top:0;">
   <div class="detail-header">
-    <button class="btn-back" onclick="show('screen-dashboard')" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
+    <button class="btn-back" onclick="showDashboard()" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
     <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;">
       <span class="fa-only">پروفایل قهوه شما</span><span class="en-only">Your Coffee Profile</span>
     </div>
@@ -786,7 +786,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">🛒 Order This Bean</span>
     <span class="fa-only">🛒 سفارش این دانه</span>
   </button>
-  <button class="btn-primary btn-ghost" onclick="show('screen-dashboard')" style="margin-bottom:10px;">
+  <button class="btn-primary btn-ghost" onclick="showDashboard()" style="margin-bottom:10px;">
     <span class="en-only">← Back to Dashboard</span>
     <span class="fa-only">← برگشت به داشبورد</span>
   </button>
@@ -1410,7 +1410,7 @@ function pick(el, category, value) {
 
 function go(n) { show('screen-' + n); }
 function goBack(n) {
-  if (n === 1) show('screen-dashboard');
+  if (n === 1) showDashboard();
   else show('screen-' + (n - 1));
 }
 
