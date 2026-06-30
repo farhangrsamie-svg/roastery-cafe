@@ -1210,7 +1210,7 @@ async function loadOrders() {
       return `<div class="order-card-new" id="ocard-${o.id}">
         <div class="order-card-top">
           <div>
-            <div class="order-amount-big">${o.amount}g</div>
+            <div class="order-amount-big">${o.amount}g${o.bean_name ? ' — ' + o.bean_name.split('(')[0].trim() : ''}</div>
             <div class="order-bean-small">${dateFA}</div>
           </div>
           <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusFA[o.status]||o.status}</div>
@@ -1528,15 +1528,22 @@ async function submitOrder() {
   btn.textContent = '...';
 
   try {
-    await sb('POST', 'orders', {
+    const orderResult = await sb('POST', 'orders', {
       user_id: currentUser.id,
       profile_id: currentProfileId || null,
       amount: selectedAmount,
       address,
       notes,
       status: 'pending',
-      payment_status: 'unpaid'
+      payment_status: 'unpaid',
+      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null
     });
+
+    if (orderResult && orderResult[0]) {
+      pendingOrderId = orderResult[0].id;
+    } else {
+      throw new Error('Order ID not returned from server');
+    }
 
     // رفتن به صفحه پرداخت
     setTimeout(() => goToPayment(), 800);
@@ -1982,6 +1989,12 @@ async function confirmPayment() {
     setLang(currentLang);
   }
 }
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+setLang('fa');
+checkAutoLogin();
 </script>
 </body>
 </html>
