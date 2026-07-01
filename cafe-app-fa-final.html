@@ -231,6 +231,37 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 /* ── DIVIDER ── */
 .divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
 
+/* ── MESSAGES ── */
+.msg-card {
+  background: var(--white); border-radius: 16px; padding: 16px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 10px;
+  direction: rtl; border-right: 4px solid var(--caramel);
+}
+.msg-card.unread { border-right-color: var(--medium-brown); background: #FDF5E8; }
+.msg-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.msg-card-from { font-size: 12px; font-weight: bold; color: var(--caramel); font-family: Arial,sans-serif; }
+.msg-card-time { font-size: 11px; color: #AAA; font-family: Arial,sans-serif; }
+.msg-card-text { font-size: 14px; color: var(--dark-brown); line-height: 1.6; }
+.msg-unread-badge {
+  background: var(--medium-brown); color: white; border-radius: 20px;
+  padding: 2px 8px; font-size: 10px; font-family: Arial,sans-serif;
+}
+.notif-bell {
+  position: fixed; bottom: 24px; left: 24px; z-index: 999;
+  background: var(--medium-brown); color: white; border-radius: 50%;
+  width: 52px; height: 52px; display: none; align-items: center;
+  justify-content: center; font-size: 22px; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(44,26,14,0.35); transition: all 0.2s;
+}
+.notif-bell.visible { display: flex; }
+.notif-bell:hover { transform: scale(1.1); }
+.notif-count {
+  position: absolute; top: -4px; right: -4px; background: #C0392B;
+  color: white; border-radius: 50%; width: 20px; height: 20px;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  font-family: Arial,sans-serif; font-weight: bold;
+}
+
 /* ── FAVORITE & DELETE ── */
 .profile-card-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F0EAE0; }
 .btn-fav {
@@ -567,6 +598,16 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
         <div class="fa-only">هنوز سفارشی نداری.</div>
       </div>
     </div>
+
+    <!-- Messages Section -->
+    <div class="section-header" style="margin-top:24px;" id="msgs-section-header" style="display:none;">
+      <div class="section-title-new">
+        <span class="en-only">💬 Messages from Roastery</span>
+        <span class="fa-only">💬 پیام‌های رستری</span>
+      </div>
+      <div class="section-count" id="stat-msgs-badge" style="display:none;">0</div>
+    </div>
+    <div id="dash-messages"></div>
   </div>
 </div>
 
@@ -955,6 +996,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </p>
 </div>
 
+<!-- Notification Bell -->
+<div class="notif-bell" id="notif-bell" onclick="scrollToMessages()">
+  💬
+  <div class="notif-count" id="notif-count">0</div>
+</div>
+
 </div><!-- /app-container -->
 
 <script>
@@ -1103,6 +1150,88 @@ async function showDashboard() {
   show('screen-dashboard');
   loadProfiles();
   loadOrders();
+  loadUserMessages();
+}
+
+async function loadUserMessages() {
+  if (!currentUser) return;
+  try {
+    const msgs = await sb('GET', `messages?user_id=eq.${currentUser.id}&from_admin=eq.true&order=created_at.desc&select=*`);
+    const container = document.getElementById('dash-messages');
+    const header = document.getElementById('msgs-section-header');
+    const badge = document.getElementById('stat-msgs-badge');
+
+    if (!msgs || msgs.length === 0) {
+      if (header) header.style.display = 'none';
+      if (container) container.innerHTML = '';
+      document.getElementById('notif-bell').classList.remove('visible');
+      return;
+    }
+
+    // نمایش section
+    if (header) header.style.display = 'flex';
+
+    // تعداد خوانده نشده
+    const unread = msgs.filter(m => !m.is_read).length;
+    if (badge) {
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? 'inline' : 'none';
+    }
+
+    // notification bell
+    const bell = document.getElementById('notif-bell');
+    const bellCount = document.getElementById('notif-count');
+    if (unread > 0) {
+      bell.classList.add('visible');
+      bellCount.textContent = unread;
+    } else {
+      bell.classList.remove('visible');
+    }
+
+    // نمایش پیام‌ها
+    container.innerHTML = msgs.map(m => {
+      const timeFA = new Date(m.created_at).toLocaleDateString('fa-IR', {
+        month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+      return `<div class="msg-card ${!m.is_read ? 'unread' : ''}" onclick="markMsgRead('${m.id}', this)">
+        <div class="msg-card-header">
+          <div class="msg-card-from">☕ رستری قهوه ${!m.is_read ? '<span class="msg-unread-badge">جدید</span>' : ''}</div>
+          <div class="msg-card-time">${timeFA}</div>
+        </div>
+        <div class="msg-card-text">${m.text}</div>
+      </div>`;
+    }).join('');
+
+    // mark all as read after viewing
+    setTimeout(() => markAllMsgsRead(msgs), 3000);
+
+  } catch(e) {
+    console.warn('loadUserMessages error:', e);
+  }
+}
+
+async function markMsgRead(msgId, el) {
+  el.classList.remove('unread');
+  try {
+    await sb('PATCH', `messages?id=eq.${msgId}`, { is_read: true });
+    loadUserMessages();
+  } catch(e) {}
+}
+
+async function markAllMsgsRead(msgs) {
+  const unread = msgs.filter(m => !m.is_read);
+  if (!unread.length) return;
+  try {
+    await sb('PATCH', `messages?user_id=eq.${currentUser.id}&from_admin=eq.true&is_read=eq.false`, { is_read: true });
+    document.getElementById('notif-bell').classList.remove('visible');
+    document.getElementById('stat-msgs-badge').style.display = 'none';
+  } catch(e) {}
+}
+
+function scrollToMessages() {
+  const el = document.getElementById('dash-messages');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  markAllMsgsRead([]);
 }
 
 const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
