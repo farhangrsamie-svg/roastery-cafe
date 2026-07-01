@@ -514,8 +514,8 @@ const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 
 // ادمین‌های مجاز — بعداً از Supabase بخوان
 const ADMINS = [
-  { username: 'admin', password: 'roastery2026', name: 'Kasra' },
-  { username: 'farhang', password: 'coffee1405', name: 'Frank' },
+  { username: 'admin', password: 'roastery2026', name: 'مدیر رستری' },
+  { username: 'farhang', password: 'coffee1401', name: 'فرهنگ' },
 ];
 
 /* ═══════════════════════════════════════════
@@ -884,7 +884,7 @@ async function loadCustomers() {
         <td style="text-align:center;">${orderCount[u.id] || 0}</td>
         <td>${dateFA}</td>
         <td>
-          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${u.name}',null)">💬 پیام</button>
+          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${u.name || ''}',null)">💬 پیام</button>
         </td>
       </tr>`;
     }).join('');
@@ -1045,14 +1045,20 @@ async function sendMsgFromModal(userId, orderId) {
   const text = document.getElementById('modal-msg-text')?.value.trim();
   const notif = document.getElementById('modal-msg-notif');
   if (!text) { showModalNotif('متن پیام را وارد کنید', 'error'); return; }
+  if (!userId || userId === 'null' || userId === 'undefined') {
+    showModalNotif('خطا: کاربر مشخص نیست', 'error'); return;
+  }
+  const msgData = {
+    user_id: userId,
+    text,
+    from_admin: true,
+    is_read: false
+  };
+  if (orderId && orderId !== 'null' && orderId !== 'undefined') {
+    msgData.order_id = orderId;
+  }
   try {
-    await sb('POST', 'messages', {
-      user_id: userId,
-      order_id: orderId || null,
-      text,
-      from_admin: true,
-      is_read: false
-    });
+    await sb('POST', 'messages', msgData);
     showModalNotif('✅ پیام ارسال شد!', 'success');
     document.getElementById('modal-msg-text').value = '';
     setTimeout(() => closeModal('msg-modal'), 1500);
