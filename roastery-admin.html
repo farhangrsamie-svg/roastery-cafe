@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پنل مدیریت رستری — Coffee Identity</title>
+<style>
+:root {
+  --cream: #F5F0E8;
+  --dark-brown: #2C1A0E;
+  --medium-brown: #6B3F2A;
+  --caramel: #C4956A;
+  --light-caramel: #E8C99A;
+  --white: #FEFEFE;
+  --green: #2E7D32;
+  --green-bg: #E8F5E9;
+  --red: #C62828;
+  --red-bg: #FFEBEE;
+  --blue: #1565C0;
+  --blue-bg: #E3F2FD;
+  --shadow: rgba(44,26,14,0.10);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Arial', sans-serif;
+  background: #F0EBE1;
+  color: var(--dark-brown);
+  min-height: 100vh;
+}
+
+/* ── LOGIN ── */
+.login-wrap {
+  min-height: 100vh; display: flex; align-items: center;
+  justify-content: center; padding: 20px;
+}
+.login-box {
+  background: var(--white); border-radius: 24px; padding: 40px 32px;
+  width: 100%; max-width: 400px;
+  box-shadow: 0 8px 40px rgba(44,26,14,0.15);
+  text-align: center;
+}
+.login-icon { font-size: 52px; margin-bottom: 12px; }
+.login-title { font-size: 22px; font-weight: bold; color: var(--medium-brown); margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: #888; margin-bottom: 28px; }
+
+/* ── LAYOUT ── */
+.admin-layout { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px; background: var(--dark-brown); flex-shrink: 0;
+  display: flex; flex-direction: column;
+}
+.sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sidebar-logo-icon { font-size: 32px; }
+.sidebar-logo-title { font-size: 16px; font-weight: bold; color: var(--white); margin-top: 6px; }
+.sidebar-logo-sub { font-size: 11px; color: var(--caramel); margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 12px 0; }
+.nav-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 20px;
+  color: rgba(255,255,255,0.65); font-size: 14px; cursor: pointer;
+  transition: all 0.2s; border-right: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.07); color: var(--white); }
+.nav-item.active { background: rgba(196,149,106,0.15); color: var(--caramel); border-right-color: var(--caramel); }
+.nav-item .nav-icon { font-size: 18px; width: 22px; text-align: center; }
+.nav-badge {
+  margin-right: auto; background: var(--caramel); color: var(--white);
+  border-radius: 20px; padding: 1px 8px; font-size: 11px; font-weight: bold;
+}
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+.sidebar-admin { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+.btn-logout {
+  width: 100%; padding: 8px; background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7);
+  border-radius: 8px; cursor: pointer; font-size: 12px; transition: all 0.2s;
+}
+.btn-logout:hover { background: rgba(255,255,255,0.15); }
+.main-content { flex: 1; overflow-y: auto; }
+.top-bar {
+  background: var(--white); padding: 16px 28px; border-bottom: 1px solid #E5DDD0;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 10;
+}
+.page-title { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
+.page-sub { font-size: 12px; color: #888; margin-top: 2px; }
+.top-actions { display: flex; gap: 10px; }
+.content-area { padding: 24px 28px; }
+
+/* ── STATS ── */
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--white); border-radius: 16px; padding: 20px;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.stat-icon { font-size: 28px; margin-bottom: 8px; }
+.stat-num { font-size: 32px; font-weight: bold; color: var(--dark-brown); }
+.stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+.stat-change { font-size: 11px; color: var(--green); margin-top: 4px; }
+
+/* ── TABLES ── */
+.section-card {
+  background: var(--white); border-radius: 16px;
+  box-shadow: 0 2px 12px var(--shadow); margin-bottom: 20px; overflow: hidden;
+}
+.section-header {
+  padding: 16px 20px; border-bottom: 1px solid #F0EAE0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.section-title { font-size: 15px; font-weight: bold; color: var(--dark-brown); }
+.filter-tabs { display: flex; gap: 6px; }
+.filter-tab {
+  padding: 5px 14px; border-radius: 20px; border: 1px solid #E0D8CE;
+  background: transparent; color: #888; font-size: 12px; cursor: pointer; transition: all 0.2s;
+}
+.filter-tab.active { background: var(--caramel); color: var(--white); border-color: var(--caramel); }
+.orders-table { width: 100%; border-collapse: collapse; }
+.orders-table th {
+  text-align: right; padding: 10px 16px; font-size: 11px;
+  color: #AAA; font-weight: normal; border-bottom: 1px solid #F0EAE0;
+  background: #FAFAF8; text-transform: uppercase; letter-spacing: 1px;
+}
+.orders-table td { padding: 14px 16px; border-bottom: 1px solid #F7F3EC; font-size: 13px; vertical-align: top; }
+.orders-table tr:last-child td { border-bottom: none; }
+.orders-table tr:hover td { background: #FFFAF5; }
+.customer-name { font-weight: bold; color: var(--dark-brown); }
+.customer-phone { font-size: 11px; color: #888; direction: ltr; }
+.bean-name { color: var(--medium-brown); font-weight: bold; font-size: 12px; }
+.bean-detail { font-size: 11px; color: #AAA; }
+
+/* ── STATUS BADGES ── */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: bold;
+}
+.badge-pending { background: #FFF8EC; color: #B07A2C; border: 1px solid #E8C99A; }
+.badge-receipt { background: #E3F2FD; color: var(--blue); border: 1px solid #90CAF9; }
+.badge-confirmed { background: var(--green-bg); color: var(--green); border: 1px solid #A5D6A7; }
+.badge-shipped { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }
+.badge-cancelled { background: var(--red-bg); color: var(--red); border: 1px solid #EF9A9A; }
+
+/* ── BUTTONS ── */
+.btn { padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none; transition: all 0.15s; font-family: Arial, sans-serif; }
+.btn-confirm { background: var(--green); color: white; }
+.btn-confirm:hover { background: #1B5E20; }
+.btn-ship { background: #6A1B9A; color: white; }
+.btn-ship:hover { background: #4A148C; }
+.btn-reject { background: transparent; color: var(--red); border: 1px solid #EF9A9A; }
+.btn-reject:hover { background: var(--red-bg); }
+.btn-view { background: transparent; color: var(--caramel); border: 1px solid var(--light-caramel); }
+.btn-view:hover { background: #FDF5E8; }
+.btn-primary { background: var(--medium-brown); color: white; padding: 10px 20px; border-radius: 10px; font-size: 13px; }
+.btn-primary:hover { background: var(--dark-brown); }
+.action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* ── INPUT ── */
+.input-field {
+  width: 100%; padding: 10px 14px; border: 1.5px solid #DDD5C2; border-radius: 10px;
+  font-size: 14px; background: var(--white); color: var(--dark-brown); outline: none;
+  font-family: Arial, sans-serif; transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--caramel); }
+.input-label { display: block; font-size: 11px; color: var(--caramel); margin-bottom: 6px; letter-spacing: 1px; }
+.form-group { margin-bottom: 16px; }
+textarea.input-field { resize: vertical; min-height: 100px; }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(44,26,14,0.5);
+  z-index: 999; display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-box {
+  background: var(--white); border-radius: 20px; padding: 28px;
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(44,26,14,0.25);
+}
+.modal-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 20px; }
+.modal-close { float: left; background: none; border: none; font-size: 20px; cursor: pointer; color: #AAA; }
+
+/* ── PROFILE VIEW ── */
+.profile-detail { background: #FFFAF5; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.profile-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #F0EAE0; font-size: 13px; }
+.profile-row:last-child { border-bottom: none; }
+.profile-key { color: #888; }
+.profile-val { font-weight: bold; color: var(--dark-brown); text-align: left; }
+.receipt-img { width: 100%; border-radius: 12px; margin-top: 8px; cursor: pointer; }
+.receipt-link { color: var(--blue); font-size: 13px; text-decoration: underline; cursor: pointer; }
+
+/* ── MESSAGES ── */
+.msg-thread { border: 1px solid #F0EAE0; border-radius: 12px; overflow: hidden; margin-bottom: 16px; }
+.msg-item {
+  padding: 12px 16px; display: flex; gap: 10px; align-items: flex-start;
+  border-bottom: 1px solid #F7F3EC;
+}
+.msg-item:last-child { border-bottom: none; }
+.msg-item.admin { background: #FDF5E8; }
+.msg-item.customer { background: var(--white); }
+.msg-avatar {
+  width: 32px; height: 32px; border-radius: 50%; display: flex;
+  align-items: center; justify-content: center; font-size: 14px;
+  flex-shrink: 0;
+}
+.msg-avatar.admin-av { background: var(--caramel); }
+.msg-avatar.customer-av { background: #E8F5E9; }
+.msg-content { flex: 1; }
+.msg-sender { font-size: 11px; color: #888; margin-bottom: 2px; }
+.msg-text { font-size: 13px; color: var(--dark-brown); line-height: 1.5; }
+.msg-time { font-size: 10px; color: #BBB; margin-top: 4px; }
+.empty-msgs { text-align: center; padding: 24px; color: #BBB; font-size: 13px; }
+.unread-dot {
+  width: 8px; height: 8px; background: var(--caramel); border-radius: 50%;
+  display: inline-block; margin-left: 4px;
+}
+
+/* ── NOTIFICATIONS ── */
+.notif-bar {
+  background: var(--green-bg); border: 1px solid #A5D6A7; border-radius: 10px;
+  padding: 10px 16px; margin-bottom: 16px; font-size: 13px; color: var(--green);
+  display: none;
+}
+.notif-bar.error { background: var(--red-bg); border-color: #EF9A9A; color: var(--red); }
+.notif-bar.visible { display: block; }
+
+/* ── MESSAGES PAGE ── */
+.msg-user-list { border: 1px solid #F0EAE0; border-radius: 12px; overflow: hidden; }
+.msg-user-item {
+  padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; border-bottom: 1px solid #F7F3EC; transition: background 0.15s;
+}
+.msg-user-item:last-child { border-bottom: none; }
+.msg-user-item:hover { background: #FFFAF5; }
+.msg-user-item.selected { background: #FDF5E8; }
+.msg-user-name { font-weight: bold; font-size: 13px; color: var(--dark-brown); }
+.msg-user-phone { font-size: 11px; color: #888; direction: ltr; }
+.msg-user-preview { font-size: 11px; color: #AAA; margin-top: 2px; }
+.msg-split { display: grid; grid-template-columns: 280px 1fr; gap: 16px; }
+.msg-chat-area { border: 1px solid #F0EAE0; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; min-height: 400px; }
+.msg-chat-messages { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.msg-bubble { max-width: 75%; padding: 10px 14px; border-radius: 16px; font-size: 13px; line-height: 1.5; }
+.msg-bubble.admin { background: var(--caramel); color: white; align-self: flex-start; border-bottom-right-radius: 4px; }
+.msg-bubble.customer { background: #F0EAE0; color: var(--dark-brown); align-self: flex-end; border-bottom-left-radius: 4px; }
+.msg-bubble-time { font-size: 10px; opacity: 0.7; margin-top: 4px; }
+.msg-chat-input { padding: 12px; border-top: 1px solid #F0EAE0; display: flex; gap: 8px; }
+.msg-chat-input textarea { flex: 1; padding: 8px 12px; border: 1.5px solid #DDD5C2; border-radius: 10px; font-size: 13px; resize: none; font-family: Arial; outline: none; min-height: 44px; }
+.msg-chat-input textarea:focus { border-color: var(--caramel); }
+.msg-send-btn { background: var(--caramel); color: white; border: none; border-radius: 10px; padding: 8px 16px; cursor: pointer; font-size: 13px; }
+
+/* ── EMPTY STATE ── */
+.empty-state { text-align: center; padding: 48px 20px; color: #BBB; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; }
+
+/* ── SCREEN TOGGLE ── */
+.page { display: none; }
+.page.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ══════ LOGIN ══════ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-box">
+      <div class="login-icon">☕</div>
+      <div class="login-title">پنل مدیریت رستری</div>
+      <div class="login-sub">Coffee Identity Admin Panel</div>
+      <div class="form-group">
+        <label class="input-label">نام کاربری</label>
+        <input class="input-field" id="admin-username" type="text" placeholder="admin" />
+      </div>
+      <div class="form-group">
+        <label class="input-label">رمز عبور</label>
+        <input class="input-field" id="admin-password" type="password" placeholder="••••••••" />
+      </div>
+      <div class="notif-bar error" id="login-error">نام کاربری یا رمز اشتباه است</div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doAdminLogin()">ورود به پنل →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ ADMIN LAYOUT ══════ -->
+<div id="admin-screen" style="display:none;">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">☕</div>
+        <div class="sidebar-logo-title">هویت قهوه</div>
+        <div class="sidebar-logo-sub">Roastery Admin Panel</div>
+      </div>
+      <div class="sidebar-nav">
+        <div class="nav-item active" onclick="showPage('dashboard')">
+          <span class="nav-icon">📊</span> داشبورد
+        </div>
+        <div class="nav-item" onclick="showPage('orders')">
+          <span class="nav-icon">📦</span> سفارش‌ها
+          <span class="nav-badge" id="nav-badge-orders">0</span>
+        </div>
+        <div class="nav-item" onclick="showPage('profiles')">
+          <span class="nav-icon">☕</span> پروفایل‌های قهوه
+        </div>
+        <div class="nav-item" onclick="showPage('messages')">
+          <span class="nav-icon">💬</span> پیام‌ها
+          <span class="nav-badge" id="nav-badge-msgs" style="display:none;">0</span>
+        </div>
+        <div class="nav-item" onclick="showPage('customers')">
+          <span class="nav-icon">👥</span> مشتریان
+        </div>
+      </div>
+      <div class="sidebar-footer">
+        <div class="sidebar-admin" id="admin-name-display">ادمین</div>
+        <button class="btn-logout" onclick="doAdminLogout()">خروج ↗</button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+      <!-- ── DASHBOARD PAGE ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">داشبورد</div>
+            <div class="page-sub" id="dashboard-date"></div>
+          </div>
+          <button class="btn btn-primary" onclick="refreshAll()">🔄 بروزرسانی</button>
+        </div>
+        <div class="content-area">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-num" id="stat-pending">—</div>
+              <div class="stat-label">در انتظار تأیید</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📋</div>
+              <div class="stat-num" id="stat-receipts">—</div>
+              <div class="stat-label">رسید ارسال شده</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">✅</div>
+              <div class="stat-num" id="stat-confirmed">—</div>
+              <div class="stat-label">تأیید شده امروز</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👥</div>
+              <div class="stat-num" id="stat-customers">—</div>
+              <div class="stat-label">کل مشتریان</div>
+            </div>
+          </div>
+
+          <!-- Recent orders needing action -->
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-title">⚡ نیاز به اقدام فوری</div>
+            </div>
+            <div id="urgent-orders">
+              <div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">همه سفارش‌ها بررسی شده‌اند</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ORDERS PAGE ── -->
+      <div class="page" id="page-orders">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">سفارش‌ها</div>
+            <div class="page-sub">مدیریت و تأیید سفارش‌های مشتریان</div>
+          </div>
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterOrders('all', this)">همه</button>
+            <button class="filter-tab" onclick="filterOrders('receipt_submitted', this)">رسید دارد</button>
+            <button class="filter-tab" onclick="filterOrders('pending', this)">در انتظار</button>
+            <button class="filter-tab" onclick="filterOrders('confirmed', this)">تأیید شده</button>
+            <button class="filter-tab" onclick="filterOrders('shipped', this)">ارسال شده</button>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="section-card">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>مشتری</th>
+                  <th>دانه قهوه</th>
+                  <th>مقدار</th>
+                  <th>وضعیت</th>
+                  <th>تاریخ</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── PROFILES PAGE ── -->
+      <div class="page" id="page-profiles">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">پروفایل‌های قهوه</div>
+            <div class="page-sub">همه درخواست‌های طعم‌سنجی مشتریان</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="section-card">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>مشتری</th>
+                  <th>دانه پیشنهادی</th>
+                  <th>طعم / بدنه</th>
+                  <th>روش دم‌آوری</th>
+                  <th>امتیاز</th>
+                  <th>تاریخ</th>
+                </tr>
+              </thead>
+              <tbody id="profiles-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MESSAGES PAGE ── -->
+      <div class="page" id="page-messages">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">پیام‌ها</div>
+            <div class="page-sub">ارتباط مستقیم با مشتریان</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="msg-split">
+            <div>
+              <div class="msg-user-list" id="msg-user-list">
+                <div class="empty-state" style="padding:24px;"><div class="empty-text">در حال بارگذاری...</div></div>
+              </div>
+            </div>
+            <div class="msg-chat-area" id="msg-chat-area">
+              <div style="flex:1;display:flex;align-items:center;justify-content:center;color:#BBB;font-size:14px;">
+                یک مشتری انتخاب کنید
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── CUSTOMERS PAGE ── -->
+      <div class="page" id="page-customers">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">مشتریان</div>
+            <div class="page-sub">لیست همه کاربران ثبت‌نام‌شده</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="section-card">
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>نام</th>
+                  <th>شماره موبایل</th>
+                  <th>تعداد پروفایل</th>
+                  <th>تعداد سفارش</th>
+                  <th>تاریخ ثبت‌نام</th>
+                  <th>عملیات</th>
+                </tr>
+              </thead>
+              <tbody id="customers-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main-content -->
+  </div><!-- /admin-layout -->
+</div><!-- /admin-screen -->
+
+<!-- ══════ ORDER DETAIL MODAL ══════ -->
+<div class="modal-overlay" id="order-modal" style="display:none;">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div class="modal-title">جزئیات سفارش</div>
+      <button class="modal-close" onclick="closeModal('order-modal')">✕</button>
+    </div>
+    <div id="order-modal-content"></div>
+  </div>
+</div>
+
+<!-- ══════ SEND MESSAGE MODAL ══════ -->
+<div class="modal-overlay" id="msg-modal" style="display:none;">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div class="modal-title">ارسال پیام به مشتری</div>
+      <button class="modal-close" onclick="closeModal('msg-modal')">✕</button>
+    </div>
+    <div id="msg-modal-content"></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+
+// ادمین‌های مجاز — بعداً از Supabase بخوان
+const ADMINS = [
+  { username: 'admin', password: 'roastery2026', name: 'Kasra' },
+  { username: 'farhang', password: 'coffee1405', name: 'Frank' },
+];
+
+/* ═══════════════════════════════════════════
+   SUPABASE HELPER
+═══════════════════════════════════════════ */
+async function sb(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Supabase error ' + res.status);
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+let currentAdmin = null;
+
+function doAdminLogin() {
+  const u = document.getElementById('admin-username').value.trim();
+  const p = document.getElementById('admin-password').value;
+  const admin = ADMINS.find(a => a.username === u && a.password === p);
+  if (!admin) {
+    document.getElementById('login-error').classList.add('visible');
+    return;
+  }
+  currentAdmin = admin;
+  localStorage.setItem('roastery_admin', JSON.stringify(admin));
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'flex';
+  document.getElementById('admin-name-display').textContent = admin.name;
+  document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  initAdmin();
+}
+
+function doAdminLogout() {
+  currentAdmin = null;
+  localStorage.removeItem('roastery_admin');
+  document.getElementById('admin-screen').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'block';
+  document.getElementById('admin-username').value = '';
+  document.getElementById('admin-password').value = '';
+}
+
+function checkAdminAutoLogin() {
+  const saved = localStorage.getItem('roastery_admin');
+  if (saved) {
+    try {
+      const admin = JSON.parse(saved);
+      if (ADMINS.find(a => a.username === admin.username)) {
+        currentAdmin = admin;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('admin-screen').style.display = 'flex';
+        document.getElementById('admin-name-display').textContent = admin.name;
+        document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        initAdmin();
+        return;
+      }
+    } catch(e) {}
+  }
+}
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (name === 'orders') loadOrders('all');
+  if (name === 'profiles') loadProfiles();
+  if (name === 'messages') loadMessages();
+  if (name === 'customers') loadCustomers();
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+async function initAdmin() {
+  await refreshAll();
+  // auto-refresh هر ۳۰ ثانیه
+  setInterval(refreshDashboard, 30000);
+}
+
+async function refreshAll() {
+  await refreshDashboard();
+  loadOrders(currentFilter || 'all');
+}
+
+let currentFilter = 'all';
+let allOrders = [];
+let allUsers = [];
+let selectedMsgUserId = null;
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+async function refreshDashboard() {
+  try {
+    const [orders, users] = await Promise.all([
+      sb('GET', 'orders?select=*,users(name,phone)&order=created_at.desc'),
+      sb('GET', 'users?select=id,name,phone,created_at')
+    ]);
+
+    allOrders = orders || [];
+    allUsers = users || [];
+
+    const pending = allOrders.filter(o => o.status === 'pending').length;
+    const receipts = allOrders.filter(o => o.status === 'receipt_submitted').length;
+    const today = new Date().toISOString().split('T')[0];
+    const confirmed = allOrders.filter(o => o.status === 'confirmed' && o.created_at?.startsWith(today)).length;
+
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-receipts').textContent = receipts;
+    document.getElementById('stat-confirmed').textContent = confirmed;
+    document.getElementById('stat-customers').textContent = allUsers.length;
+
+    // badge در منو
+    const urgent = pending + receipts;
+    const badge = document.getElementById('nav-badge-orders');
+    badge.textContent = urgent;
+    badge.style.display = urgent > 0 ? 'inline' : 'none';
+
+    // urgent orders
+    renderUrgentOrders(allOrders.filter(o => ['pending','receipt_submitted'].includes(o.status)));
+
+    // unread messages badge
+    loadUnreadCount();
+
+  } catch(e) {
+    console.error('Dashboard error:', e);
+  }
+}
+
+function renderUrgentOrders(orders) {
+  const el = document.getElementById('urgent-orders');
+  if (!orders.length) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">همه سفارش‌ها بررسی شده‌اند</div></div>';
+    return;
+  }
+  el.innerHTML = `<table class="orders-table">
+    <thead><tr><th>مشتری</th><th>دانه</th><th>مقدار</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+    <tbody>${orders.map(o => orderRow(o)).join('')}</tbody>
+  </table>`;
+}
+
+/* ═══════════════════════════════════════════
+   ORDERS
+═══════════════════════════════════════════ */
+function statusBadge(status) {
+  const map = {
+    pending: '<span class="badge badge-pending">⏳ در انتظار پرداخت</span>',
+    receipt_submitted: '<span class="badge badge-receipt">📋 رسید ارسال شد</span>',
+    confirmed: '<span class="badge badge-confirmed">✅ تأیید شد</span>',
+    shipped: '<span class="badge badge-shipped">🚚 ارسال شد</span>',
+    cancelled: '<span class="badge badge-cancelled">❌ کنسل شد</span>',
+  };
+  return map[status] || `<span class="badge">${status}</span>`;
+}
+
+function orderRow(o) {
+  const user = o.users || {};
+  const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+  const beanName = (o.bean_name || '').split('(')[0].trim() || '—';
+  return `<tr>
+    <td>
+      <div class="customer-name">${user.name || '—'}</div>
+      <div class="customer-phone">${user.phone || '—'}</div>
+    </td>
+    <td>
+      <div class="bean-name">${beanName}</div>
+      <div class="bean-detail">${o.amount}g</div>
+    </td>
+    <td>${o.amount}g</td>
+    <td>${statusBadge(o.status)}</td>
+    <td>${dateFA}</td>
+    <td>
+      <div class="action-btns">
+        <button class="btn btn-view" onclick="viewOrder('${o.id}')">🔍 جزئیات</button>
+        ${o.status === 'receipt_submitted' ? `
+          <button class="btn btn-confirm" onclick="updateOrderStatus('${o.id}','confirmed')">✅ تأیید</button>
+          <button class="btn btn-reject" onclick="updateOrderStatus('${o.id}','cancelled')">❌ رد</button>
+        ` : ''}
+        ${o.status === 'confirmed' ? `
+          <button class="btn btn-ship" onclick="updateOrderStatus('${o.id}','shipped')">🚚 ارسال شد</button>
+        ` : ''}
+        <button class="btn btn-view" onclick="openMsgModal('${o.users?.id || ''}','${user.name || ''}','${o.id}')">💬</button>
+      </div>
+    </td>
+  </tr>`;
+}
+
+async function loadOrders(filter) {
+  currentFilter = filter;
+  const tbody = document.getElementById('orders-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  try {
+    let path = 'orders?select=*,users(id,name,phone)&order=created_at.desc';
+    if (filter !== 'all') path += `&status=eq.${filter}`;
+    const orders = await sb('GET', path);
+    if (!orders || !orders.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📦</div><div class="empty-text">سفارشی یافت نشد</div></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = orders.map(o => orderRow(o)).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+  }
+}
+
+function filterOrders(filter, btn) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  loadOrders(filter);
+}
+
+async function updateOrderStatus(orderId, status) {
+  try {
+    await sb('PATCH', `orders?id=eq.${orderId}`, { status });
+    await refreshAll();
+    closeModal('order-modal');
+    showNotif(status === 'confirmed' ? '✅ سفارش تأیید شد' : status === 'shipped' ? '🚚 وضعیت ارسال ثبت شد' : '❌ سفارش رد شد', status === 'cancelled' ? 'error' : 'success');
+  } catch(e) {
+    showNotif('خطا: ' + e.message, 'error');
+  }
+}
+
+async function viewOrder(orderId) {
+  const order = allOrders.find(o => o.id === orderId) ||
+    (await sb('GET', `orders?id=eq.${orderId}&select=*,users(id,name,phone)`).catch(() => []))[0];
+  if (!order) return;
+
+  // load coffee profile for this user
+  let profile = null;
+  if (order.profile_id) {
+    const profiles = await sb('GET', `coffee_profiles?id=eq.${order.profile_id}&select=*`).catch(() => []);
+    profile = profiles?.[0] || null;
+  }
+
+  const user = order.users || {};
+  const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
+  const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
+  const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+
+  document.getElementById('order-modal-content').innerHTML = `
+    <div class="notif-bar" id="modal-notif"></div>
+
+    <div class="profile-detail">
+      <div class="profile-row"><span class="profile-key">مشتری</span><span class="profile-val">${user.name || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">موبایل</span><span class="profile-val" style="direction:ltr;">${user.phone || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">دانه سفارشی</span><span class="profile-val">${order.bean_name || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">مقدار</span><span class="profile-val">${order.amount}g</span></div>
+      <div class="profile-row"><span class="profile-key">وضعیت</span><span class="profile-val">${statusBadge(order.status)}</span></div>
+      <div class="profile-row"><span class="profile-key">کد پیگیری</span><span class="profile-val">${order.transaction_id || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">آدرس</span><span class="profile-val">${order.address || '—'}</span></div>
+      ${order.notes ? `<div class="profile-row"><span class="profile-key">یادداشت</span><span class="profile-val">${order.notes}</span></div>` : ''}
+    </div>
+
+    ${order.receipt_url ? `
+      <div style="margin-bottom:16px;">
+        <div class="input-label" style="margin-bottom:8px;">تصویر رسید پرداخت</div>
+        <a href="${order.receipt_url}" target="_blank" class="receipt-link">🔗 مشاهده رسید در Google Drive</a>
+      </div>
+    ` : '<div style="color:#BBB;font-size:13px;margin-bottom:16px;">رسیدی آپلود نشده</div>'}
+
+    ${profile ? `
+      <div style="margin-bottom:16px;">
+        <div class="input-label" style="margin-bottom:8px;">پروفایل قهوه مشتری</div>
+        <div class="profile-detail">
+          <div class="profile-row"><span class="profile-key">طعم</span><span class="profile-val">${tasteFA[profile.flavor] || profile.flavor || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">بدنه</span><span class="profile-val">${bodyFA[profile.body] || profile.body || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">روش دم‌آوری</span><span class="profile-val">${brewFA[profile.brew_method] || profile.brew_method || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">تجربه</span><span class="profile-val">${profile.experience || '—'}</span></div>
+          ${profile.review_text ? `<div class="profile-row"><span class="profile-key">نظر مشتری</span><span class="profile-val">${profile.review_text}</span></div>` : ''}
+          ${profile.review_rating ? `<div class="profile-row"><span class="profile-key">امتیاز</span><span class="profile-val">${'⭐'.repeat(profile.review_rating)}</span></div>` : ''}
+        </div>
+      </div>
+    ` : ''}
+
+    <div class="action-btns" style="margin-top:16px;">
+      ${order.status === 'receipt_submitted' ? `
+        <button class="btn btn-confirm" onclick="updateOrderStatus('${order.id}','confirmed')">✅ تأیید سفارش</button>
+        <button class="btn btn-reject" onclick="updateOrderStatus('${order.id}','cancelled')">❌ رد سفارش</button>
+      ` : ''}
+      ${order.status === 'confirmed' ? `
+        <button class="btn btn-ship" onclick="updateOrderStatus('${order.id}','shipped')">🚚 ثبت ارسال</button>
+      ` : ''}
+      <button class="btn btn-view" onclick="openMsgModal('${user.id || ''}','${user.name || ''}','${order.id}')">💬 ارسال پیام به مشتری</button>
+    </div>
+  `;
+  document.getElementById('order-modal').style.display = 'flex';
+}
+
+/* ═══════════════════════════════════════════
+   PROFILES
+═══════════════════════════════════════════ */
+async function loadProfiles() {
+  const tbody = document.getElementById('profiles-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  try {
+    const profiles = await sb('GET', 'coffee_profiles?select=*,users(name,phone)&order=created_at.desc&limit=100');
+    if (!profiles || !profiles.length) {
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">☕</div><div class="empty-text">پروفایلی یافت نشد</div></div></td></tr>';
+      return;
+    }
+    const tasteFA = { floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند' };
+    const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
+    const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+    tbody.innerHTML = profiles.map(p => {
+      const user = p.users || {};
+      const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {month:'short', day:'numeric'});
+      const beanName = (p.recommended_bean || '').split('(')[0].trim() || '—';
+      return `<tr>
+        <td>
+          <div class="customer-name">${user.name || '—'}</div>
+          <div class="customer-phone">${user.phone || '—'}</div>
+        </td>
+        <td><div class="bean-name">${beanName}</div></td>
+        <td>${tasteFA[p.flavor] || p.flavor || '—'} / ${bodyFA[p.body] || p.body || '—'}</td>
+        <td>${brewFA[p.brew_method] || p.brew_method || '—'}</td>
+        <td>${p.review_rating ? '⭐'.repeat(p.review_rating) : '—'}</td>
+        <td>${dateFA}</td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   CUSTOMERS
+═══════════════════════════════════════════ */
+async function loadCustomers() {
+  const tbody = document.getElementById('customers-tbody');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  try {
+    const users = await sb('GET', 'users?select=*&order=created_at.desc');
+    const profiles = await sb('GET', 'coffee_profiles?select=user_id');
+    const orders = await sb('GET', 'orders?select=user_id');
+    const profileCount = {};
+    const orderCount = {};
+    (profiles || []).forEach(p => { profileCount[p.user_id] = (profileCount[p.user_id] || 0) + 1; });
+    (orders || []).forEach(o => { orderCount[o.user_id] = (orderCount[o.user_id] || 0) + 1; });
+
+    tbody.innerHTML = (users || []).map(u => {
+      const dateFA = new Date(u.created_at).toLocaleDateString('fa-IR', {year:'numeric', month:'short', day:'numeric'});
+      return `<tr>
+        <td><div class="customer-name">${u.name || '—'}</div></td>
+        <td><div class="customer-phone">${u.phone || '—'}</div></td>
+        <td style="text-align:center;">${profileCount[u.id] || 0}</td>
+        <td style="text-align:center;">${orderCount[u.id] || 0}</td>
+        <td>${dateFA}</td>
+        <td>
+          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${u.name}',null)">💬 پیام</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   MESSAGES
+═══════════════════════════════════════════ */
+async function loadUnreadCount() {
+  try {
+    const msgs = await sb('GET', 'messages?from_admin=eq.false&is_read=eq.false&select=id');
+    const count = (msgs || []).length;
+    const badge = document.getElementById('nav-badge-msgs');
+    badge.textContent = count;
+    badge.style.display = count > 0 ? 'inline' : 'none';
+  } catch(e) {}
+}
+
+async function loadMessages() {
+  try {
+    const users = await sb('GET', 'users?select=id,name,phone&order=created_at.desc');
+    const msgs = await sb('GET', 'messages?select=user_id,text,from_admin,created_at,is_read&order=created_at.desc');
+
+    const lastMsg = {};
+    const unreadCount = {};
+    (msgs || []).forEach(m => {
+      if (!lastMsg[m.user_id]) lastMsg[m.user_id] = m;
+      if (!m.from_admin && !m.is_read) {
+        unreadCount[m.user_id] = (unreadCount[m.user_id] || 0) + 1;
+      }
+    });
+
+    const list = document.getElementById('msg-user-list');
+    if (!users || !users.length) {
+      list.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="empty-text">مشتری‌ای ثبت نشده</div></div>';
+      return;
+    }
+    list.innerHTML = users.map(u => `
+      <div class="msg-user-item ${selectedMsgUserId === u.id ? 'selected' : ''}" onclick="selectMsgUser('${u.id}','${u.name}')">
+        <div style="font-size:28px;">👤</div>
+        <div style="flex:1;">
+          <div class="msg-user-name">${u.name || '—'} ${unreadCount[u.id] ? `<span class="unread-dot"></span>` : ''}</div>
+          <div class="msg-user-phone">${u.phone || '—'}</div>
+          <div class="msg-user-preview">${lastMsg[u.id] ? lastMsg[u.id].text.substring(0, 40) + '...' : 'هنوز پیامی نیست'}</div>
+        </div>
+      </div>
+    `).join('');
+
+    if (selectedMsgUserId) {
+      renderMsgChat(selectedMsgUserId, msgs.filter(m => m.user_id === selectedMsgUserId));
+    }
+  } catch(e) {
+    console.error('loadMessages error:', e);
+  }
+}
+
+async function selectMsgUser(userId, userName) {
+  selectedMsgUserId = userId;
+  document.querySelectorAll('.msg-user-item').forEach(i => i.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+
+  // mark as read
+  await sb('PATCH', `messages?user_id=eq.${userId}&from_admin=eq.false`, { is_read: true }).catch(() => {});
+
+  const msgs = await sb('GET', `messages?user_id=eq.${userId}&order=created_at.asc`).catch(() => []);
+  renderMsgChat(userId, msgs || [], userName);
+  loadUnreadCount();
+}
+
+function renderMsgChat(userId, msgs, userName = '') {
+  const area = document.getElementById('msg-chat-area');
+  area.innerHTML = `
+    <div style="padding:12px 16px;border-bottom:1px solid #F0EAE0;font-weight:bold;font-size:14px;color:var(--dark-brown);">
+      ${userName || 'مشتری'}
+    </div>
+    <div class="msg-chat-messages" id="chat-messages">
+      ${!msgs.length ? '<div style="text-align:center;color:#BBB;font-size:13px;margin:auto;">هنوز پیامی ردوبدل نشده</div>' :
+        msgs.map(m => `
+          <div>
+            <div class="msg-bubble ${m.from_admin ? 'admin' : 'customer'}">
+              ${m.text}
+              <div class="msg-bubble-time">${new Date(m.created_at).toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})}</div>
+            </div>
+          </div>
+        `).join('')
+      }
+    </div>
+    <div class="msg-chat-input">
+      <textarea id="chat-input" placeholder="پیام خود را بنویسید..." rows="2"></textarea>
+      <button class="msg-send-btn" onclick="sendMessage('${userId}')">ارسال ✓</button>
+    </div>
+  `;
+  // scroll to bottom
+  setTimeout(() => {
+    const el = document.getElementById('chat-messages');
+    if (el) el.scrollTop = el.scrollHeight;
+  }, 50);
+}
+
+async function sendMessage(userId) {
+  const input = document.getElementById('chat-input');
+  const text = input?.value.trim();
+  if (!text || !userId) return;
+  input.value = '';
+  try {
+    await sb('POST', 'messages', {
+      user_id: userId,
+      text,
+      from_admin: true,
+      is_read: false
+    });
+    const msgs = await sb('GET', `messages?user_id=eq.${userId}&order=created_at.asc`);
+    renderMsgChat(userId, msgs || []);
+    loadMessages();
+  } catch(e) {
+    showNotif('خطا در ارسال پیام: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SEND MESSAGE MODAL (from order view)
+═══════════════════════════════════════════ */
+async function openMsgModal(userId, userName, orderId) {
+  if (!userId) return;
+  selectedMsgUserId = userId;
+  const msgs = await sb('GET', `messages?user_id=eq.${userId}&order=created_at.asc`).catch(() => []);
+
+  document.getElementById('msg-modal-content').innerHTML = `
+    <div style="margin-bottom:12px;font-size:13px;color:#888;">پیام به: <strong>${userName}</strong></div>
+    <div class="msg-thread" style="max-height:250px;overflow-y:auto;margin-bottom:16px;">
+      ${!msgs.length ? '<div class="empty-msgs">هنوز پیامی ردوبدل نشده</div>' :
+        msgs.map(m => `
+          <div class="msg-item ${m.from_admin ? 'admin' : 'customer'}">
+            <div class="msg-avatar ${m.from_admin ? 'admin-av' : 'customer-av'}">${m.from_admin ? '👨‍💼' : '👤'}</div>
+            <div class="msg-content">
+              <div class="msg-sender">${m.from_admin ? 'رستری' : userName}</div>
+              <div class="msg-text">${m.text}</div>
+              <div class="msg-time">${new Date(m.created_at).toLocaleString('fa-IR')}</div>
+            </div>
+          </div>
+        `).join('')
+      }
+    </div>
+    <div class="form-group">
+      <label class="input-label">پیام جدید</label>
+      <textarea class="input-field" id="modal-msg-text" placeholder="متن پیام برای مشتری..." rows="3"></textarea>
+    </div>
+    <div class="notif-bar" id="modal-msg-notif"></div>
+    <button class="btn btn-primary" onclick="sendMsgFromModal('${userId}','${orderId}')">ارسال پیام ✓</button>
+  `;
+  document.getElementById('msg-modal').style.display = 'flex';
+}
+
+async function sendMsgFromModal(userId, orderId) {
+  const text = document.getElementById('modal-msg-text')?.value.trim();
+  const notif = document.getElementById('modal-msg-notif');
+  if (!text) { showModalNotif('متن پیام را وارد کنید', 'error'); return; }
+  try {
+    await sb('POST', 'messages', {
+      user_id: userId,
+      order_id: orderId || null,
+      text,
+      from_admin: true,
+      is_read: false
+    });
+    showModalNotif('✅ پیام ارسال شد!', 'success');
+    document.getElementById('modal-msg-text').value = '';
+    setTimeout(() => closeModal('msg-modal'), 1500);
+  } catch(e) {
+    showModalNotif('خطا: ' + e.message, 'error');
+  }
+}
+
+/* ═══════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════ */
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+
+function showNotif(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;
+    padding:12px 24px;border-radius:12px;font-size:14px;font-family:Arial;
+    background:${type==='success'?'#E8F5E9':'#FFEBEE'};
+    color:${type==='success'?'#2E7D32':'#C62828'};
+    border:1px solid ${type==='success'?'#A5D6A7':'#EF9A9A'};
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function showModalNotif(msg, type = 'success') {
+  const el = document.getElementById('modal-msg-notif') || document.getElementById('modal-notif');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `notif-bar ${type === 'error' ? 'error' : ''} visible`;
+}
+
+// Enter key in admin login
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.getElementById('login-screen').style.display !== 'none') {
+    doAdminLogin();
+  }
+});
+
+// ── INIT ──
+checkAdminAutoLogin();
+</script>
+</body>
+</html>
