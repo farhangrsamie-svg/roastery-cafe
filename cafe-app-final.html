@@ -1680,6 +1680,13 @@ async function loadProfiles() {
 
 function startNewProfile() {
   ans = { taste:null, body:null, state:null, context:null, brew:null, experience:null };
+  rec = null;
+  currentProfileId = null;
+  // اگه logged in هست، name و email رو از currentUser بگیر
+  if (currentUser) {
+    name  = currentUser.name  || '';
+    email = currentUser.email || '';
+  }
   document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true; });
   show('screen-1');
@@ -2554,6 +2561,11 @@ const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
 
 function sendEmail() {
+  // اگه name/email خالی بود از currentUser بگیر
+  if (currentUser) {
+    if (!name)  name  = currentUser.name  || '';
+    if (!email) email = currentUser.email || '';
+  }
   // چک کردن order intent
   const intentSelected = document.querySelector('input[name="order_intent"]:checked');
   if (!intentSelected) {
