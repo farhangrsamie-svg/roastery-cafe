@@ -2126,7 +2126,11 @@ function sendEmail() {
       .then(() => {
         document.getElementById('success-msg').classList.add('visible');
         btn.textContent = currentLang === 'fi' ? '✅ Lähetetty!' : '✅ Sent!';
-        // اگه چک‌باکس ریمایندر تیک خورده، اطلاعات رو ذخیره کن
+        // ذخیره در Supabase
+        if (rec) saveProfile(rec).catch(()=>{});
+        // اگه Yes انتخاب شده → بعد از 1.2 ثانیه به order بره
+        const intentVal = (document.querySelector('input[name="order_intent"]:checked') || {}).value;
+        if (intentVal === 'yes') { setTimeout(() => goToOrder(), 1200); }
         // دیتا قبلاً ذخیره شده
       })
       .catch((err) => {
