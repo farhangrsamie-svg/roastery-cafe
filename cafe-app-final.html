@@ -620,6 +620,14 @@ body.lang-en .loading-fi { display: none !important; }
     <span class="en-only">Your Previous Profiles</span>
     <span class="fi-only">Aiemmat profiilisi</span>
   </div>
+  <div style="display:flex;gap:0;margin-bottom:16px;border-radius:12px;overflow:hidden;border:2px solid #DDD5C2;">
+    <button id="tab-profiles" onclick="showDashTab('profiles')" style="flex:1;padding:10px;background:var(--medium-brown);color:white;border:none;cursor:pointer;font-size:12px;font-family:Arial,sans-serif;font-weight:bold;">
+      <span class="en-only">Profiles</span><span class="fi-only">Profiilit</span>
+    </button>
+    <button id="tab-orders" onclick="showDashTab('orders')" style="flex:1;padding:10px;background:var(--white);color:var(--caramel);border:none;cursor:pointer;font-size:12px;font-family:Arial,sans-serif;font-weight:bold;">
+      <span class="en-only">Orders</span><span class="fi-only">Tilaukset</span>
+    </button>
+  </div>
   <div id="dash-profiles">
     <div style="text-align:center;color:#AAA;font-size:14px;padding:20px;font-family:Arial,sans-serif;">
       <span class="en-only">No profiles yet — start your first one!</span>
@@ -627,6 +635,7 @@ body.lang-en .loading-fi { display: none !important; }
     </div>
   </div>
 </div>
+  <div id="dash-orders" style="display:none;"></div>
 
 <!-- ══════════════════════════════════════
      SCREEN: ORDER
@@ -1624,7 +1633,11 @@ function loginUser(user) {
 function doLogout() {
   currentUser = null;
   localStorage.removeItem('ci_user_nordic');
-  show('screen-auth');
+  if (currentUser) {
+    showDashboard();
+  } else {
+    show('screen-auth');
+  }
 }
 
 function checkAutoLogin() {
@@ -1765,8 +1778,7 @@ async function submitOrder() {
     if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
       fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify(data) }).catch(()=>{});
     }
-    show('screen-dashboard');
-    await loadProfiles();
+    await showDashboard();
   } catch(e) {
     errEl.textContent = 'Error submitting order. Please try again.'; errEl.style.display='block';
     btn.disabled = false;
@@ -1774,6 +1786,476 @@ async function submitOrder() {
   }
 }
 
+async function autoCancelOrder() {
+  if (!pendingOrderId) return;
+  try {
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'cancelled',
+      payment_status: 'cancelled'
+    });
+    const errEl = document.getElementById('payment-error');
+    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
+    document.getElementById('btn-confirm-payment').disabled = true;
+  } catch(e) {
+    console.warn('Auto cancel error:', e);
+  }
+}
+
+async function confirmDelete(profileId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    // اول profile_id در سفارش‌ها رو null کن تا foreign key مشکل نداشته باشه
+    await sb('PATCH', `orders?profile_id=eq.${profileId}`, { profile_id: null });
+  } catch(e) {
+    // اگه سفارشی نبود مشکلی نیست
+  }
+  try {
+    await sb('DELETE', `coffee_profiles?id=eq.${profileId}`);
+    overlay.remove();
+    // انیمیشن حذف کارت
+    const card = document.getElementById('pcard-' + profileId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadProfiles(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    console.warn('Delete error:', e.message);
+    alert('خطا: ' + e.message);
+  }
+}
+
+async function confirmDeleteOrder(orderId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    await sb('DELETE', `orders?id=eq.${orderId}`);
+    overlay.remove();
+    const card = document.getElementById('ocard-' + orderId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadOrders(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    alert('خطا در حذف: ' + e.message);
+  }
+}
+
+async function confirmPayment() {
+  const errEl = document.getElementById('payment-error');
+  const sucEl = document.getElementById('payment-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const txId = document.getElementById('transaction-id').value.trim();
+
+  if (!receiptBase64) return showErr(errEl, 'لطفاً تصویر رسید را آپلود کنید');
+  if (!txId) return showErr(errEl, 'لطفاً کد پیگیری پرداخت را وارد کنید');
+
+  const btn = document.getElementById('btn-confirm-payment');
+  btn.disabled = true;
+  btn.textContent = '...در حال ارسال رسید';
+
+  // اگه pendingOrderId نداریم، نباید ادامه بدیم
+  if (!pendingOrderId) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+    return showErr(errEl, 'خطا: شناسه سفارش یافت نشد. لطفاً دوباره سفارش بده.');
+  }
+
+  try {
+    // ۱. آپدیت Supabase — این مهم‌ترین قدمه، باید همیشه انجام بشه
+    btn.textContent = '...در حال ثبت اطلاعات';
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'receipt_submitted',
+      payment_status: 'receipt_submitted',
+      transaction_id: txId
+    });
+
+    // ۲. ارسال رسید به Apps Script → Google Drive (جداگانه، نباید کل فرآیند رو fail کنه)
+    btn.textContent = '...در حال آپلود تصویر';
+    let receiptUrl = '';
+    try {
+      const receiptData = {
+        type: 'payment_receipt',
+        order_id: pendingOrderId,
+        transaction_id: txId,
+        receipt_base64: receiptBase64,
+        name: currentUser ? currentUser.name : '',
+        phone: currentUser ? currentUser.phone : '',
+        bean: rec ? rec.name : '',
+        amount: selectedAmount ? selectedAmount + 'g' : '',
+        price: (PRICES[selectedAmount] || 0).toLocaleString()
+      };
+      const scriptRes = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(receiptData)
+      });
+      const scriptData = await scriptRes.json().catch(() => ({}));
+      receiptUrl = scriptData.receipt_url || '';
+
+      // اگه لینک Drive موفق گرفتیم، Supabase رو دوباره آپدیت کن
+      if (receiptUrl) {
+        await sb('PATCH', `orders?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
+      }
+    } catch(scriptErr) {
+      console.warn('Apps Script / Drive upload error:', scriptErr);
+      // مشکلی نیست — وضعیت سفارش از قبل در Supabase ثبت شده
+    }
+
+    // ۳. توقف تایمر
+    if (paymentTimer) clearInterval(paymentTimer);
+
+    sucEl.textContent = '✅ رسید شما با موفقیت ارسال و ذخیره شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
+    sucEl.classList.add('visible');
+    btn.textContent = '✅ ارسال شد';
+
+    setTimeout(() => {
+      show('screen-dashboard');
+      showDashboard();
+    }, 3000);
+
+  } catch(e) {
+    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+  }
+}
+
+function copyCardNumber() {
+  navigator.clipboard.writeText(SHOP_CARD.replace(/\s/g, '')).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = SHOP_CARD.replace(/\s/g, '');
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  });
+}
+
+async function deleteOrder(orderId) {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف سفارش؟</div>
+      <div class="confirm-desc">این سفارش کنسل‌شده برای همیشه حذف می‌شود.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function deleteProfile(profileId) {
+  // نمایش confirm dialog
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف پروفایل؟</div>
+      <div class="confirm-desc">این پروفایل قهوه برای همیشه حذف می‌شود و قابل بازیابی نیست.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDelete('${profileId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function goToPayment() {
+  // تنظیم شماره کارت
+  document.getElementById('shop-card-number').textContent = SHOP_CARD;
+  document.getElementById('shop-card-owner').textContent = SHOP_OWNER;
+
+  // مبلغ
+  const price = PRICES[selectedAmount] || 0;
+  document.getElementById('pay-amount').textContent = price.toLocaleString('fa-IR');
+  document.getElementById('pay-order-summary').textContent =
+    `${selectedAmount}g — ${rec ? rec.name : ''}`;
+
+  // پاک کردن فرم
+  document.getElementById('transaction-id').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-icon').style.display = 'block';
+  document.getElementById('upload-text').textContent = 'تصویر رسید را انتخاب کنید';
+  document.getElementById('payment-error').classList.remove('visible');
+  document.getElementById('payment-success').classList.remove('visible');
+  document.getElementById('btn-confirm-payment').disabled = false;
+  document.getElementById('btn-confirm-payment').innerHTML =
+    '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+  receiptBase64 = null;
+
+  // تایمر ۳۰ دقیقه
+  startPaymentTimer(30 * 60);
+
+  show('screen-payment');
+  setLang(currentLang);
+}
+
+function handleReceiptUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showErr(document.getElementById('payment-error'), 'حجم فایل باید کمتر از ۵ مگابایت باشد');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    receiptBase64 = e.target.result;
+    const preview = document.getElementById('upload-preview');
+    preview.src = receiptBase64;
+    preview.style.display = 'block';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').textContent = '✅ رسید انتخاب شد';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function loadUserMessages() {
+  if (!currentUser) return;
+  try {
+    const msgs = await sb('GET', `messages?user_id=eq.${currentUser.id}&from_admin=eq.true&order=created_at.desc&select=*`);
+    const container = document.getElementById('dash-messages');
+    const header = document.getElementById('msgs-section-header');
+    const badge = document.getElementById('stat-msgs-badge');
+
+    if (!msgs || msgs.length === 0) {
+      if (header) header.style.display = 'none';
+      if (container) container.innerHTML = '';
+      document.getElementById('notif-bell').classList.remove('visible');
+      return;
+    }
+
+    // نمایش section
+    if (header) header.style.display = 'flex';
+
+    // تعداد خوانده نشده
+    const unread = msgs.filter(m => !m.is_read).length;
+    if (badge) {
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? 'inline' : 'none';
+    }
+
+    // notification bell
+    const bell = document.getElementById('notif-bell');
+    const bellCount = document.getElementById('notif-count');
+    if (unread > 0) {
+      bell.classList.add('visible');
+      bellCount.textContent = unread;
+    } else {
+      bell.classList.remove('visible');
+    }
+
+    // نمایش پیام‌ها
+    container.innerHTML = msgs.map(m => {
+      const timeFA = new Date(m.created_at).toLocaleDateString('fa-IR', {
+        month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+      return `<div class="msg-card ${!m.is_read ? 'unread' : ''}" onclick="markMsgRead('${m.id}', this)">
+        <div class="msg-card-header">
+          <div class="msg-card-from">☕ رستری قهوه ${!m.is_read ? '<span class="msg-unread-badge">جدید</span>' : ''}</div>
+          <div class="msg-card-time">${timeFA}</div>
+        </div>
+        <div class="msg-card-text">${m.text}</div>
+      </div>`;
+    }).join('');
+
+    // mark all as read after viewing
+    setTimeout(() => markAllMsgsRead(msgs), 3000);
+
+  } catch(e) {
+    console.warn('loadUserMessages error:', e);
+  }
+}
+
+function scrollToMessages() {
+  const el = document.getElementById('dash-messages');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  markAllMsgsRead([]);
+}
+
+function setRating(profileId, rating) {
+  currentRating = rating;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.getElementById('star-' + profileId + '-' + i);
+    if (star) star.textContent = i <= rating ? '⭐' : '☆';
+  }
+}
+
+async function submitReview(profileId) {
+  const textEl = document.getElementById('review-text-' + profileId);
+  const sucEl  = document.getElementById('review-success-' + profileId);
+  const text   = textEl ? textEl.value.trim() : '';
+  if (!text && currentRating === 0) {
+    sucEl.textContent = 'لطفاً نظر یا امتیاز وارد کنید';
+    sucEl.classList.add('visible');
+    return;
+  }
+  try {
+    await sb('PATCH', 'coffee_profiles?id=eq.' + profileId, {
+      review_text: text || null,
+      review_rating: currentRating || null
+    });
+    sucEl.textContent = '✅ نظر شما ثبت شد. ممنون!';
+    sucEl.classList.add('visible');
+  } catch(e) {
+    sucEl.textContent = 'خطا در ثبت نظر';
+    sucEl.classList.add('visible');
+  }
+}
+
+async function toggleFavorite(profileId, currentFav, btn) {
+  const newFav = !currentFav;
+  btn.disabled = true;
+  try {
+    await sb('PATCH', `coffee_profiles?id=eq.${profileId}`, { is_favorite: newFav });
+    btn.classList.toggle('active', newFav);
+    btn.textContent = newFav ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی';
+    btn.onclick = () => toggleFavorite(profileId, newFav, btn);
+    // نمایش/حذف badge
+    const card = document.getElementById('pcard-' + profileId);
+    let badge = card.querySelector('.fav-badge');
+    if (newFav) {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'fav-badge';
+        badge.textContent = '⭐';
+        card.insertBefore(badge, card.firstChild);
+      }
+    } else {
+      if (badge) badge.remove();
+    }
+    // مرتب‌سازی مجدد
+    await loadProfiles();
+  } catch(e) {
+    console.warn('Toggle favorite error:', e);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function viewProfile(p) {
+  if (typeof p === 'string') return;
+  const beanFull = p.recommended_bean || '—';
+  const beanName = beanFull.split('(')[0].trim();
+  const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+
+  // بازسازی rec از پروفایل تا سفارش کار کنه
+  ans.taste = p.flavor || null;
+  ans.body = p.body || null;
+  ans.state = p.mood || null;
+  ans.context = p.context || null;
+  ans.brew = p.brew_method || null;
+  ans.experience = p.experience || null;
+  currentProfileId = p.id;
+  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+  rec = matchedBean ? { ...matchedBean, _matchPct: 90 } : {
+    name: beanName, detail: beanDetail, origin: '', flavors: [],
+    roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
+  };
+
+  document.getElementById('detail-bean-name').textContent = beanName;
+  document.getElementById('detail-bean-origin').textContent = beanDetail;
+
+  const tags = [
+    p.flavor      ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
+    p.body        ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
+    p.brew_method ? `<span class="profile-tag-new">${brewFA[p.brew_method]||p.brew_method}</span>` : '',
+    p.mood        ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
+    p.experience  ? `<span class="profile-tag-new">${p.experience}</span>` : '',
+  ].filter(Boolean).join('');
+
+  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const pid = p.id;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">دانه پیشنهادی</div>
+      <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
+      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);font-style:italic;">${beanDetail}</div>` : ''}
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">طعم‌شناسی</div>
+      <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">تاریخ ثبت</div>
+      <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">نظر و پیشنهاد شما</div>
+      <textarea class="textarea-field" id="review-text-${pid}"
+        placeholder="تجربه‌ات از این قهوه رو بنویس..."
+        style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:#888;font-family:Arial,sans-serif;">امتیاز:</span>
+        <div style="display:flex;gap:4px;" id="stars-${pid}">
+          <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
+          <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
+          <span onclick="setRating('${pid}',3)" style="font-size:26px;cursor:pointer;" id="star-${pid}-3">☆</span>
+          <span onclick="setRating('${pid}',4)" style="font-size:26px;cursor:pointer;" id="star-${pid}-4">☆</span>
+          <span onclick="setRating('${pid}',5)" style="font-size:26px;cursor:pointer;" id="star-${pid}-5">☆</span>
+        </div>
+      </div>
+      <div class="success-msg" id="review-success-${pid}"></div>
+      <button class="btn-primary" onclick="submitReview('${pid}')" style="margin-top:4px;">
+        💬 <span class="fa-only">ثبت نظر</span><span class="en-only">Submit Review</span>
+      </button>
+    </div>
+    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
+      🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
+    </button>
+  `;
+  // اگه rec معتبره، result رو هم render کن
+  if (rec && rec.name) {
+    try { render(rec); } catch(e) {}
+  }
+  setLang(currentLang);
+  show('screen-profile-detail');
+}
+
+function viewProfileById(id) {
+  const p = window._profilesMap && window._profilesMap[id];
+  if (!p) { console.warn('Profile not found:', id); return; }
+  viewProfile(p);
+}
+
+function showDashTab(tab) {
+  document.getElementById('tab-profiles').style.background = tab==='profiles' ? 'var(--medium-brown)' : 'var(--white)';
+  document.getElementById('tab-profiles').style.color = tab==='profiles' ? 'white' : 'var(--caramel)';
+  document.getElementById('tab-orders').style.background = tab==='orders' ? 'var(--medium-brown)' : 'var(--white)';
+  document.getElementById('tab-orders').style.color = tab==='orders' ? 'white' : 'var(--caramel)';
+  document.getElementById('dash-profiles').style.display = tab==='profiles' ? '' : 'none';
+  const ordersEl = document.getElementById('dash-orders');
+  if (ordersEl) ordersEl.style.display = tab==='orders' ? '' : 'none';
+  if (tab==='orders') loadOrders();
+}
 /* ── RECOMMENDATION ENGINE ── */
 function recommend() {
   const scored = BEANS.map(b => {
