@@ -2139,6 +2139,11 @@ function sendEmail() {
         console.warn('EmailJS response error (email may have sent):', err);
         document.getElementById('success-msg').classList.add('visible');
         btn.textContent = currentLang === 'fi' ? '✅ Lähetetty!' : '✅ Sent!';
+        // ذخیره در Supabase
+        if (rec) saveProfile(rec).catch(()=>{});
+        // اگه Yes انتخاب شده → به order بره
+        const intentValC = (document.querySelector('input[name="order_intent"]:checked') || {}).value;
+        if (intentValC === 'yes') { setTimeout(() => goToOrder(), 1200); }
       });
   } else {
     fallbackMailto();
