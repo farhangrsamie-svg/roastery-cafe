@@ -1756,12 +1756,25 @@ async function submitOrder() {
   btn.disabled = true;
   btn.textContent = currentLang==='fi' ? 'Lähetetään…' : 'Sending…';
   try {
-    if (currentUser && currentProfileId) {
-      await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
-        order_amount: selectedAmount,
-        grind_type:   selectedGrind,
-        order_status: 'requested',
-      });
+    // اگه user لاگین کرده و profile داره، آپدیت کن
+    if (currentUser) {
+      if (currentProfileId) {
+        await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
+          order_amount: selectedAmount,
+          grind_type:   selectedGrind,
+          order_status: 'requested',
+        }).catch(e => console.warn('Profile update failed:', e.message));
+      } else {
+        // profile نداره — یه جدید بساز
+        await saveProfile(rec);
+        if (currentProfileId) {
+          await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
+            order_amount: selectedAmount,
+            grind_type:   selectedGrind,
+            order_status: 'requested',
+          }).catch(()=>{});
+        }
+      }
     }
     // Apps Script هم ذخیره کن
     const data = {
@@ -1778,7 +1791,11 @@ async function submitOrder() {
     if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
       fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify(data) }).catch(()=>{});
     }
-    await showDashboard();
+    if (currentUser) {
+      await showDashboard();
+    } else {
+      show('screen-auth');
+    }
   } catch(e) {
     errEl.textContent = 'Error submitting order. Please try again.'; errEl.style.display='block';
     btn.disabled = false;
