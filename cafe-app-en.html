@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<!-- 
+  ╔═══════════════════════════════════════════════════════╗
+  ║   Coffee Identity — Personal Roast Platform (EN/FI)  ║
+  ║   Version: 5.0-en — Converted from FA v5.0           ║
+  ║   Date: 2026-07-03                                   ║
+  ║                                                       ║
+  ║   Stack:                                             ║
+  ║   • Hosting: GitHub Pages                            ║
+  ║   • Database: Supabase (qoxmkuivwpbdzmajplus)        ║
+  ║     Tables: coffee_users, coffee_profiles_en, orders ║
+  ║   • Sheet Log: Google Apps Script                    ║
+  ║   • Email: EmailJS (recipe / order / welcome)        ║
+  ║   • Auth: Email + Password (manual)                  ║
+  ║                                                       ║
+  ║   Screens:                                           ║
+  ║   1. Auth (Login / Register)                         ║
+  ║   2. Dashboard (Profiles + Orders)                   ║
+  ║   3. Quiz (6 questions)                              ║
+  ║   4. Result (Coffee profile)                         ║
+  ║   5. Order (50g / 100g + address)                    ║
+  ║   6. Payment (Manual IBAN bank transfer)             ║
+  ║   7. Profile Detail                                  ║
+  ║                                                       ║
+  ║   TODO before going live:                            ║
+  ║   • Set real EUR prices in PRICES constant           ║
+  ║   • Confirm EmailJS User ID / template fields        ║
+  ║   • Decide on separate `orders` table for EN/FI      ║
+
+  ╚═══════════════════════════════════════════════════════╝
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Coffee Identity — Personal Roast Platform</title>
+<style>
+:root {
+  --cream: #F5F0E8;
+  --dark-brown: #2C1A0E;
+  --medium-brown: #6B3F2A;
+  --caramel: #C4956A;
+  --light-caramel: #E8C99A;
+  --white: #FEFEFE;
+  --shadow: rgba(44, 26, 14, 0.12);
+  --shadow-strong: rgba(44, 26, 14, 0.25);
+  --green: #3A7A3A;
+  --green-bg: #EAF5EA;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark-brown);
+  overflow-x: hidden;
+}
+.app-container { max-width: 680px; margin: 0 auto; min-height: 100vh; }
+
+/* ── SCREENS ── */
+.screen {
+  display: none; min-height: 100vh; padding: 40px 28px 36px;
+  flex-direction: column; animation: fadeUp 0.35s ease;
+}
+.screen.active { display: flex; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.spacer { flex: 1; }
+
+/* ── LOGO ── */
+.logo { text-align: center; margin-bottom: 32px; }
+.logo-icon { font-size: 52px; margin-bottom: 10px; line-height: 1; }
+.logo h1 { font-size: 26px; color: var(--medium-brown); letter-spacing: 4px; text-transform: uppercase; font-weight: normal; }
+.logo-sub { font-size: 11px; color: var(--caramel); letter-spacing: 5px; text-transform: uppercase; margin-top: 6px; }
+
+/* ── INPUTS ── */
+.input-group { margin-bottom: 18px; }
+.input-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 8px; font-family: 'Arial', sans-serif; }
+.input-field {
+  width: 100%; padding: 16px 20px; border: 2px solid #DDD5C2; border-radius: 14px;
+  font-size: 17px; background: var(--white); color: var(--dark-brown); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; -webkit-appearance: none;
+}
+.input-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
+.input-field.error { border-color: #C0392B; }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 28px; }
+.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--caramel); letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 8px; }
+.progress-bar { background: #DDD5C2; border-radius: 4px; height: 3px; overflow: hidden; }
+.progress-fill { background: var(--caramel); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+/* ── QUESTION ── */
+.q-header { margin-bottom: 28px; }
+.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 4px; line-height: 1.3; }
+.q-text-fi { font-size: 16px; color: var(--medium-brown); font-style: italic; }
+
+/* ── OPTION CARDS ── */
+.options { display: grid; gap: 12px; }
+.options.cols-2 { grid-template-columns: 1fr 1fr; }
+.options.cols-1 { grid-template-columns: 1fr; }
+.option-card {
+  background: var(--white); border: 2px solid transparent; border-radius: 18px;
+  padding: 18px 14px; cursor: pointer; transition: all 0.18s ease;
+  box-shadow: 0 2px 10px var(--shadow); text-align: center;
+  user-select: none; -webkit-user-select: none;
+}
+.option-card:active { transform: scale(0.96); }
+.option-card.selected { border-color: var(--caramel); background: #FDF5E8; box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
+.option-card.full-row { grid-column: span 2; }
+.option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
+.option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
+.option-fi { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
+.option-desc { font-size: 10px; color: #AAA; margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  background: var(--medium-brown); color: var(--white); border: none; border-radius: 50px;
+  padding: 17px 40px; font-size: 14px; font-family: 'Arial', sans-serif;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer; width: 100%;
+  transition: all 0.2s; box-shadow: 0 4px 18px rgba(107,63,42,0.30); -webkit-appearance: none;
+}
+.btn-primary:hover:not(:disabled) { background: var(--dark-brown); transform: translateY(-1px); }
+.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.btn-primary:disabled { background: #C8BFB5; box-shadow: none; cursor: default; }
+.btn-ghost { background: transparent; color: var(--caramel); border: 2px solid var(--light-caramel); box-shadow: none; }
+.btn-ghost:hover:not(:disabled) { background: #FDF5E8; transform: none; }
+.btn-back { background: transparent; border: none; color: var(--caramel); font-size: 13px; cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; padding: 6px 0; margin-bottom: 14px; display: inline-block; }
+
+/* ── LOADING ── */
+#screen-loading {
+  display: none; position: fixed; inset: 0; background: var(--cream);
+  flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+}
+#screen-loading.visible { display: flex; }
+.spinner { font-size: 60px; animation: roast 1.8s ease-in-out infinite; }
+@keyframes roast {
+  0%,100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.05); }
+  75% { transform: rotate(-15deg) scale(1.05); }
+}
+.loading-text { font-size: 20px; color: var(--medium-brown); margin-top: 24px; text-align: center; }
+
+/* ── CARD ── */
+.card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; }
+.card-title { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
+
+/* ── RESULT ── */
+.result-identity-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
+.result-identity-label { font-size: 12px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; }
+.result-identity-name { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 12px; }
+.match-score-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; }
+.match-score-bar { flex: 1; max-width: 160px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+.match-score-fill { height: 100%; background: var(--caramel); border-radius: 4px; }
+.match-score-pct { font-size: 13px; color: var(--light-caramel); font-family: 'Arial', sans-serif; font-weight: bold; }
+.result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
+.result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-style: italic; }
+.flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.flavor-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 14px; color: #AAA; }
+.info-value { font-size: 14px; font-weight: bold; color: var(--dark-brown); text-align: right; max-width: 60%; }
+.result-desc { font-size: 14px; line-height: 1.75; color: var(--medium-brown); }
+.why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
+.identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+.identity-tag { background: var(--medium-brown); color: var(--white); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-family: 'Arial', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
+
+/* ── LANG TOGGLE ── */
+.lang-toggle { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 10px rgba(44,26,14,0.18); border: 1px solid var(--light-caramel); }
+.lang-btn { padding: 7px 13px; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; border: none; background: var(--white); color: var(--medium-brown); transition: background 0.2s, color 0.2s; line-height: 1; }
+.lang-btn.active { background: var(--caramel); color: white; }
+
+/* ── CSS LANG VISIBILITY ── */
+body.lang-fi .en-only { display: none !important; }
+body.lang-en .fi-only { display: none !important; }
+body.lang-fi .option-en, body.lang-fi .q-text-en, body.lang-fi .loading-en { display: none !important; }
+body.lang-en .option-fi, body.lang-en .q-text-fi, body.lang-fi .loading-fi { display: none !important; }
+
+/* ── SUCCESS MSG ── */
+.success-msg { background: var(--green-bg); border-radius: 12px; padding: 14px 20px; text-align: center; color: var(--green); font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #C0DEC0; }
+.success-msg.visible { display: block; }
+.error-msg { background: #FFF0F0; border-radius: 12px; padding: 14px 20px; text-align: center; color: #C0392B; font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #F0C0C0; }
+.error-msg.visible { display: block; }
+
+/* ── AUTH SCREEN ── */
+.auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: 12px; overflow: hidden; border: 2px solid #DDD5C2; }
+.auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; background: var(--white); color: var(--caramel); border: none; transition: all 0.2s; }
+.auth-tab.active { background: var(--medium-brown); color: var(--white); }
+.otp-hint { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; text-align: center; margin-top: 8px; line-height: 1.6; }
+
+/* ── DASHBOARD ── */
+.dash-header { background: var(--medium-brown); margin: 0 -28px; padding: 28px 28px 24px; margin-bottom: 24px; }
+.dash-welcome { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 4px; }
+.dash-name { font-size: 22px; font-weight: bold; color: var(--white); }
+.dash-phone { font-size: 12px; color: var(--light-caramel); margin-top: 4px; font-family: 'Arial', sans-serif; direction: ltr; }
+.dash-logout { font-size: 11px; color: var(--caramel); background: transparent; border: 1px solid var(--caramel); border-radius: 20px; padding: 4px 12px; cursor: pointer; font-family: 'Arial', sans-serif; margin-top: 10px; }
+.dash-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
+.profile-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
+.profile-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
+.profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
+.profile-card-date { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; }
+.profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.profile-card-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 12px; padding: 3px 10px; font-size: 10px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
+.order-card-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: 'Arial', sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
+.status-paid { background: var(--green-bg); color: var(--green); border: 1px solid #C0DEC0; }
+.status-shipped { background: #E8F0FF; color: #3A5FBF; border: 1px solid #C0D0FF; }
+.empty-state { text-align: center; padding: 40px 20px; color: #AAA; font-family: 'Arial', sans-serif; font-size: 14px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ── ORDER SCREEN ── */
+.amount-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.amount-card { background: var(--white); border: 2px solid transparent; border-radius: 18px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px var(--shadow); }
+.amount-card.selected { border-color: var(--caramel); background: #FDF5E8; }
+.amount-card:active { transform: scale(0.96); }
+.amount-g { font-size: 28px; font-weight: bold; color: var(--dark-brown); }
+.amount-label { font-size: 11px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 4px; }
+.textarea-field { width: 100%; padding: 14px 18px; border: 2px solid #DDD5C2; border-radius: 14px; font-size: 15px; background: var(--white); color: var(--dark-brown); outline: none; transition: border-color 0.2s; font-family: inherit; resize: vertical; min-height: 90px; direction: rtl; }
+.textarea-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
+.order-summary { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
+.order-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; font-family: 'Arial', sans-serif; }
+.order-summary-label { color: #AAA; }
+.order-summary-value { font-weight: bold; color: var(--dark-brown); text-align: left; direction: ltr; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
+
+/* ── FAVORITE & DELETE ── */
+.profile-card-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F0EAE0; }
+.btn-fav {
+  flex: 1; padding: 8px; border-radius: 12px; border: 1px solid var(--light-caramel);
+  background: transparent; color: var(--caramel); font-size: 14px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-fav.active { background: #FDF5E8; border-color: var(--caramel); color: var(--medium-brown); font-weight: bold; }
+.btn-fav:hover { background: #FDF5E8; }
+.btn-del {
+  padding: 8px 14px; border-radius: 12px; border: 1px solid #F0C0C0;
+  background: transparent; color: #C0392B; font-size: 12px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-del:hover { background: #FFF0F0; }
+.fav-badge {
+  position: absolute; top: 14px; left: 16px;
+  font-size: 16px; line-height: 1;
+}
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(44,26,14,0.5); z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.confirm-box {
+  background: var(--white); border-radius: 24px; padding: 28px 24px;
+  margin: 20px; max-width: 340px; width: 100%; text-align: center;
+  box-shadow: 0 20px 60px rgba(44,26,14,0.3);
+}
+.confirm-icon { font-size: 44px; margin-bottom: 12px; }
+.confirm-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 8px; }
+.confirm-desc { font-size: 13px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; direction: rtl; }
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
+.confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
+
+/* ── PAYMENT ── */
+.payment-step {
+  background: var(--white); border-radius: 20px; padding: 22px;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; direction: rtl;
+}
+.payment-step-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--caramel);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: bold; font-family: Arial,sans-serif;
+  float: right; margin-left: 12px; flex-shrink: 0;
+}
+.payment-step-content { overflow: hidden; }
+.payment-step-title { font-size: 14px; font-weight: bold; color: var(--dark-brown); margin-bottom: 6px; }
+.payment-step-desc { font-size: 12px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; }
+.card-number-box {
+  background: linear-gradient(135deg, var(--dark-brown), var(--medium-brown));
+  border-radius: 16px; padding: 20px 22px; margin: 12px 0; direction: ltr; text-align: center;
+}
+.card-number { font-size: 22px; font-weight: bold; color: white; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+.card-owner { font-size: 11px; color: var(--caramel); margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
+.copy-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; border-radius: 8px; padding: 6px 14px; font-size: 11px;
+  font-family: Arial,sans-serif; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.25); }
+.amount-due-box {
+  background: #FDF5E8; border: 2px solid var(--light-caramel);
+  border-radius: 14px; padding: 16px 20px; margin: 12px 0; direction: rtl;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.amount-due-label { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; }
+.amount-due-value { font-size: 22px; font-weight: bold; color: var(--dark-brown); }
+.amount-due-currency { font-size: 12px; color: var(--caramel); font-family: Arial,sans-serif; }
+.upload-area {
+  border: 2px dashed var(--light-caramel); border-radius: 16px;
+  padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;
+  background: #FFFAF5; margin: 12px 0;
+}
+.upload-area:hover { border-color: var(--caramel); background: #FDF5E8; }
+.upload-area input { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.upload-sub { font-size: 11px; color: #AAA; margin-top: 4px; font-family: Arial,sans-serif; }
+.upload-preview { max-width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
+.payment-timer {
+  background: #FFF8EC; border: 1px solid #F0C070; border-radius: 12px;
+  padding: 12px 16px; text-align: center; margin-bottom: 16px; direction: rtl;
+}
+.timer-text { font-size: 12px; color: #C4956A; font-family: Arial,sans-serif; }
+.timer-count { font-size: 20px; font-weight: bold; color: var(--medium-brown); font-family: 'Courier New', monospace; margin-top: 4px; }
+
+/* ── DASHBOARD NEW ── */
+.dash-header-new {
+  background: linear-gradient(145deg, var(--dark-brown) 0%, var(--medium-brown) 100%);
+  margin: 0 -28px; padding: 32px 28px 28px; margin-bottom: 0;
+  position: relative; overflow: hidden;
+}
+.dash-header-new::before {
+  content: '☕'; position: absolute; right: -10px; top: -10px;
+  font-size: 120px; opacity: 0.06; line-height: 1;
+}
+.dash-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.dash-user-info {}
+.dash-welcome-new { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: Arial,sans-serif; margin-bottom: 4px; }
+.dash-name-new { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 2px; }
+.dash-phone-new { font-size: 12px; color: rgba(255,255,255,0.5); font-family: Arial,sans-serif; direction: ltr; }
+.dash-logout-new { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-family: Arial,sans-serif; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dash-logout-new:hover { background: rgba(255,255,255,0.2); }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.dash-stat { background: rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.dash-stat-num { font-size: 22px; font-weight: bold; color: var(--white); line-height: 1; }
+.dash-stat-label { font-size: 9px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
+
+/* ── NEW PROFILE BTN ── */
+.new-profile-btn {
+  background: linear-gradient(135deg, var(--caramel), #D4A574);
+  color: var(--white); border: none; border-radius: 18px;
+  padding: 20px 24px; width: 100%; text-align: right; direction: rtl;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 24px rgba(196,149,106,0.35);
+  display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.new-profile-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(196,149,106,0.45); }
+.new-profile-btn:active { transform: scale(0.98); }
+.new-profile-icon { font-size: 32px; flex-shrink: 0; }
+.new-profile-text {}
+.new-profile-title { font-size: 15px; font-weight: bold; color: var(--white); font-family: Arial,sans-serif; }
+.new-profile-sub { font-size: 11px; color: rgba(255,255,255,0.75); font-family: Arial,sans-serif; margin-top: 2px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; margin-top: 8px; }
+.section-title-new { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); font-family: Arial,sans-serif; font-weight: bold; }
+.section-count { background: var(--light-caramel); color: var(--medium-brown); border-radius: 20px; padding: 2px 10px; font-size: 11px; font-family: Arial,sans-serif; font-weight: bold; }
+
+/* ── PROFILE CARD NEW ── */
+.profile-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  direction: rtl; position: relative; overflow: hidden;
+}
+.profile-card-new::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--caramel); border-radius: 0 4px 4px 0;
+}
+.profile-card-new:hover { transform: translateY(-2px); border-color: var(--light-caramel); box-shadow: 0 6px 24px rgba(196,149,106,0.2); }
+.profile-card-new:active { transform: scale(0.99); }
+.profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
+.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
+.profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
+.profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.profile-tag-new { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
+
+/* ── ORDER CARD NEW ── */
+.order-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  direction: rtl; border: 2px solid transparent;
+}
+.order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
+.order-bean-small { font-size: 12px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
+.order-address-new { font-size: 14px; color: #888; margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
+
+/* ── PROFILE DETAIL SCREEN ── */
+.detail-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
+.detail-bean-name { font-size: 22px; font-weight: bold; color: var(--white); margin-bottom: 6px; }
+.detail-origin { font-size: 12px; color: var(--caramel); font-style: italic; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body class="lang-en">
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn active" id="btn-lang-en" onclick="setLang('en')">🇬🇧 EN</button>
+  <button class="lang-btn" id="btn-lang-fi" onclick="setLang('fi')">🇫🇮 FI</button>
+</div>
+
+<div class="app-container">
+
+<!-- ══════ SCREEN: AUTH ══════ -->
+<div class="screen active" id="screen-auth">
+  <div class="logo">
+    <div class="logo-icon">☕</div>
+    <h1>Roastery</h1>
+    <div class="logo-sub"><span class="en-only">Personal Roast Platform</span><span class="fi-only">Henkilökohtainen paahtoalusta</span></div>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+      <span class="en-only">Login</span>
+      <span class="fi-only">Kirjaudu</span>
+    </button>
+    <button class="auth-tab" id="tab-register" onclick="switchTab('register')">
+      <span class="en-only">Register</span>
+      <span class="fi-only">Rekisteröidy</span>
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div id="login-form">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Email</span>
+        <span class="fi-only">Sähköposti</span>
+      </label>
+      <input class="input-field" id="login-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fi-only">Salasana</span>
+      </label>
+      <input class="input-field" id="login-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">
+      <span class="en-only">Login →</span>
+      <span class="fi-only">Kirjaudu →</span>
+    </button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="register-form" style="display:none;">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Your Name</span>
+        <span class="fi-only">Nimesi</span>
+      </label>
+      <input class="input-field" id="reg-name" type="text" placeholder="Your name" autocomplete="given-name" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Email</span>
+        <span class="fi-only">Sähköposti</span>
+      </label>
+      <input class="input-field" id="reg-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fi-only">Salasana (väh. 6 merkkiä)</span>
+      </label>
+      <input class="input-field" id="reg-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="reg-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-register" onclick="doRegister()">
+      <span class="en-only">Create Account →</span>
+      <span class="fi-only">Luo tili →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: DASHBOARD ══════ -->
+<div class="screen" id="screen-dashboard" style="padding-top:0;">
+
+  <!-- Header -->
+  <div class="dash-header-new">
+    <div class="dash-header-top">
+      <div class="dash-user-info">
+        <div class="dash-welcome-new">
+          <span class="en-only">Welcome back</span>
+          <span class="fi-only">Tervetuloa</span>
+        </div>
+        <div class="dash-name-new" id="dash-name">—</div>
+        <div class="dash-phone-new" id="dash-phone">—</div>
+      </div>
+      <button class="dash-logout-new" onclick="doLogout()">
+        <span class="en-only">Logout</span>
+        <span class="fi-only">Kirjaudu ulos ↗</span>
+      </button>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-profiles">0</div>
+        <div class="dash-stat-label"><span class="en-only">Profiles</span><span class="fi-only">Profiilit</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-orders">0</div>
+        <div class="dash-stat-label"><span class="en-only">Orders</span><span class="fi-only">Tilaukset</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num">☕</div>
+        <div class="dash-stat-label"><span class="en-only">Active</span><span class="fi-only">Aktiivinen</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 0 0 32px;">
+    <!-- New Profile Button -->
+    <button class="new-profile-btn" onclick="startNewProfile()">
+      <div class="new-profile-icon">✨</div>
+      <div class="new-profile-text">
+        <div class="new-profile-title">
+          <span class="en-only">New Coffee Profile</span>
+          <span class="fi-only">Uusi kahviprofiili</span>
+        </div>
+        <div class="new-profile-sub">
+          <span class="en-only">Discover your perfect roast</span>
+          <span class="fi-only">Löydä sinulle sopiva paahto</span>
+        </div>
+      </div>
+    </button>
+
+    <!-- Profiles Section -->
+    <div class="section-header">
+      <div class="section-title-new">
+        <span class="en-only">My Coffee Profiles</span>
+        <span class="fi-only">Kahviprofiilini</span>
+      </div>
+      <div class="section-count" id="stat-profiles-badge">0</div>
+    </div>
+    <div id="dash-profiles">
+      <div class="empty-state">
+        <div class="empty-icon">☕</div>
+        <div class="en-only">No profiles yet. Start your first journey!</div>
+        <div class="fi-only">Ei vielä profiileja. Aloita ensimmäinen matkasi!</div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="section-header" style="margin-top:24px;">
+      <div class="section-title-new">
+        <span class="en-only">My Orders</span>
+        <span class="fi-only">Tilaukseni</span>
+      </div>
+      <div class="section-count" id="stat-orders-badge">0</div>
+    </div>
+    <div id="dash-orders">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <div class="en-only">No orders yet.</div>
+        <div class="fi-only">Ei vielä tilauksia.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: PROFILE DETAIL ══════ -->
+<div class="screen" id="screen-profile-detail" style="padding-top:0;">
+  <div class="detail-header">
+    <button class="btn-back" onclick="showDashboard()" style="color:var(--caramel);margin-bottom:12px;">← <span class="fi-only">Kojelauta</span><span class="en-only">Dashboard</span></button>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;">
+      <span class="fi-only">Kahviprofiilisi</span><span class="en-only">Your Coffee Profile</span>
+    </div>
+    <div class="detail-bean-name" id="detail-bean-name">—</div>
+    <div class="detail-origin" id="detail-bean-origin">—</div>
+  </div>
+  <div id="detail-content" style="padding-bottom:32px;"></div>
+</div>
+
+<!-- ══════ SCREENS 1–6: QUIZ ══════ -->
+<div class="screen" id="screen-1">
+  <button class="btn-back" onclick="goBack(1)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 1 of 6</span><span class="fi-only">Kysymys 1/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">What flavors call to you?</div>
+    <div class="q-text-fi">Mitkä maut vetävät sinua puoleensa?</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon">🌸</div><div class="option-en">Floral & Fruity</div><div class="option-fi" style="direction:rtl">Kukkainen ja hedelmäinen</div><div class="option-desc">Jasmine, peach, citrus</div></div>
+    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon">🍯</div><div class="option-en">Sweet & Balanced</div><div class="option-fi" style="direction:rtl">Makea ja tasapainoinen</div><div class="option-desc">Caramel, honey, cherry</div></div>
+    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon">🍫</div><div class="option-en">Chocolatey & Nutty</div><div class="option-fi" style="direction:rtl">Suklainen ja pähkinäinen</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
+    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon">⚡</div><div class="option-en">Bold & Earthy</div><div class="option-fi" style="direction:rtl">Voimakas ja maanläheinen</div><div class="option-desc">Strong, dark, intense</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-1" onclick="go(2)" disabled>Next →</button>
+</div>
+
+<div class="screen" id="screen-2">
+  <button class="btn-back" onclick="goBack(2)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 2 of 6</span><span class="fi-only">Kysymys 2/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">How do you like your coffee?</div>
+    <div class="q-text-fi">Millaisena pidät kahvistasi?</div>
+  </div>
+  <div class="options cols-1">
+    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon">🍃</div><div class="option-en">Light & Delicate</div><div class="option-fi" style="direction:rtl">Kevyt ja hienostunut</div><div class="option-desc">Tea-like, clear, bright</div></div>
+    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon">☕</div><div class="option-en">Medium & Smooth</div><div class="option-fi" style="direction:rtl">Keskitäyteläinen ja sulava</div><div class="option-desc">Balanced and comfortable</div></div>
+    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon">🌊</div><div class="option-en">Rich & Full</div><div class="option-fi" style="direction:rtl">Rikas ja täyteläinen</div><div class="option-desc">Heavy, coating, intense</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-2" onclick="go(3)" disabled>Next →</button>
+</div>
+
+<div class="screen" id="screen-3">
+  <button class="btn-back" onclick="goBack(3)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 3 of 6</span><span class="fi-only">Kysymys 3/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">What are you seeking right now?</div>
+    <div class="q-text-fi">Millaista hetkeä etsit juuri nyt?</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon">⚡</div><div class="option-en">Energised</div><div class="option-fi" style="direction:rtl">Energinen</div></div>
+    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon">🎯</div><div class="option-en">Focused</div><div class="option-fi" style="direction:rtl">Keskittynyt</div></div>
+    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon">🎨</div><div class="option-en">Creative</div><div class="option-fi" style="direction:rtl">Luova</div></div>
+    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon">🌿</div><div class="option-en">Relaxed</div><div class="option-fi" style="direction:rtl">Rento</div></div>
+    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon">🌙</div><div class="option-en">Reflective</div><div class="option-fi" style="direction:rtl">Mietiskelevä</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-3" onclick="go(4)" disabled>Next →</button>
+</div>
+
+<div class="screen" id="screen-4">
+  <button class="btn-back" onclick="goBack(4)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 4 of 6</span><span class="fi-only">Kysymys 4/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">When is this coffee for?</div>
+    <div class="q-text-fi">Mihin tilanteeseen tämä kahvi on?</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'context','morning')"><div class="option-icon">🌅</div><div class="option-en">Morning</div><div class="option-fi" style="direction:rtl">Aamu</div></div>
+    <div class="option-card" onclick="pick(this,'context','work')"><div class="option-icon">💼</div><div class="option-en">Work Session</div><div class="option-fi" style="direction:rtl">Työsessio</div></div>
+    <div class="option-card" onclick="pick(this,'context','reading')"><div class="option-icon">📚</div><div class="option-en">Reading</div><div class="option-fi" style="direction:rtl">Lukuhetki</div></div>
+    <div class="option-card" onclick="pick(this,'context','friends')"><div class="option-icon">👥</div><div class="option-en">With Friends</div><div class="option-fi" style="direction:rtl">Ystävien kanssa</div></div>
+    <div class="option-card" onclick="pick(this,'context','afterdinner')"><div class="option-icon">🍽️</div><div class="option-en">After Dinner</div><div class="option-fi" style="direction:rtl">Illallisen jälkeen</div></div>
+    <div class="option-card" onclick="pick(this,'context','weekend')"><div class="option-icon">🌿</div><div class="option-en">Weekend Relax</div><div class="option-fi" style="direction:rtl">Viikonloppu</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-4" onclick="go(5)" disabled>Next →</button>
+</div>
+
+<div class="screen" id="screen-5">
+  <button class="btn-back" onclick="goBack(5)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 5 of 6</span><span class="fi-only">Kysymys 5/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:83%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">How do you brew your coffee?</div>
+    <div class="q-text-fi">Mikä on valmistustapasi?</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon">☕</div><div class="option-en">Pour Over</div><div class="option-fi" style="direction:rtl">Suodatinkahvi (V60)</div><div class="option-desc">V60, Chemex, Kalita</div></div>
+    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon">🫖</div><div class="option-en">French Press</div><div class="option-fi" style="direction:rtl">Pannukahvi (French Press)</div></div>
+    <div class="option-card" onclick="pick(this,'brew','espresso')"><div class="option-icon">⚡</div><div class="option-en">Espresso</div><div class="option-fi" style="direction:rtl">Espresso</div><div class="option-desc">Machine or Moka Pot</div></div>
+    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon">🔧</div><div class="option-en">AeroPress</div><div class="option-fi" style="direction:rtl">AeroPress</div></div>
+    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon">🧊</div><div class="option-en">Cold Brew</div><div class="option-fi" style="direction:rtl">Kylmäuutto</div></div>
+    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon">🌟</div><div class="option-en">Other / Flexible</div><div class="option-fi" style="direction:rtl">Muu / joustava</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-5" onclick="go(6)" disabled>Next →</button>
+</div>
+
+<div class="screen" id="screen-6">
+  <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+  <div class="progress-wrap">
+    <div class="progress-label"><span class="en-only">Question 6 of 6</span><span class="fi-only">Kysymys 6/6</span></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">Your coffee experience?</div>
+    <div class="q-text-fi">Kuinka kokenut olet kahvin suhteen?</div>
+  </div>
+  <div class="options cols-1">
+    <div class="option-card" onclick="pick(this,'experience','beginner')"><div class="option-icon">🌱</div><div class="option-en">I'm exploring coffee</div><div class="option-fi" style="direction:rtl">Tutustun kahvin maailmaan</div></div>
+    <div class="option-card" onclick="pick(this,'experience','regular')"><div class="option-icon">☕</div><div class="option-en">Regular coffee lover</div><div class="option-fi" style="direction:rtl">Kahvin ystävä</div></div>
+    <div class="option-card" onclick="pick(this,'experience','enthusiast')"><div class="option-icon">🏆</div><div class="option-en">Coffee enthusiast</div><div class="option-fi" style="direction:rtl">Kahviasiantuntija</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-6" onclick="showLoading()" disabled>
+    <span class="en-only">Find My Coffee ✨</span>
+    <span class="fi-only">Löydä kahvini ✨</span>
+  </button>
+</div>
+
+<!-- ══════ LOADING ══════ -->
+<div id="screen-loading">
+  <div class="spinner">☕</div>
+  <div class="loading-text">
+    <span class="en-only">Crafting your profile…</span>
+    <span class="fi-only">Rakennetaan kahviprofiiliasi…</span>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: RESULT ══════ -->
+<div class="screen" id="screen-result">
+  <div class="result-identity-header">
+    <div class="result-identity-label"><span class="en-only">Your Coffee Identity</span><span class="fi-only">Kahvi-identiteettisi</span></div>
+    <div class="result-identity-name" id="r-identity-name">—</div>
+    <div class="identity-badge" id="r-identity-badge"></div>
+    <div class="match-score-wrap">
+      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%"></div></div>
+      <div class="match-score-pct"><span id="r-match-pct">—</span> <span class="en-only">match</span><span class="fi-only">osuvuus</span></div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:4px 0 16px;">
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;"><span class="en-only">Today's Recommendation</span><span class="fi-only">Tämän päivän suositus</span></div>
+    <div class="result-bean-name" id="r-name"></div>
+    <div class="result-origin" id="r-origin"></div>
+  </div>
+
+  <div class="card" id="why-card">
+    <div class="card-title"><span class="en-only">Why this coffee?</span><span class="fi-only">Miksi juuri tämä kahvi?</span></div>
+    <div id="why-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="en-only">Flavor Notes</span>
+      <span class="fi-only">Makuvivahteet</span>
+    </div>
+    <div class="flavor-tags" id="r-flavors"></div>
+    <div class="result-desc" id="r-desc" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="en-only">How to Brew</span>
+      <span class="fi-only">Valmistustapa</span>
+    </div>
+    <div class="info-row"><span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fi-only">Paahto</span></span><span class="info-value" id="r-roast"></span></div>
+    <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fi-only">Paras valmistustapa tälle paahdolle</span></span><span class="info-value" id="r-brew"></span></div>
+    <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fi-only">Sinun valmistustapasi</span></span><span class="info-value" id="r-your-brew"></span></div>
+    <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fi-only">Huomio</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
+    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fi-only">Lämpötila</span></span><span class="info-value" id="r-temp"></span></div>
+    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fi-only">Suhde</span></span><span class="info-value" id="r-ratio"></span></div>
+  </div>
+
+  <button class="staff-toggle" onclick="toggleRoastGuide()"><span class="en-only">🔥 Roastery View: Roast Direction ▼</span><span class="fi-only">🔥 Paahtajan näkymä: Paahto-ohjeet ▼</span></button>
+  <div class="card" id="roast-card" style="display:none;">
+    <div class="card-title">🔥 Roast Guide</div>
+    <div class="info-row"><span class="info-label">⬆️ Charge Temp</span><span class="info-value" id="r-charge"></span></div>
+    <div class="info-row"><span class="info-label">⬇️ Drop Temp</span><span class="info-value" id="r-drop"></span></div>
+    <div class="info-row"><span class="info-label">⏱️ Total Time</span><span class="info-value" id="r-time"></span></div>
+    <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
+  </div>
+
+  <div style="background:#FDF5E8;border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;">
+    <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;" class="en-only">
+      ⏰ <strong>Important:</strong> Freshly roasted beans need <strong>a few days to rest</strong> before reaching peak flavor.
+    </p>
+    <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;" class="fi-only">
+      ⏰ <strong>Tärkeää:</strong> Tuoreesti paahdetut pavut tarvitsevat <strong>muutaman päivän lepoa</strong> saavuttaakseen parhaan makunsa.
+    </p>
+  </div>
+
+  <div class="success-msg" id="save-success"><span class="en-only">✅ Profile saved!</span><span class="fi-only">✅ Profiili tallennettu!</span></div>
+
+  <!-- Order CTA -->
+  <button class="btn-primary" onclick="goToOrder()" style="margin-bottom:10px;">
+    <span class="en-only">🛒 Order This Bean</span>
+    <span class="fi-only">🛒 Tilaa tämä papu</span>
+  </button>
+  <button class="btn-primary btn-ghost" id="btn-email-recipe" onclick="emailMeRecipe()" style="margin-bottom:10px;">
+    <span class="en-only">📧 Email Me This Recipe</span>
+    <span class="fi-only">📧 Lähetä resepti sähköpostiini</span>
+  </button>
+  <div class="success-msg" id="recipe-email-success"></div>
+  <button class="btn-primary btn-ghost" onclick="showDashboard()" style="margin-bottom:10px;">
+    <span class="en-only">← Back to Dashboard</span>
+    <span class="fi-only">← Takaisin kojelautaan</span>
+  </button>
+</div>
+
+<!-- ══════ SCREEN: ORDER ══════ -->
+<div class="screen" id="screen-order">
+  <button class="btn-back" onclick="show('screen-result')">← <span class="en-only">Back</span><span class="fi-only">Takaisin</span></button>
+
+  <div class="logo" style="margin-bottom:20px;">
+    <div class="logo-icon">📦</div>
+    <h1 style="font-size:20px;">
+      <span class="en-only">Place Your Order</span>
+      <span class="fi-only">Tee tilaus</span>
+    </h1>
+  </div>
+
+  <!-- Bean Summary -->
+  <div class="order-summary" id="order-bean-summary">
+    <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;"><span class="en-only">Selected bean</span><span class="fi-only">Valittu papu</span></div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
+    <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+  </div>
+
+  <!-- Amount Selector -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Amount</span>
+      <span class="fi-only">Määrä</span>
+    </label>
+    <div class="amount-selector">
+      <div class="amount-card" id="amt-50" onclick="selectAmount(50)">
+        <div class="amount-g">50g</div>
+        <div class="amount-label">
+          <span class="en-only">Small</span>
+          <span class="fi-only">Pieni</span>
+        </div>
+      </div>
+      <div class="amount-card" id="amt-100" onclick="selectAmount(100)">
+        <div class="amount-g">100g</div>
+        <div class="amount-label">
+          <span class="en-only">Medium</span>
+          <span class="fi-only">Keskikokoinen</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Delivery Address</span>
+      <span class="fi-only">Toimitusosoite</span>
+    </label>
+    <textarea class="textarea-field" id="order-address" placeholder="Enter your full delivery address..."></textarea>
+  </div>
+
+  <!-- Notes -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Notes (optional)</span>
+      <span class="fi-only">Lisätiedot (valinnainen)</span>
+    </label>
+    <textarea class="textarea-field" id="order-notes" placeholder="Any additional notes..." style="min-height:70px;"></textarea>
+  </div>
+
+  <div class="error-msg" id="order-error"></div>
+  <div class="success-msg" id="order-success"></div>
+
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-submit-order" onclick="submitOrder()">
+    <span class="en-only">✅ Submit Order</span>
+    <span class="fi-only">✅ Lähetä tilaus</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
+    <span class="en-only">After you submit, the roastery team will contact you.</span>
+    <span class="fi-only">Lähetyksen jälkeen paahtimon tiimi ottaa sinuun yhteyttä.</span>
+  </p>
+</div>
+
+<!-- ══════ SCREEN: PAYMENT ══════ -->
+<div class="screen" id="screen-payment" style="padding-top:20px;">
+  <button class="btn-back" onclick="show('screen-order')">← <span class="fi-only">Takaisin</span><span class="en-only">Back</span></button>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:40px;">💳</div>
+    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
+      <span class="fi-only">Tilauksen maksu</span>
+      <span class="en-only">Order Payment</span>
+    </h2>
+    <p style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;">
+      <span class="en-only">Transfer the amount and send your receipt</span>
+      <span class="fi-only">Siirrä summa ja lähetä kuitti</span>
+    </p>
+  </div>
+
+  <!-- Timer -->
+  <div class="payment-timer">
+    <div class="timer-text">
+      <span class="en-only">⏰ Please pay within 30 minutes</span>
+      <span class="fi-only">⏰ Maksa 30 minuutin kuluessa</span>
+    </div>
+    <div class="timer-count" id="payment-timer">30:00</div>
+  </div>
+
+  <!-- Step 1: Amount -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">1</div>
+      <div class="payment-step-content">
+        <div class="payment-step-title"><span class="en-only">Amount Due</span><span class="fi-only">Maksettava summa</span></div>
+        <div class="amount-due-box">
+          <div>
+            <div class="amount-due-label"><span class="en-only">Your Order</span><span class="fi-only">Tilauksesi</span></div>
+            <div style="font-size:12px;color:var(--caramel);font-family:Arial,sans-serif;" id="pay-order-summary">—</div>
+          </div>
+          <div style="text-align:left;">
+            <div class="amount-due-value" id="pay-amount">—</div>
+            <div class="amount-due-currency">EUR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Bank Transfer Details -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">2</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title"><span class="en-only">Bank Transfer Details</span><span class="fi-only">Tilisiirtotiedot</span></div>
+        <div class="card-number-box">
+          <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">
+            <span class="en-only">Account Holder</span><span class="fi-only">Tilinomistaja</span>
+          </div>
+          <div class="card-owner" id="shop-card-owner" style="margin-bottom:10px;">Farhang Rezaei Samie</div>
+
+          <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">IBAN</div>
+          <div class="card-number" id="shop-iban" style="direction:ltr;">BE59 9678 1322 4926</div>
+          <button class="copy-btn" onclick="copyIban()" id="btn-copy-iban">
+            <span class="en-only">📋 Copy IBAN</span>
+            <span class="fi-only">📋 Kopioi IBAN</span>
+          </button>
+
+          <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;margin:10px 0 2px;">BIC / SWIFT</div>
+          <div class="card-number" style="direction:ltr;font-size:14px;">TRWIBEB1XXX</div>
+
+          <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;text-transform:uppercase;letter-spacing:1px;margin:10px 0 2px;">
+            <span class="en-only">Bank Address</span><span class="fi-only">Pankin osoite</span>
+          </div>
+          <div style="font-size:12px;color:var(--medium-brown);font-family:Arial,sans-serif;">Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium</div>
+
+          <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;font-style:italic;margin-top:10px;">
+            <span class="en-only">Use this account when sending money from outside SEPA.</span>
+            <span class="fi-only">Käytä tätä tiliä, jos lähetät rahaa SEPA-alueen ulkopuolelta.</span>
+          </div>
+        </div>
+        <div class="payment-step-desc">
+          <span class="en-only">Transfer to the account above and note the payment reference below.</span>
+          <span class="fi-only">Siirrä summa yllä olevalle tilille ja merkitse maksuviite alla.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Upload Receipt -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">3</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title"><span class="en-only">Upload Receipt</span><span class="fi-only">Lähetä kuitti</span></div>
+        <div class="upload-area" onclick="document.getElementById('receipt-input').click()">
+          <input type="file" id="receipt-input" accept="image/*" onchange="handleReceiptUpload(this)">
+          <div class="upload-icon" id="upload-icon">🧾</div>
+          <div class="upload-text" id="upload-text">
+            <span class="en-only">Select receipt image</span>
+            <span class="fi-only">Valitse kuittikuva</span>
+          </div>
+          <div class="upload-sub"><span class="en-only">PNG, JPG up to 5MB</span><span class="fi-only">PNG, JPG, enintään 5 Mt</span></div>
+          <img class="upload-preview" id="upload-preview" src="" alt="Receipt">
+        </div>
+        <!-- Transaction ID -->
+        <div class="input-group" style="margin-top:10px;">
+          <label class="input-label">
+            <span class="en-only">Payment Reference / Transaction ID</span>
+            <span class="fi-only">Maksuviite / tapahtumatunnus</span>
+          </label>
+          <input class="input-field" id="transaction-id" type="text" placeholder="e.g. 12345678" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="payment-error"></div>
+  <div class="success-msg" id="payment-success"></div>
+
+  <button class="btn-primary" id="btn-confirm-payment" onclick="confirmPayment()">
+    <span class="fi-only">✅ Vahvista ja lähetä kuitti</span>
+    <span class="en-only">✅ Confirm Payment</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
+    <span class="en-only">Once the receipt is reviewed, your order will be confirmed and shipped.</span>
+    <span class="fi-only">Kun kuitti on tarkistettu, tilauksesi vahvistetaan ja lähetetään.</span>
+  </p>
+</div>
+
+</div><!-- /app-container -->
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI-lBDN7fQJHESYHKxPmOwEyyLT06iTsZMRWaYIG6nY0fd931h1BTqnvhHL1Z1uAi37Q/exec';
+
+/* ═══════════════════════════════════════════
+   EMAILJS SETUP
+   ------------------------------------------------------------
+   Template must contain a dynamic {{to_email}} field (confirmed).
+   We assume {{subject}} and {{message}} generic fields — if your
+   template uses different variable names, adjust the `params`
+   object inside sendTransactionalEmail() below.
+   ⚠️ Verify EJS_USER (Public Key) is correct in the EmailJS dashboard.
+═══════════════════════════════════════════ */
+const EJS_SERVICE  = 'service_yw91k2a';
+const EJS_TEMPLATE = 'template_gsitxoe';
+const EJS_USER     = 'GOVImvvzS8G5A8wRF'; // ⚠️ verify this Public Key in EmailJS dashboard
+const ROASTERY_TEAM_EMAIL = 'farhang.r.samei@gmail.com';
+
+if (window.emailjs) emailjs.init(EJS_USER);
+
+async function sendTransactionalEmail(toEmail, subject, message) {
+  if (!window.emailjs) return;
+  return emailjs.send(EJS_SERVICE, EJS_TEMPLATE, {
+    to_email: toEmail,
+    subject: subject,
+    message: message
+  });
+}
+
+async function sendWelcomeEmail(user) {
+  if (!user || !user.email) return;
+  const isFi = currentLang === 'fi';
+  const subject = isFi ? 'Tervetuloa Coffee Identityyn!' : 'Welcome to Coffee Identity!';
+  const message = isFi
+    ? `Hei ${user.name || ''},\n\nKiitos, että liityit mukaan! Tilisi on nyt valmis.\n\nAloita löytämällä oma kahviprofiilisi ja tutustu paahtimomme valikoimaan.\n\nTerveisin,\nCoffee Identity -tiimi`
+    : `Hi ${user.name || ''},\n\nThanks for joining! Your account is now ready.\n\nStart by discovering your personal coffee profile and exploring our roastery's selection.\n\nBest,\nThe Coffee Identity Team`;
+  return sendTransactionalEmail(user.email, subject, message);
+}
+
+async function sendOrderNotification(order) {
+  const subject = `🛒 New Order — ${order.amount}g ${order.bean_name || ''}`;
+  const message =
+`New order received:
+
+Customer: ${currentUser ? currentUser.name : ''} (${currentUser ? currentUser.email : ''})
+Bean: ${order.bean_name || '—'}
+Amount: ${order.amount}g
+Address: ${order.address || '—'}
+Notes: ${order.notes || '—'}
+Order ID: ${order.id}`;
+  return sendTransactionalEmail(ROASTERY_TEAM_EMAIL, subject, message);
+}
+
+async function sendRecipeEmail(toEmail, r) {
+  if (!toEmail || !r) return;
+  const isFi = currentLang === 'fi';
+  const subject = isFi ? `Kahvireseptisi: ${r.name}` : `Your Coffee Recipe: ${r.name}`;
+  const message = isFi
+    ? `Hei,\n\nTässä on suositellun kahvisi tiedot:\n\nPapu: ${r.name}${r.detail ? ' (' + r.detail + ')' : ''}\nAlkuperä: ${r.origin || '—'}\nPaahto: ${r.roast || '—'}\nValmistustapa: ${r.brew || '—'}\nLämpötila: ${r.temp || '—'}\nSuhde: ${r.ratio || '—'}\n\n${r.desc || ''}\n\nNauti kupistasi!\nCoffee Identity -tiimi`
+    : `Hi,\n\nHere are the details for your recommended coffee:\n\nBean: ${r.name}${r.detail ? ' (' + r.detail + ')' : ''}\nOrigin: ${r.origin || '—'}\nRoast: ${r.roast || '—'}\nBrew Method: ${r.brew || '—'}\nTemp: ${r.temp || '—'}\nRatio: ${r.ratio || '—'}\n\n${r.desc || ''}\n\nEnjoy your cup!\nThe Coffee Identity Team`;
+  return sendTransactionalEmail(toEmail, subject, message);
+}
+
+/* ═══════════════════════════════════════════
+   SUPABASE HELPER
+═══════════════════════════════════════════ */
+async function sb(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : '',
+      ...(method === 'PATCH' ? { 'X-HTTP-Method-Override': 'PATCH' } : {})
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Supabase error');
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+let currentUser = null; // { id, name, email }
+let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
+let rec = null;
+let currentProfileId = null;
+let selectedAmount = null;
+let currentLang = 'en';
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.classList.remove('visible');
+
+  if (!name)  return showErr(errEl, currentLang === 'fi' ? 'Anna nimesi' : 'Please enter your name');
+  if (!email || !email.includes('@')) return showErr(errEl, currentLang === 'fi' ? 'Anna kelvollinen sähköpostiosoite' : 'Please enter a valid email address');
+  if (pass.length < 6)  return showErr(errEl, currentLang === 'fi' ? 'Salasanan tulee olla vähintään 6 merkkiä' : 'Password must be at least 6 characters');
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    // Check for existing user
+    const existing = await sb('GET', `coffee_users?email=eq.${encodeURIComponent(email)}&select=id`);
+    if (existing && existing.length > 0) {
+      return showErr(errEl, currentLang === 'fi' ? 'Tämä sähköposti on jo rekisteröity. Kirjaudu sisään.' : 'This email is already registered. Please log in.');
+    }
+    // Save user
+    const users = await sb('POST', 'coffee_users', { email, name, password: pass, language: currentLang });
+    const user = users[0];
+    sendWelcomeEmail(user).catch(()=>{});
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, (currentLang === 'fi' ? 'Virhe: ' : 'Error: ') + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Create Account →</span><span class="fi-only">Luo tili →</span>';
+    setLang(currentLang);
+  }
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
+
+  if (!email) return showErr(errEl, currentLang === 'fi' ? 'Anna sähköpostiosoite' : 'Please enter your email');
+  if (!pass)  return showErr(errEl, currentLang === 'fi' ? 'Anna salasana' : 'Please enter your password');
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const users = await sb('GET', `coffee_users?email=eq.${encodeURIComponent(email)}&select=*`);
+    if (!users || users.length === 0) return showErr(errEl, currentLang === 'fi' ? 'Sähköpostia ei löytynyt' : 'Email not found');
+    const user = users[0];
+    if (user.password !== pass) return showErr(errEl, currentLang === 'fi' ? 'Väärä salasana' : 'Incorrect password');
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, (currentLang === 'fi' ? 'Virhe: ' : 'Error: ') + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Login →</span><span class="fi-only">Kirjaudu →</span>';
+    setLang(currentLang);
+  }
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('ci_user_en', JSON.stringify(user));
+  showDashboard();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('ci_user_en');
+  show('screen-auth');
+}
+
+function checkAutoLogin() {
+  const saved = localStorage.getItem('ci_user_en');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showDashboard();
+    } catch(e) {
+      localStorage.removeItem('ci_user_en');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+async function showDashboard() {
+  document.getElementById('dash-name').textContent = currentUser.name || '—';
+  document.getElementById('dash-phone').textContent = currentUser.email || '—';
+  show('screen-dashboard');
+  loadProfiles();
+  loadOrders();
+}
+
+const tasteLabels = { floral:{en:'Floral & Fruity',fi:'Kukkainen ja hedelmäinen'}, sweet:{en:'Sweet & Balanced',fi:'Makea ja tasapainoinen'}, chocolatey:{en:'Chocolatey & Nutty',fi:'Suklainen ja pähkinäinen'}, bold:{en:'Bold & Earthy',fi:'Voimakas ja maanläheinen'} };
+const bodyLabels  = { light:{en:'Light',fi:'Kevyt'}, medium:{en:'Medium',fi:'Keskitäyteläinen'}, full:{en:'Full',fi:'Täyteläinen'} };
+const brewLabels  = { v60:{en:'Pour Over',fi:'Suodatinkahvi'}, frenchpress:{en:'French Press',fi:'Pannukahvi'}, espresso:{en:'Espresso',fi:'Espresso'}, aeropress:{en:'AeroPress',fi:'AeroPress'}, coldbrew:{en:'Cold Brew',fi:'Kylmäuutto'}, other:{en:'Other',fi:'Muu'} };
+const stateLabels = { energised:{en:'Energised',fi:'Energinen'}, focused:{en:'Focused',fi:'Keskittynyt'}, creative:{en:'Creative',fi:'Luova'}, relaxed:{en:'Relaxed',fi:'Rento'}, reflective:{en:'Reflective',fi:'Mietiskelevä'} };
+function tLabel(map, key) {
+  if (!key) return null;
+  const l = map[key];
+  return l ? l[currentLang] || l.en : key;
+}
+
+async function loadProfiles() {
+  const container = document.getElementById('dash-profiles');
+  try {
+    const profiles = await sb('GET', `coffee_profiles_en?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const count = profiles ? profiles.length : 0;
+    document.getElementById('stat-profiles').textContent = count;
+    document.getElementById('stat-profiles-badge').textContent = count;
+    if (!profiles || count === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fi-only">Ei vielä profiileja. Aloita ensimmäinen matkasi!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
+      return;
+    }
+    // Sort: favorites first
+    profiles.sort((a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0));
+    // Store in a map for safe access
+    window._profilesMap = {};
+    profiles.forEach(p => { window._profilesMap[p.id] = p; });
+    container.innerHTML = profiles.map(p => {
+      const beanFull = p.recommended_bean || '—';
+      const beanName = beanFull.split('(')[0].trim();
+      const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+      const dateStr = new Date(p.created_at).toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-GB', {year:'numeric',month:'long',day:'numeric'});
+      const tags = [
+        tLabel(tasteLabels, p.flavor),
+        tLabel(bodyLabels, p.body),
+        tLabel(brewLabels, p.brew_method),
+        tLabel(stateLabels, p.mood),
+      ].filter(Boolean);
+      const pJson = JSON.stringify(p).replace(/'/g, "\'");
+      const favLabel = p.is_favorite
+        ? (currentLang === 'fi' ? '⭐ Suosikki' : '⭐ Favorite')
+        : (currentLang === 'fi' ? '☆ Suosikki' : '☆ Favorite');
+      return `<div class="profile-card-new" id="pcard-${p.id}">
+        ${p.is_favorite ? '<div class="fav-badge">⭐</div>' : ''}
+        <div style="cursor:pointer;" onclick="viewProfileById('${p.id}')">
+          <div class="profile-card-top">
+            <div>
+              <div class="profile-bean-name">${beanName}</div>
+              ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
+            </div>
+            <div class="profile-date-badge">${dateStr}</div>
+          </div>
+          <div class="profile-card-tags-new">
+            ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div class="profile-card-actions">
+          <button class="btn-fav ${p.is_favorite ? 'active' : ''}" onclick="toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)">
+            ${favLabel}
+          </button>
+          <button class="btn-del" onclick="deleteProfile('${p.id}')">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+    setLang(currentLang);
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state">${currentLang === 'fi' ? 'Virhe ladattaessa' : 'Error loading'}</div>`;
+  }
+}
+
+async function loadOrders() {
+  const container = document.getElementById('dash-orders');
+  try {
+    const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const count = orders ? orders.length : 0;
+    document.getElementById('stat-orders').textContent = count;
+    document.getElementById('stat-orders-badge').textContent = count;
+    if (!orders || count === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="fi-only">Ei vielä tilauksia.</div><div class="en-only">No orders yet.</div></div>`;
+      return;
+    }
+    const statusLabel = {
+      pending:            { en: 'Awaiting Payment',              fi: 'Odottaa maksua' },
+      receipt_submitted:  { en: 'Receipt Sent — Awaiting Review', fi: 'Kuitti lähetetty — odottaa tarkistusta' },
+      pending_review:     { en: 'Under Review',                  fi: 'Tarkistuksessa' },
+      confirmed:          { en: 'Confirmed ✅',                  fi: 'Vahvistettu ✅' },
+      paid:                { en: 'Paid',                          fi: 'Maksettu' },
+      shipped:            { en: 'Shipped',                       fi: 'Lähetetty' },
+      cancelled:          { en: 'Cancelled ❌',                  fi: 'Peruutettu ❌' }
+    };
+    const statusIcon = {
+      pending:'⏳',
+      receipt_submitted:'📋',
+      pending_review:'🔍',
+      confirmed:'✅',
+      paid:'💚',
+      shipped:'🚚',
+      cancelled:'❌'
+    };
+    const statusClass= {
+      pending:'status-pending',
+      receipt_submitted:'status-pending',
+      pending_review:'status-pending',
+      confirmed:'status-paid',
+      paid:'status-paid',
+      shipped:'status-shipped',
+      cancelled:'status-pending'
+    };
+    container.innerHTML = orders.map(o => {
+      const dateStr = new Date(o.created_at).toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-GB', {year:'numeric',month:'long',day:'numeric'});
+      const canDelete = o.status === 'cancelled';
+      const statusText = (statusLabel[o.status] && statusLabel[o.status][currentLang]) || (statusLabel[o.status] && statusLabel[o.status].en) || o.status;
+      const refLabel = currentLang === 'fi' ? '🔖 Viite' : '🔖 Reference';
+      const delLabel = currentLang === 'fi' ? '🗑️ Poista tämä tilaus' : '🗑️ Delete this order';
+      return `<div class="order-card-new" id="ocard-${o.id}">
+        <div class="order-card-top">
+          <div>
+            <div class="order-amount-big">${o.amount}g${o.bean_name ? ' — ' + o.bean_name.split('(')[0].trim() : ''}</div>
+            <div class="order-bean-small">${dateStr}</div>
+          </div>
+          <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusText}</div>
+        </div>
+        ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
+        ${o.notes ? `<div style="font-size:11px;color:#AAA;margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
+        ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;">${refLabel}: ${o.transaction_id}</div>` : ''}
+        ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">${delLabel}</button>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state">${currentLang === 'fi' ? 'Virhe ladattaessa' : 'Error loading'}</div>`;
+  }
+}
+
+async function deleteOrder(orderId) {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">${currentLang === 'fi' ? 'Poista tilaus?' : 'Delete order?'}</div>
+      <div class="confirm-desc">${currentLang === 'fi' ? 'Tämä peruutettu tilaus poistetaan pysyvästi.' : 'This cancelled order will be permanently deleted.'}</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">${currentLang === 'fi' ? 'Peruuta' : 'Cancel'}</button>
+        <button class="confirm-btn-delete" onclick="confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))">${currentLang === 'fi' ? 'Poista' : 'Delete'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDeleteOrder(orderId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    await sb('DELETE', `orders?id=eq.${orderId}`);
+    overlay.remove();
+    const card = document.getElementById('ocard-' + orderId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadOrders(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = currentLang === 'fi' ? 'Poista' : 'Delete';
+    btn.disabled = false;
+    alert((currentLang === 'fi' ? 'Virhe poistettaessa: ' : 'Error deleting: ') + e.message);
+  }
+}
+
+function viewProfileById(id) {
+  const p = window._profilesMap && window._profilesMap[id];
+  if (!p) { console.warn('Profile not found:', id); return; }
+  viewProfile(p);
+}
+
+function viewProfile(p) {
+  if (typeof p === 'string') return;
+  const beanFull = p.recommended_bean || '—';
+  const beanName = beanFull.split('(')[0].trim();
+  const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+
+  // Rebuild rec from profile so ordering works
+  ans.taste = p.flavor || null;
+  ans.body = p.body || null;
+  ans.state = p.mood || null;
+  ans.context = p.context || null;
+  ans.brew = p.brew_method || null;
+  ans.experience = p.experience || null;
+  currentProfileId = p.id;
+  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+  rec = matchedBean ? { ...matchedBean, _matchPct: 90 } : {
+    name: beanName, detail: beanDetail, origin: '', flavors: [],
+    roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
+  };
+
+  document.getElementById('detail-bean-name').textContent = beanName;
+  document.getElementById('detail-bean-origin').textContent = beanDetail;
+
+  const tags = [
+    p.flavor      ? `<span class="profile-tag-new">${tLabel(tasteLabels, p.flavor)||p.flavor}</span>` : '',
+    p.body        ? `<span class="profile-tag-new">${tLabel(bodyLabels, p.body)||p.body}</span>` : '',
+    p.brew_method ? `<span class="profile-tag-new">${tLabel(brewLabels, p.brew_method)||p.brew_method}</span>` : '',
+    p.mood        ? `<span class="profile-tag-new">${tLabel(stateLabels, p.mood)||p.mood}</span>` : '',
+    p.experience  ? `<span class="profile-tag-new">${p.experience}</span>` : '',
+  ].filter(Boolean).join('');
+
+  const dateStr = new Date(p.created_at).toLocaleDateString(currentLang === 'fi' ? 'fi-FI' : 'en-GB', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const pid = p.id;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="card">
+      <div class="card-title"><span class="en-only">Recommended Bean</span><span class="fi-only">Suositeltu papu</span></div>
+      <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
+      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);font-style:italic;">${beanDetail}</div>` : ''}
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="en-only">Taste Profile</span><span class="fi-only">Makuprofiili</span></div>
+      <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="en-only">Date Saved</span><span class="fi-only">Tallennettu</span></div>
+      <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateStr}</div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="en-only">Your Review</span><span class="fi-only">Arviosi</span></div>
+      <textarea class="textarea-field" id="review-text-${pid}"
+        placeholder="${currentLang === 'fi' ? 'Kirjoita kokemuksesi tästä kahvista...' : 'Write about your experience with this coffee...'}"
+        style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:#888;font-family:Arial,sans-serif;"><span class="en-only">Rating:</span><span class="fi-only">Arvosana:</span></span>
+        <div style="display:flex;gap:4px;" id="stars-${pid}">
+          <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
+          <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
+          <span onclick="setRating('${pid}',3)" style="font-size:26px;cursor:pointer;" id="star-${pid}-3">☆</span>
+          <span onclick="setRating('${pid}',4)" style="font-size:26px;cursor:pointer;" id="star-${pid}-4">☆</span>
+          <span onclick="setRating('${pid}',5)" style="font-size:26px;cursor:pointer;" id="star-${pid}-5">☆</span>
+        </div>
+      </div>
+      <div class="success-msg" id="review-success-${pid}"></div>
+      <button class="btn-primary" onclick="submitReview('${pid}')" style="margin-top:4px;">
+        💬 <span class="fi-only">Lähetä arvio</span><span class="en-only">Submit Review</span>
+      </button>
+    </div>
+    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
+      🛒 <span class="fi-only">Tilaa tämä papu</span><span class="en-only">Order This Bean</span>
+    </button>
+  `;
+  // Rebuild rec from profile so ordering works
+  if (rec && rec.name) {
+    try { render(rec); } catch(e) {}
+  }
+  setLang(currentLang);
+  show('screen-profile-detail');
+}
+
+let currentRating = 0;
+function setRating(profileId, rating) {
+  currentRating = rating;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.getElementById('star-' + profileId + '-' + i);
+    if (star) star.textContent = i <= rating ? '⭐' : '☆';
+  }
+}
+
+async function submitReview(profileId) {
+  const textEl = document.getElementById('review-text-' + profileId);
+  const sucEl  = document.getElementById('review-success-' + profileId);
+  const text   = textEl ? textEl.value.trim() : '';
+  if (!text && currentRating === 0) {
+    sucEl.textContent = currentLang === 'fi' ? 'Kirjoita arvio tai anna arvosana' : 'Please enter a review or rating';
+    sucEl.classList.add('visible');
+    return;
+  }
+  try {
+    await sb('PATCH', 'coffee_profiles_en?id=eq.' + profileId, {
+      review_text: text || null,
+      review_rating: currentRating || null
+    });
+    sucEl.textContent = currentLang === 'fi' ? '✅ Arviosi on tallennettu. Kiitos!' : '✅ Your review has been saved. Thank you!';
+    sucEl.classList.add('visible');
+  } catch(e) {
+    sucEl.textContent = currentLang === 'fi' ? 'Virhe arviota tallennettaessa' : 'Error saving review';
+    sucEl.classList.add('visible');
+  }
+}
+
+function reorderProfile() {
+  show('screen-order');
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+function startNewProfile() {
+  ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
+  rec = null;
+  currentProfileId = null;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  show('screen-1');
+}
+
+function pick(el, category, value) {
+  el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  ans[category] = value;
+  const btn = { taste:'btn-1', body:'btn-2', state:'btn-3', context:'btn-4', brew:'btn-5', experience:'btn-6' }[category];
+  if (btn) document.getElementById(btn).disabled = false;
+}
+
+function go(n) { show('screen-' + n); }
+function goBack(n) {
+  if (n === 1) showDashboard();
+  else show('screen-' + (n - 1));
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showLoading() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-loading').classList.add('visible');
+  setTimeout(async () => {
+    rec = recommend();
+    render(rec);
+    await saveProfile(rec);
+    document.getElementById('screen-loading').classList.remove('visible');
+    show('screen-result');
+  }, 2000);
+}
+
+/* ═══════════════════════════════════════════
+   SAVE PROFILE TO SUPABASE
+═══════════════════════════════════════════ */
+async function saveProfile(rec) {
+  if (!currentUser) return;
+  try {
+    const supaData = {
+      user_id: currentUser.id,
+      flavor: ans.taste,
+      body: ans.body,
+      mood: ans.state,
+      context: ans.context,
+      brew_method: ans.brew,
+      experience: ans.experience,
+      recommended_bean: rec.name + ' (' + rec.detail + ')'
+    };
+    const result = await sb('POST', 'coffee_profiles_en', supaData);
+    if (result && result[0]) currentProfileId = result[0].id;
+    document.getElementById('save-success').classList.add('visible');
+
+    // Send full data to Apps Script (same format as v3)
+    const restDays = rec.restDays ? (rec.restDays[ans.brew] || rec.restDays.default || 5) : 5;
+    const scriptData = {
+      name:           currentUser.name || '',
+      email:          currentUser.email || '',
+      language:       currentLang,
+      q1_taste:       ans.taste      || '',
+      q2_body:        ans.body       || '',
+      q3_state:       ans.state      || '',
+      q4_context:     ans.context    || '',
+      q5_brew:        ans.brew       || '',
+      q6_experience:  ans.experience || '',
+      bean:           rec.name + ' (' + rec.detail + ')',
+      is_blend:       rec._isBlend ? 'YES' : 'NO',
+      blend_name:     rec._blendName || '',
+      flavors:        (rec.flavors || []).join(', '),
+      roast:          rec.roast || '',
+      brew_method:    rec.brew  || '',
+      rest_days:      restDays,
+      reminder_date:  '',
+      reminder_wanted:'NO',
+      order_status:   '',
+      roastery_partner:'',
+      order_intent:   '',
+      country:        '',
+      city:           '',
+      country_code:   '',
+    };
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(scriptData)
+    }).catch(() => {});
+  } catch(e) {
+    console.warn('Save profile error:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ORDER
+═══════════════════════════════════════════ */
+function goToOrder() {
+  selectedAmount = null;
+  document.getElementById('amt-50').classList.remove('selected');
+  document.getElementById('amt-100').classList.remove('selected');
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-notes').value = '';
+  document.getElementById('order-error').classList.remove('visible');
+  document.getElementById('order-success').classList.remove('visible');
+  document.getElementById('order-bean-name').textContent = rec ? rec.name + ' (' + rec.detail + ')' : '—';
+  document.getElementById('order-bean-origin').textContent = rec ? rec.origin : '—';
+  show('screen-order');
+}
+
+function selectAmount(g) {
+  selectedAmount = g;
+  document.getElementById('amt-50').classList.toggle('selected', g === 50);
+  document.getElementById('amt-100').classList.toggle('selected', g === 100);
+}
+
+async function submitOrder() {
+  const errEl = document.getElementById('order-error');
+  const sucEl = document.getElementById('order-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const address = document.getElementById('order-address').value.trim();
+  const notes   = document.getElementById('order-notes').value.trim();
+
+  if (!selectedAmount) return showErr(errEl, currentLang === 'fi' ? 'Valitse määrä (50g tai 100g)' : 'Please select an amount (50g or 100g)');
+  if (!address) return showErr(errEl, currentLang === 'fi' ? 'Anna toimitusosoite' : 'Please enter a delivery address');
+
+  const btn = document.getElementById('btn-submit-order');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const orderResult = await sb('POST', 'orders', {
+      user_id: currentUser.id,
+      profile_id: currentProfileId || null,
+      amount: selectedAmount,
+      address,
+      notes,
+      status: 'pending',
+      payment_status: 'unpaid',
+      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null
+    });
+
+    if (orderResult && orderResult[0]) {
+      pendingOrderId = orderResult[0].id;
+      sendOrderNotification(orderResult[0]).catch(()=>{});
+    } else {
+      throw new Error('Order ID not returned from server');
+    }
+
+    // Go to payment screen
+    setTimeout(() => goToPayment(), 800);
+    sucEl.textContent = currentLang === 'fi' ? '✅ Tilaus lähetetty! Siirrytään maksusivulle...' : '✅ Order submitted! Redirecting to payment...';
+    sucEl.classList.add('visible');
+    btn.textContent = currentLang === 'fi' ? '✅ Lähetetty' : '✅ Submitted';
+
+  } catch(e) {
+    showErr(errEl, (currentLang === 'fi' ? 'Virhe tilausta lähetettäessä: ' : 'Error submitting order: ') + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">✅ Submit Order</span><span class="fi-only">✅ Lähetä tilaus</span>';
+    setLang(currentLang);
+  }
+}
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════
+   BEAN DATABASE
+═══════════════════════════════════════════ */
+const BEANS = [
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', s:{floral:10,sweet:4,chocolatey:0,bold:0,light:10,medium:5,full:0,energised:6,focused:6,creative:10,relaxed:4,reflective:7,beginner:4,regular:7,enthusiast:10} },
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', s:{floral:5,sweet:5,chocolatey:2,bold:4,light:7,medium:8,full:2,energised:10,focused:10,creative:6,relaxed:3,reflective:4,beginner:5,regular:9,enthusiast:9} },
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', s:{floral:6,sweet:10,chocolatey:3,bold:2,light:6,medium:8,full:3,energised:5,focused:7,creative:7,relaxed:9,reflective:6,beginner:10,regular:9,enthusiast:6} },
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', s:{floral:5,sweet:9,chocolatey:4,bold:3,light:3,medium:8,full:7,energised:4,focused:4,creative:8,relaxed:9,reflective:7,beginner:5,regular:8,enthusiast:9} },
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', s:{floral:2,sweet:8,chocolatey:7,bold:4,light:3,medium:9,full:5,energised:5,focused:7,creative:5,relaxed:8,reflective:6,beginner:10,regular:9,enthusiast:6} },
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', s:{floral:0,sweet:7,chocolatey:10,bold:4,light:1,medium:7,full:9,energised:3,focused:5,creative:3,relaxed:10,reflective:7,beginner:9,regular:8,enthusiast:5} },
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', s:{floral:0,sweet:5,chocolatey:9,bold:7,light:1,medium:5,full:8,energised:3,focused:5,creative:4,relaxed:7,reflective:9,beginner:6,regular:8,enthusiast:7} },
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', s:{floral:0,sweet:2,chocolatey:6,bold:10,light:0,medium:2,full:10,energised:2,focused:4,creative:3,relaxed:7,reflective:10,beginner:3,regular:6,enthusiast:9} },
+];
+
+const AVAILABLE = ['yirgacheffe','kenya','rwanda','sidama','colombia','brazil','guatemala','sumatra'];
+
+/* ═══════════════════════════════════════════
+   RECOMMENDATION ENGINE
+═══════════════════════════════════════════ */
+function recommend() {
+  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  const scored = pool.map(b => {
+    let score = 0;
+    score += (b.s[ans.taste]      || 0) * 4.5;
+    score += (b.s[ans.body]       || 0) * 2.5;
+    score += (b.s[ans.state]      || 0) * 2;
+    score += (b.s[ans.experience] || 0) * 1;
+    return { ...b, _score: score };
+  });
+  scored.sort((a, b) => b._score - a._score);
+  const best = scored[0];
+  best._matchPct = Math.min(100, Math.round((best._score / 100) * 100));
+  return best;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+═══════════════════════════════════════════ */
+function render(r) {
+  // Identity name
+  const identityMap = {
+    floral: { en: 'The Floral Soul', fi: 'Kukkainen sielu' },
+    sweet:  { en: 'The Sweet Wanderer', fi: 'Makea vaeltaja' },
+    chocolatey: { en: 'The Dark Roast Devotee', fi: 'Tumman paahdon ystävä' },
+    bold:   { en: 'The Bold Explorer', fi: 'Rohkea tutkimusmatkailija' }
+  };
+  const identity = identityMap[ans.taste] || { en: 'The Coffee Soul', fi: 'Kahvin sielu' };
+  document.getElementById('r-identity-name').textContent = currentLang === 'fi' ? identity.fi : identity.en;
+
+  // Badge tags
+  const badge = document.getElementById('r-identity-badge');
+  const tags = [ans.body, ans.state, ans.experience].filter(Boolean);
+  badge.innerHTML = tags.map(t => `<span class="identity-tag">${t}</span>`).join('');
+
+  // Match score
+  const pct = r._matchPct || 85;
+  document.getElementById('r-match-pct').textContent = pct + '%';
+  document.getElementById('r-match-fill').style.width = pct + '%';
+
+  // Bean info
+  document.getElementById('r-name').textContent = r.name;
+  document.getElementById('r-origin').textContent = r.origin;
+  document.getElementById('r-roast').textContent = r.roast;
+  document.getElementById('r-brew').textContent = r.brew;
+
+  // Show customer's brew method next to the bean's recommended method
+  const brewNameLabel = {
+    v60: { en: 'Pour Over (V60)', fi: 'Suodatinkahvi (V60)' },
+    frenchpress: { en: 'French Press', fi: 'Pannukahvi' },
+    espresso: { en: 'Espresso', fi: 'Espresso' },
+    aeropress: { en: 'AeroPress', fi: 'AeroPress' },
+    coldbrew: { en: 'Cold Brew', fi: 'Kylmäuutto' },
+    other: { en: 'Other method', fi: 'Muu menetelmä' }
+  };
+  if (ans.brew && r.brew) {
+    const brewLbl = brewNameLabel[ans.brew];
+    const yourBrewText = brewLbl ? (brewLbl[currentLang] || brewLbl.en) : ans.brew;
+    const beanBrewEN = r.brew.toLowerCase();
+    const yourBrewEN = ans.brew.replace('frenchpress','french press').replace('v60','pour over').replace('coldbrew','cold brew');
+    const isCompatible = beanBrewEN.includes(yourBrewEN) || beanBrewEN.includes(ans.brew);
+
+    document.getElementById('r-your-brew-row').style.display = 'flex';
+    document.getElementById('r-your-brew').textContent = yourBrewText;
+
+    document.getElementById('r-brew-note-row').style.display = 'flex';
+    if (isCompatible) {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fi'
+          ? '✅ Valmistustapasi sopii tähän papuun.'
+          : '✅ Your brew method is compatible with this bean.';
+    } else {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fi'
+          ? `⚡ Tämä papu loistaa menetelmällä ${r.brew}, mutta toimii myös sinun menetelmälläsi — makuprofiili on hieman erilainen.`
+          : `⚡ This bean shines with ${r.brew}, but works with your method too — the flavor profile will be slightly different.`;
+    }
+  }
+  document.getElementById('r-temp').textContent = r.temp;
+  document.getElementById('r-ratio').textContent = r.ratio;
+  document.getElementById('r-desc').textContent = r.desc;
+
+  // Roast guide
+  if (r.roastInfo) {
+    document.getElementById('r-charge').textContent = r.roastInfo.charge;
+    document.getElementById('r-drop').textContent = r.roastInfo.drop;
+    document.getElementById('r-time').textContent = r.roastInfo.time;
+    document.getElementById('r-dtr').textContent = r.roastInfo.dtr;
+  }
+
+  // Flavors
+  const fl = document.getElementById('r-flavors');
+  fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${f}</span>`).join('');
+
+  // Why this coffee
+  const whyMap = {
+    floral: { en: 'The floral, fruity character of this bean matches your taste', fi: 'Tämän pavun kukkainen, hedelmäinen luonne sopii makuusi' },
+    sweet: { en: 'The natural sweetness of this bean is exactly what you\'re looking for', fi: 'Tämän pavun luonnollinen makeus on juuri sitä, mitä etsit' },
+    chocolatey: { en: 'The rich chocolate notes of this coffee are ideal for you', fi: 'Tämän kahvin runsaat suklaanuotit sopivat sinulle ihanteellisesti' },
+    bold: { en: 'The strength and depth of this bean speaks to your coffee character', fi: 'Tämän pavun voima ja syvyys puhuttelee kahviluonnettasi' }
+  };
+  const why = document.getElementById('why-list');
+  const bodyWhy = {
+    light: { en: 'This coffee\'s light body matches your preference', fi: 'Tämän kahvin kevyt runko sopii makuusi' },
+    full:  { en: 'The strength and richness of this coffee matches what you want', fi: 'Tämän kahvin voima ja rikkaus vastaa toivettasi' }
+  };
+  const expWhy = { en: 'The complexity of this bean is designed for someone like you', fi: 'Tämän pavun monimutkaisuus on suunniteltu juuri sinunlaisellesi' };
+  const reasons = [
+    (whyMap[ans.taste] && whyMap[ans.taste][currentLang]) || (whyMap[ans.taste] && whyMap[ans.taste].en) || '',
+    (bodyWhy[ans.body] && (bodyWhy[ans.body][currentLang] || bodyWhy[ans.body].en)) || '',
+    ans.experience === 'enthusiast' ? (expWhy[currentLang] || expWhy.en) : ''
+  ].filter(Boolean);
+  why.innerHTML = reasons.map(r => `<div class="why-item"><div class="why-check">✓</div>${r}</div>`).join('');
+}
+
+async function emailMeRecipe() {
+  const btn = document.getElementById('btn-email-recipe');
+  const sucEl = document.getElementById('recipe-email-success');
+  const isFi = currentLang === 'fi';
+  if (!currentUser || !currentUser.email) {
+    sucEl.textContent = isFi ? 'Kirjaudu sisään lähettääksesi reseptin sähköpostiin.' : 'Please log in to email this recipe.';
+    sucEl.classList.add('visible');
+    return;
+  }
+  if (!rec || !rec.name) return;
+  btn.disabled = true;
+  const original = btn.innerHTML;
+  btn.textContent = isFi ? 'Lähetetään…' : 'Sending…';
+  try {
+    await sendRecipeEmail(currentUser.email, rec);
+    sucEl.textContent = isFi ? `✅ Resepti lähetetty osoitteeseen ${currentUser.email}` : `✅ Recipe sent to ${currentUser.email}`;
+    sucEl.classList.add('visible');
+  } catch (e) {
+    sucEl.textContent = isFi ? 'Sähköpostin lähetys epäonnistui.' : 'Could not send email.';
+    sucEl.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
+function toggleRoastGuide() {
+  const card = document.getElementById('roast-card');
+  const btn  = document.querySelector('.staff-toggle');
+  const visible = card.style.display !== 'none';
+  card.style.display = visible ? 'none' : 'block';
+  btn.innerHTML = currentLang === 'fi'
+    ? (visible ? '🔥 Paahtajan näkymä: Paahto-ohjeet ▼' : '🔥 Paahtajan näkymä: Paahto-ohjeet ▲')
+    : (visible ? '🔥 Roastery View: Roast Direction ▼' : '🔥 Roastery View: Roast Direction ▲');
+}
+
+/* ═══════════════════════════════════════════
+   LANGUAGE
+═══════════════════════════════════════════ */
+function setLang(lang) {
+  currentLang = lang;
+  document.body.className = 'lang-' + lang;
+  document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-lang-fi').classList.toggle('active', lang === 'fi');
+  if (currentUser && currentUser.id) {
+    sb('PATCH', `coffee_users?id=eq.${currentUser.id}`, { language: lang }).catch(()=>{});
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FAVORITE & DELETE
+═══════════════════════════════════════════ */
+async function toggleFavorite(profileId, currentFav, btn) {
+  const newFav = !currentFav;
+  btn.disabled = true;
+  try {
+    await sb('PATCH', `coffee_profiles_en?id=eq.${profileId}`, { is_favorite: newFav });
+    btn.classList.toggle('active', newFav);
+    btn.textContent = currentLang === 'fi' ? (newFav ? '⭐ Suosikki' : '☆ Suosikki') : (newFav ? '⭐ Favorite' : '☆ Favorite');
+    btn.onclick = () => toggleFavorite(profileId, newFav, btn);
+    // Show/remove badge
+    const card = document.getElementById('pcard-' + profileId);
+    let badge = card.querySelector('.fav-badge');
+    if (newFav) {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'fav-badge';
+        badge.textContent = '⭐';
+        card.insertBefore(badge, card.firstChild);
+      }
+    } else {
+      if (badge) badge.remove();
+    }
+    // Re-sort
+    await loadProfiles();
+  } catch(e) {
+    console.warn('Toggle favorite error:', e);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function deleteProfile(profileId) {
+  // Show confirm dialog
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  const isFi = currentLang === 'fi';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">${isFi ? 'Poista profiili?' : 'Delete profile?'}</div>
+      <div class="confirm-desc">${isFi ? 'Tämä kahviprofiili poistetaan pysyvästi eikä sitä voi palauttaa.' : 'This coffee profile will be permanently deleted and cannot be recovered.'}</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">${isFi ? 'Peruuta' : 'Cancel'}</button>
+        <button class="confirm-btn-delete" onclick="confirmDelete('${profileId}', this.closest('.confirm-overlay'))">${isFi ? 'Poista' : 'Delete'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDelete(profileId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    // Null out profile_id on orders first to avoid a foreign key conflict
+    await sb('PATCH', `orders?profile_id=eq.${profileId}`, { profile_id: null });
+  } catch(e) {
+    // Fine if there were no orders
+  }
+  try {
+    await sb('DELETE', `coffee_profiles_en?id=eq.${profileId}`);
+    overlay.remove();
+    // Card removal animation
+    const card = document.getElementById('pcard-' + profileId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadProfiles(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = currentLang === 'fi' ? 'Poista' : 'Delete';
+    btn.disabled = false;
+    console.warn('Delete error:', e.message);
+    alert((currentLang === 'fi' ? 'Virhe: ' : 'Error: ') + e.message);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PAYMENT
+═══════════════════════════════════════════ */
+// Roastery bank details — TODO: replace PRICES with real EUR prices
+const SHOP_IBAN = 'BE59 9678 1322 4926';
+const SHOP_BIC = 'TRWIBEB1XXX';
+const SHOP_OWNER = 'Farhang Rezaei Samie';
+const PRICES = { 50: 12, 100: 20 }; // ⚠️ PLACEHOLDER EUR prices — set real prices before going live
+
+let paymentTimer = null;
+let receiptBase64 = null;
+let pendingOrderId = null;
+
+function goToPayment() {
+  document.getElementById('shop-card-owner').textContent = SHOP_OWNER;
+
+  // Amount
+  const price = PRICES[selectedAmount] || 0;
+  document.getElementById('pay-amount').textContent = price.toLocaleString(currentLang === 'fi' ? 'fi-FI' : 'en-GB');
+  document.getElementById('pay-order-summary').textContent =
+    `${selectedAmount}g — ${rec ? rec.name : ''}`;
+
+  // Reset form
+  document.getElementById('transaction-id').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-icon').style.display = 'block';
+  document.getElementById('upload-text').innerHTML =
+    '<span class="en-only">Select receipt image</span><span class="fi-only">Valitse kuittikuva</span>';
+  document.getElementById('payment-error').classList.remove('visible');
+  document.getElementById('payment-success').classList.remove('visible');
+  document.getElementById('btn-confirm-payment').disabled = false;
+  document.getElementById('btn-confirm-payment').innerHTML =
+    '<span class="fi-only">✅ Vahvista ja lähetä kuitti</span><span class="en-only">✅ Confirm Payment</span>';
+  receiptBase64 = null;
+
+  // 30-minute timer
+  startPaymentTimer(30 * 60);
+
+  show('screen-payment');
+  setLang(currentLang);
+}
+
+function startPaymentTimer(seconds) {
+  if (paymentTimer) clearInterval(paymentTimer);
+  let remaining = seconds;
+  const el = document.getElementById('payment-timer');
+  paymentTimer = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    el.textContent = m + ':' + s;
+    if (remaining <= 0) {
+      clearInterval(paymentTimer);
+      el.textContent = '00:00';
+      el.style.color = '#C0392B';
+      // Auto-cancel order
+      autoCancelOrder();
+    }
+  }, 1000);
+}
+
+function copyIban() {
+  const iban = SHOP_IBAN.replace(/\s/g, '');
+  const btn = document.getElementById('btn-copy-iban');
+  const setCopied = () => {
+    btn.innerHTML = '<span class="en-only">✅ Copied!</span><span class="fi-only">✅ Kopioitu!</span>';
+    setTimeout(() => {
+      btn.innerHTML = '<span class="en-only">📋 Copy IBAN</span><span class="fi-only">📋 Kopioi IBAN</span>';
+    }, 2000);
+  };
+  navigator.clipboard.writeText(iban).then(setCopied).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = iban;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    setCopied();
+  });
+}
+
+function handleReceiptUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showErr(document.getElementById('payment-error'), currentLang === 'fi' ? 'Tiedoston tulee olla alle 5 Mt' : 'File must be under 5MB');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    receiptBase64 = e.target.result;
+    const preview = document.getElementById('upload-preview');
+    preview.src = receiptBase64;
+    preview.style.display = 'block';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').innerHTML = '<span class="en-only">✅ Receipt selected</span><span class="fi-only">✅ Kuitti valittu</span>';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function autoCancelOrder() {
+  if (!pendingOrderId) return;
+  try {
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'cancelled',
+      payment_status: 'cancelled'
+    });
+    const errEl = document.getElementById('payment-error');
+    showErr(errEl, currentLang === 'fi' ? '⏰ Maksuaika päättyi. Tilauksesi peruutettiin maksun puuttumisen vuoksi.' : '⏰ Payment time expired. Your order was cancelled due to non-payment.');
+    document.getElementById('btn-confirm-payment').disabled = true;
+  } catch(e) {
+    console.warn('Auto cancel error:', e);
+  }
+}
+
+
+async function confirmPayment() {
+  const errEl = document.getElementById('payment-error');
+  const sucEl = document.getElementById('payment-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const txId = document.getElementById('transaction-id').value.trim();
+
+  if (!receiptBase64) return showErr(errEl, currentLang === 'fi' ? 'Lataa kuittikuva' : 'Please upload a receipt image');
+  if (!txId) return showErr(errEl, currentLang === 'fi' ? 'Anna maksuviite' : 'Please enter the payment reference');
+
+  const btn = document.getElementById('btn-confirm-payment');
+  btn.disabled = true;
+  btn.textContent = currentLang === 'fi' ? 'Lähetetään kuittia…' : 'Sending receipt…';
+
+  // If we don't have pendingOrderId, we shouldn't proceed
+  if (!pendingOrderId) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fi-only">✅ Vahvista ja lähetä kuitti</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+    return showErr(errEl, currentLang === 'fi' ? 'Virhe: Tilaustunnusta ei löytynyt. Yritä tilata uudelleen.' : 'Error: Order ID not found. Please place a new order.');
+  }
+
+  try {
+    // 1. Update Supabase — this is the most important step, must always run
+    btn.textContent = currentLang === 'fi' ? 'Tallennetaan tietoja…' : 'Saving details…';
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'receipt_submitted',
+      payment_status: 'receipt_submitted',
+      transaction_id: txId
+    });
+
+    // 2. Send receipt to Apps Script → Google Drive (separate, shouldn't fail the whole flow)
+    btn.textContent = currentLang === 'fi' ? 'Ladataan kuvaa…' : 'Uploading image…';
+    let receiptUrl = '';
+    try {
+      const receiptData = {
+        type: 'payment_receipt',
+        order_id: pendingOrderId,
+        transaction_id: txId,
+        receipt_base64: receiptBase64,
+        name: currentUser ? currentUser.name : '',
+        email: currentUser ? currentUser.email : '',
+        bean: rec ? rec.name : '',
+        amount: selectedAmount ? selectedAmount + 'g' : '',
+        price: (PRICES[selectedAmount] || 0).toLocaleString()
+      };
+      const scriptRes = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(receiptData)
+      });
+      const scriptData = await scriptRes.json().catch(() => ({}));
+      receiptUrl = scriptData.receipt_url || '';
+
+      // If we got a Drive link successfully, update Supabase again
+      if (receiptUrl) {
+        await sb('PATCH', `orders?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
+      }
+    } catch(scriptErr) {
+      console.warn('Apps Script / Drive upload error:', scriptErr);
+      // No problem — order status was already saved in Supabase
+    }
+
+    // 3. Stop the timer
+    if (paymentTimer) clearInterval(paymentTimer);
+
+    sucEl.textContent = currentLang === 'fi' ? '✅ Kuittisi on lähetetty ja tallennettu! Kun paahtimon tiimi on vahvistanut sen, tilauksesi valmistellaan.' : '✅ Your receipt was sent and saved successfully! Once the roastery team confirms it, your order will be prepared.';
+    sucEl.classList.add('visible');
+    btn.textContent = currentLang === 'fi' ? '✅ Lähetetty' : '✅ Sent';
+
+    setTimeout(() => {
+      show('screen-dashboard');
+      showDashboard();
+    }, 3000);
+
+  } catch(e) {
+    showErr(errEl, (currentLang === 'fi' ? 'Virhe tilausta tallennettaessa: ' : 'Error saving order: ') + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fi-only">✅ Vahvista ja lähetä kuitti</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+setLang('en');
+checkAutoLogin();
+</script>
+</body>
+</html>
