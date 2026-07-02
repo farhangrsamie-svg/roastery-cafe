@@ -1662,7 +1662,7 @@ async function loadProfiles() {
   const container = document.getElementById('dash-profiles');
   if (!container || !currentUser) return;
   try {
-    const rows = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const rows = await sb('GET', `coffee_profiles_en?user_id=eq.${String(currentUser.id)}&order=created_at.desc&select=*`);
     if (!rows || rows.length === 0) {
       container.innerHTML = '<div style="text-align:center;color:#AAA;font-size:14px;padding:20px;font-family:Arial,sans-serif;"><span class="en-only">No profiles yet — start your first one!</span><span class="fi-only">Ei vielä profiileja!</span></div>';
       return;
@@ -1702,7 +1702,7 @@ async function saveProfile(recBean) {
     reminderDate.setDate(reminderDate.getDate() + reminderDays);
 
     const supaData = {
-      user_id:          currentUser.id,
+      user_id:          String(currentUser.id), // convert to text for compatibility
       flavor:           ans.taste,
       body:             ans.body,
       mood:             ans.state,
@@ -1714,7 +1714,7 @@ async function saveProfile(recBean) {
       country:          userLocation.country || '',
       city:             userLocation.city    || '',
     };
-    const result = await sb('POST', 'coffee_profiles', supaData);
+    const result = await sb('POST', 'coffee_profiles_en', supaData);
     if (result && result[0]) currentProfileId = result[0].id;
   } catch(e) { console.warn('Supabase save error:', e.message); }
 }
@@ -1759,7 +1759,7 @@ async function submitOrder() {
     // اگه user لاگین کرده و profile داره، آپدیت کن
     if (currentUser) {
       if (currentProfileId) {
-        await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
+        await sb('PATCH', `coffee_profiles_en?id=eq.${currentProfileId}`, {
           order_amount: selectedAmount,
           grind_type:   selectedGrind,
           order_status: 'requested',
@@ -1768,7 +1768,7 @@ async function submitOrder() {
         // profile نداره — یه جدید بساز
         await saveProfile(rec);
         if (currentProfileId) {
-          await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
+          await sb('PATCH', `coffee_profiles_en?id=eq.${currentProfileId}`, {
             order_amount: selectedAmount,
             grind_type:   selectedGrind,
             order_status: 'requested',
@@ -1829,7 +1829,7 @@ async function confirmDelete(profileId, overlay) {
     // اگه سفارشی نبود مشکلی نیست
   }
   try {
-    await sb('DELETE', `coffee_profiles?id=eq.${profileId}`);
+    await sb('DELETE', `coffee_profiles_en?id=eq.${profileId}`);
     overlay.remove();
     // انیمیشن حذف کارت
     const card = document.getElementById('pcard-' + profileId);
@@ -2151,7 +2151,7 @@ async function toggleFavorite(profileId, currentFav, btn) {
   const newFav = !currentFav;
   btn.disabled = true;
   try {
-    await sb('PATCH', `coffee_profiles?id=eq.${profileId}`, { is_favorite: newFav });
+    await sb('PATCH', `coffee_profiles_en?id=eq.${profileId}`, { is_favorite: newFav });
     btn.classList.toggle('active', newFav);
     btn.textContent = newFav ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی';
     btn.onclick = () => toggleFavorite(profileId, newFav, btn);
