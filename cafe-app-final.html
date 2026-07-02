@@ -446,6 +446,28 @@ body {
   color: #3A7A3A;
 }
 
+/* ── AUTH / DASHBOARD / ORDER ── */
+.auth-tabs { display:flex; gap:0; margin-bottom:28px; border-radius:12px; overflow:hidden; border:2px solid #DDD5C2; }
+.auth-tab { flex:1; padding:12px; text-align:center; font-size:13px; font-family:'Arial',sans-serif; font-weight:bold; cursor:pointer; background:var(--white); color:var(--caramel); border:none; transition:all 0.2s; }
+.auth-tab.active { background:var(--medium-brown); color:var(--white); }
+.profile-card { background:var(--white); border-radius:16px; padding:18px; box-shadow:0 2px 10px var(--shadow); margin-bottom:12px; cursor:pointer; transition:all 0.18s; border:2px solid transparent; }
+.profile-card:hover { border-color:var(--caramel); }
+.profile-card-bean { font-size:16px; font-weight:bold; color:var(--dark-brown); }
+.profile-card-date { font-size:11px; color:#AAA; font-family:'Arial',sans-serif; margin-top:4px; }
+.profile-card-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.amount-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.amount-btn { background:var(--white); border:2px solid #DDD5C2; border-radius:14px; padding:16px; text-align:center; cursor:pointer; transition:all 0.18s; font-size:18px; font-weight:bold; color:var(--dark-brown); }
+.amount-btn.selected { border-color:var(--caramel); background:#FDF5E8; }
+.grind-btn { background:var(--white); border:2px solid #DDD5C2; border-radius:14px; padding:14px 10px; text-align:center; cursor:pointer; transition:all 0.18s; }
+.grind-btn.selected { border-color:var(--caramel); background:#FDF5E8; }
+.grind-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.order-summary { background:#FDF5E8; border:1px solid #E8C99A; border-radius:14px; padding:16px; margin-bottom:20px; }
+.dashboard-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.user-greeting { font-size:18px; color:var(--dark-brown); }
+.logout-btn { font-size:12px; color:var(--caramel); background:none; border:none; cursor:pointer; font-family:'Arial',sans-serif; }
+.section-title { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--caramel); font-family:'Arial',sans-serif; margin-bottom:12px; }
+.new-profile-btn { background:var(--medium-brown); color:var(--white); border:none; border-radius:50px; padding:14px 24px; font-size:13px; font-family:'Arial',sans-serif; letter-spacing:2px; text-transform:uppercase; cursor:pointer; width:100%; margin-bottom:20px; }
+
 /* CSS-driven language visibility */
 body.lang-fi .en-only { display: none !important; }
 body.lang-en .fi-only { display: none !important; }
@@ -502,9 +524,194 @@ body.lang-en .loading-fi { display: none !important; }
 <div class="app-container">
 
 <!-- ══════════════════════════════════════
+     SCREEN: AUTH (Login / Register)
+══════════════════════════════════════ -->
+<div class="screen active" id="screen-auth">
+  <div class="logo">
+    <div class="logo-icon">☕</div>
+    <h1>Coffee Identity</h1>
+    <div class="logo-sub">Personal Roast Platform</div>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+      <span class="en-only">Login</span>
+      <span class="fi-only">Kirjaudu</span>
+    </button>
+    <button class="auth-tab" id="tab-register" onclick="switchTab('register')">
+      <span class="en-only">Register</span>
+      <span class="fi-only">Rekisteröidy</span>
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div id="login-form">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Email</span>
+        <span class="fi-only">Sähköposti</span>
+      </label>
+      <input class="input-field" id="login-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fi-only">Salasana</span>
+      </label>
+      <input class="input-field" id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+    <div id="login-error" style="color:#C0392B;font-size:13px;font-family:Arial,sans-serif;margin-bottom:12px;display:none;"></div>
+    <button class="btn-primary" onclick="doLogin()">
+      <span class="en-only">Login →</span>
+      <span class="fi-only">Kirjaudu →</span>
+    </button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="register-form" style="display:none;">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Your Name</span>
+        <span class="fi-only">Nimesi</span>
+      </label>
+      <input class="input-field" id="reg-name" type="text" placeholder="Frank" autocomplete="given-name" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">Email</label>
+      <input class="input-field" id="reg-email" type="email" placeholder="your@email.com" autocomplete="email" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fi-only">Salasana</span>
+      </label>
+      <input class="input-field" id="reg-pass" type="password" placeholder="min. 6 characters" autocomplete="new-password" />
+    </div>
+    <div id="reg-error" style="color:#C0392B;font-size:13px;font-family:Arial,sans-serif;margin-bottom:12px;display:none;"></div>
+    <button class="btn-primary" onclick="doRegister()">
+      <span class="en-only">Create Account →</span>
+      <span class="fi-only">Luo tili →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: DASHBOARD
+══════════════════════════════════════ -->
+<div class="screen" id="screen-dashboard">
+  <div class="dashboard-header">
+    <div class="user-greeting">
+      <span class="en-only">Hello, </span>
+      <span class="fi-only">Hei, </span>
+      <strong id="dash-user-name">—</strong>
+    </div>
+    <button class="logout-btn" onclick="doLogout()">
+      <span class="en-only">Logout</span>
+      <span class="fi-only">Kirjaudu ulos</span>
+    </button>
+  </div>
+
+  <button class="new-profile-btn" onclick="startNewProfile()">
+    <span class="en-only">☕ Start New Coffee Profile</span>
+    <span class="fi-only">☕ Uusi kahviprofiili</span>
+  </button>
+
+  <div class="section-title">
+    <span class="en-only">Your Previous Profiles</span>
+    <span class="fi-only">Aiemmat profiilisi</span>
+  </div>
+  <div id="dash-profiles">
+    <div style="text-align:center;color:#AAA;font-size:14px;padding:20px;font-family:Arial,sans-serif;">
+      <span class="en-only">No profiles yet — start your first one!</span>
+      <span class="fi-only">Ei vielä profiileja — aloita ensimmäinen!</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN: ORDER
+══════════════════════════════════════ -->
+<div class="screen" id="screen-order">
+  <button class="btn-back" onclick="show('screen-result')">
+    ← <span class="en-only">Back</span><span class="fi-only">Takaisin</span>
+  </button>
+
+  <div class="logo" style="margin-bottom:20px;">
+    <div class="logo-icon">📦</div>
+    <h1 style="font-size:20px;">
+      <span class="en-only">Place Your Order</span>
+      <span class="fi-only">Tilaa kahvisi</span>
+    </h1>
+  </div>
+
+  <div class="order-summary" id="order-bean-summary">
+    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">
+      <span class="en-only">Selected Bean</span>
+      <span class="fi-only">Valittu papu</span>
+    </div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
+    <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+  </div>
+
+  <!-- Amount -->
+  <div class="section-title">
+    <span class="en-only">Amount</span>
+    <span class="fi-only">Määrä</span>
+  </div>
+  <div class="amount-grid">
+    <div class="amount-btn" onclick="selectAmount(this,'100g')">100g</div>
+    <div class="amount-btn" onclick="selectAmount(this,'250g')">250g</div>
+    <div class="amount-btn" onclick="selectAmount(this,'500g')">500g</div>
+    <div class="amount-btn" onclick="selectAmount(this,'1kg')">1 kg</div>
+  </div>
+
+  <!-- Grind -->
+  <div class="section-title">
+    <span class="en-only">Grind Type</span>
+    <span class="fi-only">Jauhatus</span>
+  </div>
+  <div class="grind-grid">
+    <div class="grind-btn" onclick="selectGrind(this,'whole')">
+      <div class="option-icon">🫘</div>
+      <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);">
+        <span class="en-only">Whole Bean</span>
+        <span class="fi-only">Kokonainen papu</span>
+      </div>
+    </div>
+    <div class="grind-btn" onclick="selectGrind(this,'filter')">
+      <div class="option-icon">☕</div>
+      <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);">
+        <span class="en-only">Filter Grind</span>
+        <span class="fi-only">Suodatinjauhatus</span>
+      </div>
+    </div>
+    <div class="grind-btn" onclick="selectGrind(this,'espresso')">
+      <div class="option-icon">⚡</div>
+      <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);">
+        <span class="en-only">Espresso Grind</span>
+        <span class="fi-only">Espressojauhatus</span>
+      </div>
+    </div>
+    <div class="grind-btn" onclick="selectGrind(this,'french')">
+      <div class="option-icon">🫖</div>
+      <div style="font-size:13px;font-weight:bold;color:var(--dark-brown);">
+        <span class="en-only">French Press</span>
+        <span class="fi-only">Ranskalainen puristin</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="order-error" style="color:#C0392B;font-size:13px;font-family:Arial,sans-serif;margin-bottom:12px;display:none;"></div>
+  <button class="btn-primary" id="btn-submit-order" onclick="submitOrder()">
+    <span class="en-only">Request Fresh Roast →</span>
+    <span class="fi-only">Pyydä tuoretta paahtoamista →</span>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════
      SCREEN: WELCOME
 ══════════════════════════════════════ -->
-<div class="screen active" id="screen-welcome">
+<div class="screen" id="screen-welcome">
   <div class="logo">
     <div class="logo-icon">☕</div>
     <h1>Roastery Café</h1>
@@ -971,6 +1178,7 @@ const EJS_TEMPLATE = 'template_gsitxoe';
 const EJS_USER     = 'GOVImvvzS8G5A8wRF';
 
 emailjs.init(EJS_USER);
+document.addEventListener('DOMContentLoaded', () => { checkAutoLogin(); });
 
 // شناسایی لوکیشن مشتری
 fetch('https://ipapi.co/json/')
@@ -984,6 +1192,10 @@ fetch('https://ipapi.co/json/')
 
 /* ── APP STATE ── */
 let name = '', email = '';
+let currentUser      = null; // { id, name, email }
+let currentProfileId = null;
+let selectedAmount   = null;
+let selectedGrind    = null;
 let userLocation = { country: '', city: '', country_code: '' };
 let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
 let rec = null;
@@ -1344,6 +1556,224 @@ function showLoading() {
   }, 2000);
 }
 
+
+/* ═══════════════════════════════════════════
+   SUPABASE HELPER
+═══════════════════════════════════════════ */
+async function sb(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : '',
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.message||'Supabase error'); }
+  return res.status === 204 ? null : res.json();
+}
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display    = tab === 'login'    ? '' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value.trim();
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display='block'; return; }
+  try {
+    const rows = await sb('GET', `coffee_users?email=eq.${encodeURIComponent(email)}&password=eq.${encodeURIComponent(pass)}&select=id,name,email`);
+    if (!rows || rows.length === 0) { errEl.textContent = 'Invalid email or password.'; errEl.style.display='block'; return; }
+    loginUser(rows[0]);
+  } catch(e) { errEl.textContent = 'Connection error. Please try again.'; errEl.style.display='block'; }
+}
+
+async function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass  = document.getElementById('reg-pass').value.trim();
+  const errEl = document.getElementById('reg-error');
+  errEl.style.display = 'none';
+  if (!name || !email || !pass) { errEl.textContent = 'Please fill in all fields.'; errEl.style.display='block'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display='block'; return; }
+  try {
+    const existing = await sb('GET', `coffee_users?email=eq.${encodeURIComponent(email)}&select=id`);
+    if (existing && existing.length > 0) { errEl.textContent = 'This email is already registered.'; errEl.style.display='block'; return; }
+    const rows = await sb('POST', 'coffee_users', { name, email, password: pass, language: currentLang });
+    if (rows && rows[0]) loginUser(rows[0]);
+  } catch(e) { errEl.textContent = 'Registration failed. Please try again.'; errEl.style.display='block'; }
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('ci_user_nordic', JSON.stringify(user));
+  showDashboard();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('ci_user_nordic');
+  show('screen-auth');
+}
+
+function checkAutoLogin() {
+  const saved = localStorage.getItem('ci_user_nordic');
+  if (saved) {
+    try { currentUser = JSON.parse(saved); showDashboard(); }
+    catch(e) { localStorage.removeItem('ci_user_nordic'); }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+async function showDashboard() {
+  show('screen-dashboard');
+  const nameEl = document.getElementById('dash-user-name');
+  if (nameEl) nameEl.textContent = currentUser.name || currentUser.email;
+  await loadProfiles();
+}
+
+async function loadProfiles() {
+  const container = document.getElementById('dash-profiles');
+  if (!container || !currentUser) return;
+  try {
+    const rows = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    if (!rows || rows.length === 0) {
+      container.innerHTML = '<div style="text-align:center;color:#AAA;font-size:14px;padding:20px;font-family:Arial,sans-serif;"><span class="en-only">No profiles yet — start your first one!</span><span class="fi-only">Ei vielä profiileja!</span></div>';
+      return;
+    }
+    container.innerHTML = rows.map(p => `
+      <div class="profile-card" onclick="reorderProfile('${p.id}')">
+        <div class="profile-card-bean">${p.recommended_bean || '—'}</div>
+        <div class="profile-card-date">${new Date(p.created_at).toLocaleDateString()}</div>
+        <div class="profile-card-tags">
+          ${[p.flavor,p.mood,p.brew_method].filter(Boolean).map(t=>`<span class="flavor-tag">${t}</span>`).join('')}
+        </div>
+      </div>`).join('');
+  } catch(e) { container.innerHTML = '<div style="color:#AAA;text-align:center;padding:20px;">Could not load profiles.</div>'; }
+}
+
+function startNewProfile() {
+  ans = { taste:null, body:null, state:null, context:null, brew:null, experience:null };
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => { const b=document.getElementById(id); if(b) b.disabled=true; });
+  show('screen-1');
+}
+
+async function reorderProfile(profileId) {
+  // نمایش پروفایل قدیمی — فعلاً به screen-1 بره
+  startNewProfile();
+}
+
+/* ═══════════════════════════════════════════
+   SAVE PROFILE TO SUPABASE
+═══════════════════════════════════════════ */
+async function saveProfile(recBean) {
+  if (!currentUser) return;
+  try {
+    const restDays = recBean.restDays ? (recBean.restDays[ans.brew] || recBean.restDays.default || 5) : 5;
+    const reminderDays = Math.max(restDays - 2, 1);
+    const reminderDate = new Date();
+    reminderDate.setDate(reminderDate.getDate() + reminderDays);
+
+    const supaData = {
+      user_id:          currentUser.id,
+      flavor:           ans.taste,
+      body:             ans.body,
+      mood:             ans.state,
+      context:          ans.context,
+      brew_method:      ans.brew,
+      experience:       ans.experience,
+      recommended_bean: recBean.name + ' (' + recBean.detail + ')',
+      language:         currentLang,
+      country:          userLocation.country || '',
+      city:             userLocation.city    || '',
+    };
+    const result = await sb('POST', 'coffee_profiles', supaData);
+    if (result && result[0]) currentProfileId = result[0].id;
+  } catch(e) { console.warn('Supabase save error:', e.message); }
+}
+
+/* ═══════════════════════════════════════════
+   ORDER SCREEN
+═══════════════════════════════════════════ */
+function goToOrder() {
+  if (!rec) return;
+  // پر کردن order summary
+  const nameEl = document.getElementById('order-bean-name');
+  const origEl = document.getElementById('order-bean-origin');
+  if (nameEl) nameEl.textContent = rec.name + ' (' + rec.detail + ')';
+  if (origEl) origEl.textContent = rec.origin;
+  // reset selections
+  selectedAmount = null; selectedGrind = null;
+  document.querySelectorAll('.amount-btn,.grind-btn').forEach(b => b.classList.remove('selected'));
+  show('screen-order');
+}
+
+function selectAmount(el, val) {
+  document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedAmount = val;
+}
+
+function selectGrind(el, val) {
+  document.querySelectorAll('.grind-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGrind = val;
+}
+
+async function submitOrder() {
+  const errEl = document.getElementById('order-error');
+  errEl.style.display = 'none';
+  if (!selectedAmount) { errEl.textContent = currentLang==='fi' ? 'Valitse määrä.' : 'Please select an amount.'; errEl.style.display='block'; return; }
+  if (!selectedGrind)  { errEl.textContent = currentLang==='fi' ? 'Valitse jauhatus.' : 'Please select a grind type.'; errEl.style.display='block'; return; }
+  const btn = document.getElementById('btn-submit-order');
+  btn.disabled = true;
+  btn.textContent = currentLang==='fi' ? 'Lähetetään…' : 'Sending…';
+  try {
+    if (currentUser && currentProfileId) {
+      await sb('PATCH', `coffee_profiles?id=eq.${currentProfileId}`, {
+        order_amount: selectedAmount,
+        grind_type:   selectedGrind,
+        order_status: 'requested',
+      });
+    }
+    // Apps Script هم ذخیره کن
+    const data = {
+      name:          currentUser ? currentUser.name : name,
+      email:         currentUser ? currentUser.email : email,
+      language:      currentLang,
+      bean:          rec ? rec.name + ' (' + rec.detail + ')' : '',
+      order_amount:  selectedAmount,
+      grind_type:    selectedGrind,
+      order_status:  'requested',
+      country:       userLocation.country || '',
+      city:          userLocation.city    || '',
+    };
+    if (APPS_SCRIPT_URL !== 'YOUR_APPS_SCRIPT_URL') {
+      fetch(APPS_SCRIPT_URL, { method:'POST', body:JSON.stringify(data) }).catch(()=>{});
+    }
+    show('screen-dashboard');
+    await loadProfiles();
+  } catch(e) {
+    errEl.textContent = 'Error submitting order. Please try again.'; errEl.style.display='block';
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Request Fresh Roast →</span><span class="fi-only">Pyydä tuoretta paahtoamista →</span>';
+  }
+}
+
 /* ── RECOMMENDATION ENGINE ── */
 function recommend() {
   const scored = BEANS.map(b => {
@@ -1620,6 +2050,8 @@ function render(b) {
 /* ── EMAIL ── */
 // ── آدرس Google Apps Script ──
 // بعد از Deploy کردن، URL رو اینجا بذار
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw2wIOhH0FFNs9vFGNKI3FmcxfsOeXlkNBslherHtKWifN8W7Mp1PAnXVFUJMDE3EuoDQ/exec';
 
 function sendEmail() {
