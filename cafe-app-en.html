@@ -25,7 +25,7 @@
   ║   TODO before going live:                            ║
   ║   • Set real EUR prices in PRICES constant           ║
   ║   • Confirm EmailJS User ID / template fields        ║
-  ║   • Decide on separate `orders` table for EN/FI      ║
+  ║   • Uses dedicated orders_en table (int8 user_id)    ║
 
   ╚═══════════════════════════════════════════════════════╝
 -->
@@ -1284,7 +1284,7 @@ async function loadProfiles() {
 async function loadOrders() {
   const container = document.getElementById('dash-orders');
   try {
-    const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const orders = await sb('GET', `orders_en?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
     const count = orders ? orders.length : 0;
     document.getElementById('stat-orders').textContent = count;
     document.getElementById('stat-orders-badge').textContent = count;
@@ -1366,7 +1366,7 @@ async function confirmDeleteOrder(orderId, overlay) {
   btn.textContent = '...';
   btn.disabled = true;
   try {
-    await sb('DELETE', `orders?id=eq.${orderId}`);
+    await sb('DELETE', `orders_en?id=eq.${orderId}`);
     overlay.remove();
     const card = document.getElementById('ocard-' + orderId);
     if (card) {
@@ -1646,7 +1646,7 @@ async function submitOrder() {
   btn.textContent = '...';
 
   try {
-    const orderResult = await sb('POST', 'orders', {
+    const orderResult = await sb('POST', 'orders_en', {
       user_id: currentUser.id,
       profile_id: currentProfileId || null,
       amount: selectedAmount,
@@ -1924,7 +1924,7 @@ async function confirmDelete(profileId, overlay) {
   btn.disabled = true;
   try {
     // Null out profile_id on orders first to avoid a foreign key conflict
-    await sb('PATCH', `orders?profile_id=eq.${profileId}`, { profile_id: null });
+    await sb('PATCH', `orders_en?profile_id=eq.${profileId}`, { profile_id: null });
   } catch(e) {
     // Fine if there were no orders
   }
@@ -2050,7 +2050,7 @@ function handleReceiptUpload(input) {
 async function autoCancelOrder() {
   if (!pendingOrderId) return;
   try {
-    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+    await sb('PATCH', `orders_en?id=eq.${pendingOrderId}`, {
       status: 'cancelled',
       payment_status: 'cancelled'
     });
@@ -2089,7 +2089,7 @@ async function confirmPayment() {
   try {
     // 1. Update Supabase — this is the most important step, must always run
     btn.textContent = currentLang === 'fi' ? 'Tallennetaan tietoja…' : 'Saving details…';
-    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+    await sb('PATCH', `orders_en?id=eq.${pendingOrderId}`, {
       status: 'receipt_submitted',
       payment_status: 'receipt_submitted',
       transaction_id: txId
@@ -2119,7 +2119,7 @@ async function confirmPayment() {
 
       // If we got a Drive link successfully, update Supabase again
       if (receiptUrl) {
-        await sb('PATCH', `orders?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
+        await sb('PATCH', `orders_en?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
       }
     } catch(scriptErr) {
       console.warn('Apps Script / Drive upload error:', scriptErr);
