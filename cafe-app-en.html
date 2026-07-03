@@ -1494,7 +1494,7 @@ async function submitReview(profileId) {
     sucEl.textContent = currentLang === 'fi' ? '✅ Arviosi on tallennettu. Kiitos!' : '✅ Your review has been saved. Thank you!';
     sucEl.classList.add('visible');
   } catch(e) {
-    sucEl.textContent = currentLang === 'fi' ? 'Virhe arviota tallennettaessa' : 'Error saving review';
+    sucEl.textContent = (currentLang === 'fi' ? 'Virhe: ' : 'Error: ') + e.message;
     sucEl.classList.add('visible');
   }
 }
