@@ -328,7 +328,7 @@ body.lang-en .option-fi, body.lang-en .q-text-fi, body.lang-fi .loading-fi { dis
 }
 .dash-header-new::before {
   content: '☕'; position: absolute; right: -10px; top: -10px;
-  font-size: 120px; opacity: 0.06; line-height: 1;
+  font-size: 120px; opacity: 0.06; line-height: 1; pointer-events: none;
 }
 .dash-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
 .dash-user-info {}
@@ -371,7 +371,7 @@ body.lang-en .option-fi, body.lang-en .q-text-fi, body.lang-fi .loading-fi { dis
 }
 .profile-card-new::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
-  width: 4px; background: var(--caramel); border-radius: 0 4px 4px 0;
+  width: 4px; background: var(--caramel); border-radius: 0 4px 4px 0; pointer-events: none;
 }
 .profile-card-new:hover { transform: translateY(-2px); border-color: var(--light-caramel); box-shadow: 0 6px 24px rgba(196,149,106,0.2); }
 .profile-card-new:active { transform: scale(0.99); }
