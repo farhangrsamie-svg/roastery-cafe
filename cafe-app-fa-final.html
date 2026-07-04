@@ -892,6 +892,10 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">🛒 Order This Bean</span>
     <span class="fa-only">🛒 سفارش این دانه</span>
   </button>
+  <button class="btn-primary btn-ghost" onclick="shareResultCard()" style="margin-bottom:10px;">
+    <span class="en-only">📤 Share My Coffee Identity</span>
+    <span class="fa-only">📤 اشتراک‌گذاری هویت قهوه‌ام</span>
+  </button>
   <button class="btn-primary btn-ghost" onclick="showDashboard()" style="margin-bottom:10px;">
     <span class="en-only">← Back to Dashboard</span>
     <span class="fa-only">← برگشت به داشبورد</span>
@@ -1578,6 +1582,9 @@ function viewProfile(p) {
     <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
       🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
     </button>
+    <button class="btn-primary btn-ghost" onclick="shareResultCard()" style="margin-top:10px;">
+      📤 <span class="fa-only">اشتراک‌گذاری هویت قهوه‌ام</span><span class="en-only">Share My Coffee Identity</span>
+    </button>
   `;
   document.getElementById('detail-radar-chart').innerHTML = buildFlavorRadar(rec, ans.taste);
   // اگه rec معتبره، result رو هم render کن
@@ -2106,6 +2113,175 @@ function recommend() {
   best._runner2 = scored[2]?.name || null;
 
   return best;
+}
+
+/* ═══════════════════════════════════════════
+   SHARE CARD (Instagram Story format 1080×1920)
+═══════════════════════════════════════════ */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawCanvasRadar(ctx, bean, highlightKey, cx, cy, maxR) {
+  const axes = [
+    { key: 'floral',     fa: 'گلی' },
+    { key: 'sweet',      fa: 'شیرین' },
+    { key: 'chocolatey', fa: 'شکلاتی' },
+    { key: 'bold',       fa: 'پررنگ' }
+  ];
+  const angleStep = (2 * Math.PI) / axes.length;
+  function pointAt(i, value) {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const r = (Math.max(0, Math.min(10, value)) / 10) * maxR;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+  ctx.strokeStyle = 'rgba(107,63,42,0.2)';
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1].forEach(frac => {
+    ctx.beginPath();
+    axes.forEach((a, i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const r = frac * maxR;
+      const x = cx + r * Math.cos(angle), y = cy + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.stroke();
+  });
+  axes.forEach((a, i) => {
+    const [x, y] = pointAt(i, 10);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+  });
+  ctx.beginPath();
+  axes.forEach((a, i) => {
+    const [x, y] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(196,149,106,0.35)';
+  ctx.fill();
+  ctx.strokeStyle = '#6B3F2A';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  axes.forEach((a, i) => {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const labelR = maxR + 46;
+    const lx = cx + labelR * Math.cos(angle);
+    const ly = cy + labelR * Math.sin(angle);
+    const isHi = a.key === highlightKey;
+    ctx.fillStyle = isHi ? '#C4956A' : '#6B3F2A';
+    ctx.font = (isHi ? 'bold ' : '') + '26px Arial';
+    ctx.fillText(a.fa, lx, ly);
+    const [dx, dy] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    ctx.beginPath();
+    ctx.arc(dx, dy, isHi ? 9 : 6, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function shareResultCard() {
+  if (!rec) return;
+  const persona = currentPersona || determinePersona();
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // پس‌زمینه
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, '#2C1A0E');
+  grad.addColorStop(1, '#6B3F2A');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = '#FEFEFE';
+  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.1, 260, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(W * 0.1, H * 0.88, 220, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = '#C4956A';
+  ctx.font = '600 32px Arial';
+  ctx.fillText(currentLang === 'fa' ? 'کافی آیدنتیتی' : 'COFFEE IDENTITY', W / 2, 130);
+
+  ctx.font = '150px Arial';
+  ctx.fillText(persona.icon, W / 2, 350);
+
+  ctx.fillStyle = '#FEFEFE';
+  ctx.font = 'bold 62px Arial';
+  ctx.fillText(currentLang === 'fa' ? persona.fa : persona.en, W / 2, 450);
+
+  ctx.fillStyle = '#C4956A';
+  ctx.font = '600 30px Arial';
+  ctx.fillText(currentLang === 'fa' ? persona.tagFa : '', W / 2, 505);
+
+  ctx.strokeStyle = 'rgba(254,254,254,0.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W / 2 - 120, 555); ctx.lineTo(W / 2 + 120, 555); ctx.stroke();
+
+  ctx.fillStyle = '#FEFEFE';
+  ctx.font = '500 30px Arial';
+  ctx.fillText(`${Math.round(rec._matchPct || 0)}% ${currentLang === 'fa' ? 'تطابق' : 'match'}`, W / 2, 615);
+
+  // کارت دانه
+  const cardY = 680, cardH = 760;
+  ctx.fillStyle = 'rgba(254,254,254,0.96)';
+  roundRect(ctx, 80, cardY, W - 160, cardH, 32);
+  ctx.fill();
+
+  ctx.fillStyle = '#6B3F2A';
+  ctx.font = '500 26px Arial';
+  ctx.fillText(currentLang === 'fa' ? 'پیشنهاد امروز' : "Today's Pick", W / 2, cardY + 60);
+
+  ctx.fillStyle = '#2C1A0E';
+  ctx.font = 'bold 44px Arial';
+  ctx.fillText(rec.name || '', W / 2, cardY + 120);
+
+  if (rec.origin) {
+    ctx.fillStyle = '#C4956A';
+    ctx.font = 'italic 28px Arial';
+    ctx.fillText(rec.origin, W / 2, cardY + 165);
+  }
+
+  drawCanvasRadar(ctx, rec, ans.taste, W / 2, cardY + 420, 130);
+
+  ctx.fillStyle = 'rgba(254,254,254,0.55)';
+  ctx.font = '24px Arial';
+  ctx.fillText('farhangrsamie-svg.github.io/roastery-cafe', W / 2, H - 70);
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'coffee-identity.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: currentLang === 'fa' ? 'هویت قهوهٔ من' : 'My Coffee Identity',
+          text: currentLang === 'fa' ? persona.fa : persona.en
+        });
+        return;
+      } catch (e) { /* کاربر لغو کرد یا مرورگر ساپورت نمی‌کنه؛ برو سراغ دانلود */ }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'coffee-identity.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 'image/png');
 }
 
 /* ═══════════════════════════════════════════
