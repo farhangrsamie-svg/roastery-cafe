@@ -2250,7 +2250,7 @@ async function confirmPayment() {
 /* ── FALLBACK EXPLANATIONS ── */
 const FALLBACK_FA = {
   yirgacheffe: {
-    floral:      'ذائقه‌ات دقیقاً با روح این دانه هم‌خوانی داره. Ethiopia Yirgacheffe با نت‌های یاسمن و هلو، معطرترین قهوه دنیاست و برای کسی که طعم‌های繊細 گلی رو دوست داره انتخاب بی‌نظیریه. هر فنجان یه تجربه ظریف و به‌یادماندنیه.',
+    floral:      'ذائقه‌ات دقیقاً با روح این دانه هم‌خوانی داره. Ethiopia Yirgacheffe با نت‌های یاسمن و هلو، معطرترین قهوه دنیاست و برای کسی که طعم‌های گلی رو دوست داره انتخاب بی‌نظیریه. هر فنجان یه تجربه ظریف و به‌یادماندنیه.',
     sweet:       'شیرینی طبیعی Ethiopia Yirgacheffe بدون هیچ تلخی اضافه‌ای، دقیقاً چیزیه که دنبالش بودی. نت‌های هلو و چای سبز با هم یه هارمونی شیرین و لطیف می‌سازن. این دانه برای کسی مثل تو که سبکی و شیرینی رو دوست داره ایده‌آله.',
     chocolatey:  'شاید تعجب کنی ولی Ethiopia Yirgacheffe با وجود سبکی، یه پیچیدگی منحصربه‌فرد داره که عاشقان قهوه رو شگفت‌زده می‌کنه. پروفایل طعمیت نشون میده که آماده‌ای تجربه جدیدی داشته باشی. این دانه دنیای قهوه رو از زاویه‌ای متفاوت نشونت میده.',
     bold:        'این دانه به‌عنوان یه تجربه متفاوت برات جالبه. Yirgacheffe سبک و گلی، یه کنتراست جذاب با سلیقه‌ی معمولت ایجاد می‌کنه و ممکنه افق‌های جدیدی از دنیای قهوه رو برات باز کنه.',
@@ -2312,13 +2312,17 @@ const FALLBACK_EN = {
 
 function getFallbackExplanation(rec) {
   const lang = currentLang;
+  const name = currentUser?.name ? currentUser.name + ' عزیز، ' : '';
+  const nameEN = currentUser?.name ? currentUser.name + ', ' : '';
   if (lang === 'fa') {
     const beanFallbacks = FALLBACK_FA[rec.id];
     if (beanFallbacks) {
-      return beanFallbacks[ans.taste] || beanFallbacks['floral'] || '';
+      const text = beanFallbacks[ans.taste] || beanFallbacks['floral'] || '';
+      return name + text;
     }
   } else {
-    return FALLBACK_EN[rec.id] || '';
+    const text = FALLBACK_EN[rec.id] || '';
+    return nameEN + text;
   }
   return '';
 }
@@ -2336,8 +2340,9 @@ async function getAIExplanation(rec) {
   const contextLabels = { morning:'صبح', work:'جلسه کاری', reading:'مطالعه', friends:'با دوستان', afterdinner:'بعد از شام', weekend:'آخر هفته' };
   const brewLabels  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'روش دلخواه' };
 
+  const namePrefix = userName ? `${userName} عزیز` : '';
   const prompt = lang === 'fa'
-    ? `تو یک متخصص قهوه هستی. بر اساس اطلاعات زیر یک توضیح کوتاه، گرم و کاملاً شخصی‌سازی‌شده به فارسی بنویس (۳ جمله، حداکثر ۸۰ کلمه).${userName ? ` با نام "${userName}" شروع کن.` : ''}
+    ? `تو یک متخصص قهوه هستی. بر اساس اطلاعات زیر یک توضیح کوتاه، گرم و کاملاً شخصی‌سازی‌شده به فارسی بنویس (۳ جمله، حداکثر ۸۰ کلمه). ${namePrefix ? `حتماً با "${namePrefix}،" شروع کن.` : ''}
 
 پروفایل مشتری:
 - طعم مورد علاقه: ${tasteLabels[ans.taste] || ans.taste}
@@ -2346,31 +2351,27 @@ async function getAIExplanation(rec) {
 - روش دم‌آوری: ${brewLabels[ans.brew] || ans.brew}
 دانه پیشنهادی: ${rec.name} از ${rec.origin}
 نت‌های طعمی: ${rec.flavors.join('، ')}
-فقط توضیح شخصی‌سازی‌شده بنویس، بدون عنوان.`
-    : `You are a specialty coffee expert. Write a short warm personalized explanation in English (3 sentences, max 80 words).${userName ? ` Start with "${userName}".` : ''}
-Customer: taste=${ans.taste}, body=${ans.body}, context=${ans.context}, brew=${ans.brew}
+فقط توضیح شخصی‌سازی‌شده بنویس، بدون عنوان یا توضیح اضافه.`
+    : `You are a specialty coffee expert. Write a short warm personalized explanation in English (3 sentences, max 80 words). ${userName ? `You must start with "${userName},"` : ''}
+Customer taste: ${ans.taste}, body: ${ans.body}, context: ${ans.context}, brew: ${ans.brew}
 Bean: ${rec.name} from ${rec.origin}, notes: ${rec.flavors.join(', ')}
 Write only the explanation, no title.`;
 
   let text = '';
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 6000); // 6 ثانیه timeout
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10 ثانیه timeout
+    // از Apps Script به عنوان proxy استفاده می‌کنیم — key در سرور مخفیه
+    const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      }),
+      body: JSON.stringify({ type: 'ai_explanation', prompt }),
       signal: controller.signal
     });
     clearTimeout(timeout);
     const data = await response.json();
-    text = data.content?.[0]?.text || '';
+    text = data.text || '';
   } catch(e) {
-    console.warn('AI API unavailable — using fallback:', e.message);
+    console.warn('AI via proxy unavailable — using fallback:', e.message);
   }
 
   // اگه API جواب نداد یا متن خالی بود → fallback
