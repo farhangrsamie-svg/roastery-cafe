@@ -411,6 +411,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
               <thead>
                 <tr>
                   <th>مشتری</th>
+                  <th>پرسونا</th>
                   <th>دانه پیشنهادی</th>
                   <th>طعم / بدنه</th>
                   <th>روش دم‌آوری</th>
@@ -419,7 +420,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
                 </tr>
               </thead>
               <tbody id="profiles-tbody">
-                <tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+                <tr><td colspan="7" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
               </tbody>
             </table>
           </div>
@@ -772,6 +773,13 @@ async function viewOrder(orderId) {
   const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
   const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
   const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+  const personaFA = {
+    'The Explorer': '🧭 کاوشگر',
+    'The Comfort Lover': '☕ آرامش‌جو',
+    'The Bold Drinker': '⚡ جسور',
+    'The Creative Mood': '🎨 خلاق',
+    'The Weekend Sipper': '🌤️ آخرهفته‌ای'
+  };
 
   document.getElementById('order-modal-content').innerHTML = `
     <div class="notif-bar" id="modal-notif"></div>
@@ -798,6 +806,7 @@ async function viewOrder(orderId) {
       <div style="margin-bottom:16px;">
         <div class="input-label" style="margin-bottom:8px;">پروفایل قهوه مشتری</div>
         <div class="profile-detail">
+          <div class="profile-row"><span class="profile-key">پرسونا</span><span class="profile-val">${personaFA[profile.persona] || profile.persona || '—'}</span></div>
           <div class="profile-row"><span class="profile-key">طعم</span><span class="profile-val">${tasteFA[profile.flavor] || profile.flavor || '—'}</span></div>
           <div class="profile-row"><span class="profile-key">بدنه</span><span class="profile-val">${bodyFA[profile.body] || profile.body || '—'}</span></div>
           <div class="profile-row"><span class="profile-key">روش دم‌آوری</span><span class="profile-val">${brewFA[profile.brew_method] || profile.brew_method || '—'}</span></div>
@@ -828,16 +837,23 @@ async function viewOrder(orderId) {
 async function loadProfiles() {
   const tbody = document.getElementById('profiles-tbody');
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
   try {
     const profiles = await sb('GET', 'coffee_profiles?select=*,users(name,phone)&order=created_at.desc&limit=100');
     if (!profiles || !profiles.length) {
-      tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">☕</div><div class="empty-text">پروفایلی یافت نشد</div></div></td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">☕</div><div class="empty-text">پروفایلی یافت نشد</div></div></td></tr>';
       return;
     }
     const tasteFA = { floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند' };
     const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
     const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+    const personaFA = {
+      'The Explorer': '🧭 کاوشگر',
+      'The Comfort Lover': '☕ آرامش‌جو',
+      'The Bold Drinker': '⚡ جسور',
+      'The Creative Mood': '🎨 خلاق',
+      'The Weekend Sipper': '🌤️ آخرهفته‌ای'
+    };
     tbody.innerHTML = profiles.map(p => {
       const user = p.users || {};
       const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {month:'short', day:'numeric'});
@@ -847,6 +863,7 @@ async function loadProfiles() {
           <div class="customer-name">${user.name || '—'}</div>
           <div class="customer-phone">${user.phone || '—'}</div>
         </td>
+        <td>${personaFA[p.persona] || p.persona || '—'}</td>
         <td><div class="bean-name">${beanName}</div></td>
         <td>${tasteFA[p.flavor] || p.flavor || '—'} / ${bodyFA[p.body] || p.body || '—'}</td>
         <td>${brewFA[p.brew_method] || p.brew_method || '—'}</td>
@@ -855,7 +872,7 @@ async function loadProfiles() {
       </tr>`;
     }).join('');
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
   }
 }
 
