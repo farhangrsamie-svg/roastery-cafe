@@ -2342,8 +2342,8 @@ async function getAIExplanation(rec) {
 
   const namePrefix = userName ? `${userName} عزیز` : '';
   const prompt = lang === 'fa'
-    ? `متخصص قهوه هستی. ${namePrefix ? `با "${namePrefix}،" شروع کن.` : ''} دقیقاً ۲ جمله کوتاه و گرم به فارسی بنویس (حداکثر ۴۰ کلمه). بگو چرا ${rec.name} برای این مشتری با ذائقه ${tasteLabels[ans.taste]||ans.taste}، روش ${brewLabels[ans.brew]||ans.brew}، در موقعیت ${contextLabels[ans.context]||ans.context} ایده‌آله. فقط همان ۲ جمله، بدون هیچ توضیح اضافه.`
-    : `Coffee expert. ${userName ? `Start with "${userName},"` : ''} Write exactly 2 short warm sentences (max 40 words) explaining why ${rec.name} is perfect for someone who loves ${ans.taste} flavors, brews with ${ans.brew}, and drinks coffee ${ans.context}. Only those 2 sentences, nothing else.`;
+    ? `تو یک متخصص قهوه فارسی‌زبان هستی. دقیقاً ۲ جمله کوتاه، گرم و ساده به فارسی روان بنویس (حداکثر ۳۵ کلمه). فقط از کلمات فارسی و انگلیسی رایج استفاده کن — هیچ کلمه عربی سنگین یا کاراکتر غیرفارسی نداشته باشد. ${namePrefix ? `با "${namePrefix}،" شروع کن.` : ''} توضیح بده چرا ${rec.name} با نت‌های ${rec.flavors.slice(0,2).join(' و ')} برای کسی که طعم ${tasteLabels[ans.taste]||ans.taste} دوست داره و با ${brewLabels[ans.brew]||ans.brew} دم می‌کنه عالیه.`
+    : `Coffee expert. ${userName ? `Start with "${userName},"` : ''} Write exactly 2 short warm sentences (max 35 words) explaining why ${rec.name} with its ${rec.flavors.slice(0,2).join(' and ')} notes is perfect for someone who loves ${ans.taste} flavors and brews ${ans.brew}. Only those 2 sentences.`;
 
   let text = '';
   try {
