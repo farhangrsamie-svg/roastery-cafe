@@ -2342,20 +2342,8 @@ async function getAIExplanation(rec) {
 
   const namePrefix = userName ? `${userName} عزیز` : '';
   const prompt = lang === 'fa'
-    ? `تو یک متخصص قهوه هستی. بر اساس اطلاعات زیر یک توضیح کوتاه، گرم و کاملاً شخصی‌سازی‌شده به فارسی بنویس (۳ جمله، حداکثر ۸۰ کلمه). ${namePrefix ? `حتماً با "${namePrefix}،" شروع کن.` : ''}
-
-پروفایل مشتری:
-- طعم مورد علاقه: ${tasteLabels[ans.taste] || ans.taste}
-- بدنه ترجیحی: ${bodyLabels[ans.body] || ans.body}
-- موقعیت مصرف: ${contextLabels[ans.context] || ans.context}
-- روش دم‌آوری: ${brewLabels[ans.brew] || ans.brew}
-دانه پیشنهادی: ${rec.name} از ${rec.origin}
-نت‌های طعمی: ${rec.flavors.join('، ')}
-فقط توضیح شخصی‌سازی‌شده بنویس، بدون عنوان یا توضیح اضافه.`
-    : `You are a specialty coffee expert. Write a short warm personalized explanation in English (3 sentences, max 80 words). ${userName ? `You must start with "${userName},"` : ''}
-Customer taste: ${ans.taste}, body: ${ans.body}, context: ${ans.context}, brew: ${ans.brew}
-Bean: ${rec.name} from ${rec.origin}, notes: ${rec.flavors.join(', ')}
-Write only the explanation, no title.`;
+    ? `متخصص قهوه هستی. ${namePrefix ? `با "${namePrefix}،" شروع کن.` : ''} دقیقاً ۲ جمله کوتاه و گرم به فارسی بنویس (حداکثر ۴۰ کلمه). بگو چرا ${rec.name} برای این مشتری با ذائقه ${tasteLabels[ans.taste]||ans.taste}، روش ${brewLabels[ans.brew]||ans.brew}، در موقعیت ${contextLabels[ans.context]||ans.context} ایده‌آله. فقط همان ۲ جمله، بدون هیچ توضیح اضافه.`
+    : `Coffee expert. ${userName ? `Start with "${userName},"` : ''} Write exactly 2 short warm sentences (max 40 words) explaining why ${rec.name} is perfect for someone who loves ${ans.taste} flavors, brews with ${ans.brew}, and drinks coffee ${ans.context}. Only those 2 sentences, nothing else.`;
 
   let text = '';
   try {
