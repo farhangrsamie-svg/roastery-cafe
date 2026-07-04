@@ -299,6 +299,34 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
 .confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
 
+/* ── ROASTERY SELECT ── */
+.roastery-card {
+  background: var(--white); border-radius: 20px; padding: 20px;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  direction: rtl; position: relative;
+}
+.roastery-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
+.roastery-card:active { transform: scale(0.98); }
+.roastery-card.selected { border-color: var(--caramel); background: #FDF5E8; }
+.roastery-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.roastery-logo { font-size: 36px; width: 56px; height: 56px; background: #FDF5E8; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.roastery-name { font-size: 17px; font-weight: bold; color: var(--dark-brown); }
+.roastery-location { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; margin-top: 3px; }
+.roastery-stats { display: flex; gap: 14px; margin-bottom: 10px; }
+.roastery-stat { font-size: 12px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.roastery-stat span { font-weight: bold; }
+.roastery-desc { font-size: 13px; color: #888; line-height: 1.6; font-family: Arial,sans-serif; }
+.roastery-select-btn {
+  width: 100%; padding: 11px; background: var(--medium-brown); color: white;
+  border: none; border-radius: 12px; font-size: 13px; font-family: Arial,sans-serif;
+  cursor: pointer; margin-top: 12px; transition: all 0.2s;
+}
+.roastery-select-btn:hover { background: var(--dark-brown); }
+.roastery-beans { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.roastery-bean-tag { background: #F5F0E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.roastery-bean-tag.match { background: #E8F5E8; border-color: #A5D6A7; color: #2E7D32; font-weight: bold; }
+
 /* ── PAYMENT ── */
 .payment-step {
   background: var(--white); border-radius: 20px; padding: 22px;
@@ -858,6 +886,32 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </button>
 </div>
 
+<!-- ══════ SCREEN: ROASTERY SELECT ══════ -->
+<div class="screen" id="screen-roastery">
+  <button class="btn-back" onclick="show('screen-result')">← <span class="fa-only">بازگشت</span><span class="en-only">Back</span></button>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:40px;">🏪</div>
+    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
+      <span class="fa-only">انتخاب رستری</span>
+      <span class="en-only">Choose Roastery</span>
+    </h2>
+    <p style="font-size:13px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;direction:rtl;">
+      رستری مورد نظرت رو انتخاب کن
+    </p>
+  </div>
+
+  <!-- Bean being ordered -->
+  <div style="background:#FDF5E8;border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;direction:rtl;text-align:center;">
+    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
+  </div>
+
+  <div id="roastery-list">
+    <div class="empty-state"><div class="empty-icon">⏳</div><div class="fa-only">در حال بارگذاری رستری‌ها...</div></div>
+  </div>
+</div>
+
 <!-- ══════ SCREEN: ORDER ══════ -->
 <div class="screen" id="screen-order">
   <button class="btn-back" onclick="show('screen-result')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
@@ -870,11 +924,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </h1>
   </div>
 
-  <!-- Bean Summary -->
+  <!-- Bean + Roastery Summary -->
   <div class="order-summary" id="order-bean-summary">
     <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;direction:rtl;">دانه انتخابی</div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
     <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+    <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
   </div>
 
   <!-- Amount Selector -->
@@ -1648,7 +1703,16 @@ async function saveProfile(rec) {
 /* ═══════════════════════════════════════════
    ORDER
 ═══════════════════════════════════════════ */
+let selectedRoastery = null;
+
 function goToOrder() {
+  // اول رستری انتخاب بشه
+  document.getElementById('roastery-screen-bean').textContent = rec ? rec.name : '—';
+  show('screen-roastery');
+  loadRoasteries();
+}
+
+function goToOrderDirect() {
   selectedAmount = null;
   document.getElementById('amt-50').classList.remove('selected');
   document.getElementById('amt-100').classList.remove('selected');
@@ -1656,9 +1720,65 @@ function goToOrder() {
   document.getElementById('order-notes').value = '';
   document.getElementById('order-error').classList.remove('visible');
   document.getElementById('order-success').classList.remove('visible');
-  document.getElementById('order-bean-name').textContent = rec ? rec.name + ' (' + rec.detail + ')' : '—';
+  document.getElementById('order-bean-name').textContent = rec ? rec.name + (rec.detail ? ' (' + rec.detail + ')' : '') : '—';
   document.getElementById('order-bean-origin').textContent = rec ? rec.origin : '—';
+  // نمایش رستری انتخاب‌شده
+  if (selectedRoastery) {
+    const roasteryInfo = document.getElementById('order-roastery-info');
+    if (roasteryInfo) {
+      roasteryInfo.textContent = selectedRoastery.logo_emoji + ' ' + selectedRoastery.name;
+      roasteryInfo.style.display = 'block';
+    }
+  }
   show('screen-order');
+}
+
+async function loadRoasteries() {
+  const container = document.getElementById('roastery-list');
+  try {
+    const roasteries = await sb('GET', 'roasteries?is_active=eq.true&order=rating.desc&select=*');
+    if (!roasteries || !roasteries.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div></div>';
+      return;
+    }
+    const beanName = rec ? rec.name : '';
+    container.innerHTML = roasteries.map(r => {
+      const stars = '⭐'.repeat(Math.round(r.rating || 5));
+      const hasBeen = r.beans && r.beans.some(b => b.includes(beanName.split('(')[0].trim()));
+      const matchBadge = hasBeen ? '<span style="background:#E8F5E8;color:#2E7D32;border-radius:20px;padding:2px 10px;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;border:1px solid #A5D6A7;">✓ این دانه رو داره</span>' : '';
+      return `<div class="roastery-card" id="rcard-${r.id}">
+        <div class="roastery-card-top">
+          <div class="roastery-logo">${r.logo_emoji || '☕'}</div>
+          <div>
+            <div class="roastery-name">${r.name}</div>
+            <div class="roastery-location">📍 ${r.location || '—'}</div>
+          </div>
+        </div>
+        <div class="roastery-stats">
+          <div class="roastery-stat">${stars} <span>${r.rating || 5}</span></div>
+          <div class="roastery-stat">🚚 <span>${r.delivery_days || 3}</span> روز</div>
+          <div class="roastery-stat">📦 از <span>${r.min_order || 50}</span>g</div>
+        </div>
+        ${matchBadge}
+        <div class="roastery-desc" style="margin-top:8px;">${r.description || ''}</div>
+        <button class="roastery-select-btn" onclick="selectRoastery(${JSON.stringify(r).replace(/"/g, '&quot;')})">
+          انتخاب این رستری ←
+        </button>
+      </div>`;
+    }).join('');
+    setLang(currentLang);
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
+  }
+}
+
+function selectRoastery(r) {
+  if (typeof r === 'string') r = JSON.parse(r);
+  selectedRoastery = r;
+  // هایلایت کارت انتخاب‌شده
+  document.querySelectorAll('.roastery-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rcard-' + r.id)?.classList.add('selected');
+  setTimeout(() => goToOrderDirect(), 300);
 }
 
 function selectAmount(g) {
@@ -1692,7 +1812,9 @@ async function submitOrder() {
       notes,
       status: 'pending',
       payment_status: 'unpaid',
-      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null
+      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null,
+      roastery_id: selectedRoastery ? selectedRoastery.id : null,
+      roastery_name: selectedRoastery ? selectedRoastery.name : null
     });
 
     if (orderResult && orderResult[0]) {
