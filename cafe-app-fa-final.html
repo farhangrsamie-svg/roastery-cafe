@@ -1697,14 +1697,92 @@ function showErr(el, msg) {
    BEAN DATABASE
 ═══════════════════════════════════════════ */
 const BEANS = [
-  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', s:{floral:10,sweet:4,chocolatey:0,bold:0,light:10,medium:5,full:0,energised:6,focused:6,creative:10,relaxed:4,reflective:7,beginner:4,regular:7,enthusiast:10} },
-  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', s:{floral:5,sweet:5,chocolatey:2,bold:4,light:7,medium:8,full:2,energised:10,focused:10,creative:6,relaxed:3,reflective:4,beginner:5,regular:9,enthusiast:9} },
-  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', s:{floral:6,sweet:10,chocolatey:3,bold:2,light:6,medium:8,full:3,energised:5,focused:7,creative:7,relaxed:9,reflective:6,beginner:10,regular:9,enthusiast:6} },
-  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', s:{floral:5,sweet:9,chocolatey:4,bold:3,light:3,medium:8,full:7,energised:4,focused:4,creative:8,relaxed:9,reflective:7,beginner:5,regular:8,enthusiast:9} },
-  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', s:{floral:2,sweet:8,chocolatey:7,bold:4,light:3,medium:9,full:5,energised:5,focused:7,creative:5,relaxed:8,reflective:6,beginner:10,regular:9,enthusiast:6} },
-  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', s:{floral:0,sweet:7,chocolatey:10,bold:4,light:1,medium:7,full:9,energised:3,focused:5,creative:3,relaxed:10,reflective:7,beginner:9,regular:8,enthusiast:5} },
-  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', s:{floral:0,sweet:5,chocolatey:9,bold:7,light:1,medium:5,full:8,energised:3,focused:5,creative:4,relaxed:7,reflective:9,beginner:6,regular:8,enthusiast:7} },
-  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', s:{floral:0,sweet:2,chocolatey:6,bold:10,light:0,medium:2,full:10,energised:2,focused:4,creative:3,relaxed:7,reflective:10,beginner:3,regular:6,enthusiast:9} },
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.',
+    s:{
+      // طعم
+      floral:10, sweet:4, chocolatey:0, bold:0,
+      // بدنه
+      light:10, medium:5, full:0,
+      // حالت ذهنی
+      energised:6, focused:6, creative:10, relaxed:4, reflective:7,
+      // موقعیت مصرف
+      morning:9, work:5, reading:8, friends:6, afterdinner:4, weekend:7,
+      // روش دم‌آوری
+      v60:10, frenchpress:4, espresso:2, aeropress:7, coldbrew:6, other:5,
+      // تجربه
+      beginner:4, regular:7, enthusiast:10
+    }
+  },
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.',
+    s:{
+      floral:5, sweet:5, chocolatey:2, bold:4,
+      light:7, medium:8, full:2,
+      energised:10, focused:10, creative:6, relaxed:3, reflective:4,
+      morning:8, work:10, reading:7, friends:6, afterdinner:3, weekend:5,
+      v60:10, frenchpress:5, espresso:3, aeropress:8, coldbrew:5, other:5,
+      beginner:5, regular:9, enthusiast:9
+    }
+  },
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.',
+    s:{
+      floral:6, sweet:10, chocolatey:3, bold:2,
+      light:6, medium:8, full:3,
+      energised:5, focused:7, creative:7, relaxed:9, reflective:6,
+      morning:8, work:6, reading:9, friends:8, afterdinner:7, weekend:10,
+      v60:9, frenchpress:6, espresso:4, aeropress:10, coldbrew:5, other:6,
+      beginner:10, regular:9, enthusiast:6
+    }
+  },
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.',
+    s:{
+      floral:5, sweet:9, chocolatey:4, bold:3,
+      light:3, medium:8, full:7,
+      energised:4, focused:4, creative:8, relaxed:9, reflective:7,
+      morning:5, work:4, reading:9, friends:7, afterdinner:9, weekend:8,
+      v60:7, frenchpress:9, espresso:3, aeropress:6, coldbrew:4, other:6,
+      beginner:5, regular:8, enthusiast:9
+    }
+  },
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.',
+    s:{
+      floral:2, sweet:8, chocolatey:7, bold:4,
+      light:3, medium:9, full:5,
+      energised:5, focused:7, creative:5, relaxed:8, reflective:6,
+      morning:9, work:8, reading:7, friends:9, afterdinner:6, weekend:8,
+      v60:8, frenchpress:7, espresso:8, aeropress:7, coldbrew:6, other:10,
+      beginner:10, regular:9, enthusiast:6
+    }
+  },
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.',
+    s:{
+      floral:0, sweet:7, chocolatey:10, bold:4,
+      light:1, medium:7, full:9,
+      energised:3, focused:5, creative:3, relaxed:10, reflective:7,
+      morning:6, work:5, reading:6, friends:8, afterdinner:9, weekend:10,
+      v60:3, frenchpress:9, espresso:10, aeropress:5, coldbrew:4, other:7,
+      beginner:9, regular:8, enthusiast:5
+    }
+  },
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.',
+    s:{
+      floral:0, sweet:5, chocolatey:9, bold:7,
+      light:1, medium:5, full:8,
+      energised:3, focused:5, creative:4, relaxed:7, reflective:9,
+      morning:5, work:6, reading:8, friends:6, afterdinner:10, weekend:7,
+      v60:4, frenchpress:8, espresso:10, aeropress:4, coldbrew:3, other:7,
+      beginner:6, regular:8, enthusiast:7
+    }
+  },
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.',
+    s:{
+      floral:0, sweet:2, chocolatey:6, bold:10,
+      light:0, medium:2, full:10,
+      energised:2, focused:4, creative:3, relaxed:7, reflective:10,
+      morning:3, work:4, reading:10, friends:4, afterdinner:8, weekend:7,
+      v60:2, frenchpress:10, espresso:7, aeropress:3, coldbrew:3, other:6,
+      beginner:3, regular:6, enthusiast:9
+    }
+  },
 ];
 
 const AVAILABLE = ['yirgacheffe','kenya','rwanda','sidama','colombia','brazil','guatemala','sumatra'];
@@ -1716,15 +1794,35 @@ function recommend() {
   const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
   const scored = pool.map(b => {
     let score = 0;
-    score += (b.s[ans.taste]      || 0) * 4.5;
-    score += (b.s[ans.body]       || 0) * 2.5;
-    score += (b.s[ans.state]      || 0) * 2;
-    score += (b.s[ans.experience] || 0) * 1;
+
+    // ── وزن‌دهی جدید بر اساس سند شریک رستری ──
+    // طعم: 30%
+    score += (b.s[ans.taste]      || 0) * 3.0;
+    // بدنه: 20%
+    score += (b.s[ans.body]       || 0) * 2.0;
+    // حالت ذهنی: 15%
+    score += (b.s[ans.state]      || 0) * 1.5;
+    // موقعیت مصرف: 15% (جدید)
+    score += (b.s[ans.context]    || 0) * 1.5;
+    // روش دم‌آوری: 10% (جدید)
+    score += (b.s[ans.brew]       || 0) * 1.0;
+    // سطح تجربه: 10%
+    score += (b.s[ans.experience] || 0) * 1.0;
+
     return { ...b, _score: score };
   });
+
   scored.sort((a, b) => b._score - a._score);
   const best = scored[0];
-  best._matchPct = Math.min(100, Math.round((best._score / 100) * 100));
+
+  // محاسبه درصد تطابق واقعی‌تر
+  const maxPossible = 10 * (3.0 + 2.0 + 1.5 + 1.5 + 1.0 + 1.0); // = 100
+  best._matchPct = Math.min(98, Math.round((best._score / maxPossible) * 100));
+
+  // دومین و سومین گزینه برای نمایش (آینده)
+  best._runner1 = scored[1]?.name || null;
+  best._runner2 = scored[2]?.name || null;
+
   return best;
 }
 
