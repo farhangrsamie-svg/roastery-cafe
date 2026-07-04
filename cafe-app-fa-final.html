@@ -44,6 +44,20 @@
   --shadow-strong: rgba(44, 26, 14, 0.25);
   --green: #3A7A3A;
   --green-bg: #EAF5EA;
+  --tint: #FDF5E8;
+}
+body.dark-mode {
+  --cream: #17110C;
+  --dark-brown: #F2E9DC;
+  --medium-brown: #D8B999;
+  --caramel: #E0AA76;
+  --light-caramel: #6B5138;
+  --white: #241A11;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --shadow-strong: rgba(0, 0, 0, 0.65);
+  --green: #7FD17F;
+  --green-bg: #1E3320;
+  --tint: #2E2013;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
@@ -52,7 +66,19 @@ body {
   min-height: 100vh;
   color: var(--dark-brown);
   overflow-x: hidden;
+  transition: background-color 0.35s ease, color 0.35s ease;
 }
+.card { transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease; }
+.dark-toggle {
+  position: fixed; top: 14px; left: 14px; z-index: 9999;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--white); color: var(--medium-brown);
+  border: 1px solid var(--light-caramel);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; cursor: pointer; box-shadow: 0 2px 10px rgba(44,26,14,0.18);
+  transition: all 0.3s ease;
+}
+.dark-toggle:active { transform: scale(0.88); }
 .app-container { max-width: 680px; margin: 0 auto; min-height: 100vh; }
 
 /* ── SCREENS ── */
@@ -106,7 +132,7 @@ body {
   user-select: none; -webkit-user-select: none;
 }
 .option-card:active { transform: scale(0.96); }
-.option-card.selected { border-color: var(--caramel); background: #FDF5E8; box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
+.option-card.selected { border-color: var(--caramel); background: var(--tint); box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
 .option-card.full-row { grid-column: span 2; }
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
@@ -124,7 +150,7 @@ body {
 .btn-primary:active:not(:disabled) { transform: scale(0.98); }
 .btn-primary:disabled { background: #C8BFB5; box-shadow: none; cursor: default; }
 .btn-ghost { background: transparent; color: var(--caramel); border: 2px solid var(--light-caramel); box-shadow: none; }
-.btn-ghost:hover:not(:disabled) { background: #FDF5E8; transform: none; }
+.btn-ghost:hover:not(:disabled) { background: var(--tint); transform: none; }
 .btn-back { background: transparent; border: none; color: var(--caramel); font-size: 13px; cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; padding: 6px 0; margin-bottom: 14px; display: inline-block; }
 
 /* ── LOADING ── */
@@ -156,7 +182,7 @@ body {
 .result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
 .result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-style: italic; }
 .flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
-.flavor-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.flavor-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
 .info-row:last-child { border-bottom: none; }
 .info-label { font-size: 14px; color: #AAA; }
@@ -207,7 +233,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
 .profile-card-date { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; }
 .profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.profile-card-tag { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 12px; padding: 3px 10px; font-size: 10px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.profile-card-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 12px; padding: 3px 10px; font-size: 10px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
 .order-card-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: 'Arial', sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
 .status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
@@ -219,13 +245,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 /* ── ORDER SCREEN ── */
 .amount-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
 .amount-card { background: var(--white); border: 2px solid transparent; border-radius: 18px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px var(--shadow); }
-.amount-card.selected { border-color: var(--caramel); background: #FDF5E8; }
+.amount-card.selected { border-color: var(--caramel); background: var(--tint); }
 .amount-card:active { transform: scale(0.96); }
 .amount-g { font-size: 28px; font-weight: bold; color: var(--dark-brown); }
 .amount-label { font-size: 11px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 4px; }
 .textarea-field { width: 100%; padding: 14px 18px; border: 2px solid #DDD5C2; border-radius: 14px; font-size: 15px; background: var(--white); color: var(--dark-brown); outline: none; transition: border-color 0.2s; font-family: inherit; resize: vertical; min-height: 90px; direction: rtl; }
 .textarea-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
-.order-summary { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
+.order-summary { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
 .order-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; font-family: 'Arial', sans-serif; }
 .order-summary-label { color: #AAA; }
 .order-summary-value { font-weight: bold; color: var(--dark-brown); text-align: left; direction: ltr; }
@@ -239,7 +265,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   box-shadow: 0 3px 16px var(--shadow); margin-bottom: 10px;
   direction: rtl; border-right: 4px solid var(--caramel);
 }
-.msg-card.unread { border-right-color: var(--medium-brown); background: #FDF5E8; }
+.msg-card.unread { border-right-color: var(--medium-brown); background: var(--tint); }
 .msg-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .msg-card-from { font-size: 12px; font-weight: bold; color: var(--caramel); font-family: Arial,sans-serif; }
 .msg-card-time { font-size: 11px; color: #AAA; font-family: Arial,sans-serif; }
@@ -271,8 +297,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   background: transparent; color: var(--caramel); font-size: 14px; font-family: Arial,sans-serif;
   cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
 }
-.btn-fav.active { background: #FDF5E8; border-color: var(--caramel); color: var(--medium-brown); font-weight: bold; }
-.btn-fav:hover { background: #FDF5E8; }
+.btn-fav.active { background: var(--tint); border-color: var(--caramel); color: var(--medium-brown); font-weight: bold; }
+.btn-fav:hover { background: var(--tint); }
 .btn-del {
   padding: 8px 14px; border-radius: 12px; border: 1px solid #F0C0C0;
   background: transparent; color: #C0392B; font-size: 12px; font-family: Arial,sans-serif;
@@ -310,9 +336,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .roastery-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
 .roastery-card:active { transform: scale(0.98); }
-.roastery-card.selected { border-color: var(--caramel); background: #FDF5E8; }
+.roastery-card.selected { border-color: var(--caramel); background: var(--tint); }
 .roastery-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
-.roastery-logo { font-size: 36px; width: 56px; height: 56px; background: #FDF5E8; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.roastery-logo { font-size: 36px; width: 56px; height: 56px; background: var(--tint); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .roastery-name { font-size: 17px; font-weight: bold; color: var(--dark-brown); }
 .roastery-location { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; margin-top: 3px; }
 .roastery-stats { display: flex; gap: 14px; margin-bottom: 10px; }
@@ -356,7 +382,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .copy-btn:hover { background: rgba(255,255,255,0.25); }
 .amount-due-box {
-  background: #FDF5E8; border: 2px solid var(--light-caramel);
+  background: var(--tint); border: 2px solid var(--light-caramel);
   border-radius: 14px; padding: 16px 20px; margin: 12px 0; direction: rtl;
   display: flex; justify-content: space-between; align-items: center;
 }
@@ -368,7 +394,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;
   background: #FFFAF5; margin: 12px 0;
 }
-.upload-area:hover { border-color: var(--caramel); background: #FDF5E8; }
+.upload-area:hover { border-color: var(--caramel); background: var(--tint); }
 .upload-area input { display: none; }
 .upload-icon { font-size: 36px; margin-bottom: 8px; }
 .upload-text { font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
@@ -441,7 +467,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
 .profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
 .profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.profile-tag-new { background: #FDF5E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
 .profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
 
 /* ── ORDER CARD NEW ── */
@@ -462,6 +488,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 </style>
 </head>
 <body class="lang-fa">
+
+<!-- Dark Mode Toggle -->
+<button class="dark-toggle" id="btn-dark-toggle" onclick="toggleDarkMode()" title="حالت تاریک">🌙</button>
 
 <!-- Language Toggle -->
 <div class="lang-toggle">
@@ -879,7 +908,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
   </div>
 
-  <div style="background:#FDF5E8;border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;direction:rtl;">
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;direction:rtl;">
     <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;">
       ⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.
     </p>
@@ -918,7 +947,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <!-- Bean being ordered -->
-  <div style="background:#FDF5E8;border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;direction:rtl;text-align:center;">
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;direction:rtl;text-align:center;">
     <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
   </div>
@@ -2462,7 +2491,8 @@ function toggleRoastGuide() {
 ═══════════════════════════════════════════ */
 function setLang(lang) {
   currentLang = lang;
-  document.body.className = 'lang-' + lang;
+  document.body.classList.remove('lang-fa', 'lang-en');
+  document.body.classList.add('lang-' + lang);
   document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
   document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
   document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
@@ -2890,8 +2920,29 @@ async function getAIExplanation(rec) {
 }
 
 /* ═══════════════════════════════════════════
+   DARK MODE
+═══════════════════════════════════════════ */
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  document.getElementById('btn-dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  try { localStorage.setItem('coffeeIdentityDarkMode', isDark ? '1' : '0'); } catch (e) {}
+}
+
+function initDarkMode() {
+  let saved = null;
+  try { saved = localStorage.getItem('coffeeIdentityDarkMode'); } catch (e) {}
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const shouldBeDark = saved !== null ? saved === '1' : prefersDark;
+  if (shouldBeDark) {
+    document.body.classList.add('dark-mode');
+    document.getElementById('btn-dark-toggle').textContent = '☀️';
+  }
+}
+
+/* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
+initDarkMode();
 setLang('fa');
 checkAutoLogin();
 </script>
