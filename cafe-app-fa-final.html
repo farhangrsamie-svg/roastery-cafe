@@ -169,7 +169,7 @@ body {
 
 /* ── CARD ── */
 .card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; }
-.card-title { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
+.card-title { font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; font-weight: 700; }
 
 /* ── RESULT ── */
 .result-identity-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
@@ -233,7 +233,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
 .profile-card-date { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; }
 .profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-.profile-card-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 12px; padding: 3px 10px; font-size: 10px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.profile-card-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 12px; padding: 4px 11px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
 .order-card-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: 'Arial', sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
 .status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
@@ -467,7 +467,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
 .profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
 .profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-.profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 13px; font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; font-weight: 600; }
 .profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
 
 /* ── ORDER CARD NEW ── */
@@ -482,9 +482,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .order-address-new { font-size: 14px; color: #888; margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
 
 /* ── PROFILE DETAIL SCREEN ── */
-.detail-header { background: var(--medium-brown); margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
-.detail-bean-name { font-size: 22px; font-weight: bold; color: var(--white); margin-bottom: 6px; }
-.detail-origin { font-size: 12px; color: var(--caramel); font-style: italic; }
+.detail-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
+.detail-bean-name { font-size: 24px; font-weight: bold; color: #FEFEFE; margin-bottom: 6px; }
+.detail-origin { font-size: 14px; color: var(--caramel); font-style: italic; }
 </style>
 </head>
 <body class="lang-fa">
@@ -674,7 +674,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen" id="screen-profile-detail" style="padding-top:0;">
   <div class="detail-header">
     <button class="btn-back" onclick="showDashboard()" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
-    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;">
+    <div style="font-size:13px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;font-weight:600;">
       <span class="fa-only">پروفایل قهوه شما</span><span class="en-only">Your Coffee Profile</span>
     </div>
     <div class="detail-bean-name" id="detail-bean-name">—</div>
@@ -2368,7 +2368,7 @@ function buildFlavorRadar(bean, highlightKey) {
     const isHi = a.key === highlightKey;
     const color = isHi ? '#C4956A' : '#6B3F2A';
     const label = currentLang === 'fa' ? a.fa : a.en;
-    labels += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="12" font-family="Arial, sans-serif" fill="${color}" font-weight="${isHi ? 'bold' : 'normal'}">${label}</text>`;
+    labels += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="Arial, sans-serif" fill="${color}" font-weight="${isHi ? '700' : '600'}">${label}</text>`;
     const [dx, dy] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
     dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${isHi ? 5 : 3}" fill="${color}"/>`;
   });
