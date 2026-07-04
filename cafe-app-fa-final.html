@@ -778,6 +778,31 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="result-origin" id="r-origin"></div>
   </div>
 
+  <!-- AI Explanation Card -->
+  <div class="ai-card" id="ai-explanation-card">
+    <div class="ai-card-header">
+      <div class="ai-card-icon">✨</div>
+      <div>
+        <div class="ai-card-title">
+          <span class="fa-only">تحلیل شخصی‌سازی‌شده</span>
+          <span class="en-only">Personalized Analysis</span>
+        </div>
+        <div class="ai-card-sub">
+          <span class="fa-only">بر اساس پروفایل منحصربه‌فرد شما</span>
+          <span class="en-only">Based on your unique profile</span>
+        </div>
+      </div>
+    </div>
+    <div id="ai-text-content">
+      <div class="ai-typing">
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+      </div>
+    </div>
+    <div id="ai-runner-up" class="ai-runner-up" style="display:none;"></div>
+  </div>
+
   <div class="card" id="why-card">
     <div class="card-title" style="direction:rtl">چرا این قهوه؟</div>
     <div id="why-list"></div>
@@ -1558,6 +1583,8 @@ function showLoading() {
     await saveProfile(rec);
     document.getElementById('screen-loading').classList.remove('visible');
     show('screen-result');
+    // AI explanation در پس‌زمینه لود میشه
+    getAIExplanation(rec);
   }, 2000);
 }
 
@@ -2214,6 +2241,156 @@ async function confirmPayment() {
     btn.disabled = false;
     btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
     setLang(currentLang);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   AI EXPLANATION
+═══════════════════════════════════════════ */
+/* ── FALLBACK EXPLANATIONS ── */
+const FALLBACK_FA = {
+  yirgacheffe: {
+    floral:      'ذائقه‌ات دقیقاً با روح این دانه هم‌خوانی داره. Ethiopia Yirgacheffe با نت‌های یاسمن و هلو، معطرترین قهوه دنیاست و برای کسی که طعم‌های繊細 گلی رو دوست داره انتخاب بی‌نظیریه. هر فنجان یه تجربه ظریف و به‌یادماندنیه.',
+    sweet:       'شیرینی طبیعی Ethiopia Yirgacheffe بدون هیچ تلخی اضافه‌ای، دقیقاً چیزیه که دنبالش بودی. نت‌های هلو و چای سبز با هم یه هارمونی شیرین و لطیف می‌سازن. این دانه برای کسی مثل تو که سبکی و شیرینی رو دوست داره ایده‌آله.',
+    chocolatey:  'شاید تعجب کنی ولی Ethiopia Yirgacheffe با وجود سبکی، یه پیچیدگی منحصربه‌فرد داره که عاشقان قهوه رو شگفت‌زده می‌کنه. پروفایل طعمیت نشون میده که آماده‌ای تجربه جدیدی داشته باشی. این دانه دنیای قهوه رو از زاویه‌ای متفاوت نشونت میده.',
+    bold:        'این دانه به‌عنوان یه تجربه متفاوت برات جالبه. Yirgacheffe سبک و گلی، یه کنتراست جذاب با سلیقه‌ی معمولت ایجاد می‌کنه و ممکنه افق‌های جدیدی از دنیای قهوه رو برات باز کنه.',
+  },
+  kenya: {
+    floral:      'Kenya AA با اسیدیته درخشان و نت‌های میوه‌ای قرمز، برای کسی که طعم‌های زنده و پُرانرژی رو دوست داره عالیه. تمشک و انگور قرمز در هر قطره این قهوه حس میشه. یه انتخاب هیجان‌انگیز برای ذائقه‌ای مثل تو.',
+    sweet:       'شیرینی خاص Kenya AA از نوع قند قهوه‌ایه — عمیق‌تر و پیچیده‌تر از شیرینی معمولی. پروفایل طعمیت با این دانه جذاب به‌خوبی جور در میاد. یه فنجان Kenya خوب، تعریف شیرینی رو برات عوض می‌کنه.',
+    chocolatey:  'Kenya AA یه ترکیب جالب از شکلات تلخ و میوه‌های قرمز داره که برای ذائقه‌ات عالیه. اسیدیته پُرانرژیش یه بُعد جدید به تجربه‌ات اضافه می‌کنه. این دانه برای کسی که عمق طعمی می‌خواد بی‌نظیره.',
+    bold:        'Kenya AA با اسیدیته جسور و طعم‌های میوه‌ای شدید، برای ذائقه‌ی پُرانرژی تو انتخاب درستیه. قدرت این دانه از جای دیگه‌ای میاد — نه از تلخی بلکه از شدت طعم. یه تجربه قوی و به‌یادماندنی.',
+  },
+  rwanda: {
+    floral:      'Rwanda Bourbon با طراوت هلو و زردآلو، یه تجربه گلی و میوه‌ای دلنشین داره. این دانه برای کسی که ظرافت و شیرینی طبیعی رو دوست داره ایده‌آله. هر فنجان مثل یه صبح بهاری شاداب و طراواته.',
+    sweet:       'Rwanda Bourbon شیرین‌ترین دانه‌ای هست که می‌تونی پیدا کنی. کاراملو میوه‌های قرمز با هم یه شیرینی طبیعی و دلنشین می‌سازن که نیازی به قند نداره. این دانه دقیقاً برای ذائقه‌ی شیرین‌دوست تو ساخته شده.',
+    chocolatey:  'Rwanda Bourbon یه تعادل زیبا بین شیرینی میوه‌ای و عمق طعمی داره. برای کسی که از شکلات شیری لذت می‌بره، این دانه یه جایگزین قهوه‌ای عالیه. ملایم، شیرین، و کاملاً دلنشین.',
+    bold:        'Rwanda Bourbon یه آرامش لذت‌بخش داره که می‌تونه تعادل خوبی با سلیقه‌ات ایجاد کنه. این دانه نشون میده که قهوه قوی همیشه لازم نیست تلخ باشه. یه تجربه متفاوت و شاید کشف یه ذائقه جدید.',
+  },
+  sidama: {
+    floral:      'Ethiopia Sidama Natural با فرآوری طبیعی، توت‌فرنگی و زغال‌اخته رو توی فنجانت میاره. برای کسی که طعم‌های میوه‌ای شدید رو دوست داره، این دانه یه کشف جذابه. پُرشدت، شیرین، و کاملاً استثنایی.',
+    sweet:       'Sidama Natural یکی از شیرین‌ترین قهوه‌های دنیاست. فرآوری طبیعیش باعث میشه شیرینی میوه مستقیماً وارد فنجانت بشه. برای ذائقه‌ای مثل تو که شیرینی اصیل رو دوست داره، این دانه یه هدیه‌ست.',
+    chocolatey:  'Sidama Natural ترکیب جادویی شکلات تلخ و میوه‌های قرمز رو داره. مثل یه شکلات تلخ با مغز توت‌فرنگی — عمق شکلاتی که عاشقشی با یه پیچش میوه‌ای سورپرایزکننده. کاملاً برای ذائقه‌ی تو.',
+    bold:        'Sidama Natural با شدت طعمی بالاش برای ذائقه‌ی جسور تو ایده‌آله. این دانه قوی‌ترین طعم‌های میوه‌ای رو داره — انگور قرمز و توت‌فرنگی در یه فنجان پُرانرژی. یه تجربه غنی و فراموش‌نشدنی.',
+  },
+  colombia: {
+    floral:      'Colombia Huila متعادل‌ترین قهوه دنیاست و برای هر ذائقه‌ای کار می‌کنه. شکلات تیره و پرتقال با هم یه هارمونی زیبا می‌سازن. برای کسی که تازه با specialty coffee آشنا میشه، یه نقطه شروع ایده‌آله.',
+    sweet:       'Colombia Huila با کاراملو گیلاس، شیرینی متعادل و دلنشینی داره. نه خیلی شیرین، نه خیلی تلخ — دقیقاً اون تعادلی که دنبالش بودی. این دانه برای هر موقعیتی مناسبه.',
+    chocolatey:  'Colombia Huila با نت‌های شکلات تیره و کاراملو گیلاس، دقیقاً برای ذائقه‌ی تو ساخته شده. عمق شکلاتی این دانه با یه شیرینی طبیعی همراهه که هر فنجان رو کامل می‌کنه. یه انتخاب کلاسیک و بی‌نقص.',
+    bold:        'Colombia Huila با وجود قدرتش، یه تعادل زیبا بین قوّت و شیرینی داره. این دانه نشون میده که قهوه جسور می‌تونه هم قوی باشه هم دلنشین. برای ذائقه‌ات یه انتخاب بی‌نقصه.',
+  },
+  brazil: {
+    floral:      'Brazil Natural با شکلات شیری و کاراملو وانیل، یه آرامش دلنشین داره. این دانه برای کسی که می‌خواد یه تجربه راحت و بدون دردسر داشته باشه عالیه. ساده، خوشایند، و همیشه قابل اعتماد.',
+    sweet:       'Brazil Natural با وانیل و کاراملو فندق، شیرین‌ترین و راحت‌ترین قهوه‌ای هست که می‌تونی پیدا کنی. برای ذائقه‌ی شیرین‌دوست تو، این دانه مثل یه لاته بدون شیر عمل می‌کنه. کاملاً برای تو.',
+    chocolatey:  'Brazil Natural بهترین دانه برای عاشقان شکلات شیریه. فندق، بادام، و شکلات شیری در هر قطره این قهوه وجود داره. اگه عاشق شکلات هستی، این دانه رویاهات رو به واقعیت تبدیل می‌کنه.',
+    bold:        'Brazil Natural با وجود بدنه‌ی غنی، یه ملایمت دلنشین داره. برای کسی که قهوه قوی دوست داره ولی می‌خواد از تلخی خبری نباشه، این دانه انتخاب هوشمندانه‌ایه. قوی، غنی، و راحت.',
+  },
+  guatemala: {
+    floral:      'Guatemala Antigua با آلو و دارچین، یه پیچیدگی جذاب داره که ذائقه‌ی کنجکاوت رو راضی می‌کنه. خاک آتشفشانیش یه طعم مینرال خاص بهش میده. یه کشف جذاب برای عاشق تنوع طعمی.',
+    sweet:       'Guatemala Antigua با آلو شیرین و کاراملو گردو، یه شیرینی عمیق و پیچیده داره. این شیرینی از جنس متفاوتیه — تیره‌تر و غنی‌تر از شیرینی‌های معمول. برای ذائقه‌ای که می‌خواد عمق داشته باشه.',
+    chocolatey:  'Guatemala Antigua بهترین گزینه برای عاشقان شکلات تلخه. آلو و دارچین با شکلات تیره ترکیب می‌شن و یه عمق طعمی استثنایی می‌سازن. اگه شکلات تلخ ۷۵٪ دوست داری، این قهوه برای توئه.',
+    bold:        'Guatemala Antigua با قوّت و پیچیدگیش، دقیقاً برای ذائقه‌ی جسور تو ایده‌آله. خاک آتشفشانی گواتمالا یه قدرت خاص به این دانه میده. یه تجربه‌ی عمیق، قوی، و فراموش‌نشدنی.',
+  },
+  sumatra: {
+    floral:      'Sumatra Mandheling یه تجربه کاملاً متفاوت از قهوه‌ست. خاکی، سدر، و تنباکو در یه فنجان سنگین و تأملی. برای کسی که می‌خواد از منطقه راحتش خارج بشه و چیز جدیدی کشف کنه.',
+    sweet:       'Sumatra Mandheling قهوه‌ای برای لحظات تأملی و عمیقه. سنگین، خاکی، و با شخصیت قوی. این دانه طرف‌داران وفادار خودش رو داره — کسایی که از پیچیدگی لذت می‌برن.',
+    chocolatey:  'Sumatra Mandheling با شکلات تیره و عطر سدر، یه عمق طعمی بی‌مثال داره. برای عاشقان شکلات تلخ که می‌خوان یه بُعد خاکی هم به تجربه‌شون اضافه بشه. قوی، عمیق، و اثرگذار.',
+    bold:        'Sumatra Mandheling دقیقاً همون قهوه‌ایه که دنبالش بودی. سنگین‌ترین، خاکی‌ترین، و قوی‌ترین قهوه دنیا. برای کسی که می‌خواد قهوه واقعی بخوره — بدون هیچ سازش و تعارفی.',
+  },
+};
+
+const FALLBACK_EN = {
+  yirgacheffe: "Ethiopia Yirgacheffe is the world's most aromatic coffee — jasmine, peach, and bergamot in every sip. Its light body and delicate complexity make it a perfect match for your flavor preferences. Brew it with care and it will reward you with an unforgettable experience.",
+  kenya: "Kenya AA's sparkling acidity and red fruit intensity match your bold preferences perfectly. Blackcurrant and pomegranate dance in every cup, leaving a long satisfying finish. This is coffee that demands your full attention — in the best possible way.",
+  rwanda: "Rwanda Bourbon is the sweetest and most approachable specialty coffee in the world. Peach, apricot and caramel create a naturally sweet cup that needs nothing added. It is the perfect companion for your relaxed moments.",
+  sidama: "Ethiopia Sidama Natural brings intense fruit sweetness through its natural processing method. Strawberries and blueberries leap from the cup in a way no other origin can replicate. A bold fruit-forward experience that matches your adventurous palate.",
+  colombia: "Colombia Huila is the world's most balanced coffee — dark chocolate, caramel and cherry in perfect harmony. It works beautifully with any brew method making it endlessly versatile. A reliable elegant choice for any moment of your day.",
+  brazil: "Brazil Natural is the foundation of great coffee comfort. Milk chocolate, hazelnut and vanilla create a smooth low-acid cup that is easy to love. Perfect for your relaxed moments and those long unhurried afternoons.",
+  guatemala: "Guatemala Antigua's volcanic soil gives it a distinctive mineral richness that sets it apart. Dark chocolate, plum and cinnamon create a complex satisfying cup. For those who appreciate depth and character in their coffee.",
+  sumatra: "Sumatra Mandheling is the boldest most earthy coffee on the planet. Cedar, tobacco and dark chocolate in a syrupy full-bodied cup — built for contemplation and depth. This is coffee for those who want nothing held back."
+};
+
+function getFallbackExplanation(rec) {
+  const lang = currentLang;
+  if (lang === 'fa') {
+    const beanFallbacks = FALLBACK_FA[rec.id];
+    if (beanFallbacks) {
+      return beanFallbacks[ans.taste] || beanFallbacks['floral'] || '';
+    }
+  } else {
+    return FALLBACK_EN[rec.id] || '';
+  }
+  return '';
+}
+
+async function getAIExplanation(rec) {
+  const el = document.getElementById('ai-text-content');
+  const runnerEl = document.getElementById('ai-runner-up');
+  if (!el) return;
+
+  const userName = currentUser?.name || '';
+  const lang = currentLang;
+
+  const tasteLabels = { floral:'طعم‌های گلی و میوه‌ای', sweet:'طعم‌های شیرین و متعادل', chocolatey:'طعم‌های شکلاتی و آجیلی', bold:'طعم‌های تند و خاکی' };
+  const bodyLabels  = { light:'قهوه سبک و لطیف', medium:'قهوه متوسط و روان', full:'قهوه غنی و پُربدنه' };
+  const contextLabels = { morning:'صبح', work:'جلسه کاری', reading:'مطالعه', friends:'با دوستان', afterdinner:'بعد از شام', weekend:'آخر هفته' };
+  const brewLabels  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'روش دلخواه' };
+
+  const prompt = lang === 'fa'
+    ? `تو یک متخصص قهوه هستی. بر اساس اطلاعات زیر یک توضیح کوتاه، گرم و کاملاً شخصی‌سازی‌شده به فارسی بنویس (۳ جمله، حداکثر ۸۰ کلمه).${userName ? ` با نام "${userName}" شروع کن.` : ''}
+
+پروفایل مشتری:
+- طعم مورد علاقه: ${tasteLabels[ans.taste] || ans.taste}
+- بدنه ترجیحی: ${bodyLabels[ans.body] || ans.body}
+- موقعیت مصرف: ${contextLabels[ans.context] || ans.context}
+- روش دم‌آوری: ${brewLabels[ans.brew] || ans.brew}
+دانه پیشنهادی: ${rec.name} از ${rec.origin}
+نت‌های طعمی: ${rec.flavors.join('، ')}
+فقط توضیح شخصی‌سازی‌شده بنویس، بدون عنوان.`
+    : `You are a specialty coffee expert. Write a short warm personalized explanation in English (3 sentences, max 80 words).${userName ? ` Start with "${userName}".` : ''}
+Customer: taste=${ans.taste}, body=${ans.body}, context=${ans.context}, brew=${ans.brew}
+Bean: ${rec.name} from ${rec.origin}, notes: ${rec.flavors.join(', ')}
+Write only the explanation, no title.`;
+
+  let text = '';
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 6000); // 6 ثانیه timeout
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    const data = await response.json();
+    text = data.content?.[0]?.text || '';
+  } catch(e) {
+    console.warn('AI API unavailable — using fallback:', e.message);
+  }
+
+  // اگه API جواب نداد یا متن خالی بود → fallback
+  if (!text) {
+    text = getFallbackExplanation(rec);
+  }
+
+  if (text) {
+    el.innerHTML = `<div class="ai-text">${text}</div>`;
+  } else {
+    el.style.display = 'none';
+    document.getElementById('ai-explanation-card').style.display = 'none';
+  }
+
+  // نمایش runner-up
+  if (rec._runner1) {
+    runnerEl.style.display = 'block';
+    runnerEl.innerHTML = lang === 'fa'
+      ? `💡 گزینه دیگه‌ای که ممکنه دوست داشته باشی: <strong>${rec._runner1}</strong>`
+      : `💡 You might also enjoy: <strong>${rec._runner1}</strong>`;
   }
 }
 
