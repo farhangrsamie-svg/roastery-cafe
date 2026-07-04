@@ -173,12 +173,12 @@ body {
 
 /* ── RESULT ── */
 .result-identity-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
-.result-identity-label { font-size: 13px; letter-spacing: 3px; color: #E8C99A; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; font-weight: 600; }
-.result-identity-name { font-size: 24px; font-weight: bold; color: #FEFEFE; margin-bottom: 12px; }
+.result-identity-label { font-size: 15px; letter-spacing: 2.5px; color: #E8C99A; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; font-weight: 700; }
+.result-identity-name { font-size: 27px; font-weight: bold; color: #FEFEFE; margin-bottom: 12px; }
 .match-score-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; }
 .match-score-bar { flex: 1; max-width: 160px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
 .match-score-fill { height: 100%; background: #E8C99A; border-radius: 4px; }
-.match-score-pct { font-size: 14px; color: #F0DAB8; font-family: 'Arial', sans-serif; font-weight: 700; }
+.match-score-pct { font-size: 16px; color: #F0DAB8; font-family: 'Arial', sans-serif; font-weight: 700; }
 .result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
 .result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-style: italic; }
 .flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -191,9 +191,9 @@ body {
 .why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
 .identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
-.persona-tagline { font-size: 15px; color: #E8C99A; margin-bottom: 8px; font-weight: 700; }
-.persona-desc { font-size: 14px; color: #FEFEFE; opacity: 0.92; line-height: 1.75; max-width: 340px; margin: 0 auto 10px; }
-.identity-tag { background: #543018; color: #FEFEFE; border-radius: 20px; padding: 6px 15px; font-size: 12px; font-family: 'Arial', sans-serif; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
+.persona-tagline { font-size: 17px; color: #E8C99A; margin-bottom: 8px; font-weight: 700; }
+.persona-desc { font-size: 16px; color: #FEFEFE; opacity: 0.92; line-height: 1.75; max-width: 340px; margin: 0 auto 10px; }
+.identity-tag { background: #543018; color: #FEFEFE; border-radius: 20px; padding: 7px 16px; font-size: 14px; font-family: 'Arial', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
 .staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
 
 /* ── LANG TOGGLE ── */
@@ -207,6 +207,12 @@ body.lang-en .fa-only { display: none !important; }
 body.lang-fa .option-en, body.lang-fa .q-text-en, body.lang-fa .loading-en { display: none !important; }
 body.lang-en .option-fa, body.lang-en .q-text-fa, body.lang-fa .loading-fa { display: none !important; }
 body.lang-fa { direction: rtl; }
+body.lang-fa .msg-card, body.lang-fa .confirm-desc, body.lang-fa .roastery-card,
+body.lang-fa .payment-step, body.lang-fa .amount-due-box, body.lang-fa .payment-timer,
+body.lang-fa .new-profile-btn, body.lang-fa .profile-card-new, body.lang-fa .order-card-new {
+  direction: rtl;
+}
+body.lang-fa .new-profile-btn { text-align: right; }
 body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
 /* ── SUCCESS MSG ── */
@@ -263,7 +269,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .msg-card {
   background: var(--white); border-radius: 16px; padding: 16px 20px;
   box-shadow: 0 3px 16px var(--shadow); margin-bottom: 10px;
-  direction: rtl; border-right: 4px solid var(--caramel);
+  border-right: 4px solid var(--caramel);
 }
 .msg-card.unread { border-right-color: var(--medium-brown); background: var(--tint); }
 .msg-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -322,7 +328,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .confirm-icon { font-size: 44px; margin-bottom: 12px; }
 .confirm-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 8px; }
-.confirm-desc { font-size: 13px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; direction: rtl; }
+.confirm-desc { font-size: 13px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; }
 .confirm-actions { display: flex; gap: 10px; }
 .confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
 .confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
@@ -332,7 +338,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   background: var(--white); border-radius: 20px; padding: 20px;
   box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px;
   cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
-  direction: rtl; position: relative;
+  position: relative;
 }
 .roastery-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
 .roastery-card:active { transform: scale(0.98); }
@@ -358,7 +364,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 /* ── PAYMENT ── */
 .payment-step {
   background: var(--white); border-radius: 20px; padding: 22px;
-  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; direction: rtl;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px;
 }
 .payment-step-num {
   width: 32px; height: 32px; border-radius: 50%; background: var(--caramel);
@@ -383,7 +389,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .copy-btn:hover { background: rgba(255,255,255,0.25); }
 .amount-due-box {
   background: var(--tint); border: 2px solid var(--light-caramel);
-  border-radius: 14px; padding: 16px 20px; margin: 12px 0; direction: rtl;
+  border-radius: 14px; padding: 16px 20px; margin: 12px 0;
   display: flex; justify-content: space-between; align-items: center;
 }
 .amount-due-label { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; }
@@ -402,7 +408,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .upload-preview { max-width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
 .payment-timer {
   background: #FFF8EC; border: 1px solid #F0C070; border-radius: 12px;
-  padding: 12px 16px; text-align: center; margin-bottom: 16px; direction: rtl;
+  padding: 12px 16px; text-align: center; margin-bottom: 16px;
 }
 .timer-text { font-size: 12px; color: #C4956A; font-family: Arial,sans-serif; }
 .timer-count { font-size: 20px; font-weight: bold; color: var(--medium-brown); font-family: 'Courier New', monospace; margin-top: 4px; }
@@ -433,7 +439,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .new-profile-btn {
   background: linear-gradient(135deg, var(--caramel), #D4A574);
   color: var(--white); border: none; border-radius: 18px;
-  padding: 20px 24px; width: 100%; text-align: right; direction: rtl;
+  padding: 20px 24px; width: 100%;
   cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 24px rgba(196,149,106,0.35);
   display: flex; align-items: center; gap: 14px; margin: 20px 0;
 }
@@ -454,7 +460,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   background: var(--white); border-radius: 20px; padding: 18px 20px;
   box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
   cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
-  direction: rtl; position: relative; overflow: hidden;
+  position: relative; overflow: hidden;
 }
 .profile-card-new::before {
   content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -474,7 +480,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .order-card-new {
   background: var(--white); border-radius: 20px; padding: 18px 20px;
   box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
-  direction: rtl; border: 2px solid transparent;
+  border: 2px solid transparent;
 }
 .order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
@@ -674,7 +680,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen" id="screen-profile-detail" style="padding-top:0;">
   <div class="detail-header">
     <button class="btn-back" onclick="showDashboard()" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
-    <div style="font-size:13px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;font-weight:600;">
+    <div style="font-size:15px;letter-spacing:2.5px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;font-weight:700;">
       <span class="fa-only">پروفایل قهوه شما</span><span class="en-only">Your Coffee Profile</span>
     </div>
     <div class="detail-bean-name" id="detail-bean-name">—</div>
@@ -833,7 +839,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </div>
   </div>
 
-  <div style="text-align:center;padding:4px 0 16px;direction:rtl;">
+  <div style="text-align:center;padding:4px 0 16px;">
     <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;">پیشنهاد امروز</div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
@@ -865,7 +871,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <div class="card" id="why-card">
-    <div class="card-title" style="direction:rtl">چرا این قهوه؟</div>
+    <div class="card-title"><span class="fa-only">چرا این قهوه؟</span><span class="en-only">Why This Coffee?</span></div>
     <div id="why-list"></div>
   </div>
 
@@ -908,7 +914,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
   </div>
 
-  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;direction:rtl;">
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;">
     <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;">
       ⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.
     </p>
@@ -941,13 +947,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">انتخاب رستری</span>
       <span class="en-only">Choose Roastery</span>
     </h2>
-    <p style="font-size:13px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;direction:rtl;">
+    <p style="font-size:13px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;">
       رستری مورد نظرت رو انتخاب کن
     </p>
   </div>
 
   <!-- Bean being ordered -->
-  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;direction:rtl;text-align:center;">
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center;">
     <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
   </div>
@@ -971,7 +977,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <!-- Bean + Roastery Summary -->
   <div class="order-summary" id="order-bean-summary">
-    <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;direction:rtl;">دانه انتخابی</div>
+    <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
     <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
     <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
@@ -1027,7 +1033,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">✅ Submit Order</span>
     <span class="fa-only">✅ ثبت سفارش</span>
   </button>
-  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;direction:rtl;">
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
     پس از ثبت سفارش، تیم رستری با شما تماس می‌گیرد.
   </p>
 </div>
@@ -1042,7 +1048,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">پرداخت سفارش</span>
       <span class="en-only">Order Payment</span>
     </h2>
-    <p style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;direction:rtl;">مبلغ رو واریز کن و رسید بفرست</p>
+    <p style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;"><span class="fa-only">مبلغ رو واریز کن و رسید بفرست</span><span class="en-only">Transfer the amount and send the receipt</span></p>
   </div>
 
   <!-- Timer -->
@@ -1116,7 +1122,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="fa-only">✅ تأیید و ارسال رسید</span>
     <span class="en-only">✅ Confirm Payment</span>
   </button>
-  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;direction:rtl;">
+  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
     بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.
   </p>
 </div>
