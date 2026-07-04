@@ -195,6 +195,50 @@ body {
 .persona-desc { font-size: 16px; color: #FEFEFE; opacity: 0.92; line-height: 1.75; max-width: 340px; margin: 0 auto 10px; }
 .identity-tag { background: #543018; color: #FEFEFE; border-radius: 20px; padding: 7px 16px; font-size: 14px; font-family: 'Arial', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
 .staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
+.alt-bean-card {
+  background: var(--tint); border: 1px solid var(--light-caramel);
+  border-radius: 18px; padding: 18px 20px; margin-bottom: 14px;
+  animation: fadeUp 0.4s ease;
+}
+.alt-bean-label {
+  font-size: 13px; color: var(--caramel); font-weight: 700; font-family: 'Arial', sans-serif;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.alt-bean-icon { font-size: 15px; }
+.alt-bean-name { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 3px; }
+.alt-bean-origin { font-size: 13px; color: var(--medium-brown); font-style: italic; margin-bottom: 10px; }
+.alt-bean-flavors { display: flex; flex-wrap: wrap; gap: 6px; }
+.alt-bean-flavor-tag {
+  background: var(--white); border: 1px solid var(--light-caramel); border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif;
+}
+
+/* ── AI EXPLANATION CARD ── */
+.ai-card {
+  background: var(--white); border-radius: 20px; padding: 20px 22px;
+  margin-bottom: 14px; box-shadow: 0 4px 20px var(--shadow);
+  border: 1px solid var(--light-caramel); animation: fadeUp 0.4s ease;
+}
+.ai-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ai-card-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--caramel), var(--medium-brown));
+  color: white; display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.ai-card-title { font-size: 14px; font-weight: 700; color: var(--dark-brown); font-family: 'Arial', sans-serif; }
+.ai-card-sub { font-size: 12px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 2px; }
+.ai-text { font-size: 15px; line-height: 1.8; color: var(--medium-brown); }
+.ai-typing { display: flex; gap: 6px; padding: 8px 0; }
+.ai-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--light-caramel);
+  animation: aiPulse 1.2s infinite ease-in-out;
+}
+.ai-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
 
 /* ── LANG TOGGLE ── */
 .lang-toggle { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 10px rgba(44,26,14,0.18); border: 1px solid var(--light-caramel); }
@@ -867,7 +911,18 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
         <div class="ai-dot"></div>
       </div>
     </div>
-    <div id="ai-runner-up" class="ai-runner-up" style="display:none;"></div>
+  </div>
+
+  <!-- Alternative Bean Suggestion -->
+  <div class="alt-bean-card" id="alt-bean-card" style="display:none;">
+    <div class="alt-bean-label">
+      <span class="alt-bean-icon">💡</span>
+      <span class="fa-only">شاید این یکی هم دوست داشته باشید</span>
+      <span class="en-only">You might also enjoy</span>
+    </div>
+    <div class="alt-bean-name" id="alt-bean-name">—</div>
+    <div class="alt-bean-origin" id="alt-bean-origin">—</div>
+    <div class="alt-bean-flavors" id="alt-bean-flavors"></div>
   </div>
 
   <div class="card" id="why-card">
@@ -1551,6 +1606,7 @@ function viewProfile(p) {
     name: beanName, detail: beanDetail, origin: '', flavors: [],
     roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
   };
+  try { rec._runnerBean = recommend()._runnerBean; } catch (e) {}
 
   document.getElementById('detail-bean-name').textContent = beanName;
   document.getElementById('detail-bean-origin').textContent = beanDetail;
@@ -1590,6 +1646,14 @@ function viewProfile(p) {
       <div class="card-title">نمودار طعم</div>
       <div id="detail-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
     </div>
+    ${rec._runnerBean ? `
+    <div class="alt-bean-card">
+      <div class="alt-bean-label"><span class="alt-bean-icon">💡</span>شاید این یکی هم دوست داشته باشید</div>
+      <div class="alt-bean-name">${rec._runnerBean.name}</div>
+      <div class="alt-bean-origin">${rec._runnerBean.origin || ''}</div>
+      <div class="alt-bean-flavors">${(rec._runnerBean.flavors || []).slice(0,4).map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('')}</div>
+    </div>
+    ` : ''}
     <div class="card" style="direction:rtl;">
       <div class="card-title">تاریخ ثبت</div>
       <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
@@ -2143,7 +2207,8 @@ function recommend() {
   const maxPossible = 10 * (3.0 + 2.0 + 1.5 + 1.5 + 1.0 + 1.0); // = 100
   best._matchPct = Math.min(98, Math.round((best._score / maxPossible) * 100));
 
-  // دومین و سومین گزینه برای نمایش (آینده)
+  // دومین گزینه برای نمایش به‌عنوان «پیشنهاد جایگزین»
+  best._runnerBean = scored[1] || null;
   best._runner1 = scored[1]?.name || null;
   best._runner2 = scored[2]?.name || null;
 
@@ -2466,6 +2531,19 @@ function render(r) {
 
   // Flavor Radar
   document.getElementById('r-radar-chart').innerHTML = buildFlavorRadar(r, ans.taste);
+
+  // Alternative Bean Suggestion (نمایش فوری، مستقل از تحلیل AI)
+  const altCard = document.getElementById('alt-bean-card');
+  if (r._runnerBean) {
+    document.getElementById('alt-bean-name').textContent = r._runnerBean.name;
+    document.getElementById('alt-bean-origin').textContent = r._runnerBean.origin || '';
+    const altFlavorsEl = document.getElementById('alt-bean-flavors');
+    altFlavorsEl.innerHTML = (r._runnerBean.flavors || []).slice(0, 4)
+      .map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('');
+    altCard.style.display = 'block';
+  } else if (altCard) {
+    altCard.style.display = 'none';
+  }
 
   // Why this coffee
   const whyMap = {
@@ -2871,7 +2949,6 @@ function getFallbackExplanation(rec) {
 
 async function getAIExplanation(rec) {
   const el = document.getElementById('ai-text-content');
-  const runnerEl = document.getElementById('ai-runner-up');
   if (!el) return;
 
   const userName = currentUser?.name || '';
@@ -2914,14 +2991,6 @@ async function getAIExplanation(rec) {
   } else {
     el.style.display = 'none';
     document.getElementById('ai-explanation-card').style.display = 'none';
-  }
-
-  // نمایش runner-up
-  if (rec._runner1) {
-    runnerEl.style.display = 'block';
-    runnerEl.innerHTML = lang === 'fa'
-      ? `💡 گزینه دیگه‌ای که ممکنه دوست داشته باشی: <strong>${rec._runner1}</strong>`
-      : `💡 You might also enjoy: <strong>${rec._runner1}</strong>`;
   }
 }
 
