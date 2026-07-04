@@ -165,6 +165,8 @@ body {
 .why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
 .identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+.persona-tagline { font-size: 14px; color: var(--caramel); margin-bottom: 8px; font-weight: 600; }
+.persona-desc { font-size: 13px; color: var(--white); opacity: 0.85; line-height: 1.7; max-width: 340px; margin: 0 auto 10px; }
 .identity-tag { background: var(--medium-brown); color: var(--white); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-family: 'Arial', sans-serif; letter-spacing: 1px; text-transform: uppercase; }
 .staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
 
@@ -793,6 +795,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="result-identity-header">
     <div class="result-identity-label">هویت قهوه شما</div>
     <div class="result-identity-name" id="r-identity-name">—</div>
+    <div class="persona-tagline" id="r-persona-tagline"></div>
+    <div class="persona-desc" id="r-persona-desc"></div>
     <div class="identity-badge" id="r-identity-badge"></div>
     <div class="match-score-wrap">
       <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%"></div></div>
@@ -1121,6 +1125,7 @@ async function sb(method, path, body = null) {
 let currentUser = null; // { id, name, phone }
 let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
 let rec = null;
+let currentPersona = null;
 let currentProfileId = null;
 let selectedAmount = null;
 let currentLang = 'fa';
@@ -1600,6 +1605,7 @@ function reorderProfile() {
 function startNewProfile() {
   ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
   rec = null;
+  currentPersona = null;
   currentProfileId = null;
   document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => {
@@ -1634,6 +1640,7 @@ function showLoading() {
   document.getElementById('screen-loading').classList.add('visible');
   setTimeout(async () => {
     rec = recommend();
+    currentPersona = determinePersona();
     render(rec);
     await saveProfile(rec);
     document.getElementById('screen-loading').classList.remove('visible');
@@ -1657,6 +1664,7 @@ async function saveProfile(rec) {
       context: ans.context,
       brew_method: ans.brew,
       experience: ans.experience,
+      persona: currentPersona ? currentPersona.en : null,
       recommended_bean: rec.name + ' (' + rec.detail + ')'
     };
     const result = await sb('POST', 'coffee_profiles', supaData);
@@ -1675,6 +1683,7 @@ async function saveProfile(rec) {
       q4_context:     ans.context    || '',
       q5_brew:        ans.brew       || '',
       q6_experience:  ans.experience || '',
+      persona:        currentPersona ? currentPersona.en : '',
       bean:           rec.name + ' (' + rec.detail + ')',
       is_blend:       rec._isBlend ? 'YES' : 'NO',
       blend_name:     rec._blendName || '',
@@ -1937,6 +1946,106 @@ const BEANS = [
 const AVAILABLE = ['yirgacheffe','kenya','rwanda','sidama','colombia','brazil','guatemala','sumatra'];
 
 /* ═══════════════════════════════════════════
+   COFFEE PERSONAS (Coffee Personality Engine)
+   هر پرسونا مثل دانه‌ها یک بردار امتیاز روی همان
+   ۶ محور سؤال دارد و با همان وزن‌دهی سند
+   (طعم ۳۰٪ / بدنه ۲۰٪ / حالت ۱۵٪ / موقعیت ۱۵٪ / دم‌آوری ۱۰٪ / تجربه ۱۰٪) نمره می‌گیرد
+═══════════════════════════════════════════ */
+const PERSONAS = {
+  explorer: {
+    icon: '🧭',
+    fa: 'کاوشگر', en: 'The Explorer',
+    tagFa: 'همیشه دنبال یک تجربهٔ تازه',
+    descFa: 'کنجکاوی موتور محرک شماست؛ دانه‌های غیرمعمول و روش‌های دم‌آوری جدید را به تکرار ترجیح می‌دهید.',
+    descEn: 'Curiosity drives you — unusual beans and new brew methods beat repeating the familiar.',
+    s: {
+      floral:8, sweet:4, chocolatey:3, bold:7,
+      light:6, medium:5, full:5,
+      energised:6, focused:7, creative:8, relaxed:2, reflective:6,
+      morning:5, work:6, reading:8, friends:4, afterdinner:5, weekend:6,
+      v60:9, frenchpress:5, espresso:5, aeropress:9, coldbrew:6, other:7,
+      beginner:2, regular:6, enthusiast:10
+    }
+  },
+  comfort: {
+    icon: '☕',
+    fa: 'آرامش‌جو', en: 'The Comfort Lover',
+    tagFa: 'قهوه یعنی یک لحظهٔ گرم و آشنا',
+    descFa: 'برایتان قهوه بیش از هر چیز باید آرامش‌بخش و آشنا باشد؛ طعم‌های شیرین و ملایم را به هیجان ترجیح می‌دهید.',
+    descEn: 'Coffee is comfort first — sweet, gentle flavors over intensity.',
+    s: {
+      floral:3, sweet:9, chocolatey:8, bold:2,
+      light:3, medium:6, full:8,
+      energised:2, focused:3, creative:4, relaxed:10, reflective:6,
+      morning:6, work:4, reading:6, friends:6, afterdinner:9, weekend:8,
+      v60:4, frenchpress:9, espresso:7, aeropress:5, coldbrew:5, other:6,
+      beginner:9, regular:6, enthusiast:2
+    }
+  },
+  bold: {
+    icon: '⚡',
+    fa: 'جسور', en: 'The Bold Drinker',
+    tagFa: 'قهوه باید حس حضورش را نشان بدهد',
+    descFa: 'طعم‌های قوی و پرقدرت را دوست دارید و از قهوه انرژی و تمرکز واقعی می‌خواهید.',
+    descEn: 'You want coffee that makes its presence known — strong, intense, energising.',
+    s: {
+      floral:1, sweet:2, chocolatey:7, bold:10,
+      light:1, medium:4, full:9,
+      energised:9, focused:9, creative:3, relaxed:2, reflective:5,
+      morning:9, work:9, reading:4, friends:5, afterdinner:6, weekend:4,
+      v60:3, frenchpress:6, espresso:10, aeropress:5, coldbrew:5, other:5,
+      beginner:3, regular:8, enthusiast:8
+    }
+  },
+  creative: {
+    icon: '🎨',
+    fa: 'خلاق', en: 'The Creative Mood',
+    tagFa: 'قهوه بخشی از فرآیند فکری شماست',
+    descFa: 'قهوه همراه لحظات تمرکز و ایده‌پردازی‌تان است؛ طعم‌های پیچیده و لایه‌دار را می‌پسندید.',
+    descEn: 'Coffee accompanies your focus and ideas — layered, complex flavors appeal to you.',
+    s: {
+      floral:9, sweet:6, chocolatey:4, bold:3,
+      light:8, medium:5, full:2,
+      energised:4, focused:6, creative:10, relaxed:6, reflective:9,
+      morning:5, work:5, reading:9, friends:4, afterdinner:6, weekend:6,
+      v60:8, frenchpress:5, espresso:3, aeropress:7, coldbrew:6, other:6,
+      beginner:4, regular:7, enthusiast:8
+    }
+  },
+  weekend: {
+    icon: '🌤️',
+    fa: 'آخرهفته‌ای', en: 'The Weekend Sipper',
+    tagFa: 'قهوه یعنی وقت‌گذرانی بی‌عجله',
+    descFa: 'قهوه‌تان را در کنار دوستان و بدون عجله می‌نوشید؛ لذت بردن برایتان مهم‌تر از پیچیدگی است.',
+    descEn: 'You sip slowly with friends — enjoyment matters more than complexity.',
+    s: {
+      floral:4, sweet:7, chocolatey:5, bold:2,
+      light:4, medium:6, full:6,
+      energised:3, focused:2, creative:5, relaxed:9, reflective:4,
+      morning:4, work:1, reading:5, friends:10, afterdinner:6, weekend:10,
+      v60:5, frenchpress:6, espresso:4, aeropress:5, coldbrew:8, other:6,
+      beginner:7, regular:6, enthusiast:3
+    }
+  }
+};
+
+function determinePersona() {
+  let bestKey = null, bestScore = -1;
+  for (const key in PERSONAS) {
+    const p = PERSONAS[key];
+    let score = 0;
+    score += (p.s[ans.taste]      || 0) * 3.0;
+    score += (p.s[ans.body]       || 0) * 2.0;
+    score += (p.s[ans.state]      || 0) * 1.5;
+    score += (p.s[ans.context]    || 0) * 1.5;
+    score += (p.s[ans.brew]       || 0) * 1.0;
+    score += (p.s[ans.experience] || 0) * 1.0;
+    if (score > bestScore) { bestScore = score; bestKey = key; }
+  }
+  return PERSONAS[bestKey];
+}
+
+/* ═══════════════════════════════════════════
    RECOMMENDATION ENGINE
 ═══════════════════════════════════════════ */
 function recommend() {
@@ -1979,15 +2088,14 @@ function recommend() {
    RENDER RESULT
 ═══════════════════════════════════════════ */
 function render(r) {
-  // Identity name
-  const identityMap = {
-    floral: { en: 'The Floral Soul', fa: 'روح گل‌ها' },
-    sweet:  { en: 'The Sweet Wanderer', fa: 'دل‌شیفته شیرینی' },
-    chocolatey: { en: 'The Dark Roast Devotee', fa: 'عاشق تلخی' },
-    bold:   { en: 'The Bold Explorer', fa: 'کاوشگر جسور' }
-  };
-  const identity = identityMap[ans.taste] || { en: 'The Coffee Soul', fa: 'روح قهوه' };
-  document.getElementById('r-identity-name').textContent = currentLang === 'fa' ? identity.fa : identity.en;
+  // Persona (Coffee Personality Engine — بر اساس ترکیب هر ۶ جواب)
+  const persona = currentPersona || determinePersona();
+  document.getElementById('r-identity-name').textContent =
+    persona.icon + ' ' + (currentLang === 'fa' ? persona.fa : persona.en);
+  document.getElementById('r-persona-tagline').textContent =
+    currentLang === 'fa' ? persona.tagFa : '';
+  document.getElementById('r-persona-desc').textContent =
+    currentLang === 'fa' ? persona.descFa : persona.descEn;
 
   // Badge tags
   const badge = document.getElementById('r-identity-badge');
