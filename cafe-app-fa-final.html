@@ -2120,7 +2120,7 @@ function buildFlavorRadar(bean, highlightKey) {
     { key: 'chocolatey', fa: 'شکلاتی',  en: 'Chocolatey' },
     { key: 'bold',       fa: 'پررنگ',   en: 'Bold' }
   ];
-  const cx = 110, cy = 110, maxR = 78;
+  const cx = 140, cy = 140, maxR = 62;
   const angleStep = (2 * Math.PI) / axes.length;
 
   function pointAt(i, value) {
@@ -2157,7 +2157,7 @@ function buildFlavorRadar(bean, highlightKey) {
   let labels = '', dots = '';
   axes.forEach((a, i) => {
     const angle = -Math.PI / 2 + i * angleStep;
-    const labelR = maxR + 24;
+    const labelR = maxR + 38;
     const lx = cx + labelR * Math.cos(angle);
     const ly = cy + labelR * Math.sin(angle);
     const isHi = a.key === highlightKey;
@@ -2168,7 +2168,7 @@ function buildFlavorRadar(bean, highlightKey) {
     dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${isHi ? 5 : 3}" fill="${color}"/>`;
   });
 
-  return `<svg viewBox="0 0 220 220" width="240" height="240" xmlns="http://www.w3.org/2000/svg">
+  return `<svg viewBox="0 0 280 280" width="260" height="260" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
     ${grid}
     ${axisLines}
     <polygon points="${dataPts}" fill="rgba(196,149,106,0.35)" stroke="#6B3F2A" stroke-width="2"/>
