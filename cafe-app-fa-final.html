@@ -45,6 +45,8 @@
   --green: #3A7A3A;
   --green-bg: #EAF5EA;
   --tint: #FDF5E8;
+  --gray: #9B9086;
+  --gray-light: #C7BEB2;
 }
 body.dark-mode {
   --cream: #17110C;
@@ -58,6 +60,8 @@ body.dark-mode {
   --green: #7FD17F;
   --green-bg: #1E3320;
   --tint: #2E2013;
+  --gray: #8B8378;
+  --gray-light: #4A4238;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
@@ -111,8 +115,16 @@ body {
 .input-field.error { border-color: #C0392B; }
 
 /* ── PROGRESS ── */
-.progress-wrap { margin-bottom: 28px; }
-.progress-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--caramel); letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 8px; }
+.progress-wrap { margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.progress-bean { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 6px var(--shadow)); }
+.progress-bean svg { transition: fill 0.3s ease; }
+.bean-pulse { animation: beanPulse 0.4s ease; }
+@keyframes beanPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.progress-label { font-size: 11px; color: var(--caramel); letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial', sans-serif; font-weight: 600; }
 .progress-bar { background: #DDD5C2; border-radius: 4px; height: 3px; overflow: hidden; }
 .progress-fill { background: var(--caramel); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 
@@ -134,10 +146,12 @@ body {
 .option-card:active { transform: scale(0.96); }
 .option-card.selected { border-color: var(--caramel); background: var(--tint); box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
 .option-card.full-row { grid-column: span 2; }
-.option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
+.option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; display: flex; justify-content: center; }
+.option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
+.option-card.selected .option-icon svg { color: var(--caramel); }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
 .option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
-.option-desc { font-size: 10px; color: #AAA; margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
+.option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
 .btn-primary {
@@ -269,7 +283,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: 12px; overflow: hidden; border: 2px solid #DDD5C2; }
 .auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; background: var(--white); color: var(--caramel); border: none; transition: all 0.2s; }
 .auth-tab.active { background: var(--medium-brown); color: var(--white); }
-.otp-hint { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; text-align: center; margin-top: 8px; line-height: 1.6; }
+.otp-hint { font-size: 11px; color: var(--gray-light); font-family: 'Arial', sans-serif; text-align: center; margin-top: 8px; line-height: 1.6; }
 
 /* ── DASHBOARD ── */
 .dash-header { background: var(--medium-brown); margin: 0 -28px; padding: 28px 28px 24px; margin-bottom: 24px; }
@@ -281,7 +295,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
 .profile-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
 .profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
-.profile-card-date { font-size: 11px; color: #AAA; font-family: 'Arial', sans-serif; }
+.profile-card-date { font-size: 11px; color: var(--gray-light); font-family: 'Arial', sans-serif; }
 .profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
 .profile-card-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 12px; padding: 4px 11px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
@@ -289,7 +303,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
 .status-paid { background: var(--green-bg); color: var(--green); border: 1px solid #C0DEC0; }
 .status-shipped { background: #E8F0FF; color: #3A5FBF; border: 1px solid #C0D0FF; }
-.empty-state { text-align: center; padding: 40px 20px; color: #AAA; font-family: 'Arial', sans-serif; font-size: 14px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-light); font-family: 'Arial', sans-serif; font-size: 14px; }
 .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
 /* ── ORDER SCREEN ── */
@@ -303,7 +317,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .textarea-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
 .order-summary { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
 .order-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; font-family: 'Arial', sans-serif; }
-.order-summary-label { color: #AAA; }
+.order-summary-label { color: var(--gray-light); }
 .order-summary-value { font-weight: bold; color: var(--dark-brown); text-align: left; direction: ltr; }
 
 /* ── DIVIDER ── */
@@ -318,7 +332,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .msg-card.unread { border-right-color: var(--medium-brown); background: var(--tint); }
 .msg-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .msg-card-from { font-size: 12px; font-weight: bold; color: var(--caramel); font-family: Arial,sans-serif; }
-.msg-card-time { font-size: 11px; color: #AAA; font-family: Arial,sans-serif; }
+.msg-card-time { font-size: 11px; color: var(--gray-light); font-family: Arial,sans-serif; }
 .msg-card-text { font-size: 14px; color: var(--dark-brown); line-height: 1.6; }
 .msg-unread-badge {
   background: var(--medium-brown); color: white; border-radius: 20px;
@@ -372,7 +386,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .confirm-icon { font-size: 44px; margin-bottom: 12px; }
 .confirm-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 8px; }
-.confirm-desc { font-size: 13px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; }
+.confirm-desc { font-size: 13px; color: var(--gray); font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; }
 .confirm-actions { display: flex; gap: 10px; }
 .confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
 .confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
@@ -390,11 +404,11 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .roastery-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
 .roastery-logo { font-size: 36px; width: 56px; height: 56px; background: var(--tint); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .roastery-name { font-size: 17px; font-weight: bold; color: var(--dark-brown); }
-.roastery-location { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; margin-top: 3px; }
+.roastery-location { font-size: 12px; color: var(--gray-light); font-family: Arial,sans-serif; margin-top: 3px; }
 .roastery-stats { display: flex; gap: 14px; margin-bottom: 10px; }
 .roastery-stat { font-size: 12px; color: var(--medium-brown); font-family: Arial,sans-serif; }
 .roastery-stat span { font-weight: bold; }
-.roastery-desc { font-size: 13px; color: #888; line-height: 1.6; font-family: Arial,sans-serif; }
+.roastery-desc { font-size: 13px; color: var(--gray); line-height: 1.6; font-family: Arial,sans-serif; }
 .roastery-select-btn {
   width: 100%; padding: 11px; background: var(--medium-brown); color: white;
   border: none; border-radius: 12px; font-size: 13px; font-family: Arial,sans-serif;
@@ -418,7 +432,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 }
 .payment-step-content { overflow: hidden; }
 .payment-step-title { font-size: 14px; font-weight: bold; color: var(--dark-brown); margin-bottom: 6px; }
-.payment-step-desc { font-size: 12px; color: #888; font-family: Arial,sans-serif; line-height: 1.6; }
+.payment-step-desc { font-size: 12px; color: var(--gray); font-family: Arial,sans-serif; line-height: 1.6; }
 .card-number-box {
   background: linear-gradient(135deg, var(--dark-brown), var(--medium-brown));
   border-radius: 16px; padding: 20px 22px; margin: 12px 0; direction: ltr; text-align: center;
@@ -436,7 +450,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   border-radius: 14px; padding: 16px 20px; margin: 12px 0;
   display: flex; justify-content: space-between; align-items: center;
 }
-.amount-due-label { font-size: 12px; color: #AAA; font-family: Arial,sans-serif; }
+.amount-due-label { font-size: 12px; color: var(--gray-light); font-family: Arial,sans-serif; }
 .amount-due-value { font-size: 22px; font-weight: bold; color: var(--dark-brown); }
 .amount-due-currency { font-size: 12px; color: var(--caramel); font-family: Arial,sans-serif; }
 .upload-area {
@@ -448,7 +462,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .upload-area input { display: none; }
 .upload-icon { font-size: 36px; margin-bottom: 8px; }
 .upload-text { font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
-.upload-sub { font-size: 11px; color: #AAA; margin-top: 4px; font-family: Arial,sans-serif; }
+.upload-sub { font-size: 11px; color: var(--gray-light); margin-top: 4px; font-family: Arial,sans-serif; }
 .upload-preview { max-width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
 .payment-timer {
   background: #FFF8EC; border: 1px solid #F0C070; border-radius: 12px;
@@ -515,7 +529,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
 .profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
-.profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: #AAA; font-family: Arial,sans-serif; white-space: nowrap; }
+.profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: var(--gray-light); font-family: Arial,sans-serif; white-space: nowrap; }
 .profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 13px; font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; font-weight: 600; }
 .profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
@@ -529,7 +543,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
 .order-bean-small { font-size: 12px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
-.order-address-new { font-size: 14px; color: #888; margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
+.order-address-new { font-size: 14px; color: var(--gray); margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
 
 /* ── PROFILE DETAIL SCREEN ── */
 .detail-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
@@ -737,127 +751,123 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen" id="screen-1">
   <button class="btn-back" onclick="goBack(1)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7CB342"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 1 of 6</span><span class="fa-only">سوال ۱ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:17%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">What flavors call to you?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">چه طعم‌هایی شما را جذب می‌کند؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon">🌸</div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
-    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon">🍯</div><div class="option-en">Sweet & Balanced</div><div class="option-fa" style="direction:rtl">شیرین و متعادل</div><div class="option-desc">Caramel, honey, cherry</div></div>
-    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon">🍫</div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
-    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon">⚡</div><div class="option-en">Bold & Earthy</div><div class="option-fa" style="direction:rtl">تند و خاکی</div><div class="option-desc">Strong, dark, intense</div></div>
+    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="12" cy="6" r="2.6"/><circle cx="17" cy="9.5" r="2.6"/><circle cx="15" cy="16" r="2.6"/><circle cx="9" cy="16" r="2.6"/><circle cx="7" cy="9.5" r="2.6"/></svg></div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
+    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8.2 6 11a6 6 0 0 1-12 0c0-2.8 2-6 6-11z"/><line x1="8.3" y1="15" x2="15.7" y2="15"/></svg></div><div class="option-en">Sweet & Mellow</div><div class="option-fa" style="direction:rtl">شیرین و ملایم</div><div class="option-desc">Caramel, honey, cherry</div></div>
+    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
+    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Bold & Woodsy</div><div class="option-fa" style="direction:rtl">تند و چوبی</div><div class="option-desc">Strong, deep, woodsy</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-1" onclick="go(2)" disabled>Next →</button>
+
 </div>
 
 <div class="screen" id="screen-2">
   <button class="btn-back" onclick="goBack(2)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#6C9438"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 2 of 6</span><span class="fa-only">سوال ۲ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:33%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">How do you like your coffee?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه‌تان را چگونه دوست دارید؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon">🍃</div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
-    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon">☕</div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
-    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon">🌊</div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
+    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c8 0 14-6 14-15-9 0-15 6-15 14 0 .5 0 1 .3 1z"/><path d="M6 18c3-3 6-6 9-11"/></svg></div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
+    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
+    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-2" onclick="go(3)" disabled>Next →</button>
+
 </div>
 
 <div class="screen" id="screen-3">
   <button class="btn-back" onclick="goBack(3)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#5C762D"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 3 of 6</span><span class="fa-only">سوال ۳ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">What are you seeking right now?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه‌ای هستید؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon">⚡</div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
-    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon">🎯</div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
-    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon">🎨</div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
-    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon">🌿</div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
-    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon">🌙</div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
+    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
+    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
+    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 8 0 1 0 0 16c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-6-9-6z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
+    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
+    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-3" onclick="go(4)" disabled>Next →</button>
+
 </div>
 
 <div class="screen" id="screen-4">
   <button class="btn-back" onclick="goBack(4)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4C5723"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 4 of 6</span><span class="fa-only">سوال ۴ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:67%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">When is this coffee for?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">این قهوه برای چه موقعیتی است؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'context','morning')"><div class="option-icon">🌅</div><div class="option-en">Morning</div><div class="option-fa" style="direction:rtl">صبح</div></div>
-    <div class="option-card" onclick="pick(this,'context','work')"><div class="option-icon">💼</div><div class="option-en">Work Session</div><div class="option-fa" style="direction:rtl">جلسه کاری</div></div>
-    <div class="option-card" onclick="pick(this,'context','reading')"><div class="option-icon">📚</div><div class="option-en">Reading</div><div class="option-fa" style="direction:rtl">مطالعه</div></div>
-    <div class="option-card" onclick="pick(this,'context','friends')"><div class="option-icon">👥</div><div class="option-en">With Friends</div><div class="option-fa" style="direction:rtl">با دوستان</div></div>
-    <div class="option-card" onclick="pick(this,'context','afterdinner')"><div class="option-icon">🍽️</div><div class="option-en">After Dinner</div><div class="option-fa" style="direction:rtl">بعد از شام</div></div>
-    <div class="option-card" onclick="pick(this,'context','weekend')"><div class="option-icon">🌿</div><div class="option-en">Weekend Relax</div><div class="option-fa" style="direction:rtl">آخر هفته</div></div>
+    <div class="option-card" onclick="pick(this,'context','morning')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><line x1="2" y1="18" x2="22" y2="18"/><line x1="12" y1="6" x2="12" y2="9"/><line x1="5.5" y1="9.5" x2="7.3" y2="11"/><line x1="18.5" y1="9.5" x2="16.7" y2="11"/></svg></div><div class="option-en">Morning</div><div class="option-fa" style="direction:rtl">صبح</div></div>
+    <div class="option-card" onclick="pick(this,'context','work')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="3" y1="13" x2="21" y2="13"/></svg></div><div class="option-en">Work Session</div><div class="option-fa" style="direction:rtl">جلسه کاری</div></div>
+    <div class="option-card" onclick="pick(this,'context','reading')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5C5 4.5 8 4.5 12 5.5c4-1 7-1 9 0v13c-2-1-5-1-9 0-4-1-7-1-9 0v-13z"/><line x1="12" y1="5.5" x2="12" y2="18.5"/></svg></div><div class="option-en">Reading</div><div class="option-fa" style="direction:rtl">مطالعه</div></div>
+    <div class="option-card" onclick="pick(this,'context','friends')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 14.2c2.6.3 4.5 2.4 4.5 5.3"/></svg></div><div class="option-en">With Friends</div><div class="option-fa" style="direction:rtl">با دوستان</div></div>
+    <div class="option-card" onclick="pick(this,'context','afterdinner')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="3"/></svg></div><div class="option-en">After Dinner</div><div class="option-fa" style="direction:rtl">بعد از شام</div></div>
+    <div class="option-card" onclick="pick(this,'context','weekend')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Weekend Relax</div><div class="option-fa" style="direction:rtl">آخر هفته</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-4" onclick="go(5)" disabled>Next →</button>
+
 </div>
 
 <div class="screen" id="screen-5">
   <button class="btn-back" onclick="goBack(5)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#3C3918"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 5 of 6</span><span class="fa-only">سوال ۵ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:83%"></div></div>
   </div>
   <div class="q-header">
     <div class="q-text-en">How do you brew your coffee?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">روش دم‌آوری شما چیست؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon">☕</div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
-    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon">🫖</div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
-    <div class="option-card" onclick="pick(this,'brew','espresso')"><div class="option-icon">⚡</div><div class="option-en">Espresso</div><div class="option-fa" style="direction:rtl">اسپرسو</div><div class="option-desc">Machine or Moka Pot</div></div>
-    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon">🔧</div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
-    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon">🧊</div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
-    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon">🌟</div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
+    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
+    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg></div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','espresso')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Espresso</div><div class="option-fa" style="direction:rtl">اسپرسو</div><div class="option-desc">Machine or Moka Pot</div></div>
+    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg></div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
+    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6z"/></svg></div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-5" onclick="go(6)" disabled>Next →</button>
+
 </div>
 
 <div class="screen" id="screen-6">
   <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#2C1A0E"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label"><span class="en-only">Question 6 of 6</span><span class="fa-only">سوال ۶ از ۶</span></div>
-    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
   </div>
   <div class="q-header">
-    <div class="q-text-en">Your coffee experience?</div>
-    <div class="q-text-fa" style="text-align:right;direction:rtl">تجربه شما با قهوه چقدر است؟</div>
+    <div class="q-text-en">How do you like your acidity?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">ترشی و طراوت قهوه رو چطور دوست داری؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'experience','beginner')"><div class="option-icon">🌱</div><div class="option-en">I'm exploring coffee</div><div class="option-fa" style="direction:rtl">در حال کشف دنیای قهوه‌ام</div></div>
-    <div class="option-card" onclick="pick(this,'experience','regular')"><div class="option-icon">☕</div><div class="option-en">Regular coffee lover</div><div class="option-fa" style="direction:rtl">عاشق قهوه</div></div>
-    <div class="option-card" onclick="pick(this,'experience','enthusiast')"><div class="option-icon">🏆</div><div class="option-en">Coffee enthusiast</div><div class="option-fa" style="direction:rtl">متخصص قهوه</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','bright')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg></div><div class="option-en">Bright & Citrusy</div><div class="option-fa" style="direction:rtl">زنده و ترش</div><div class="option-desc">Lively, juicy, tea-like</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','balanced')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div><div class="option-en">Balanced</div><div class="option-fa" style="direction:rtl">متعادل</div><div class="option-desc">Not too sharp, not too flat</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','smooth')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Smooth & Low-Acid</div><div class="option-fa" style="direction:rtl">نرم و بدون ترشی</div><div class="option-desc">Mellow, heavy, no sharpness</div></div>
   </div>
   <div class="spacer"></div>
-  <button class="btn-primary" id="btn-6" onclick="showLoading()" disabled>
-    <span class="en-only">Find My Coffee ✨</span>
-    <span class="fa-only">قهوه من را پیدا کن ✨</span>
-  </button>
 </div>
 
 <!-- ══════ LOADING ══════ -->
@@ -982,7 +992,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">🛒 Order This Bean</span>
     <span class="fa-only">🛒 سفارش این دانه</span>
   </button>
-  <button class="btn-primary btn-ghost" onclick="shareResultCard()" style="margin-bottom:10px;">
+  <button class="btn-primary btn-ghost" onclick="openSharePrefsModal()" style="margin-bottom:10px;">
     <span class="en-only">📤 Share My Coffee Identity</span>
     <span class="fa-only">📤 اشتراک‌گذاری هویت قهوه‌ام</span>
   </button>
@@ -1002,14 +1012,14 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">انتخاب رستری</span>
       <span class="en-only">Choose Roastery</span>
     </h2>
-    <p style="font-size:13px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;">
+    <p style="font-size:13px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;">
       رستری مورد نظرت رو انتخاب کن
     </p>
   </div>
 
   <!-- Bean being ordered -->
   <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center;">
-    <div style="font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
+    <div style="font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
   </div>
 
@@ -1032,7 +1042,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <!-- Bean + Roastery Summary -->
   <div class="order-summary" id="order-bean-summary">
-    <div style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
+    <div style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
     <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
     <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
@@ -1088,7 +1098,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">✅ Submit Order</span>
     <span class="fa-only">✅ ثبت سفارش</span>
   </button>
-  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
+  <p style="text-align:center;font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:12px;">
     پس از ثبت سفارش، تیم رستری با شما تماس می‌گیرد.
   </p>
 </div>
@@ -1103,7 +1113,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">پرداخت سفارش</span>
       <span class="en-only">Order Payment</span>
     </h2>
-    <p style="font-size:12px;color:#AAA;font-family:Arial,sans-serif;margin-top:4px;"><span class="fa-only">مبلغ رو واریز کن و رسید بفرست</span><span class="en-only">Transfer the amount and send the receipt</span></p>
+    <p style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;"><span class="fa-only">مبلغ رو واریز کن و رسید بفرست</span><span class="en-only">Transfer the amount and send the receipt</span></p>
   </div>
 
   <!-- Timer -->
@@ -1177,7 +1187,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="fa-only">✅ تأیید و ارسال رسید</span>
     <span class="en-only">✅ Confirm Payment</span>
   </button>
-  <p style="text-align:center;font-size:11px;color:#AAA;font-family:Arial,sans-serif;margin-top:12px;">
+  <p style="text-align:center;font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:12px;">
     بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.
   </p>
 </div>
@@ -1225,7 +1235,7 @@ async function sb(method, path, body = null) {
    APP STATE
 ═══════════════════════════════════════════ */
 let currentUser = null; // { id, name, phone }
-let ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
+let ans = { taste: null, body: null, state: null, context: null, brew: null, acidity: null };
 let rec = null;
 let currentPersona = null;
 let currentProfileId = null;
@@ -1421,7 +1431,7 @@ function scrollToMessages() {
   markAllMsgsRead([]);
 }
 
-const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
+const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
 const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
 const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
 const stateFA = { energised:'پرانرژی', focused:'متمرکز', creative:'خلاق', relaxed:'آرام', reflective:'تأملی' };
@@ -1532,7 +1542,7 @@ async function loadOrders() {
           <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusFA[o.status]||o.status}</div>
         </div>
         ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
-        ${o.notes ? `<div style="font-size:11px;color:#AAA;margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
+        ${o.notes ? `<div style="font-size:11px;color:var(--gray-light);margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
         ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;direction:ltr;text-align:right;">🔖 کد پیگیری: ${o.transaction_id}</div>` : ''}
         ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">🗑️ حذف این سفارش</button>` : ''}
       </div>`;
@@ -1598,7 +1608,7 @@ function viewProfile(p) {
   ans.state = p.mood || null;
   ans.context = p.context || null;
   ans.brew = p.brew_method || null;
-  ans.experience = p.experience || null;
+  ans.acidity = p.acidity || null;
   currentProfileId = p.id;
   currentPersona = determinePersona();
   const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
@@ -1616,7 +1626,7 @@ function viewProfile(p) {
     p.body        ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
     p.brew_method ? `<span class="profile-tag-new">${brewFA[p.brew_method]||p.brew_method}</span>` : '',
     p.mood        ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
-    p.experience  ? `<span class="profile-tag-new">${p.experience}</span>` : '',
+    p.acidity  ? `<span class="profile-tag-new">${p.acidity}</span>` : '',
   ].filter(Boolean).join('');
 
   const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
@@ -1664,7 +1674,7 @@ function viewProfile(p) {
         placeholder="تجربه‌ات از این قهوه رو بنویس..."
         style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <span style="font-size:13px;color:#888;font-family:Arial,sans-serif;">امتیاز:</span>
+        <span style="font-size:13px;color:var(--gray);font-family:Arial,sans-serif;">امتیاز:</span>
         <div style="display:flex;gap:4px;" id="stars-${pid}">
           <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
           <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
@@ -1681,7 +1691,7 @@ function viewProfile(p) {
     <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
       🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
     </button>
-    <button class="btn-primary btn-ghost" onclick="shareResultCard()" style="margin-top:10px;">
+    <button class="btn-primary btn-ghost" onclick="openSharePrefsModal()" style="margin-top:10px;">
       📤 <span class="fa-only">اشتراک‌گذاری هویت قهوه‌ام</span><span class="en-only">Share My Coffee Identity</span>
     </button>
   `;
@@ -1733,7 +1743,7 @@ function reorderProfile() {
    QUIZ
 ═══════════════════════════════════════════ */
 function startNewProfile() {
-  ans = { taste: null, body: null, state: null, context: null, brew: null, experience: null };
+  ans = { taste: null, body: null, state: null, context: null, brew: null, acidity: null };
   rec = null;
   currentPersona = null;
   currentProfileId = null;
@@ -1745,12 +1755,28 @@ function startNewProfile() {
   show('screen-1');
 }
 
+function updateProgressBean(category) {
+  const active = document.querySelector('.screen.active .progress-bean');
+  if (!active) return;
+  active.classList.remove('bean-pulse');
+  void active.offsetWidth; // ری‌استارت انیمیشن
+  active.classList.add('bean-pulse');
+}
+
 function pick(el, category, value) {
   el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   ans[category] = value;
-  const btn = { taste:'btn-1', body:'btn-2', state:'btn-3', context:'btn-4', brew:'btn-5', experience:'btn-6' }[category];
-  if (btn) document.getElementById(btn).disabled = false;
+  updateProgressBean(category);
+  const nextAction = {
+    taste: () => go(2),
+    body: () => go(3),
+    state: () => go(4),
+    context: () => go(5),
+    brew: () => go(6),
+    acidity: () => showLoading()
+  }[category];
+  if (nextAction) setTimeout(nextAction, 280);
 }
 
 function go(n) { show('screen-' + n); }
@@ -1793,7 +1819,7 @@ async function saveProfile(rec) {
       mood: ans.state,
       context: ans.context,
       brew_method: ans.brew,
-      experience: ans.experience,
+      acidity: ans.acidity,
       persona: currentPersona ? currentPersona.en : null,
       recommended_bean: rec.name + ' (' + rec.detail + ')'
     };
@@ -1812,7 +1838,7 @@ async function saveProfile(rec) {
       q3_state:       ans.state      || '',
       q4_context:     ans.context    || '',
       q5_brew:        ans.brew       || '',
-      q6_experience:  ans.experience || '',
+      q6_acidity:     ans.acidity || '',
       persona:        currentPersona ? currentPersona.en : '',
       bean:           rec.name + ' (' + rec.detail + ')',
       is_blend:       rec._isBlend ? 'YES' : 'NO',
@@ -1997,8 +2023,8 @@ const BEANS = [
       morning:9, work:5, reading:8, friends:6, afterdinner:4, weekend:7,
       // روش دم‌آوری
       v60:10, frenchpress:4, espresso:2, aeropress:7, coldbrew:6, other:5,
-      // تجربه
-      beginner:4, regular:7, enthusiast:10
+      // اسیدیته
+      bright:10, balanced:5, smooth:1
     }
   },
   { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.',
@@ -2008,7 +2034,7 @@ const BEANS = [
       energised:10, focused:10, creative:6, relaxed:3, reflective:4,
       morning:8, work:10, reading:7, friends:6, afterdinner:3, weekend:5,
       v60:10, frenchpress:5, espresso:3, aeropress:8, coldbrew:5, other:5,
-      beginner:5, regular:9, enthusiast:9
+      bright:10, balanced:6, smooth:1
     }
   },
   { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.',
@@ -2018,7 +2044,7 @@ const BEANS = [
       energised:5, focused:7, creative:7, relaxed:9, reflective:6,
       morning:8, work:6, reading:9, friends:8, afterdinner:7, weekend:10,
       v60:9, frenchpress:6, espresso:4, aeropress:10, coldbrew:5, other:6,
-      beginner:10, regular:9, enthusiast:6
+      bright:7, balanced:9, smooth:4
     }
   },
   { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.',
@@ -2028,7 +2054,7 @@ const BEANS = [
       energised:4, focused:4, creative:8, relaxed:9, reflective:7,
       morning:5, work:4, reading:9, friends:7, afterdinner:9, weekend:8,
       v60:7, frenchpress:9, espresso:3, aeropress:6, coldbrew:4, other:6,
-      beginner:5, regular:8, enthusiast:9
+      bright:8, balanced:7, smooth:3
     }
   },
   { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.',
@@ -2038,7 +2064,7 @@ const BEANS = [
       energised:5, focused:7, creative:5, relaxed:8, reflective:6,
       morning:9, work:8, reading:7, friends:9, afterdinner:6, weekend:8,
       v60:8, frenchpress:7, espresso:8, aeropress:7, coldbrew:6, other:10,
-      beginner:10, regular:9, enthusiast:6
+      bright:5, balanced:10, smooth:6
     }
   },
   { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.',
@@ -2048,7 +2074,7 @@ const BEANS = [
       energised:3, focused:5, creative:3, relaxed:10, reflective:7,
       morning:6, work:5, reading:6, friends:8, afterdinner:9, weekend:10,
       v60:3, frenchpress:9, espresso:10, aeropress:5, coldbrew:4, other:7,
-      beginner:9, regular:8, enthusiast:5
+      bright:1, balanced:5, smooth:10
     }
   },
   { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.',
@@ -2058,7 +2084,7 @@ const BEANS = [
       energised:3, focused:5, creative:4, relaxed:7, reflective:9,
       morning:5, work:6, reading:8, friends:6, afterdinner:10, weekend:7,
       v60:4, frenchpress:8, espresso:10, aeropress:4, coldbrew:3, other:7,
-      beginner:6, regular:8, enthusiast:7
+      bright:4, balanced:8, smooth:7
     }
   },
   { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.',
@@ -2068,7 +2094,7 @@ const BEANS = [
       energised:2, focused:4, creative:3, relaxed:7, reflective:10,
       morning:3, work:4, reading:10, friends:4, afterdinner:8, weekend:7,
       v60:2, frenchpress:10, espresso:7, aeropress:3, coldbrew:3, other:6,
-      beginner:3, regular:6, enthusiast:9
+      bright:0, balanced:3, smooth:10
     }
   },
 ];
@@ -2094,7 +2120,7 @@ const PERSONAS = {
       energised:6, focused:7, creative:8, relaxed:2, reflective:6,
       morning:5, work:6, reading:8, friends:4, afterdinner:5, weekend:6,
       v60:9, frenchpress:5, espresso:5, aeropress:9, coldbrew:6, other:7,
-      beginner:2, regular:6, enthusiast:10
+      bright:8, balanced:6, smooth:3
     }
   },
   comfort: {
@@ -2109,7 +2135,7 @@ const PERSONAS = {
       energised:2, focused:3, creative:4, relaxed:10, reflective:6,
       morning:6, work:4, reading:6, friends:6, afterdinner:9, weekend:8,
       v60:4, frenchpress:9, espresso:7, aeropress:5, coldbrew:5, other:6,
-      beginner:9, regular:6, enthusiast:2
+      bright:3, balanced:6, smooth:9
     }
   },
   bold: {
@@ -2124,7 +2150,7 @@ const PERSONAS = {
       energised:9, focused:9, creative:3, relaxed:2, reflective:5,
       morning:9, work:9, reading:4, friends:5, afterdinner:6, weekend:4,
       v60:3, frenchpress:6, espresso:10, aeropress:5, coldbrew:5, other:5,
-      beginner:3, regular:8, enthusiast:8
+      bright:2, balanced:5, smooth:9
     }
   },
   creative: {
@@ -2139,7 +2165,7 @@ const PERSONAS = {
       energised:4, focused:6, creative:10, relaxed:6, reflective:9,
       morning:5, work:5, reading:9, friends:4, afterdinner:6, weekend:6,
       v60:8, frenchpress:5, espresso:3, aeropress:7, coldbrew:6, other:6,
-      beginner:4, regular:7, enthusiast:8
+      bright:9, balanced:6, smooth:2
     }
   },
   weekend: {
@@ -2154,7 +2180,7 @@ const PERSONAS = {
       energised:3, focused:2, creative:5, relaxed:9, reflective:4,
       morning:4, work:1, reading:5, friends:10, afterdinner:6, weekend:10,
       v60:5, frenchpress:6, espresso:4, aeropress:5, coldbrew:8, other:6,
-      beginner:7, regular:6, enthusiast:3
+      bright:4, balanced:7, smooth:7
     }
   }
 };
@@ -2169,7 +2195,7 @@ function determinePersona() {
     score += (p.s[ans.state]      || 0) * 1.5;
     score += (p.s[ans.context]    || 0) * 1.5;
     score += (p.s[ans.brew]       || 0) * 1.0;
-    score += (p.s[ans.experience] || 0) * 1.0;
+    score += (p.s[ans.acidity] || 0) * 1.0;
     if (score > bestScore) { bestScore = score; bestKey = key; }
   }
   return PERSONAS[bestKey];
@@ -2195,7 +2221,7 @@ function recommend() {
     // روش دم‌آوری: 10% (جدید)
     score += (b.s[ans.brew]       || 0) * 1.0;
     // سطح تجربه: 10%
-    score += (b.s[ans.experience] || 0) * 1.0;
+    score += (b.s[ans.acidity] || 0) * 1.0;
 
     return { ...b, _score: score };
   });
@@ -2287,31 +2313,47 @@ function drawCanvasRadar(ctx, bean, highlightKey, cx, cy, maxR) {
   });
 }
 
-function shareResultCard() {
+function shareResultCard(style, birthDay, birthMonth) {
   if (!rec) return;
+  style = style || 'surprise';
   const persona = currentPersona || determinePersona();
   const W = 1080, H = 1920;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
 
+  // پالت رنگی بر اساس سبک انتخابی
+  const palettes = {
+    feminine:  { top: '#4A2038', bottom: '#B87A9E', accent: '#F0C9DD', decoShape: 'circle' },
+    masculine: { top: '#1A1410', bottom: '#3A3028', accent: '#C4956A', decoShape: 'diamond' },
+    surprise:  { top: '#2C1A0E', bottom: '#6B3F2A', accent: '#C4956A', decoShape: 'circle' }
+  };
+  const pal = palettes[style] || palettes.surprise;
+
   // پس‌زمینه
   const grad = ctx.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, '#2C1A0E');
-  grad.addColorStop(1, '#6B3F2A');
+  grad.addColorStop(0, pal.top);
+  grad.addColorStop(1, pal.bottom);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
   ctx.globalAlpha = 0.08;
   ctx.fillStyle = '#FEFEFE';
-  ctx.beginPath(); ctx.arc(W * 0.85, H * 0.1, 260, 0, Math.PI * 2); ctx.fill();
-  ctx.beginPath(); ctx.arc(W * 0.1, H * 0.88, 220, 0, Math.PI * 2); ctx.fill();
+  if (pal.decoShape === 'diamond') {
+    ctx.save(); ctx.translate(W * 0.85, H * 0.1); ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-160, -160, 320, 320); ctx.restore();
+    ctx.save(); ctx.translate(W * 0.1, H * 0.88); ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-140, -140, 280, 280); ctx.restore();
+  } else {
+    ctx.beginPath(); ctx.arc(W * 0.85, H * 0.1, 260, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(W * 0.1, H * 0.88, 220, 0, Math.PI * 2); ctx.fill();
+  }
   ctx.globalAlpha = 1;
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'alphabetic';
 
-  ctx.fillStyle = '#C4956A';
+  ctx.fillStyle = pal.accent;
   ctx.font = '600 32px Arial';
   ctx.fillText(currentLang === 'fa' ? 'کافی آیدنتیتی' : 'COFFEE IDENTITY', W / 2, 130);
 
@@ -2322,7 +2364,7 @@ function shareResultCard() {
   ctx.font = 'bold 62px Arial';
   ctx.fillText(currentLang === 'fa' ? persona.fa : persona.en, W / 2, 450);
 
-  ctx.fillStyle = '#C4956A';
+  ctx.fillStyle = pal.accent;
   ctx.font = '600 30px Arial';
   ctx.fillText(currentLang === 'fa' ? persona.tagFa : '', W / 2, 505);
 
@@ -2355,6 +2397,14 @@ function shareResultCard() {
   }
 
   drawCanvasRadar(ctx, rec, ans.taste, W / 2, cardY + 420, 130);
+
+  if (birthDay && birthMonth) {
+    const monthsFA = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    const monthName = monthsFA[parseInt(birthMonth, 10) - 1] || '';
+    ctx.fillStyle = pal.accent;
+    ctx.font = '600 28px Arial';
+    ctx.fillText(`🎂 ${birthDay} ${monthName} — روزت مبارک!`, W / 2, cardY + cardH + 70);
+  }
 
   ctx.fillStyle = 'rgba(254,254,254,0.55)';
   ctx.font = '24px Arial';
@@ -2468,7 +2518,7 @@ function render(r) {
 
   // Badge tags
   const badge = document.getElementById('r-identity-badge');
-  const tags = [ans.body, ans.state, ans.experience].filter(Boolean);
+  const tags = [ans.body, ans.state, ans.acidity].filter(Boolean);
   badge.innerHTML = tags.map(t => `<span class="identity-tag">${t}</span>`).join('');
 
   // Match score
@@ -2557,7 +2607,7 @@ function render(r) {
     whyMap[ans.taste] || '',
     ans.body === 'light' ? 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد' :
     ans.body === 'full'  ? 'قدرت و غنای این قهوه با خواسته شما هماهنگ است' : '',
-    ans.experience === 'enthusiast' ? 'پیچیدگی این دانه برای کسی مثل شما طراحی شده' : ''
+    ans.acidity === 'bright' ? 'طراوت و شادابی این دانه دقیقاً همونیه که دنبالش بودید' : ''
   ].filter(Boolean);
   why.innerHTML = reasons.map(r => `<div class="why-item"><div class="why-check">✓</div>${r}</div>`).join('');
 }
@@ -2954,7 +3004,7 @@ async function getAIExplanation(rec) {
   const userName = currentUser?.name || '';
   const lang = currentLang;
 
-  const tasteLabels = { floral:'طعم‌های گلی و میوه‌ای', sweet:'طعم‌های شیرین و متعادل', chocolatey:'طعم‌های شکلاتی و آجیلی', bold:'طعم‌های تند و خاکی' };
+  const tasteLabels = { floral:'طعم‌های گلی و میوه‌ای', sweet:'طعم‌های شیرین و ملایم', chocolatey:'طعم‌های شکلاتی و آجیلی', bold:'طعم‌های تند و چوبی' };
   const bodyLabels  = { light:'قهوه سبک و لطیف', medium:'قهوه متوسط و روان', full:'قهوه غنی و پُربدنه' };
   const contextLabels = { morning:'صبح', work:'جلسه کاری', reading:'مطالعه', friends:'با دوستان', afterdinner:'بعد از شام', weekend:'آخر هفته' };
   const brewLabels  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'روش دلخواه' };
@@ -3015,11 +3065,116 @@ function initDarkMode() {
 }
 
 /* ═══════════════════════════════════════════
+   SHARE PREFERENCES (اختیاری، قبل از اشتراک‌گذاری)
+═══════════════════════════════════════════ */
+let selectedShareStyle = 'surprise';
+
+function populateShareBirthSelects() {
+  const dayEl = document.getElementById('share-birth-day');
+  const monthEl = document.getElementById('share-birth-month');
+  if (dayEl.options.length <= 1) {
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      dayEl.appendChild(opt);
+    }
+  }
+  if (monthEl.options.length <= 1) {
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    months.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i + 1; opt.textContent = m;
+      monthEl.appendChild(opt);
+    });
+  }
+}
+
+function openSharePrefsModal() {
+  if (!rec) return;
+  populateShareBirthSelects();
+  selectedShareStyle = 'surprise';
+  document.querySelectorAll('#share-prefs-overlay .option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('share-prefs-overlay').style.display = 'flex';
+}
+
+function closeSharePrefsModal() {
+  document.getElementById('share-prefs-overlay').style.display = 'none';
+}
+
+function selectShareStyle(style) {
+  selectedShareStyle = style;
+  document.querySelectorAll('#share-prefs-overlay .option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('style-opt-' + style).classList.add('selected');
+}
+
+async function saveSharePrefs(style, day, month) {
+  if (!currentUser) return;
+  try {
+    await sb('POST', 'share_preferences', {
+      user_id: currentUser.id,
+      style: style,
+      birth_day: day || null,
+      birth_month: month || null
+    });
+  } catch (e) { /* اختیاریه، اگه ذخیره نشد مشکلی نیست */ }
+}
+
+function submitSharePrefs() {
+  const day = document.getElementById('share-birth-day').value;
+  const month = document.getElementById('share-birth-month').value;
+  closeSharePrefsModal();
+  saveSharePrefs(selectedShareStyle, day, month);
+  shareResultCard(selectedShareStyle, day, month);
+}
+
+function skipSharePrefs() {
+  closeSharePrefsModal();
+  shareResultCard('surprise', null, null);
+}
+
+/* ═══════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════ */
 initDarkMode();
 setLang('fa');
 checkAutoLogin();
 </script>
+
+<!-- Share Preferences Modal (اختیاری، شفاف) -->
+<div id="share-prefs-overlay" style="display:none;position:fixed;inset:0;background:rgba(44,26,14,0.55);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--white);border-radius:22px;padding:26px 24px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;direction:rtl;">
+    <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">کارتت رو شخصی‌تر کنیم؟</div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:18px;">کاملاً اختیاریه — می‌تونی رد کنی و همون کارت پیش‌فرض رو بگیری</div>
+
+    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">کارتت رو چه‌جوری بسازم؟</div>
+    <div class="options cols-1" style="gap:8px;margin-bottom:18px;">
+      <div class="option-card" id="style-opt-feminine" onclick="selectShareStyle('feminine')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">👗</span> <span style="font-size:14px;">خانومی</span>
+      </div>
+      <div class="option-card" id="style-opt-masculine" onclick="selectShareStyle('masculine')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">🎩</span> <span style="font-size:14px;">مثل آقاها</span>
+      </div>
+      <div class="option-card" id="style-opt-surprise" onclick="selectShareStyle('surprise')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">✨</span> <span style="font-size:14px;">فرقی نمی‌کنه، غافلگیرم کن</span>
+      </div>
+    </div>
+
+    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">
+      اگه دوست داری، روز تولدت رو بگو تا یادم نره براش یه هدیه بفرستم 🎂
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:22px;">
+      <select id="share-birth-day" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">روز</option>
+      </select>
+      <select id="share-birth-month" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">ماه</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="submitSharePrefs()" style="margin-bottom:10px;">🎉 بساز و به اشتراک بذار</button>
+    <button class="btn-primary btn-ghost" onclick="skipSharePrefs()">رد کن، همون پیش‌فرض</button>
+  </div>
+</div>
+
 </body>
 </html>
