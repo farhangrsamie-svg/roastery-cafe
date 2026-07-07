@@ -770,9 +770,10 @@ async function viewOrder(orderId) {
   }
 
   const user = order.users || {};
-  const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و متعادل', chocolatey:'شکلاتی و آجیلی', bold:'تند و خاکی' };
+  const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
   const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
   const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+  const acidityFA = { bright:'زنده و ترش', balanced:'متعادل', smooth:'نرم و بدون ترشی' };
   const personaFA = {
     'The Explorer': '🧭 کاوشگر',
     'The Comfort Lover': '☕ آرامش‌جو',
@@ -810,7 +811,7 @@ async function viewOrder(orderId) {
           <div class="profile-row"><span class="profile-key">طعم</span><span class="profile-val">${tasteFA[profile.flavor] || profile.flavor || '—'}</span></div>
           <div class="profile-row"><span class="profile-key">بدنه</span><span class="profile-val">${bodyFA[profile.body] || profile.body || '—'}</span></div>
           <div class="profile-row"><span class="profile-key">روش دم‌آوری</span><span class="profile-val">${brewFA[profile.brew_method] || profile.brew_method || '—'}</span></div>
-          <div class="profile-row"><span class="profile-key">تجربه</span><span class="profile-val">${profile.experience || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">اسیدیته</span><span class="profile-val">${acidityFA[profile.acidity] || profile.acidity || '—'}</span></div>
           ${profile.review_text ? `<div class="profile-row"><span class="profile-key">نظر مشتری</span><span class="profile-val">${profile.review_text}</span></div>` : ''}
           ${profile.review_rating ? `<div class="profile-row"><span class="profile-key">امتیاز</span><span class="profile-val">${'⭐'.repeat(profile.review_rating)}</span></div>` : ''}
         </div>
