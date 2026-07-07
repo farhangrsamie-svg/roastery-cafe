@@ -1,0 +1,3180 @@
+<!DOCTYPE html>
+<!-- 
+  ╔═══════════════════════════════════════════════════════╗
+  ║   هویت قهوه — Coffee Identity Platform               ║
+  ║   Version: 4.0 — Archive Build                       ║
+  ║   Date: 2026-06-28                                   ║
+  ║                                                       ║
+  ║   Stack:                                             ║
+  ║   • Hosting: GitHub Pages                            ║
+  ║   • Database: Supabase (qoxmkuivwpbdzmajplus)        ║
+  ║   • Sheet Log: Google Apps Script                    ║
+  ║   • Auth: Phone + Password (manual)                  ║
+  ║                                                       ║
+  ║   Screens:                                           ║
+  ║   1. Auth (Login / Register)                         ║
+  ║   2. Dashboard (Profiles + Orders)                   ║
+  ║   3. Quiz (6 questions)                              ║
+  ║   4. Result (Coffee profile)                         ║
+  ║   5. Order (50g / 100g + address)                    ║
+  ║   6. Payment (Manual card transfer)                  ║
+  ║   7. Profile Detail                                  ║
+  ║                                                       ║
+  ║   TODO (Next phases):                                ║
+  ║   • OTP via Kavenegar                               ║
+  ║   • IDPay payment gateway                           ║
+  ║   • Admin panel                                      ║
+  ║   • Multi-roastery support                          ║
+  ╚═══════════════════════════════════════════════════════╝
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>هویت قهوه — پلتفرم رست شخصی</title>
+<style>
+:root {
+  --cream: #F5F0E8;
+  --dark-brown: #2C1A0E;
+  --medium-brown: #6B3F2A;
+  --caramel: #C4956A;
+  --light-caramel: #E8C99A;
+  --white: #FEFEFE;
+  --shadow: rgba(44, 26, 14, 0.12);
+  --shadow-strong: rgba(44, 26, 14, 0.25);
+  --green: #3A7A3A;
+  --green-bg: #EAF5EA;
+  --tint: #FDF5E8;
+  --gray: #9B9086;
+  --gray-light: #C7BEB2;
+}
+body.dark-mode {
+  --cream: #17110C;
+  --dark-brown: #F2E9DC;
+  --medium-brown: #D8B999;
+  --caramel: #E0AA76;
+  --light-caramel: #6B5138;
+  --white: #241A11;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --shadow-strong: rgba(0, 0, 0, 0.65);
+  --green: #7FD17F;
+  --green-bg: #1E3320;
+  --tint: #2E2013;
+  --gray: #8B8378;
+  --gray-light: #4A4238;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  background: var(--cream);
+  min-height: 100vh;
+  color: var(--dark-brown);
+  overflow-x: hidden;
+  transition: background-color 0.35s ease, color 0.35s ease;
+}
+.card { transition: background-color 0.35s ease, color 0.35s ease, box-shadow 0.35s ease; }
+.dark-toggle {
+  position: fixed; top: 14px; left: 14px; z-index: 9999;
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--white); color: var(--medium-brown);
+  border: 1px solid var(--light-caramel);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px; cursor: pointer; box-shadow: 0 2px 10px rgba(44,26,14,0.18);
+  transition: all 0.3s ease;
+}
+.dark-toggle:active { transform: scale(0.88); }
+.app-container { max-width: 680px; margin: 0 auto; min-height: 100vh; }
+
+/* ── SCREENS ── */
+.screen {
+  display: none; min-height: 100vh; padding: 40px 28px 36px;
+  flex-direction: column; animation: fadeUp 0.35s ease;
+}
+.screen.active { display: flex; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.spacer { flex: 1; }
+
+/* ── LOGO ── */
+.logo { text-align: center; margin-bottom: 32px; }
+.logo-icon { font-size: 52px; margin-bottom: 10px; line-height: 1; }
+.logo h1 { font-size: 26px; color: var(--medium-brown); letter-spacing: 4px; text-transform: uppercase; font-weight: normal; }
+.logo-sub { font-size: 11px; color: var(--caramel); letter-spacing: 5px; text-transform: uppercase; margin-top: 6px; }
+
+/* ── INPUTS ── */
+.input-group { margin-bottom: 18px; }
+.input-label { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); margin-bottom: 8px; font-family: 'Arial', sans-serif; }
+.input-field {
+  width: 100%; padding: 16px 20px; border: 2px solid #DDD5C2; border-radius: 14px;
+  font-size: 17px; background: var(--white); color: var(--dark-brown); outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; -webkit-appearance: none;
+}
+.input-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
+.input-field.error { border-color: #C0392B; }
+
+/* ── PROGRESS ── */
+.progress-wrap { margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.progress-bean { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 6px var(--shadow)); }
+.progress-bean svg { transition: fill 0.3s ease; }
+.bean-pulse { animation: beanPulse 0.4s ease; }
+@keyframes beanPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.progress-label { font-size: 11px; color: var(--caramel); letter-spacing: 2px; text-transform: uppercase; font-family: 'Arial', sans-serif; font-weight: 600; }
+.progress-bar { background: #DDD5C2; border-radius: 4px; height: 3px; overflow: hidden; }
+.progress-fill { background: var(--caramel); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+/* ── QUESTION ── */
+.q-header { margin-bottom: 28px; }
+.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 4px; line-height: 1.3; }
+.q-text-fa { font-size: 16px; color: var(--medium-brown); font-style: italic; }
+
+/* ── OPTION CARDS ── */
+.options { display: grid; gap: 12px; }
+.options.cols-2 { grid-template-columns: 1fr 1fr; }
+.options.cols-1 { grid-template-columns: 1fr; }
+.option-card {
+  background: var(--white); border: 2px solid transparent; border-radius: 18px;
+  padding: 18px 14px; cursor: pointer; transition: all 0.18s ease;
+  box-shadow: 0 2px 10px var(--shadow); text-align: center;
+  user-select: none; -webkit-user-select: none;
+}
+.option-card:active { transform: scale(0.96); }
+.option-card.selected { border-color: var(--caramel); background: var(--tint); box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
+.option-card.full-row { grid-column: span 2; }
+.option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; display: flex; justify-content: center; }
+.option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
+.option-card.selected .option-icon svg { color: var(--caramel); }
+.option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
+.option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
+.option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  background: var(--medium-brown); color: var(--white); border: none; border-radius: 50px;
+  padding: 17px 40px; font-size: 14px; font-family: 'Arial', sans-serif;
+  letter-spacing: 2px; text-transform: uppercase; cursor: pointer; width: 100%;
+  transition: all 0.2s; box-shadow: 0 4px 18px rgba(107,63,42,0.30); -webkit-appearance: none;
+}
+.btn-primary:hover:not(:disabled) { background: var(--dark-brown); transform: translateY(-1px); }
+.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+.btn-primary:disabled { background: #C8BFB5; box-shadow: none; cursor: default; }
+.btn-ghost { background: transparent; color: var(--caramel); border: 2px solid var(--light-caramel); box-shadow: none; }
+.btn-ghost:hover:not(:disabled) { background: var(--tint); transform: none; }
+.btn-back { background: transparent; border: none; color: var(--caramel); font-size: 13px; cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; padding: 6px 0; margin-bottom: 14px; display: inline-block; }
+
+/* ── LOADING ── */
+#screen-loading {
+  display: none; position: fixed; inset: 0; background: var(--cream);
+  flex-direction: column; align-items: center; justify-content: center; z-index: 100;
+}
+#screen-loading.visible { display: flex; }
+.spinner { font-size: 60px; animation: roast 1.8s ease-in-out infinite; }
+@keyframes roast {
+  0%,100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(15deg) scale(1.05); }
+  75% { transform: rotate(-15deg) scale(1.05); }
+}
+.loading-text { font-size: 20px; color: var(--medium-brown); margin-top: 24px; text-align: center; }
+
+/* ── CARD ── */
+.card { background: var(--white); border-radius: 20px; padding: 24px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px; }
+.card-title { font-size: 14px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; font-weight: 700; }
+
+/* ── RESULT ── */
+.result-identity-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; text-align: center; margin-bottom: 20px; }
+.result-identity-label { font-size: 15px; letter-spacing: 2.5px; color: #E8C99A; text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 6px; font-weight: 700; }
+.result-identity-name { font-size: 27px; font-weight: bold; color: #FEFEFE; margin-bottom: 12px; }
+.match-score-wrap { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0 0; }
+.match-score-bar { flex: 1; max-width: 160px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 4px; overflow: hidden; }
+.match-score-fill { height: 100%; background: #E8C99A; border-radius: 4px; }
+.match-score-pct { font-size: 16px; color: #F0DAB8; font-family: 'Arial', sans-serif; font-weight: 700; }
+.result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
+.result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-style: italic; }
+.flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.flavor-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
+.info-row:last-child { border-bottom: none; }
+.info-label { font-size: 14px; color: #999; }
+.info-value { font-size: 14px; font-weight: bold; color: var(--dark-brown); text-align: right; max-width: 60%; }
+.result-desc { font-size: 14px; line-height: 1.75; color: var(--medium-brown); }
+.why-item { display: flex; align-items: center; gap: 10px; padding: 5px 0; font-size: 13px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.why-check { width: 20px; height: 20px; background: #E8F5E8; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #3A7A3A; }
+.identity-badge { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 12px 0 4px; }
+.persona-tagline { font-size: 17px; color: #E8C99A; margin-bottom: 8px; font-weight: 700; }
+.persona-desc { font-size: 16px; color: #FEFEFE; opacity: 0.92; line-height: 1.75; max-width: 340px; margin: 0 auto 10px; }
+.identity-tag { background: #543018; color: #FEFEFE; border-radius: 20px; padding: 7px 16px; font-size: 14px; font-family: 'Arial', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; }
+.staff-toggle { background: transparent; border: 1px dashed var(--light-caramel); border-radius: 8px; padding: 6px 14px; font-size: 11px; color: var(--caramel); cursor: pointer; font-family: 'Arial', sans-serif; letter-spacing: 1px; margin-bottom: 8px; display: block; width: 100%; text-align: center; }
+.alt-bean-card {
+  background: var(--tint); border: 1px solid var(--light-caramel);
+  border-radius: 18px; padding: 18px 20px; margin-bottom: 14px;
+  animation: fadeUp 0.4s ease;
+}
+.alt-bean-label {
+  font-size: 13px; color: var(--caramel); font-weight: 700; font-family: 'Arial', sans-serif;
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.alt-bean-icon { font-size: 15px; }
+.alt-bean-name { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 3px; }
+.alt-bean-origin { font-size: 13px; color: var(--medium-brown); font-style: italic; margin-bottom: 10px; }
+.alt-bean-flavors { display: flex; flex-wrap: wrap; gap: 6px; }
+.alt-bean-flavor-tag {
+  background: var(--white); border: 1px solid var(--light-caramel); border-radius: 20px;
+  padding: 4px 12px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif;
+}
+
+/* ── AI EXPLANATION CARD ── */
+.ai-card {
+  background: var(--white); border-radius: 20px; padding: 20px 22px;
+  margin-bottom: 14px; box-shadow: 0 4px 20px var(--shadow);
+  border: 1px solid var(--light-caramel); animation: fadeUp 0.4s ease;
+}
+.ai-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.ai-card-icon {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--caramel), var(--medium-brown));
+  color: white; display: flex; align-items: center; justify-content: center; font-size: 18px;
+}
+.ai-card-title { font-size: 14px; font-weight: 700; color: var(--dark-brown); font-family: 'Arial', sans-serif; }
+.ai-card-sub { font-size: 12px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 2px; }
+.ai-text { font-size: 15px; line-height: 1.8; color: var(--medium-brown); }
+.ai-typing { display: flex; gap: 6px; padding: 8px 0; }
+.ai-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--light-caramel);
+  animation: aiPulse 1.2s infinite ease-in-out;
+}
+.ai-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiPulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+/* ── LANG TOGGLE ── */
+.lang-toggle { position: fixed; top: 14px; right: 14px; z-index: 9999; display: flex; border-radius: 22px; overflow: hidden; box-shadow: 0 2px 10px rgba(44,26,14,0.18); border: 1px solid var(--light-caramel); }
+.lang-btn { padding: 7px 13px; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; border: none; background: var(--white); color: var(--medium-brown); transition: background 0.2s, color 0.2s; line-height: 1; }
+.lang-btn.active { background: var(--caramel); color: white; }
+
+/* ── CSS LANG VISIBILITY ── */
+body.lang-fa .en-only { display: none !important; }
+body.lang-en .fa-only { display: none !important; }
+body.lang-fa .option-en, body.lang-fa .q-text-en, body.lang-fa .loading-en { display: none !important; }
+body.lang-en .option-fa, body.lang-en .q-text-fa, body.lang-fa .loading-fa { display: none !important; }
+body.lang-fa { direction: rtl; }
+body.lang-fa .msg-card, body.lang-fa .confirm-desc, body.lang-fa .roastery-card,
+body.lang-fa .payment-step, body.lang-fa .amount-due-box, body.lang-fa .payment-timer,
+body.lang-fa .new-profile-btn, body.lang-fa .profile-card-new, body.lang-fa .order-card-new {
+  direction: rtl;
+}
+body.lang-fa .new-profile-btn { text-align: right; }
+body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
+
+/* ── SUCCESS MSG ── */
+.success-msg { background: var(--green-bg); border-radius: 12px; padding: 14px 20px; text-align: center; color: var(--green); font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #C0DEC0; }
+.success-msg.visible { display: block; }
+.error-msg { background: #FFF0F0; border-radius: 12px; padding: 14px 20px; text-align: center; color: #C0392B; font-size: 13px; margin-top: 10px; display: none; font-family: 'Arial', sans-serif; border: 1px solid #F0C0C0; }
+.error-msg.visible { display: block; }
+
+/* ── AUTH SCREEN ── */
+.auth-tabs { display: flex; gap: 0; margin-bottom: 28px; border-radius: 12px; overflow: hidden; border: 2px solid #DDD5C2; }
+.auth-tab { flex: 1; padding: 12px; text-align: center; font-size: 13px; font-family: 'Arial', sans-serif; font-weight: bold; cursor: pointer; background: var(--white); color: var(--caramel); border: none; transition: all 0.2s; }
+.auth-tab.active { background: var(--medium-brown); color: var(--white); }
+.otp-hint { font-size: 11px; color: var(--gray-light); font-family: 'Arial', sans-serif; text-align: center; margin-top: 8px; line-height: 1.6; }
+
+/* ── DASHBOARD ── */
+.dash-header { background: var(--medium-brown); margin: 0 -28px; padding: 28px 28px 24px; margin-bottom: 24px; }
+.dash-welcome { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: 'Arial', sans-serif; margin-bottom: 4px; }
+.dash-name { font-size: 22px; font-weight: bold; color: var(--white); }
+.dash-phone { font-size: 12px; color: var(--light-caramel); margin-top: 4px; font-family: 'Arial', sans-serif; direction: ltr; }
+.dash-logout { font-size: 11px; color: var(--caramel); background: transparent; border: 1px solid var(--caramel); border-radius: 20px; padding: 4px 12px; cursor: pointer; font-family: 'Arial', sans-serif; margin-top: 10px; }
+.dash-section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--caramel); font-family: 'Arial', sans-serif; margin-bottom: 14px; }
+.profile-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; cursor: pointer; transition: transform 0.2s; border: 2px solid transparent; }
+.profile-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
+.profile-card-bean { font-size: 16px; font-weight: bold; color: var(--dark-brown); margin-bottom: 4px; }
+.profile-card-date { font-size: 11px; color: var(--gray-light); font-family: 'Arial', sans-serif; }
+.profile-card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.profile-card-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 12px; padding: 4px 11px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
+.order-card { background: var(--white); border-radius: 20px; padding: 20px; box-shadow: 0 4px 20px var(--shadow); margin-bottom: 12px; }
+.order-card-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-family: 'Arial', sans-serif; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.status-pending { background: #FFF8EC; color: #C4956A; border: 1px solid #E8C99A; }
+.status-paid { background: var(--green-bg); color: var(--green); border: 1px solid #C0DEC0; }
+.status-shipped { background: #E8F0FF; color: #3A5FBF; border: 1px solid #C0D0FF; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--gray-light); font-family: 'Arial', sans-serif; font-size: 14px; }
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+/* ── ORDER SCREEN ── */
+.amount-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+.amount-card { background: var(--white); border: 2px solid transparent; border-radius: 18px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px var(--shadow); }
+.amount-card.selected { border-color: var(--caramel); background: var(--tint); }
+.amount-card:active { transform: scale(0.96); }
+.amount-g { font-size: 28px; font-weight: bold; color: var(--dark-brown); }
+.amount-label { font-size: 11px; color: var(--caramel); font-family: 'Arial', sans-serif; margin-top: 4px; }
+.textarea-field { width: 100%; padding: 14px 18px; border: 2px solid #DDD5C2; border-radius: 14px; font-size: 15px; background: var(--white); color: var(--dark-brown); outline: none; transition: border-color 0.2s; font-family: inherit; resize: vertical; min-height: 90px; direction: rtl; }
+.textarea-field:focus { border-color: var(--caramel); box-shadow: 0 0 0 4px rgba(196,149,106,0.15); }
+.order-summary { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 16px; padding: 18px 20px; margin-bottom: 20px; }
+.order-summary-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; font-family: 'Arial', sans-serif; }
+.order-summary-label { color: var(--gray-light); }
+.order-summary-value { font-weight: bold; color: var(--dark-brown); text-align: left; direction: ltr; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 1px solid #E8DFD0; margin: 16px 0; }
+
+/* ── MESSAGES ── */
+.msg-card {
+  background: var(--white); border-radius: 16px; padding: 16px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 10px;
+  border-right: 4px solid var(--caramel);
+}
+.msg-card.unread { border-right-color: var(--medium-brown); background: var(--tint); }
+.msg-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.msg-card-from { font-size: 12px; font-weight: bold; color: var(--caramel); font-family: Arial,sans-serif; }
+.msg-card-time { font-size: 11px; color: var(--gray-light); font-family: Arial,sans-serif; }
+.msg-card-text { font-size: 14px; color: var(--dark-brown); line-height: 1.6; }
+.msg-unread-badge {
+  background: var(--medium-brown); color: white; border-radius: 20px;
+  padding: 2px 8px; font-size: 10px; font-family: Arial,sans-serif;
+}
+.notif-bell {
+  position: fixed; bottom: 24px; left: 24px; z-index: 999;
+  background: var(--medium-brown); color: white; border-radius: 50%;
+  width: 52px; height: 52px; display: none; align-items: center;
+  justify-content: center; font-size: 22px; cursor: pointer;
+  box-shadow: 0 4px 20px rgba(44,26,14,0.35); transition: all 0.2s;
+}
+.notif-bell.visible { display: flex; }
+.notif-bell:hover { transform: scale(1.1); }
+.notif-count {
+  position: absolute; top: -4px; right: -4px; background: #C0392B;
+  color: white; border-radius: 50%; width: 20px; height: 20px;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+  font-family: Arial,sans-serif; font-weight: bold;
+}
+
+/* ── FAVORITE & DELETE ── */
+.profile-card-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #F0EAE0; }
+.btn-fav {
+  flex: 1; padding: 8px; border-radius: 12px; border: 1px solid var(--light-caramel);
+  background: transparent; color: var(--caramel); font-size: 14px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-fav.active { background: var(--tint); border-color: var(--caramel); color: var(--medium-brown); font-weight: bold; }
+.btn-fav:hover { background: var(--tint); }
+.btn-del {
+  padding: 8px 14px; border-radius: 12px; border: 1px solid #F0C0C0;
+  background: transparent; color: #C0392B; font-size: 12px; font-family: Arial,sans-serif;
+  cursor: pointer; transition: all 0.2s;
+}
+.btn-del:hover { background: #FFF0F0; }
+.fav-badge {
+  position: absolute; top: 14px; left: 16px;
+  font-size: 16px; line-height: 1;
+}
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(44,26,14,0.5); z-index: 999;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.confirm-box {
+  background: var(--white); border-radius: 24px; padding: 28px 24px;
+  margin: 20px; max-width: 340px; width: 100%; text-align: center;
+  box-shadow: 0 20px 60px rgba(44,26,14,0.3);
+}
+.confirm-icon { font-size: 44px; margin-bottom: 12px; }
+.confirm-title { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 8px; }
+.confirm-desc { font-size: 13px; color: var(--gray); font-family: Arial,sans-serif; line-height: 1.6; margin-bottom: 20px; }
+.confirm-actions { display: flex; gap: 10px; }
+.confirm-btn-cancel { flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #E0D8CE; background: transparent; color: var(--medium-brown); font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; }
+.confirm-btn-delete { flex: 1; padding: 13px; border-radius: 14px; border: none; background: #C0392B; color: white; font-size: 13px; font-family: Arial,sans-serif; cursor: pointer; font-weight: bold; }
+
+/* ── ROASTERY SELECT ── */
+.roastery-card {
+  background: var(--white); border-radius: 20px; padding: 20px;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  position: relative;
+}
+.roastery-card:hover { transform: translateY(-2px); border-color: var(--light-caramel); }
+.roastery-card:active { transform: scale(0.98); }
+.roastery-card.selected { border-color: var(--caramel); background: var(--tint); }
+.roastery-card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+.roastery-logo { font-size: 36px; width: 56px; height: 56px; background: var(--tint); border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.roastery-name { font-size: 17px; font-weight: bold; color: var(--dark-brown); }
+.roastery-location { font-size: 12px; color: var(--gray-light); font-family: Arial,sans-serif; margin-top: 3px; }
+.roastery-stats { display: flex; gap: 14px; margin-bottom: 10px; }
+.roastery-stat { font-size: 12px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.roastery-stat span { font-weight: bold; }
+.roastery-desc { font-size: 13px; color: var(--gray); line-height: 1.6; font-family: Arial,sans-serif; }
+.roastery-select-btn {
+  width: 100%; padding: 11px; background: var(--medium-brown); color: white;
+  border: none; border-radius: 12px; font-size: 13px; font-family: Arial,sans-serif;
+  cursor: pointer; margin-top: 12px; transition: all 0.2s;
+}
+.roastery-select-btn:hover { background: var(--dark-brown); }
+.roastery-beans { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.roastery-bean-tag { background: #F5F0E8; border: 1px solid var(--light-caramel); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.roastery-bean-tag.match { background: #E8F5E8; border-color: #A5D6A7; color: #2E7D32; font-weight: bold; }
+
+/* ── PAYMENT ── */
+.payment-step {
+  background: var(--white); border-radius: 20px; padding: 22px;
+  box-shadow: 0 4px 20px var(--shadow); margin-bottom: 14px;
+}
+.payment-step-num {
+  width: 32px; height: 32px; border-radius: 50%; background: var(--caramel);
+  color: white; display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: bold; font-family: Arial,sans-serif;
+  float: right; margin-left: 12px; flex-shrink: 0;
+}
+.payment-step-content { overflow: hidden; }
+.payment-step-title { font-size: 14px; font-weight: bold; color: var(--dark-brown); margin-bottom: 6px; }
+.payment-step-desc { font-size: 12px; color: var(--gray); font-family: Arial,sans-serif; line-height: 1.6; }
+.card-number-box {
+  background: linear-gradient(135deg, var(--dark-brown), var(--medium-brown));
+  border-radius: 16px; padding: 20px 22px; margin: 12px 0; direction: ltr; text-align: center;
+}
+.card-number { font-size: 22px; font-weight: bold; color: white; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+.card-owner { font-size: 11px; color: var(--caramel); margin-top: 6px; letter-spacing: 2px; text-transform: uppercase; }
+.copy-btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: white; border-radius: 8px; padding: 6px 14px; font-size: 11px;
+  font-family: Arial,sans-serif; cursor: pointer; margin-top: 10px; transition: all 0.2s;
+}
+.copy-btn:hover { background: rgba(255,255,255,0.25); }
+.amount-due-box {
+  background: var(--tint); border: 2px solid var(--light-caramel);
+  border-radius: 14px; padding: 16px 20px; margin: 12px 0;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.amount-due-label { font-size: 12px; color: var(--gray-light); font-family: Arial,sans-serif; }
+.amount-due-value { font-size: 22px; font-weight: bold; color: var(--dark-brown); }
+.amount-due-currency { font-size: 12px; color: var(--caramel); font-family: Arial,sans-serif; }
+.upload-area {
+  border: 2px dashed var(--light-caramel); border-radius: 16px;
+  padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s;
+  background: #FFFAF5; margin: 12px 0;
+}
+.upload-area:hover { border-color: var(--caramel); background: var(--tint); }
+.upload-area input { display: none; }
+.upload-icon { font-size: 36px; margin-bottom: 8px; }
+.upload-text { font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; }
+.upload-sub { font-size: 11px; color: var(--gray-light); margin-top: 4px; font-family: Arial,sans-serif; }
+.upload-preview { max-width: 100%; border-radius: 12px; margin-top: 10px; display: none; }
+.payment-timer {
+  background: #FFF8EC; border: 1px solid #F0C070; border-radius: 12px;
+  padding: 12px 16px; text-align: center; margin-bottom: 16px;
+}
+.timer-text { font-size: 12px; color: #C4956A; font-family: Arial,sans-serif; }
+.timer-count { font-size: 20px; font-weight: bold; color: var(--medium-brown); font-family: 'Courier New', monospace; margin-top: 4px; }
+
+/* ── DASHBOARD NEW ── */
+.dash-header-new {
+  background: linear-gradient(145deg, var(--dark-brown) 0%, var(--medium-brown) 100%);
+  margin: 0 -28px; padding: 32px 28px 28px; margin-bottom: 0;
+  position: relative; overflow: hidden;
+}
+.dash-header-new::before {
+  content: '☕'; position: absolute; right: -10px; top: -10px;
+  font-size: 120px; opacity: 0.06; line-height: 1;
+}
+.dash-header-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+.dash-user-info {}
+.dash-welcome-new { font-size: 11px; letter-spacing: 3px; color: var(--caramel); text-transform: uppercase; font-family: Arial,sans-serif; margin-bottom: 4px; }
+.dash-name-new { font-size: 24px; font-weight: bold; color: var(--white); margin-bottom: 2px; }
+.dash-phone-new { font-size: 12px; color: rgba(255,255,255,0.5); font-family: Arial,sans-serif; direction: ltr; }
+.dash-logout-new { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); border-radius: 20px; padding: 6px 14px; font-size: 11px; font-family: Arial,sans-serif; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+.dash-logout-new:hover { background: rgba(255,255,255,0.2); }
+.dash-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.dash-stat { background: rgba(255,255,255,0.08); border-radius: 14px; padding: 12px; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+.dash-stat-num { font-size: 22px; font-weight: bold; color: var(--white); line-height: 1; }
+.dash-stat-label { font-size: 9px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
+
+/* ── NEW PROFILE BTN ── */
+.new-profile-btn {
+  background: linear-gradient(135deg, var(--caramel), #D4A574);
+  color: var(--white); border: none; border-radius: 18px;
+  padding: 20px 24px; width: 100%;
+  cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 24px rgba(196,149,106,0.35);
+  display: flex; align-items: center; gap: 14px; margin: 20px 0;
+}
+.new-profile-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(196,149,106,0.45); }
+.new-profile-btn:active { transform: scale(0.98); }
+.new-profile-icon { font-size: 32px; flex-shrink: 0; }
+.new-profile-text {}
+.new-profile-title { font-size: 15px; font-weight: bold; color: var(--white); font-family: Arial,sans-serif; }
+.new-profile-sub { font-size: 11px; color: rgba(255,255,255,0.75); font-family: Arial,sans-serif; margin-top: 2px; }
+
+/* ── SECTION HEADER ── */
+.section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; margin-top: 8px; }
+.section-title-new { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel); font-family: Arial,sans-serif; font-weight: bold; }
+.section-count { background: var(--light-caramel); color: var(--medium-brown); border-radius: 20px; padding: 2px 10px; font-size: 11px; font-family: Arial,sans-serif; font-weight: bold; }
+
+/* ── PROFILE CARD NEW ── */
+.profile-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  cursor: pointer; transition: all 0.2s; border: 2px solid transparent;
+  position: relative; overflow: hidden;
+}
+.profile-card-new::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+  width: 4px; background: var(--caramel); border-radius: 0 4px 4px 0;
+}
+.profile-card-new:hover { transform: translateY(-2px); border-color: var(--light-caramel); box-shadow: 0 6px 24px rgba(196,149,106,0.2); }
+.profile-card-new:active { transform: scale(0.99); }
+.profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
+.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
+.profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: var(--gray-light); font-family: Arial,sans-serif; white-space: nowrap; }
+.profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 13px; font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; font-weight: 600; }
+.profile-card-arrow { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--light-caramel); font-size: 18px; }
+
+/* ── ORDER CARD NEW ── */
+.order-card-new {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin-bottom: 12px;
+  border: 2px solid transparent;
+}
+.order-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.order-amount-big { font-size: 20px; font-weight: bold; color: var(--dark-brown); }
+.order-bean-small { font-size: 12px; color: var(--caramel); margin-top: 2px; font-family: Arial,sans-serif; }
+.order-address-new { font-size: 14px; color: var(--gray); margin-top: 8px; line-height: 1.5; font-family: Arial,sans-serif; padding-top: 8px; border-top: 1px solid #F0EAE0; }
+
+/* ── PROFILE DETAIL SCREEN ── */
+.detail-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
+.detail-bean-name { font-size: 24px; font-weight: bold; color: #FEFEFE; margin-bottom: 6px; }
+.detail-origin { font-size: 14px; color: var(--caramel); font-style: italic; }
+</style>
+</head>
+<body class="lang-fa">
+
+<!-- Dark Mode Toggle -->
+<button class="dark-toggle" id="btn-dark-toggle" onclick="toggleDarkMode()" title="حالت تاریک">🌙</button>
+
+<!-- Language Toggle -->
+<div class="lang-toggle">
+  <button class="lang-btn" id="btn-lang-en" onclick="setLang('en')">🇬🇧 EN</button>
+  <button class="lang-btn active" id="btn-lang-fa" onclick="setLang('fa')">🇮🇷 FA</button>
+</div>
+
+<div class="app-container">
+
+<!-- ══════ SCREEN: AUTH ══════ -->
+<div class="screen active" id="screen-auth">
+  <div class="logo">
+    <div class="logo-icon">☕</div>
+    <h1>Roastery</h1>
+    <div class="logo-sub">پلتفرم رست شخصی</div>
+  </div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+      <span class="en-only">Login</span>
+      <span class="fa-only">ورود</span>
+    </button>
+    <button class="auth-tab" id="tab-register" onclick="switchTab('register')">
+      <span class="en-only">Register</span>
+      <span class="fa-only">ثبت‌نام</span>
+    </button>
+  </div>
+
+  <!-- Login Form -->
+  <div id="login-form">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Mobile Number</span>
+        <span class="fa-only">شماره موبایل</span>
+      </label>
+      <input class="input-field" id="login-phone" type="tel" placeholder="09121234567" dir="ltr" autocomplete="tel" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fa-only">رمز عبور</span>
+      </label>
+      <input class="input-field" id="login-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="login-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-login" onclick="doLogin()">
+      <span class="en-only">Login →</span>
+      <span class="fa-only">ورود →</span>
+    </button>
+  </div>
+
+  <!-- Register Form -->
+  <div id="register-form" style="display:none;">
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Your Name</span>
+        <span class="fa-only">نام شما</span>
+      </label>
+      <input class="input-field" id="reg-name" type="text" placeholder="نام خود را وارد کنید" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Mobile Number</span>
+        <span class="fa-only">شماره موبایل</span>
+      </label>
+      <input class="input-field" id="reg-phone" type="tel" placeholder="09121234567" dir="ltr" autocomplete="tel" />
+    </div>
+    <div class="input-group">
+      <label class="input-label">
+        <span class="en-only">Password</span>
+        <span class="fa-only">رمز عبور (حداقل ۶ کاراکتر)</span>
+      </label>
+      <input class="input-field" id="reg-pass" type="password" placeholder="••••••••" dir="ltr" />
+    </div>
+    <div class="error-msg" id="reg-error"></div>
+    <div class="spacer"></div>
+    <button class="btn-primary" id="btn-register" onclick="doRegister()">
+      <span class="en-only">Create Account →</span>
+      <span class="fa-only">ایجاد حساب →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: DASHBOARD ══════ -->
+<div class="screen" id="screen-dashboard" style="padding-top:0;">
+
+  <!-- Header -->
+  <div class="dash-header-new">
+    <div class="dash-header-top">
+      <div class="dash-user-info">
+        <div class="dash-welcome-new">
+          <span class="en-only">Welcome back</span>
+          <span class="fa-only">خوش آمدی</span>
+        </div>
+        <div class="dash-name-new" id="dash-name">—</div>
+        <div class="dash-phone-new" id="dash-phone">—</div>
+      </div>
+      <button class="dash-logout-new" onclick="doLogout()">
+        <span class="en-only">Logout</span>
+        <span class="fa-only">خروج ↗</span>
+      </button>
+    </div>
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-profiles">0</div>
+        <div class="dash-stat-label"><span class="en-only">Profiles</span><span class="fa-only">پروفایل</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num" id="stat-orders">0</div>
+        <div class="dash-stat-label"><span class="en-only">Orders</span><span class="fa-only">سفارش</span></div>
+      </div>
+      <div class="dash-stat">
+        <div class="dash-stat-num">☕</div>
+        <div class="dash-stat-label"><span class="en-only">Active</span><span class="fa-only">فعال</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding: 0 0 32px;">
+    <!-- New Profile Button -->
+    <button class="new-profile-btn" onclick="startNewProfile()">
+      <div class="new-profile-icon">✨</div>
+      <div class="new-profile-text">
+        <div class="new-profile-title">
+          <span class="en-only">New Coffee Profile</span>
+          <span class="fa-only">پروفایل قهوه جدید</span>
+        </div>
+        <div class="new-profile-sub">
+          <span class="en-only">Discover your perfect roast</span>
+          <span class="fa-only">دانه متناسب با شما رو پیدا کن</span>
+        </div>
+      </div>
+    </button>
+
+    <!-- Profiles Section -->
+    <div class="section-header">
+      <div class="section-title-new">
+        <span class="en-only">My Coffee Profiles</span>
+        <span class="fa-only">پروفایل‌های قهوه من</span>
+      </div>
+      <div class="section-count" id="stat-profiles-badge">0</div>
+    </div>
+    <div id="dash-profiles">
+      <div class="empty-state">
+        <div class="empty-icon">☕</div>
+        <div class="en-only">No profiles yet. Start your first journey!</div>
+        <div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div>
+      </div>
+    </div>
+
+    <!-- Orders Section -->
+    <div class="section-header" style="margin-top:24px;">
+      <div class="section-title-new">
+        <span class="en-only">My Orders</span>
+        <span class="fa-only">سفارش‌های من</span>
+      </div>
+      <div class="section-count" id="stat-orders-badge">0</div>
+    </div>
+    <div id="dash-orders">
+      <div class="empty-state">
+        <div class="empty-icon">📦</div>
+        <div class="en-only">No orders yet.</div>
+        <div class="fa-only">هنوز سفارشی نداری.</div>
+      </div>
+    </div>
+
+    <!-- Messages Section -->
+    <div class="section-header" style="margin-top:24px;" id="msgs-section-header" style="display:none;">
+      <div class="section-title-new">
+        <span class="en-only">💬 Messages from Roastery</span>
+        <span class="fa-only">💬 پیام‌های رستری</span>
+      </div>
+      <div class="section-count" id="stat-msgs-badge" style="display:none;">0</div>
+    </div>
+    <div id="dash-messages"></div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: PROFILE DETAIL ══════ -->
+<div class="screen" id="screen-profile-detail" style="padding-top:0;">
+  <div class="detail-header">
+    <button class="btn-back" onclick="showDashboard()" style="color:var(--caramel);margin-bottom:12px;">← <span class="fa-only">داشبورد</span><span class="en-only">Dashboard</span></button>
+    <div style="font-size:15px;letter-spacing:2.5px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:6px;font-weight:700;">
+      <span class="fa-only">پروفایل قهوه شما</span><span class="en-only">Your Coffee Profile</span>
+    </div>
+    <div class="detail-bean-name" id="detail-bean-name">—</div>
+    <div class="detail-origin" id="detail-bean-origin">—</div>
+  </div>
+  <div id="detail-content" style="padding-bottom:32px;"></div>
+</div>
+
+<!-- ══════ SCREENS 1–6: QUIZ ══════ -->
+<div class="screen" id="screen-1">
+  <button class="btn-back" onclick="goBack(1)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7CB342"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 1 of 6</span><span class="fa-only">سوال ۱ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">What flavors call to you?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">چه طعم‌هایی شما را جذب می‌کند؟</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="12" cy="6" r="2.6"/><circle cx="17" cy="9.5" r="2.6"/><circle cx="15" cy="16" r="2.6"/><circle cx="9" cy="16" r="2.6"/><circle cx="7" cy="9.5" r="2.6"/></svg></div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
+    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8.2 6 11a6 6 0 0 1-12 0c0-2.8 2-6 6-11z"/><line x1="8.3" y1="15" x2="15.7" y2="15"/></svg></div><div class="option-en">Sweet & Mellow</div><div class="option-fa" style="direction:rtl">شیرین و ملایم</div><div class="option-desc">Caramel, honey, cherry</div></div>
+    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
+    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Bold & Woodsy</div><div class="option-fa" style="direction:rtl">تند و چوبی</div><div class="option-desc">Strong, deep, woodsy</div></div>
+  </div>
+  <div class="spacer"></div>
+
+</div>
+
+<div class="screen" id="screen-2">
+  <button class="btn-back" onclick="goBack(2)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#6C9438"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 2 of 6</span><span class="fa-only">سوال ۲ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">How do you like your coffee?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه‌تان را چگونه دوست دارید؟</div>
+  </div>
+  <div class="options cols-1">
+    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c8 0 14-6 14-15-9 0-15 6-15 14 0 .5 0 1 .3 1z"/><path d="M6 18c3-3 6-6 9-11"/></svg></div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
+    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
+    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
+  </div>
+  <div class="spacer"></div>
+
+</div>
+
+<div class="screen" id="screen-3">
+  <button class="btn-back" onclick="goBack(3)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#5C762D"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 3 of 6</span><span class="fa-only">سوال ۳ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">What are you seeking right now?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه‌ای هستید؟</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
+    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
+    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 8 0 1 0 0 16c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-6-9-6z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
+    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
+    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
+  </div>
+  <div class="spacer"></div>
+
+</div>
+
+<div class="screen" id="screen-4">
+  <button class="btn-back" onclick="goBack(4)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4C5723"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 4 of 6</span><span class="fa-only">سوال ۴ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">When is this coffee for?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">این قهوه برای چه موقعیتی است؟</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'context','morning')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18a7 7 0 0 1 14 0"/><line x1="2" y1="18" x2="22" y2="18"/><line x1="12" y1="6" x2="12" y2="9"/><line x1="5.5" y1="9.5" x2="7.3" y2="11"/><line x1="18.5" y1="9.5" x2="16.7" y2="11"/></svg></div><div class="option-en">Morning</div><div class="option-fa" style="direction:rtl">صبح</div></div>
+    <div class="option-card" onclick="pick(this,'context','work')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="12" rx="1.5"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="3" y1="13" x2="21" y2="13"/></svg></div><div class="option-en">Work Session</div><div class="option-fa" style="direction:rtl">جلسه کاری</div></div>
+    <div class="option-card" onclick="pick(this,'context','reading')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5C5 4.5 8 4.5 12 5.5c4-1 7-1 9 0v13c-2-1-5-1-9 0-4-1-7-1-9 0v-13z"/><line x1="12" y1="5.5" x2="12" y2="18.5"/></svg></div><div class="option-en">Reading</div><div class="option-fa" style="direction:rtl">مطالعه</div></div>
+    <div class="option-card" onclick="pick(this,'context','friends')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.3"/><path d="M15.5 14.2c2.6.3 4.5 2.4 4.5 5.3"/></svg></div><div class="option-en">With Friends</div><div class="option-fa" style="direction:rtl">با دوستان</div></div>
+    <div class="option-card" onclick="pick(this,'context','afterdinner')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="3"/></svg></div><div class="option-en">After Dinner</div><div class="option-fa" style="direction:rtl">بعد از شام</div></div>
+    <div class="option-card" onclick="pick(this,'context','weekend')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Weekend Relax</div><div class="option-fa" style="direction:rtl">آخر هفته</div></div>
+  </div>
+  <div class="spacer"></div>
+
+</div>
+
+<div class="screen" id="screen-5">
+  <button class="btn-back" onclick="goBack(5)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#3C3918"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 5 of 6</span><span class="fa-only">سوال ۵ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">How do you brew your coffee?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">روش دم‌آوری شما چیست؟</div>
+  </div>
+  <div class="options cols-2">
+    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
+    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg></div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','espresso')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Espresso</div><div class="option-fa" style="direction:rtl">اسپرسو</div><div class="option-desc">Machine or Moka Pot</div></div>
+    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg></div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
+    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6z"/></svg></div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
+  </div>
+  <div class="spacer"></div>
+
+</div>
+
+<div class="screen" id="screen-6">
+  <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#2C1A0E"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="en-only">Question 6 of 6</span><span class="fa-only">سوال ۶ از ۶</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-en">How do you like your acidity?</div>
+    <div class="q-text-fa" style="text-align:right;direction:rtl">ترشی و طراوت قهوه رو چطور دوست داری؟</div>
+  </div>
+  <div class="options cols-1">
+    <div class="option-card" onclick="pick(this,'acidity','bright')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg></div><div class="option-en">Bright & Citrusy</div><div class="option-fa" style="direction:rtl">زنده و ترش</div><div class="option-desc">Lively, juicy, tea-like</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','balanced')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div><div class="option-en">Balanced</div><div class="option-fa" style="direction:rtl">متعادل</div><div class="option-desc">Not too sharp, not too flat</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','smooth')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Smooth & Low-Acid</div><div class="option-fa" style="direction:rtl">نرم و بدون ترشی</div><div class="option-desc">Mellow, heavy, no sharpness</div></div>
+  </div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══════ LOADING ══════ -->
+<div id="screen-loading">
+  <div class="spinner">☕</div>
+  <div class="loading-text">
+    <span class="en-only">Crafting your profile…</span>
+    <span class="fa-only">در حال ساخت پروفایل قهوه شما…</span>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: RESULT ══════ -->
+<div class="screen" id="screen-result">
+  <div class="result-identity-header">
+    <div class="result-identity-label">هویت قهوه شما</div>
+    <div class="result-identity-name" id="r-identity-name">—</div>
+    <div class="persona-tagline" id="r-persona-tagline"></div>
+    <div class="persona-desc" id="r-persona-desc"></div>
+    <div class="identity-badge" id="r-identity-badge"></div>
+    <div class="match-score-wrap">
+      <div class="match-score-bar"><div class="match-score-fill" id="r-match-fill" style="width:0%"></div></div>
+      <div class="match-score-pct"><span id="r-match-pct">—</span> تطابق</div>
+    </div>
+  </div>
+
+  <div style="text-align:center;padding:4px 0 16px;">
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;">پیشنهاد امروز</div>
+    <div class="result-bean-name" id="r-name"></div>
+    <div class="result-origin" id="r-origin"></div>
+  </div>
+
+  <!-- AI Explanation Card -->
+  <div class="ai-card" id="ai-explanation-card">
+    <div class="ai-card-header">
+      <div class="ai-card-icon">✨</div>
+      <div>
+        <div class="ai-card-title">
+          <span class="fa-only">تحلیل شخصی‌سازی‌شده</span>
+          <span class="en-only">Personalized Analysis</span>
+        </div>
+        <div class="ai-card-sub">
+          <span class="fa-only">بر اساس پروفایل منحصربه‌فرد شما</span>
+          <span class="en-only">Based on your unique profile</span>
+        </div>
+      </div>
+    </div>
+    <div id="ai-text-content">
+      <div class="ai-typing">
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+        <div class="ai-dot"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alternative Bean Suggestion -->
+  <div class="alt-bean-card" id="alt-bean-card" style="display:none;">
+    <div class="alt-bean-label">
+      <span class="alt-bean-icon">💡</span>
+      <span class="fa-only">شاید این یکی هم دوست داشته باشید</span>
+      <span class="en-only">You might also enjoy</span>
+    </div>
+    <div class="alt-bean-name" id="alt-bean-name">—</div>
+    <div class="alt-bean-origin" id="alt-bean-origin">—</div>
+    <div class="alt-bean-flavors" id="alt-bean-flavors"></div>
+  </div>
+
+  <div class="card" id="why-card">
+    <div class="card-title"><span class="fa-only">چرا این قهوه؟</span><span class="en-only">Why This Coffee?</span></div>
+    <div id="why-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="en-only">Flavor Notes</span>
+      <span class="fa-only">نت‌های طعمی</span>
+    </div>
+    <div class="flavor-tags" id="r-flavors"></div>
+    <div class="result-desc" id="r-desc" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="en-only">Flavor Radar</span>
+      <span class="fa-only">نمودار طعم</span>
+    </div>
+    <div id="r-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">
+      <span class="en-only">How to Brew</span>
+      <span class="fa-only">روش دم‌آوری</span>
+    </div>
+    <div class="info-row"><span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span><span class="info-value" id="r-roast"></span></div>
+    <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
+    <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fa-only">روش دم‌آوری شما</span></span><span class="info-value" id="r-your-brew"></span></div>
+    <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
+    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
+    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
+  </div>
+
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 راهنمای رست ▼</button>
+  <div class="card" id="roast-card" style="display:none;">
+    <div class="card-title">🔥 Roast Guide</div>
+    <div class="info-row"><span class="info-label">⬆️ Charge Temp</span><span class="info-value" id="r-charge"></span></div>
+    <div class="info-row"><span class="info-label">⬇️ Drop Temp</span><span class="info-value" id="r-drop"></span></div>
+    <div class="info-row"><span class="info-label">⏱️ Total Time</span><span class="info-value" id="r-time"></span></div>
+    <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
+  </div>
+
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;">
+    <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;">
+      ⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.
+    </p>
+  </div>
+
+  <div class="success-msg" id="save-success">✅ پروفایل ذخیره شد!</div>
+
+  <!-- Order CTA -->
+  <button class="btn-primary" onclick="goToOrder()" style="margin-bottom:10px;">
+    <span class="en-only">🛒 Order This Bean</span>
+    <span class="fa-only">🛒 سفارش این دانه</span>
+  </button>
+  <button class="btn-primary btn-ghost" onclick="openSharePrefsModal()" style="margin-bottom:10px;">
+    <span class="en-only">📤 Share My Coffee Identity</span>
+    <span class="fa-only">📤 اشتراک‌گذاری هویت قهوه‌ام</span>
+  </button>
+  <button class="btn-primary btn-ghost" onclick="showDashboard()" style="margin-bottom:10px;">
+    <span class="en-only">← Back to Dashboard</span>
+    <span class="fa-only">← برگشت به داشبورد</span>
+  </button>
+</div>
+
+<!-- ══════ SCREEN: ROASTERY SELECT ══════ -->
+<div class="screen" id="screen-roastery">
+  <button class="btn-back" onclick="show('screen-result')">← <span class="fa-only">بازگشت</span><span class="en-only">Back</span></button>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:40px;">🏪</div>
+    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
+      <span class="fa-only">انتخاب رستری</span>
+      <span class="en-only">Choose Roastery</span>
+    </h2>
+    <p style="font-size:13px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;">
+      رستری مورد نظرت رو انتخاب کن
+    </p>
+  </div>
+
+  <!-- Bean being ordered -->
+  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center;">
+    <div style="font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
+  </div>
+
+  <div id="roastery-list">
+    <div class="empty-state"><div class="empty-icon">⏳</div><div class="fa-only">در حال بارگذاری رستری‌ها...</div></div>
+  </div>
+</div>
+
+<!-- ══════ SCREEN: ORDER ══════ -->
+<div class="screen" id="screen-order">
+  <button class="btn-back" onclick="show('screen-result')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+
+  <div class="logo" style="margin-bottom:20px;">
+    <div class="logo-icon">📦</div>
+    <h1 style="font-size:20px;">
+      <span class="en-only">Place Your Order</span>
+      <span class="fa-only">ثبت سفارش</span>
+    </h1>
+  </div>
+
+  <!-- Bean + Roastery Summary -->
+  <div class="order-summary" id="order-bean-summary">
+    <div style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
+    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
+    <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+    <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
+  </div>
+
+  <!-- Amount Selector -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Amount</span>
+      <span class="fa-only">مقدار</span>
+    </label>
+    <div class="amount-selector">
+      <div class="amount-card" id="amt-50" onclick="selectAmount(50)">
+        <div class="amount-g">50g</div>
+        <div class="amount-label">
+          <span class="en-only">Small</span>
+          <span class="fa-only">کوچک</span>
+        </div>
+      </div>
+      <div class="amount-card" id="amt-100" onclick="selectAmount(100)">
+        <div class="amount-g">100g</div>
+        <div class="amount-label">
+          <span class="en-only">Medium</span>
+          <span class="fa-only">متوسط</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Address -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Delivery Address</span>
+      <span class="fa-only">آدرس تحویل</span>
+    </label>
+    <textarea class="textarea-field" id="order-address" placeholder="آدرس کامل خود را وارد کنید..."></textarea>
+  </div>
+
+  <!-- Notes -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Notes (optional)</span>
+      <span class="fa-only">توضیحات (اختیاری)</span>
+    </label>
+    <textarea class="textarea-field" id="order-notes" placeholder="هر توضیح اضافه‌ای..." style="min-height:70px;"></textarea>
+  </div>
+
+  <div class="error-msg" id="order-error"></div>
+  <div class="success-msg" id="order-success"></div>
+
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-submit-order" onclick="submitOrder()">
+    <span class="en-only">✅ Submit Order</span>
+    <span class="fa-only">✅ ثبت سفارش</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:12px;">
+    پس از ثبت سفارش، تیم رستری با شما تماس می‌گیرد.
+  </p>
+</div>
+
+<!-- ══════ SCREEN: PAYMENT ══════ -->
+<div class="screen" id="screen-payment" style="padding-top:20px;">
+  <button class="btn-back" onclick="show('screen-order')">← <span class="fa-only">بازگشت</span><span class="en-only">Back</span></button>
+
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:40px;">💳</div>
+    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
+      <span class="fa-only">پرداخت سفارش</span>
+      <span class="en-only">Order Payment</span>
+    </h2>
+    <p style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;"><span class="fa-only">مبلغ رو واریز کن و رسید بفرست</span><span class="en-only">Transfer the amount and send the receipt</span></p>
+  </div>
+
+  <!-- Timer -->
+  <div class="payment-timer">
+    <div class="timer-text">⏰ لطفاً ظرف ۳۰ دقیقه پرداخت کنید</div>
+    <div class="timer-count" id="payment-timer">30:00</div>
+  </div>
+
+  <!-- Step 1: Amount -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۱</div>
+      <div class="payment-step-content">
+        <div class="payment-step-title">مبلغ قابل پرداخت</div>
+        <div class="amount-due-box">
+          <div>
+            <div class="amount-due-label">سفارش شما</div>
+            <div style="font-size:12px;color:var(--caramel);font-family:Arial,sans-serif;" id="pay-order-summary">—</div>
+          </div>
+          <div style="text-align:left;">
+            <div class="amount-due-value" id="pay-amount">—</div>
+            <div class="amount-due-currency">تومان</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2: Card Number -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۲</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title">واریز به شماره کارت</div>
+        <div class="card-number-box">
+          <div class="card-number" id="shop-card-number">6219 8619 xxxx xxxx</div>
+          <div class="card-owner" id="shop-card-owner">Roastery Platform</div>
+          <button class="copy-btn" onclick="copyCardNumber()">📋 کپی شماره کارت</button>
+        </div>
+        <div class="payment-step-desc">به نام صاحب حساب واریز کنید و شناسه پرداخت رو یادداشت کنید.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 3: Upload Receipt -->
+  <div class="payment-step">
+    <div style="display:flex;align-items:flex-start;gap:12px;">
+      <div class="payment-step-num">۳</div>
+      <div class="payment-step-content" style="width:100%;">
+        <div class="payment-step-title">ارسال تصویر رسید</div>
+        <div class="upload-area" onclick="document.getElementById('receipt-input').click()">
+          <input type="file" id="receipt-input" accept="image/*" onchange="handleReceiptUpload(this)">
+          <div class="upload-icon" id="upload-icon">🧾</div>
+          <div class="upload-text" id="upload-text">تصویر رسید را انتخاب کنید</div>
+          <div class="upload-sub">PNG, JPG تا ۵ مگابایت</div>
+          <img class="upload-preview" id="upload-preview" src="" alt="رسید">
+        </div>
+        <!-- Transaction ID -->
+        <div class="input-group" style="margin-top:10px;">
+          <label class="input-label">شناسه / کد پیگیری پرداخت</label>
+          <input class="input-field" id="transaction-id" type="text" placeholder="مثلاً: ۱۲۳۴۵۶۷۸" dir="rtl" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="error-msg" id="payment-error"></div>
+  <div class="success-msg" id="payment-success"></div>
+
+  <button class="btn-primary" id="btn-confirm-payment" onclick="confirmPayment()">
+    <span class="fa-only">✅ تأیید و ارسال رسید</span>
+    <span class="en-only">✅ Confirm Payment</span>
+  </button>
+  <p style="text-align:center;font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:12px;">
+    بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.
+  </p>
+</div>
+
+<!-- Notification Bell -->
+<div class="notif-bell" id="notif-bell" onclick="scrollToMessages()">
+  💬
+  <div class="notif-count" id="notif-count">0</div>
+</div>
+
+</div><!-- /app-container -->
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI-lBDN7fQJHESYHKxPmOwEyyLT06iTsZMRWaYIG6nY0fd931h1BTqnvhHL1Z1uAi37Q/exec';
+
+/* ═══════════════════════════════════════════
+   SUPABASE HELPER
+═══════════════════════════════════════════ */
+async function sb(method, path, body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Prefer': method === 'POST' ? 'return=representation' : '',
+      ...(method === 'PATCH' ? { 'X-HTTP-Method-Override': 'PATCH' } : {})
+    }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + '/rest/v1/' + path, opts);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Supabase error');
+  }
+  return res.status === 204 ? null : res.json();
+}
+
+/* ═══════════════════════════════════════════
+   APP STATE
+═══════════════════════════════════════════ */
+let currentUser = null; // { id, name, phone }
+let ans = { taste: null, body: null, state: null, context: null, brew: null, acidity: null };
+let rec = null;
+let currentPersona = null;
+let currentProfileId = null;
+let selectedAmount = null;
+let currentLang = 'fa';
+
+/* ═══════════════════════════════════════════
+   AUTH
+═══════════════════════════════════════════ */
+function switchTab(tab) {
+  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+}
+
+async function doRegister() {
+  const name  = document.getElementById('reg-name').value.trim();
+  const phone = document.getElementById('reg-phone').value.trim();
+  const pass  = document.getElementById('reg-pass').value;
+  const errEl = document.getElementById('reg-error');
+  errEl.classList.remove('visible');
+
+  if (!name)  return showErr(errEl, 'نام را وارد کنید');
+  if (phone.length < 10) return showErr(errEl, 'شماره موبایل معتبر وارد کنید');
+  if (pass.length < 6)  return showErr(errEl, 'رمز عبور باید حداقل ۶ کاراکتر باشد');
+
+  const btn = document.getElementById('btn-register');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    // بررسی کاربر تکراری
+    const existing = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=id`);
+    if (existing && existing.length > 0) {
+      return showErr(errEl, 'این شماره قبلاً ثبت شده. لطفاً وارد شوید.');
+    }
+    // ذخیره کاربر (رمز رو به صورت ساده ذخیره می‌کنیم - در production باید hash بشه)
+    const users = await sb('POST', 'users', { phone, name, password_hash: btoa(pass) });
+    const user = users[0];
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, 'خطا: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Create Account →</span><span class="fa-only">ایجاد حساب →</span>';
+    setLang(currentLang);
+  }
+}
+
+async function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
+
+  if (!phone) return showErr(errEl, 'شماره موبایل را وارد کنید');
+  if (!pass)  return showErr(errEl, 'رمز عبور را وارد کنید');
+
+  const btn = document.getElementById('btn-login');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const users = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=*`);
+    if (!users || users.length === 0) return showErr(errEl, 'شماره موبایل یافت نشد');
+    const user = users[0];
+    if (user.password_hash !== btoa(pass)) return showErr(errEl, 'رمز عبور اشتباه است');
+    loginUser(user);
+  } catch (e) {
+    showErr(errEl, 'خطا: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">Login →</span><span class="fa-only">ورود →</span>';
+    setLang(currentLang);
+  }
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('roastery_user', JSON.stringify(user));
+  showDashboard();
+}
+
+function doLogout() {
+  currentUser = null;
+  localStorage.removeItem('roastery_user');
+  show('screen-auth');
+}
+
+function checkAutoLogin() {
+  const saved = localStorage.getItem('roastery_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      showDashboard();
+    } catch(e) {
+      localStorage.removeItem('roastery_user');
+    }
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════ */
+async function showDashboard() {
+  document.getElementById('dash-name').textContent = currentUser.name || '—';
+  document.getElementById('dash-phone').textContent = currentUser.phone || '—';
+  show('screen-dashboard');
+  loadProfiles();
+  loadOrders();
+  loadUserMessages();
+}
+
+async function loadUserMessages() {
+  if (!currentUser) return;
+  try {
+    const msgs = await sb('GET', `messages?user_id=eq.${currentUser.id}&from_admin=eq.true&order=created_at.desc&select=*`);
+    const container = document.getElementById('dash-messages');
+    const header = document.getElementById('msgs-section-header');
+    const badge = document.getElementById('stat-msgs-badge');
+
+    if (!msgs || msgs.length === 0) {
+      if (header) header.style.display = 'none';
+      if (container) container.innerHTML = '';
+      document.getElementById('notif-bell').classList.remove('visible');
+      return;
+    }
+
+    // نمایش section
+    if (header) header.style.display = 'flex';
+
+    // تعداد خوانده نشده
+    const unread = msgs.filter(m => !m.is_read).length;
+    if (badge) {
+      badge.textContent = unread;
+      badge.style.display = unread > 0 ? 'inline' : 'none';
+    }
+
+    // notification bell
+    const bell = document.getElementById('notif-bell');
+    const bellCount = document.getElementById('notif-count');
+    if (unread > 0) {
+      bell.classList.add('visible');
+      bellCount.textContent = unread;
+    } else {
+      bell.classList.remove('visible');
+    }
+
+    // نمایش پیام‌ها
+    container.innerHTML = msgs.map(m => {
+      const timeFA = new Date(m.created_at).toLocaleDateString('fa-IR', {
+        month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
+      });
+      return `<div class="msg-card ${!m.is_read ? 'unread' : ''}" onclick="markMsgRead('${m.id}', this)">
+        <div class="msg-card-header">
+          <div class="msg-card-from">☕ رستری قهوه ${!m.is_read ? '<span class="msg-unread-badge">جدید</span>' : ''}</div>
+          <div class="msg-card-time">${timeFA}</div>
+        </div>
+        <div class="msg-card-text">${m.text}</div>
+      </div>`;
+    }).join('');
+
+    // mark all as read after viewing
+    setTimeout(() => markAllMsgsRead(msgs), 3000);
+
+  } catch(e) {
+    console.warn('loadUserMessages error:', e);
+  }
+}
+
+async function markMsgRead(msgId, el) {
+  el.classList.remove('unread');
+  try {
+    await sb('PATCH', `messages?id=eq.${msgId}`, { is_read: true });
+    loadUserMessages();
+  } catch(e) {}
+}
+
+async function markAllMsgsRead(msgs) {
+  const unread = msgs.filter(m => !m.is_read);
+  if (!unread.length) return;
+  try {
+    await sb('PATCH', `messages?user_id=eq.${currentUser.id}&from_admin=eq.true&is_read=eq.false`, { is_read: true });
+    document.getElementById('notif-bell').classList.remove('visible');
+    document.getElementById('stat-msgs-badge').style.display = 'none';
+  } catch(e) {}
+}
+
+function scrollToMessages() {
+  const el = document.getElementById('dash-messages');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+  markAllMsgsRead([]);
+}
+
+const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
+const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
+const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+const stateFA = { energised:'پرانرژی', focused:'متمرکز', creative:'خلاق', relaxed:'آرام', reflective:'تأملی' };
+
+async function loadProfiles() {
+  const container = document.getElementById('dash-profiles');
+  try {
+    const profiles = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const count = profiles ? profiles.length : 0;
+    document.getElementById('stat-profiles').textContent = count;
+    document.getElementById('stat-profiles-badge').textContent = count;
+    if (!profiles || count === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
+      return;
+    }
+    // مرتب‌سازی: علاقه‌مندها اول
+    profiles.sort((a, b) => (b.is_favorite ? 1 : 0) - (a.is_favorite ? 1 : 0));
+    // ذخیره در Map برای دسترسی امن
+    window._profilesMap = {};
+    profiles.forEach(p => { window._profilesMap[p.id] = p; });
+    container.innerHTML = profiles.map(p => {
+      const beanFull = p.recommended_bean || '—';
+      const beanName = beanFull.split('(')[0].trim();
+      const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+      const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      const tags = [
+        p.flavor ? (tasteFA[p.flavor] || p.flavor) : null,
+        p.body   ? (bodyFA[p.body]   || p.body)   : null,
+        p.brew_method ? (brewFA[p.brew_method] || p.brew_method) : null,
+        p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
+      ].filter(Boolean);
+      const pJson = JSON.stringify(p).replace(/'/g, "\'");
+      return `<div class="profile-card-new" id="pcard-${p.id}">
+        ${p.is_favorite ? '<div class="fav-badge">⭐</div>' : ''}
+        <div style="cursor:pointer;" onclick="viewProfileById('${p.id}')">
+          <div class="profile-card-top">
+            <div>
+              <div class="profile-bean-name">${beanName}</div>
+              ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
+            </div>
+            <div class="profile-date-badge">${dateFA}</div>
+          </div>
+          <div class="profile-card-tags-new">
+            ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
+          </div>
+        </div>
+        <div class="profile-card-actions">
+          <button class="btn-fav ${p.is_favorite ? 'active' : ''}" onclick="toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)">
+            ${p.is_favorite ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی'}
+          </button>
+          <button class="btn-del" onclick="deleteProfile('${p.id}')">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+    setLang(currentLang);
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+  }
+}
+
+async function loadOrders() {
+  const container = document.getElementById('dash-orders');
+  try {
+    const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
+    const count = orders ? orders.length : 0;
+    document.getElementById('stat-orders').textContent = count;
+    document.getElementById('stat-orders-badge').textContent = count;
+    if (!orders || count === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="fa-only">هنوز سفارشی نداری.</div><div class="en-only">No orders yet.</div></div>`;
+      return;
+    }
+    const statusFA   = { 
+      pending:'در انتظار پرداخت', 
+      receipt_submitted:'رسید ارسال شد — در انتظار تأیید',
+      pending_review:'در بررسی',
+      confirmed:'تأیید شد ✅',
+      paid:'پرداخت شده', 
+      shipped:'ارسال شده',
+      cancelled:'کنسل شد ❌'
+    };
+    const statusIcon = { 
+      pending:'⏳', 
+      receipt_submitted:'📋',
+      pending_review:'🔍',
+      confirmed:'✅',
+      paid:'💚', 
+      shipped:'🚚',
+      cancelled:'❌'
+    };
+    const statusClass= { 
+      pending:'status-pending', 
+      receipt_submitted:'status-pending',
+      pending_review:'status-pending',
+      confirmed:'status-paid',
+      paid:'status-paid', 
+      shipped:'status-shipped',
+      cancelled:'status-pending'
+    };
+    container.innerHTML = orders.map(o => {
+      const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      const canDelete = o.status === 'cancelled';
+      return `<div class="order-card-new" id="ocard-${o.id}">
+        <div class="order-card-top">
+          <div>
+            <div class="order-amount-big">${o.amount}g${o.bean_name ? ' — ' + o.bean_name.split('(')[0].trim() : ''}</div>
+            <div class="order-bean-small">${dateFA}</div>
+          </div>
+          <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusFA[o.status]||o.status}</div>
+        </div>
+        ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
+        ${o.notes ? `<div style="font-size:11px;color:var(--gray-light);margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
+        ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;direction:ltr;text-align:right;">🔖 کد پیگیری: ${o.transaction_id}</div>` : ''}
+        ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">🗑️ حذف این سفارش</button>` : ''}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+  }
+}
+
+async function deleteOrder(orderId) {
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف سفارش؟</div>
+      <div class="confirm-desc">این سفارش کنسل‌شده برای همیشه حذف می‌شود.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDeleteOrder(orderId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    await sb('DELETE', `orders?id=eq.${orderId}`);
+    overlay.remove();
+    const card = document.getElementById('ocard-' + orderId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadOrders(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    alert('خطا در حذف: ' + e.message);
+  }
+}
+
+function viewProfileById(id) {
+  const p = window._profilesMap && window._profilesMap[id];
+  if (!p) { console.warn('Profile not found:', id); return; }
+  viewProfile(p);
+}
+
+function viewProfile(p) {
+  if (typeof p === 'string') return;
+  const beanFull = p.recommended_bean || '—';
+  const beanName = beanFull.split('(')[0].trim();
+  const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
+
+  // بازسازی rec از پروفایل تا سفارش کار کنه
+  ans.taste = p.flavor || null;
+  ans.body = p.body || null;
+  ans.state = p.mood || null;
+  ans.context = p.context || null;
+  ans.brew = p.brew_method || null;
+  ans.acidity = p.acidity || null;
+  currentProfileId = p.id;
+  currentPersona = determinePersona();
+  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+  rec = matchedBean ? { ...matchedBean, _matchPct: 90 } : {
+    name: beanName, detail: beanDetail, origin: '', flavors: [],
+    roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
+  };
+  try { rec._runnerBean = recommend()._runnerBean; } catch (e) {}
+
+  document.getElementById('detail-bean-name').textContent = beanName;
+  document.getElementById('detail-bean-origin').textContent = beanDetail;
+
+  const tags = [
+    p.flavor      ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
+    p.body        ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
+    p.brew_method ? `<span class="profile-tag-new">${brewFA[p.brew_method]||p.brew_method}</span>` : '',
+    p.mood        ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
+    p.acidity  ? `<span class="profile-tag-new">${p.acidity}</span>` : '',
+  ].filter(Boolean).join('');
+
+  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const pid = p.id;
+
+  const personaFa = currentPersona ? (currentPersona.icon + ' ' + currentPersona.fa) : '';
+  const personaTagline = currentPersona ? currentPersona.tagFa : '';
+  const personaDesc = currentPersona ? currentPersona.descFa : '';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="card" style="direction:rtl;text-align:center;">
+      <div class="card-title">هویت قهوهٔ شما</div>
+      <div style="font-size:19px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${personaFa}</div>
+      <div style="font-size:13px;color:var(--caramel);font-weight:600;margin-bottom:6px;">${personaTagline}</div>
+      <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;">${personaDesc}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">دانه پیشنهادی</div>
+      <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
+      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);font-style:italic;">${beanDetail}</div>` : ''}
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">طعم‌شناسی</div>
+      <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">نمودار طعم</div>
+      <div id="detail-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
+    </div>
+    ${rec._runnerBean ? `
+    <div class="alt-bean-card">
+      <div class="alt-bean-label"><span class="alt-bean-icon">💡</span>شاید این یکی هم دوست داشته باشید</div>
+      <div class="alt-bean-name">${rec._runnerBean.name}</div>
+      <div class="alt-bean-origin">${rec._runnerBean.origin || ''}</div>
+      <div class="alt-bean-flavors">${(rec._runnerBean.flavors || []).slice(0,4).map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('')}</div>
+    </div>
+    ` : ''}
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">تاریخ ثبت</div>
+      <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
+    </div>
+    <div class="card" style="direction:rtl;">
+      <div class="card-title">نظر و پیشنهاد شما</div>
+      <textarea class="textarea-field" id="review-text-${pid}"
+        placeholder="تجربه‌ات از این قهوه رو بنویس..."
+        style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+        <span style="font-size:13px;color:var(--gray);font-family:Arial,sans-serif;">امتیاز:</span>
+        <div style="display:flex;gap:4px;" id="stars-${pid}">
+          <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
+          <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
+          <span onclick="setRating('${pid}',3)" style="font-size:26px;cursor:pointer;" id="star-${pid}-3">☆</span>
+          <span onclick="setRating('${pid}',4)" style="font-size:26px;cursor:pointer;" id="star-${pid}-4">☆</span>
+          <span onclick="setRating('${pid}',5)" style="font-size:26px;cursor:pointer;" id="star-${pid}-5">☆</span>
+        </div>
+      </div>
+      <div class="success-msg" id="review-success-${pid}"></div>
+      <button class="btn-primary" onclick="submitReview('${pid}')" style="margin-top:4px;">
+        💬 <span class="fa-only">ثبت نظر</span><span class="en-only">Submit Review</span>
+      </button>
+    </div>
+    <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
+      🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
+    </button>
+    <button class="btn-primary btn-ghost" onclick="openSharePrefsModal()" style="margin-top:10px;">
+      📤 <span class="fa-only">اشتراک‌گذاری هویت قهوه‌ام</span><span class="en-only">Share My Coffee Identity</span>
+    </button>
+  `;
+  document.getElementById('detail-radar-chart').innerHTML = buildFlavorRadar(rec, ans.taste);
+  // اگه rec معتبره، result رو هم render کن
+  if (rec && rec.name) {
+    try { render(rec); } catch(e) {}
+  }
+  setLang(currentLang);
+  show('screen-profile-detail');
+}
+
+let currentRating = 0;
+function setRating(profileId, rating) {
+  currentRating = rating;
+  for (let i = 1; i <= 5; i++) {
+    const star = document.getElementById('star-' + profileId + '-' + i);
+    if (star) star.textContent = i <= rating ? '⭐' : '☆';
+  }
+}
+
+async function submitReview(profileId) {
+  const textEl = document.getElementById('review-text-' + profileId);
+  const sucEl  = document.getElementById('review-success-' + profileId);
+  const text   = textEl ? textEl.value.trim() : '';
+  if (!text && currentRating === 0) {
+    sucEl.textContent = 'لطفاً نظر یا امتیاز وارد کنید';
+    sucEl.classList.add('visible');
+    return;
+  }
+  try {
+    await sb('PATCH', 'coffee_profiles?id=eq.' + profileId, {
+      review_text: text || null,
+      review_rating: currentRating || null
+    });
+    sucEl.textContent = '✅ نظر شما ثبت شد. ممنون!';
+    sucEl.classList.add('visible');
+  } catch(e) {
+    sucEl.textContent = 'خطا در ثبت نظر';
+    sucEl.classList.add('visible');
+  }
+}
+
+function reorderProfile() {
+  show('screen-order');
+}
+
+/* ═══════════════════════════════════════════
+   QUIZ
+═══════════════════════════════════════════ */
+function startNewProfile() {
+  ans = { taste: null, body: null, state: null, context: null, brew: null, acidity: null };
+  rec = null;
+  currentPersona = null;
+  currentProfileId = null;
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.disabled = true;
+  });
+  show('screen-1');
+}
+
+function updateProgressBean(category) {
+  const active = document.querySelector('.screen.active .progress-bean');
+  if (!active) return;
+  active.classList.remove('bean-pulse');
+  void active.offsetWidth; // ری‌استارت انیمیشن
+  active.classList.add('bean-pulse');
+}
+
+function pick(el, category, value) {
+  el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  ans[category] = value;
+  updateProgressBean(category);
+  const nextAction = {
+    taste: () => go(2),
+    body: () => go(3),
+    state: () => go(4),
+    context: () => go(5),
+    brew: () => go(6),
+    acidity: () => showLoading()
+  }[category];
+  if (nextAction) setTimeout(nextAction, 280);
+}
+
+function go(n) { show('screen-' + n); }
+function goBack(n) {
+  if (n === 1) showDashboard();
+  else show('screen-' + (n - 1));
+}
+
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showLoading() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-loading').classList.add('visible');
+  setTimeout(async () => {
+    rec = recommend();
+    currentPersona = determinePersona();
+    render(rec);
+    await saveProfile(rec);
+    document.getElementById('screen-loading').classList.remove('visible');
+    show('screen-result');
+    // AI explanation در پس‌زمینه لود میشه
+    getAIExplanation(rec);
+  }, 2000);
+}
+
+/* ═══════════════════════════════════════════
+   SAVE PROFILE TO SUPABASE
+═══════════════════════════════════════════ */
+async function saveProfile(rec) {
+  if (!currentUser) return;
+  try {
+    const supaData = {
+      user_id: currentUser.id,
+      flavor: ans.taste,
+      body: ans.body,
+      mood: ans.state,
+      context: ans.context,
+      brew_method: ans.brew,
+      acidity: ans.acidity,
+      persona: currentPersona ? currentPersona.en : null,
+      recommended_bean: rec.name + ' (' + rec.detail + ')'
+    };
+    const result = await sb('POST', 'coffee_profiles', supaData);
+    if (result && result[0]) currentProfileId = result[0].id;
+    document.getElementById('save-success').classList.add('visible');
+
+    // ارسال کامل داده به Apps Script (همان فرمت v3)
+    const restDays = rec.restDays ? (rec.restDays[ans.brew] || rec.restDays.default || 5) : 5;
+    const scriptData = {
+      name:           currentUser.name || '',
+      email:          currentUser.phone || '',
+      language:       currentLang,
+      q1_taste:       ans.taste      || '',
+      q2_body:        ans.body       || '',
+      q3_state:       ans.state      || '',
+      q4_context:     ans.context    || '',
+      q5_brew:        ans.brew       || '',
+      q6_acidity:     ans.acidity || '',
+      persona:        currentPersona ? currentPersona.en : '',
+      bean:           rec.name + ' (' + rec.detail + ')',
+      is_blend:       rec._isBlend ? 'YES' : 'NO',
+      blend_name:     rec._blendName || '',
+      flavors:        (rec.flavors || []).join(', '),
+      roast:          rec.roast || '',
+      brew_method:    rec.brew  || '',
+      rest_days:      restDays,
+      reminder_date:  '',
+      reminder_wanted:'NO',
+      order_status:   '',
+      roastery_partner:'',
+      order_intent:   '',
+      country:        '',
+      city:           '',
+      country_code:   '',
+    };
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(scriptData)
+    }).catch(() => {});
+  } catch(e) {
+    console.warn('Save profile error:', e);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   ORDER
+═══════════════════════════════════════════ */
+let selectedRoastery = null;
+
+function goToOrder() {
+  // اول رستری انتخاب بشه
+  document.getElementById('roastery-screen-bean').textContent = rec ? rec.name : '—';
+  show('screen-roastery');
+  loadRoasteries();
+}
+
+function goToOrderDirect() {
+  selectedAmount = null;
+  document.getElementById('amt-50').classList.remove('selected');
+  document.getElementById('amt-100').classList.remove('selected');
+  document.getElementById('order-address').value = '';
+  document.getElementById('order-notes').value = '';
+  document.getElementById('order-error').classList.remove('visible');
+  document.getElementById('order-success').classList.remove('visible');
+  document.getElementById('order-bean-name').textContent = rec ? rec.name + (rec.detail ? ' (' + rec.detail + ')' : '') : '—';
+  document.getElementById('order-bean-origin').textContent = rec ? rec.origin : '—';
+  // نمایش رستری انتخاب‌شده
+  if (selectedRoastery) {
+    const roasteryInfo = document.getElementById('order-roastery-info');
+    if (roasteryInfo) {
+      roasteryInfo.textContent = selectedRoastery.logo_emoji + ' ' + selectedRoastery.name;
+      roasteryInfo.style.display = 'block';
+    }
+  }
+  show('screen-order');
+}
+
+async function loadRoasteries() {
+  const container = document.getElementById('roastery-list');
+  try {
+    const roasteries = await sb('GET', 'roasteries?is_active=eq.true&order=rating.desc&select=*');
+    if (!roasteries || !roasteries.length) {
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div></div>';
+      return;
+    }
+    const beanName = rec ? rec.name : '';
+    container.innerHTML = roasteries.map(r => {
+      const stars = '⭐'.repeat(Math.round(r.rating || 5));
+      const hasBeen = r.beans && r.beans.some(b => b.includes(beanName.split('(')[0].trim()));
+      const matchBadge = hasBeen ? '<span style="background:#E8F5E8;color:#2E7D32;border-radius:20px;padding:2px 10px;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;border:1px solid #A5D6A7;">✓ این دانه رو داره</span>' : '';
+      return `<div class="roastery-card" id="rcard-${r.id}">
+        <div class="roastery-card-top">
+          <div class="roastery-logo">${r.logo_emoji || '☕'}</div>
+          <div>
+            <div class="roastery-name">${r.name}</div>
+            <div class="roastery-location">📍 ${r.location || '—'}</div>
+          </div>
+        </div>
+        <div class="roastery-stats">
+          <div class="roastery-stat">${stars} <span>${r.rating || 5}</span></div>
+          <div class="roastery-stat">🚚 <span>${r.delivery_days || 3}</span> روز</div>
+          <div class="roastery-stat">📦 از <span>${r.min_order || 50}</span>g</div>
+        </div>
+        ${matchBadge}
+        <div class="roastery-desc" style="margin-top:8px;">${r.description || ''}</div>
+        <button class="roastery-select-btn" onclick="selectRoastery(${JSON.stringify(r).replace(/"/g, '&quot;')})">
+          انتخاب این رستری ←
+        </button>
+      </div>`;
+    }).join('');
+    setLang(currentLang);
+  } catch(e) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
+  }
+}
+
+function selectRoastery(r) {
+  if (typeof r === 'string') r = JSON.parse(r);
+  selectedRoastery = r;
+  // هایلایت کارت انتخاب‌شده
+  document.querySelectorAll('.roastery-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('rcard-' + r.id)?.classList.add('selected');
+  setTimeout(() => goToOrderDirect(), 300);
+}
+
+function selectAmount(g) {
+  selectedAmount = g;
+  document.getElementById('amt-50').classList.toggle('selected', g === 50);
+  document.getElementById('amt-100').classList.toggle('selected', g === 100);
+}
+
+async function submitOrder() {
+  const errEl = document.getElementById('order-error');
+  const sucEl = document.getElementById('order-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const address = document.getElementById('order-address').value.trim();
+  const notes   = document.getElementById('order-notes').value.trim();
+
+  if (!selectedAmount) return showErr(errEl, 'مقدار را انتخاب کنید (۵۰g یا ۱۰۰g)');
+  if (!address) return showErr(errEl, 'آدرس تحویل را وارد کنید');
+
+  const btn = document.getElementById('btn-submit-order');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    const orderResult = await sb('POST', 'orders', {
+      user_id: currentUser.id,
+      profile_id: currentProfileId || null,
+      amount: selectedAmount,
+      address,
+      notes,
+      status: 'pending',
+      payment_status: 'unpaid',
+      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null,
+      roastery_id: selectedRoastery ? selectedRoastery.id : null,
+      roastery_name: selectedRoastery ? selectedRoastery.name : null
+    });
+
+    if (orderResult && orderResult[0]) {
+      pendingOrderId = orderResult[0].id;
+    } else {
+      throw new Error('Order ID not returned from server');
+    }
+
+    // رفتن به صفحه پرداخت
+    setTimeout(() => goToPayment(), 800);
+    sucEl.textContent = '✅ سفارش ثبت شد! در حال انتقال به صفحه پرداخت...';
+    sucEl.classList.add('visible');
+    btn.textContent = '✅ ثبت شد';
+
+  } catch(e) {
+    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="en-only">✅ Submit Order</span><span class="fa-only">✅ ثبت سفارش</span>';
+    setLang(currentLang);
+  }
+}
+
+function showErr(el, msg) {
+  el.textContent = msg;
+  el.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════════
+   BEAN DATABASE
+═══════════════════════════════════════════ */
+const BEANS = [
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.',
+    s:{
+      // طعم
+      floral:10, sweet:4, chocolatey:0, bold:0,
+      // بدنه
+      light:10, medium:5, full:0,
+      // حالت ذهنی
+      energised:6, focused:6, creative:10, relaxed:4, reflective:7,
+      // موقعیت مصرف
+      morning:9, work:5, reading:8, friends:6, afterdinner:4, weekend:7,
+      // روش دم‌آوری
+      v60:10, frenchpress:4, espresso:2, aeropress:7, coldbrew:6, other:5,
+      // اسیدیته
+      bright:10, balanced:5, smooth:1
+    }
+  },
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.',
+    s:{
+      floral:5, sweet:5, chocolatey:2, bold:4,
+      light:7, medium:8, full:2,
+      energised:10, focused:10, creative:6, relaxed:3, reflective:4,
+      morning:8, work:10, reading:7, friends:6, afterdinner:3, weekend:5,
+      v60:10, frenchpress:5, espresso:3, aeropress:8, coldbrew:5, other:5,
+      bright:10, balanced:6, smooth:1
+    }
+  },
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.',
+    s:{
+      floral:6, sweet:10, chocolatey:3, bold:2,
+      light:6, medium:8, full:3,
+      energised:5, focused:7, creative:7, relaxed:9, reflective:6,
+      morning:8, work:6, reading:9, friends:8, afterdinner:7, weekend:10,
+      v60:9, frenchpress:6, espresso:4, aeropress:10, coldbrew:5, other:6,
+      bright:7, balanced:9, smooth:4
+    }
+  },
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.',
+    s:{
+      floral:5, sweet:9, chocolatey:4, bold:3,
+      light:3, medium:8, full:7,
+      energised:4, focused:4, creative:8, relaxed:9, reflective:7,
+      morning:5, work:4, reading:9, friends:7, afterdinner:9, weekend:8,
+      v60:7, frenchpress:9, espresso:3, aeropress:6, coldbrew:4, other:6,
+      bright:8, balanced:7, smooth:3
+    }
+  },
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.',
+    s:{
+      floral:2, sweet:8, chocolatey:7, bold:4,
+      light:3, medium:9, full:5,
+      energised:5, focused:7, creative:5, relaxed:8, reflective:6,
+      morning:9, work:8, reading:7, friends:9, afterdinner:6, weekend:8,
+      v60:8, frenchpress:7, espresso:8, aeropress:7, coldbrew:6, other:10,
+      bright:5, balanced:10, smooth:6
+    }
+  },
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.',
+    s:{
+      floral:0, sweet:7, chocolatey:10, bold:4,
+      light:1, medium:7, full:9,
+      energised:3, focused:5, creative:3, relaxed:10, reflective:7,
+      morning:6, work:5, reading:6, friends:8, afterdinner:9, weekend:10,
+      v60:3, frenchpress:9, espresso:10, aeropress:5, coldbrew:4, other:7,
+      bright:1, balanced:5, smooth:10
+    }
+  },
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.',
+    s:{
+      floral:0, sweet:5, chocolatey:9, bold:7,
+      light:1, medium:5, full:8,
+      energised:3, focused:5, creative:4, relaxed:7, reflective:9,
+      morning:5, work:6, reading:8, friends:6, afterdinner:10, weekend:7,
+      v60:4, frenchpress:8, espresso:10, aeropress:4, coldbrew:3, other:7,
+      bright:4, balanced:8, smooth:7
+    }
+  },
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.',
+    s:{
+      floral:0, sweet:2, chocolatey:6, bold:10,
+      light:0, medium:2, full:10,
+      energised:2, focused:4, creative:3, relaxed:7, reflective:10,
+      morning:3, work:4, reading:10, friends:4, afterdinner:8, weekend:7,
+      v60:2, frenchpress:10, espresso:7, aeropress:3, coldbrew:3, other:6,
+      bright:0, balanced:3, smooth:10
+    }
+  },
+];
+
+const AVAILABLE = ['yirgacheffe','kenya','rwanda','sidama','colombia','brazil','guatemala','sumatra'];
+
+/* ═══════════════════════════════════════════
+   COFFEE PERSONAS (Coffee Personality Engine)
+   هر پرسونا مثل دانه‌ها یک بردار امتیاز روی همان
+   ۶ محور سؤال دارد و با همان وزن‌دهی سند
+   (طعم ۳۰٪ / بدنه ۲۰٪ / حالت ۱۵٪ / موقعیت ۱۵٪ / دم‌آوری ۱۰٪ / تجربه ۱۰٪) نمره می‌گیرد
+═══════════════════════════════════════════ */
+const PERSONAS = {
+  explorer: {
+    icon: '🧭',
+    fa: 'کاوشگر', en: 'The Explorer',
+    tagFa: 'همیشه دنبال یک تجربهٔ تازه',
+    descFa: 'کنجکاوی موتور محرک شماست؛ دانه‌های غیرمعمول و روش‌های دم‌آوری جدید را به تکرار ترجیح می‌دهید.',
+    descEn: 'Curiosity drives you — unusual beans and new brew methods beat repeating the familiar.',
+    s: {
+      floral:8, sweet:4, chocolatey:3, bold:7,
+      light:6, medium:5, full:5,
+      energised:6, focused:7, creative:8, relaxed:2, reflective:6,
+      morning:5, work:6, reading:8, friends:4, afterdinner:5, weekend:6,
+      v60:9, frenchpress:5, espresso:5, aeropress:9, coldbrew:6, other:7,
+      bright:8, balanced:6, smooth:3
+    }
+  },
+  comfort: {
+    icon: '☕',
+    fa: 'آرامش‌جو', en: 'The Comfort Lover',
+    tagFa: 'قهوه یعنی یک لحظهٔ گرم و آشنا',
+    descFa: 'برایتان قهوه بیش از هر چیز باید آرامش‌بخش و آشنا باشد؛ طعم‌های شیرین و ملایم را به هیجان ترجیح می‌دهید.',
+    descEn: 'Coffee is comfort first — sweet, gentle flavors over intensity.',
+    s: {
+      floral:3, sweet:9, chocolatey:8, bold:2,
+      light:3, medium:6, full:8,
+      energised:2, focused:3, creative:4, relaxed:10, reflective:6,
+      morning:6, work:4, reading:6, friends:6, afterdinner:9, weekend:8,
+      v60:4, frenchpress:9, espresso:7, aeropress:5, coldbrew:5, other:6,
+      bright:3, balanced:6, smooth:9
+    }
+  },
+  bold: {
+    icon: '⚡',
+    fa: 'جسور', en: 'The Bold Drinker',
+    tagFa: 'قهوه باید حس حضورش را نشان بدهد',
+    descFa: 'طعم‌های قوی و پرقدرت را دوست دارید و از قهوه انرژی و تمرکز واقعی می‌خواهید.',
+    descEn: 'You want coffee that makes its presence known — strong, intense, energising.',
+    s: {
+      floral:1, sweet:2, chocolatey:7, bold:10,
+      light:1, medium:4, full:9,
+      energised:9, focused:9, creative:3, relaxed:2, reflective:5,
+      morning:9, work:9, reading:4, friends:5, afterdinner:6, weekend:4,
+      v60:3, frenchpress:6, espresso:10, aeropress:5, coldbrew:5, other:5,
+      bright:2, balanced:5, smooth:9
+    }
+  },
+  creative: {
+    icon: '🎨',
+    fa: 'خلاق', en: 'The Creative Mood',
+    tagFa: 'قهوه بخشی از فرآیند فکری شماست',
+    descFa: 'قهوه همراه لحظات تمرکز و ایده‌پردازی‌تان است؛ طعم‌های پیچیده و لایه‌دار را می‌پسندید.',
+    descEn: 'Coffee accompanies your focus and ideas — layered, complex flavors appeal to you.',
+    s: {
+      floral:9, sweet:6, chocolatey:4, bold:3,
+      light:8, medium:5, full:2,
+      energised:4, focused:6, creative:10, relaxed:6, reflective:9,
+      morning:5, work:5, reading:9, friends:4, afterdinner:6, weekend:6,
+      v60:8, frenchpress:5, espresso:3, aeropress:7, coldbrew:6, other:6,
+      bright:9, balanced:6, smooth:2
+    }
+  },
+  weekend: {
+    icon: '🌤️',
+    fa: 'آخرهفته‌ای', en: 'The Weekend Sipper',
+    tagFa: 'قهوه یعنی وقت‌گذرانی بی‌عجله',
+    descFa: 'قهوه‌تان را در کنار دوستان و بدون عجله می‌نوشید؛ لذت بردن برایتان مهم‌تر از پیچیدگی است.',
+    descEn: 'You sip slowly with friends — enjoyment matters more than complexity.',
+    s: {
+      floral:4, sweet:7, chocolatey:5, bold:2,
+      light:4, medium:6, full:6,
+      energised:3, focused:2, creative:5, relaxed:9, reflective:4,
+      morning:4, work:1, reading:5, friends:10, afterdinner:6, weekend:10,
+      v60:5, frenchpress:6, espresso:4, aeropress:5, coldbrew:8, other:6,
+      bright:4, balanced:7, smooth:7
+    }
+  }
+};
+
+function determinePersona() {
+  let bestKey = null, bestScore = -1;
+  for (const key in PERSONAS) {
+    const p = PERSONAS[key];
+    let score = 0;
+    score += (p.s[ans.taste]      || 0) * 3.0;
+    score += (p.s[ans.body]       || 0) * 2.0;
+    score += (p.s[ans.state]      || 0) * 1.5;
+    score += (p.s[ans.context]    || 0) * 1.5;
+    score += (p.s[ans.brew]       || 0) * 1.0;
+    score += (p.s[ans.acidity] || 0) * 1.0;
+    if (score > bestScore) { bestScore = score; bestKey = key; }
+  }
+  return PERSONAS[bestKey];
+}
+
+/* ═══════════════════════════════════════════
+   RECOMMENDATION ENGINE
+═══════════════════════════════════════════ */
+function recommend() {
+  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  const scored = pool.map(b => {
+    let score = 0;
+
+    // ── وزن‌دهی جدید بر اساس سند شریک رستری ──
+    // طعم: 30%
+    score += (b.s[ans.taste]      || 0) * 3.0;
+    // بدنه: 20%
+    score += (b.s[ans.body]       || 0) * 2.0;
+    // حالت ذهنی: 15%
+    score += (b.s[ans.state]      || 0) * 1.5;
+    // موقعیت مصرف: 15% (جدید)
+    score += (b.s[ans.context]    || 0) * 1.5;
+    // روش دم‌آوری: 10% (جدید)
+    score += (b.s[ans.brew]       || 0) * 1.0;
+    // سطح تجربه: 10%
+    score += (b.s[ans.acidity] || 0) * 1.0;
+
+    return { ...b, _score: score };
+  });
+
+  scored.sort((a, b) => b._score - a._score);
+  const best = scored[0];
+
+  // محاسبه درصد تطابق واقعی‌تر
+  const maxPossible = 10 * (3.0 + 2.0 + 1.5 + 1.5 + 1.0 + 1.0); // = 100
+  best._matchPct = Math.min(98, Math.round((best._score / maxPossible) * 100));
+
+  // دومین گزینه برای نمایش به‌عنوان «پیشنهاد جایگزین»
+  best._runnerBean = scored[1] || null;
+  best._runner1 = scored[1]?.name || null;
+  best._runner2 = scored[2]?.name || null;
+
+  return best;
+}
+
+/* ═══════════════════════════════════════════
+   SHARE CARD (Instagram Story format 1080×1920)
+═══════════════════════════════════════════ */
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+function drawCanvasRadar(ctx, bean, highlightKey, cx, cy, maxR) {
+  const axes = [
+    { key: 'floral',     fa: 'گلی' },
+    { key: 'sweet',      fa: 'شیرین' },
+    { key: 'chocolatey', fa: 'شکلاتی' },
+    { key: 'bold',       fa: 'پررنگ' }
+  ];
+  const angleStep = (2 * Math.PI) / axes.length;
+  function pointAt(i, value) {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const r = (Math.max(0, Math.min(10, value)) / 10) * maxR;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+  ctx.strokeStyle = 'rgba(107,63,42,0.2)';
+  ctx.lineWidth = 1;
+  [0.25, 0.5, 0.75, 1].forEach(frac => {
+    ctx.beginPath();
+    axes.forEach((a, i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const r = frac * maxR;
+      const x = cx + r * Math.cos(angle), y = cy + r * Math.sin(angle);
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.stroke();
+  });
+  axes.forEach((a, i) => {
+    const [x, y] = pointAt(i, 10);
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(x, y); ctx.stroke();
+  });
+  ctx.beginPath();
+  axes.forEach((a, i) => {
+    const [x, y] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(196,149,106,0.35)';
+  ctx.fill();
+  ctx.strokeStyle = '#6B3F2A';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  axes.forEach((a, i) => {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const labelR = maxR + 46;
+    const lx = cx + labelR * Math.cos(angle);
+    const ly = cy + labelR * Math.sin(angle);
+    const isHi = a.key === highlightKey;
+    ctx.fillStyle = isHi ? '#C4956A' : '#6B3F2A';
+    ctx.font = (isHi ? 'bold ' : '') + '26px Arial';
+    ctx.fillText(a.fa, lx, ly);
+    const [dx, dy] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    ctx.beginPath();
+    ctx.arc(dx, dy, isHi ? 9 : 6, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function shareResultCard(style, birthDay, birthMonth) {
+  if (!rec) return;
+  style = style || 'surprise';
+  const persona = currentPersona || determinePersona();
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // پالت رنگی بر اساس سبک انتخابی
+  const palettes = {
+    feminine:  { top: '#4A2038', bottom: '#B87A9E', accent: '#F0C9DD', decoShape: 'circle' },
+    masculine: { top: '#1A1410', bottom: '#3A3028', accent: '#C4956A', decoShape: 'diamond' },
+    surprise:  { top: '#2C1A0E', bottom: '#6B3F2A', accent: '#C4956A', decoShape: 'circle' }
+  };
+  const pal = palettes[style] || palettes.surprise;
+
+  // پس‌زمینه
+  const grad = ctx.createLinearGradient(0, 0, 0, H);
+  grad.addColorStop(0, pal.top);
+  grad.addColorStop(1, pal.bottom);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.globalAlpha = 0.08;
+  ctx.fillStyle = '#FEFEFE';
+  if (pal.decoShape === 'diamond') {
+    ctx.save(); ctx.translate(W * 0.85, H * 0.1); ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-160, -160, 320, 320); ctx.restore();
+    ctx.save(); ctx.translate(W * 0.1, H * 0.88); ctx.rotate(Math.PI / 4);
+    ctx.fillRect(-140, -140, 280, 280); ctx.restore();
+  } else {
+    ctx.beginPath(); ctx.arc(W * 0.85, H * 0.1, 260, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(W * 0.1, H * 0.88, 220, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  ctx.fillStyle = pal.accent;
+  ctx.font = '600 32px Arial';
+  ctx.fillText(currentLang === 'fa' ? 'کافی آیدنتیتی' : 'COFFEE IDENTITY', W / 2, 130);
+
+  ctx.font = '150px Arial';
+  ctx.fillText(persona.icon, W / 2, 350);
+
+  ctx.fillStyle = '#FEFEFE';
+  ctx.font = 'bold 62px Arial';
+  ctx.fillText(currentLang === 'fa' ? persona.fa : persona.en, W / 2, 450);
+
+  ctx.fillStyle = pal.accent;
+  ctx.font = '600 30px Arial';
+  ctx.fillText(currentLang === 'fa' ? persona.tagFa : '', W / 2, 505);
+
+  ctx.strokeStyle = 'rgba(254,254,254,0.25)';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(W / 2 - 120, 555); ctx.lineTo(W / 2 + 120, 555); ctx.stroke();
+
+  ctx.fillStyle = '#FEFEFE';
+  ctx.font = '500 30px Arial';
+  ctx.fillText(`${Math.round(rec._matchPct || 0)}% ${currentLang === 'fa' ? 'تطابق' : 'match'}`, W / 2, 615);
+
+  // کارت دانه
+  const cardY = 680, cardH = 760;
+  ctx.fillStyle = 'rgba(254,254,254,0.96)';
+  roundRect(ctx, 80, cardY, W - 160, cardH, 32);
+  ctx.fill();
+
+  ctx.fillStyle = '#6B3F2A';
+  ctx.font = '500 26px Arial';
+  ctx.fillText(currentLang === 'fa' ? 'پیشنهاد امروز' : "Today's Pick", W / 2, cardY + 60);
+
+  ctx.fillStyle = '#2C1A0E';
+  ctx.font = 'bold 44px Arial';
+  ctx.fillText(rec.name || '', W / 2, cardY + 120);
+
+  if (rec.origin) {
+    ctx.fillStyle = '#C4956A';
+    ctx.font = 'italic 28px Arial';
+    ctx.fillText(rec.origin, W / 2, cardY + 165);
+  }
+
+  drawCanvasRadar(ctx, rec, ans.taste, W / 2, cardY + 420, 130);
+
+  if (birthDay && birthMonth) {
+    const monthsFA = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    const monthName = monthsFA[parseInt(birthMonth, 10) - 1] || '';
+    ctx.fillStyle = pal.accent;
+    ctx.font = '600 28px Arial';
+    ctx.fillText(`🎂 ${birthDay} ${monthName} — روزت مبارک!`, W / 2, cardY + cardH + 70);
+  }
+
+  ctx.fillStyle = 'rgba(254,254,254,0.55)';
+  ctx.font = '24px Arial';
+  ctx.fillText('farhangrsamie-svg.github.io/roastery-cafe', W / 2, H - 70);
+
+  canvas.toBlob(async (blob) => {
+    if (!blob) return;
+    const file = new File([blob], 'coffee-identity.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: currentLang === 'fa' ? 'هویت قهوهٔ من' : 'My Coffee Identity',
+          text: currentLang === 'fa' ? persona.fa : persona.en
+        });
+        return;
+      } catch (e) { /* کاربر لغو کرد یا مرورگر ساپورت نمی‌کنه؛ برو سراغ دانلود */ }
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'coffee-identity.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 'image/png');
+}
+
+/* ═══════════════════════════════════════════
+   FLAVOR RADAR CHART (SVG)
+   نمودار رادار طعم بر اساس امتیاز ۴ بعد اصلی طعمی دانه؛
+   محور مرتبط با طعم انتخابی کاربر رنگی و برجسته می‌شود
+═══════════════════════════════════════════ */
+function buildFlavorRadar(bean, highlightKey) {
+  const axes = [
+    { key: 'floral',     fa: 'گلی',     en: 'Floral' },
+    { key: 'sweet',      fa: 'شیرین',   en: 'Sweet' },
+    { key: 'chocolatey', fa: 'شکلاتی',  en: 'Chocolatey' },
+    { key: 'bold',       fa: 'پررنگ',   en: 'Bold' }
+  ];
+  const cx = 140, cy = 140, maxR = 62;
+  const angleStep = (2 * Math.PI) / axes.length;
+
+  function pointAt(i, value) {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const r = (Math.max(0, Math.min(10, value)) / 10) * maxR;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+
+  // حلقه‌های راهنما
+  let grid = '';
+  [0.25, 0.5, 0.75, 1].forEach(frac => {
+    const pts = axes.map((a, i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const r = frac * maxR;
+      return (cx + r * Math.cos(angle)).toFixed(1) + ',' + (cy + r * Math.sin(angle)).toFixed(1);
+    }).join(' ');
+    grid += `<polygon points="${pts}" fill="none" stroke="rgba(107,63,42,0.2)" stroke-width="1"/>`;
+  });
+
+  // خطوط محور
+  let axisLines = '';
+  axes.forEach((a, i) => {
+    const [x, y] = pointAt(i, 10);
+    axisLines += `<line x1="${cx}" y1="${cy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="rgba(107,63,42,0.25)" stroke-width="1"/>`;
+  });
+
+  // چندضلعی داده
+  const dataPts = axes.map((a, i) => {
+    const [x, y] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+
+  // برچسب‌ها و نقاط
+  let labels = '', dots = '';
+  axes.forEach((a, i) => {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const labelR = maxR + 38;
+    const lx = cx + labelR * Math.cos(angle);
+    const ly = cy + labelR * Math.sin(angle);
+    const isHi = a.key === highlightKey;
+    const color = isHi ? '#C4956A' : '#6B3F2A';
+    const label = currentLang === 'fa' ? a.fa : a.en;
+    labels += `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle" dominant-baseline="middle" font-size="15" font-family="Arial, sans-serif" fill="${color}" font-weight="${isHi ? '700' : '600'}">${label}</text>`;
+    const [dx, dy] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
+    dots += `<circle cx="${dx.toFixed(1)}" cy="${dy.toFixed(1)}" r="${isHi ? 5 : 3}" fill="${color}"/>`;
+  });
+
+  return `<svg viewBox="0 0 280 280" width="260" height="260" style="overflow:visible" xmlns="http://www.w3.org/2000/svg">
+    ${grid}
+    ${axisLines}
+    <polygon points="${dataPts}" fill="rgba(196,149,106,0.35)" stroke="#6B3F2A" stroke-width="2"/>
+    ${dots}
+    ${labels}
+  </svg>`;
+}
+
+/* ═══════════════════════════════════════════
+   RENDER RESULT
+═══════════════════════════════════════════ */
+function render(r) {
+  // Persona (Coffee Personality Engine — بر اساس ترکیب هر ۶ جواب)
+  const persona = currentPersona || determinePersona();
+  document.getElementById('r-identity-name').textContent =
+    persona.icon + ' ' + (currentLang === 'fa' ? persona.fa : persona.en);
+  document.getElementById('r-persona-tagline').textContent =
+    currentLang === 'fa' ? persona.tagFa : '';
+  document.getElementById('r-persona-desc').textContent =
+    currentLang === 'fa' ? persona.descFa : persona.descEn;
+
+  // Badge tags
+  const badge = document.getElementById('r-identity-badge');
+  const tags = [ans.body, ans.state, ans.acidity].filter(Boolean);
+  badge.innerHTML = tags.map(t => `<span class="identity-tag">${t}</span>`).join('');
+
+  // Match score
+  const pct = r._matchPct || 85;
+  document.getElementById('r-match-pct').textContent = pct + '%';
+  document.getElementById('r-match-fill').style.width = pct + '%';
+
+  // Bean info
+  document.getElementById('r-name').textContent = r.name;
+  document.getElementById('r-origin').textContent = r.origin;
+  document.getElementById('r-roast').textContent = r.roast;
+  document.getElementById('r-brew').textContent = r.brew;
+
+  // نمایش روش دم‌آوری مشتری در کنار روش پیشنهادی دانه
+  const brewNameFA = {
+    v60: 'پور اور (V60)',
+    frenchpress: 'فرنچ پرس',
+    espresso: 'اسپرسو',
+    aeropress: 'ایروپرس',
+    coldbrew: 'کولد برو',
+    other: 'روش دیگر'
+  };
+  if (ans.brew && r.brew) {
+    const yourBrewFA = brewNameFA[ans.brew] || ans.brew;
+    const beanBrewEN = r.brew.toLowerCase();
+    const yourBrewEN = ans.brew.replace('frenchpress','french press').replace('v60','pour over').replace('coldbrew','cold brew');
+    const isCompatible = beanBrewEN.includes(yourBrewEN) || beanBrewEN.includes(ans.brew);
+
+    document.getElementById('r-your-brew-row').style.display = 'flex';
+    document.getElementById('r-your-brew').textContent = yourBrewFA;
+
+    document.getElementById('r-brew-note-row').style.display = 'flex';
+    if (isCompatible) {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fa'
+          ? '✅ روش دم‌آوری شما با این دانه سازگار است.'
+          : '✅ Your brew method is compatible with this bean.';
+    } else {
+      document.getElementById('r-brew-note').textContent =
+        currentLang === 'fa'
+          ? `⚡ این دانه با ${r.brew} بهترین نتیجه رو میده، ولی با روش شما هم قابل استفاده‌ست — فقط پروفایل طعمی کمی متفاوت خواهد بود.`
+          : `⚡ This bean shines with ${r.brew}, but works with your method too — the flavor profile will be slightly different.`;
+    }
+  }
+  document.getElementById('r-temp').textContent = r.temp;
+  document.getElementById('r-ratio').textContent = r.ratio;
+  document.getElementById('r-desc').textContent = r.desc;
+
+  // Roast guide
+  if (r.roastInfo) {
+    document.getElementById('r-charge').textContent = r.roastInfo.charge;
+    document.getElementById('r-drop').textContent = r.roastInfo.drop;
+    document.getElementById('r-time').textContent = r.roastInfo.time;
+    document.getElementById('r-dtr').textContent = r.roastInfo.dtr;
+  }
+
+  // Flavor Notes
+  const fl = document.getElementById('r-flavors');
+  fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${f}</span>`).join('');
+
+  // Flavor Radar
+  document.getElementById('r-radar-chart').innerHTML = buildFlavorRadar(r, ans.taste);
+
+  // Alternative Bean Suggestion (نمایش فوری، مستقل از تحلیل AI)
+  const altCard = document.getElementById('alt-bean-card');
+  if (r._runnerBean) {
+    document.getElementById('alt-bean-name').textContent = r._runnerBean.name;
+    document.getElementById('alt-bean-origin').textContent = r._runnerBean.origin || '';
+    const altFlavorsEl = document.getElementById('alt-bean-flavors');
+    altFlavorsEl.innerHTML = (r._runnerBean.flavors || []).slice(0, 4)
+      .map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('');
+    altCard.style.display = 'block';
+  } else if (altCard) {
+    altCard.style.display = 'none';
+  }
+
+  // Why this coffee
+  const whyMap = {
+    floral: 'گلی و میوه‌ای بودن این دانه با ذائقه شما هماهنگ است',
+    sweet: 'شیرینی طبیعی این دانه دقیقاً چیزی است که دنبالش هستید',
+    chocolatey: 'نت‌های شکلاتی غنی این قهوه برای شما ایده‌آل است',
+    bold: 'قدرت و عمق این دانه با شخصیت قهوه‌ای شما می‌خواند'
+  };
+  const why = document.getElementById('why-list');
+  const reasons = [
+    whyMap[ans.taste] || '',
+    ans.body === 'light' ? 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد' :
+    ans.body === 'full'  ? 'قدرت و غنای این قهوه با خواسته شما هماهنگ است' : '',
+    ans.acidity === 'bright' ? 'طراوت و شادابی این دانه دقیقاً همونیه که دنبالش بودید' : ''
+  ].filter(Boolean);
+  why.innerHTML = reasons.map(r => `<div class="why-item"><div class="why-check">✓</div>${r}</div>`).join('');
+}
+
+function toggleRoastGuide() {
+  const card = document.getElementById('roast-card');
+  const btn  = document.querySelector('.staff-toggle');
+  const visible = card.style.display !== 'none';
+  card.style.display = visible ? 'none' : 'block';
+  btn.textContent = (visible ? '🔥 راهنمای رست ▼' : '🔥 راهنمای رست ▲');
+}
+
+/* ═══════════════════════════════════════════
+   LANGUAGE
+═══════════════════════════════════════════ */
+function setLang(lang) {
+  currentLang = lang;
+  document.body.classList.remove('lang-fa', 'lang-en');
+  document.body.classList.add('lang-' + lang);
+  document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
+  document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+  document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
+  if (rec) {
+    const radarEl = document.getElementById('r-radar-chart');
+    if (radarEl) radarEl.innerHTML = buildFlavorRadar(rec, ans.taste);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   FAVORITE & DELETE
+═══════════════════════════════════════════ */
+async function toggleFavorite(profileId, currentFav, btn) {
+  const newFav = !currentFav;
+  btn.disabled = true;
+  try {
+    await sb('PATCH', `coffee_profiles?id=eq.${profileId}`, { is_favorite: newFav });
+    btn.classList.toggle('active', newFav);
+    btn.textContent = newFav ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی';
+    btn.onclick = () => toggleFavorite(profileId, newFav, btn);
+    // نمایش/حذف badge
+    const card = document.getElementById('pcard-' + profileId);
+    let badge = card.querySelector('.fav-badge');
+    if (newFav) {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'fav-badge';
+        badge.textContent = '⭐';
+        card.insertBefore(badge, card.firstChild);
+      }
+    } else {
+      if (badge) badge.remove();
+    }
+    // مرتب‌سازی مجدد
+    await loadProfiles();
+  } catch(e) {
+    console.warn('Toggle favorite error:', e);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function deleteProfile(profileId) {
+  // نمایش confirm dialog
+  const overlay = document.createElement('div');
+  overlay.className = 'confirm-overlay';
+  overlay.innerHTML = `
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">حذف پروفایل؟</div>
+      <div class="confirm-desc">این پروفایل قهوه برای همیشه حذف می‌شود و قابل بازیابی نیست.</div>
+      <div class="confirm-actions">
+        <button class="confirm-btn-cancel" onclick="this.closest('.confirm-overlay').remove()">انصراف</button>
+        <button class="confirm-btn-delete" onclick="confirmDelete('${profileId}', this.closest('.confirm-overlay'))">حذف کن</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+async function confirmDelete(profileId, overlay) {
+  const btn = overlay.querySelector('.confirm-btn-delete');
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    // اول profile_id در سفارش‌ها رو null کن تا foreign key مشکل نداشته باشه
+    await sb('PATCH', `orders?profile_id=eq.${profileId}`, { profile_id: null });
+  } catch(e) {
+    // اگه سفارشی نبود مشکلی نیست
+  }
+  try {
+    await sb('DELETE', `coffee_profiles?id=eq.${profileId}`);
+    overlay.remove();
+    // انیمیشن حذف کارت
+    const card = document.getElementById('pcard-' + profileId);
+    if (card) {
+      card.style.transition = 'all 0.3s ease';
+      card.style.opacity = '0';
+      card.style.transform = 'translateX(-20px)';
+      setTimeout(() => { card.remove(); loadProfiles(); }, 300);
+    }
+  } catch(e) {
+    btn.textContent = 'حذف کن';
+    btn.disabled = false;
+    console.warn('Delete error:', e.message);
+    alert('خطا: ' + e.message);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   PAYMENT
+═══════════════════════════════════════════ */
+// تنظیمات رستری — بعداً از پنل ادمین می‌آد
+const SHOP_CARD = '6219 8619 1234 5678'; // شماره کارت رستری
+const SHOP_OWNER = 'فرهنگ سامیه';        // نام صاحب حساب
+const PRICES = { 50: 85000, 100: 160000 }; // قیمت‌ها به تومان
+
+let paymentTimer = null;
+let receiptBase64 = null;
+let pendingOrderId = null;
+
+function goToPayment() {
+  // تنظیم شماره کارت
+  document.getElementById('shop-card-number').textContent = SHOP_CARD;
+  document.getElementById('shop-card-owner').textContent = SHOP_OWNER;
+
+  // مبلغ
+  const price = PRICES[selectedAmount] || 0;
+  document.getElementById('pay-amount').textContent = price.toLocaleString('fa-IR');
+  document.getElementById('pay-order-summary').textContent =
+    `${selectedAmount}g — ${rec ? rec.name : ''}`;
+
+  // پاک کردن فرم
+  document.getElementById('transaction-id').value = '';
+  document.getElementById('upload-preview').style.display = 'none';
+  document.getElementById('upload-icon').style.display = 'block';
+  document.getElementById('upload-text').textContent = 'تصویر رسید را انتخاب کنید';
+  document.getElementById('payment-error').classList.remove('visible');
+  document.getElementById('payment-success').classList.remove('visible');
+  document.getElementById('btn-confirm-payment').disabled = false;
+  document.getElementById('btn-confirm-payment').innerHTML =
+    '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+  receiptBase64 = null;
+
+  // تایمر ۳۰ دقیقه
+  startPaymentTimer(30 * 60);
+
+  show('screen-payment');
+  setLang(currentLang);
+}
+
+function startPaymentTimer(seconds) {
+  if (paymentTimer) clearInterval(paymentTimer);
+  let remaining = seconds;
+  const el = document.getElementById('payment-timer');
+  paymentTimer = setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining / 60).toString().padStart(2, '0');
+    const s = (remaining % 60).toString().padStart(2, '0');
+    el.textContent = m + ':' + s;
+    if (remaining <= 0) {
+      clearInterval(paymentTimer);
+      el.textContent = '00:00';
+      el.style.color = '#C0392B';
+      // کنسل خودکار سفارش
+      autoCancelOrder();
+    }
+  }, 1000);
+}
+
+function copyCardNumber() {
+  navigator.clipboard.writeText(SHOP_CARD.replace(/\s/g, '')).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  }).catch(() => {
+    // fallback
+    const el = document.createElement('textarea');
+    el.value = SHOP_CARD.replace(/\s/g, '');
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = '✅ کپی شد!';
+    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+  });
+}
+
+function handleReceiptUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    showErr(document.getElementById('payment-error'), 'حجم فایل باید کمتر از ۵ مگابایت باشد');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    receiptBase64 = e.target.result;
+    const preview = document.getElementById('upload-preview');
+    preview.src = receiptBase64;
+    preview.style.display = 'block';
+    document.getElementById('upload-icon').style.display = 'none';
+    document.getElementById('upload-text').textContent = '✅ رسید انتخاب شد';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function autoCancelOrder() {
+  if (!pendingOrderId) return;
+  try {
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'cancelled',
+      payment_status: 'cancelled'
+    });
+    const errEl = document.getElementById('payment-error');
+    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
+    document.getElementById('btn-confirm-payment').disabled = true;
+  } catch(e) {
+    console.warn('Auto cancel error:', e);
+  }
+}
+
+
+async function confirmPayment() {
+  const errEl = document.getElementById('payment-error');
+  const sucEl = document.getElementById('payment-success');
+  errEl.classList.remove('visible');
+  sucEl.classList.remove('visible');
+
+  const txId = document.getElementById('transaction-id').value.trim();
+
+  if (!receiptBase64) return showErr(errEl, 'لطفاً تصویر رسید را آپلود کنید');
+  if (!txId) return showErr(errEl, 'لطفاً کد پیگیری پرداخت را وارد کنید');
+
+  const btn = document.getElementById('btn-confirm-payment');
+  btn.disabled = true;
+  btn.textContent = '...در حال ارسال رسید';
+
+  // اگه pendingOrderId نداریم، نباید ادامه بدیم
+  if (!pendingOrderId) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+    return showErr(errEl, 'خطا: شناسه سفارش یافت نشد. لطفاً دوباره سفارش بده.');
+  }
+
+  try {
+    // ۱. آپدیت Supabase — این مهم‌ترین قدمه، باید همیشه انجام بشه
+    btn.textContent = '...در حال ثبت اطلاعات';
+    await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
+      status: 'receipt_submitted',
+      payment_status: 'receipt_submitted',
+      transaction_id: txId
+    });
+
+    // ۲. ارسال رسید به Apps Script → Google Drive (جداگانه، نباید کل فرآیند رو fail کنه)
+    btn.textContent = '...در حال آپلود تصویر';
+    let receiptUrl = '';
+    try {
+      const receiptData = {
+        type: 'payment_receipt',
+        order_id: pendingOrderId,
+        transaction_id: txId,
+        receipt_base64: receiptBase64,
+        name: currentUser ? currentUser.name : '',
+        phone: currentUser ? currentUser.phone : '',
+        bean: rec ? rec.name : '',
+        amount: selectedAmount ? selectedAmount + 'g' : '',
+        price: (PRICES[selectedAmount] || 0).toLocaleString()
+      };
+      const scriptRes = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        body: JSON.stringify(receiptData)
+      });
+      const scriptData = await scriptRes.json().catch(() => ({}));
+      receiptUrl = scriptData.receipt_url || '';
+
+      // اگه لینک Drive موفق گرفتیم، Supabase رو دوباره آپدیت کن
+      if (receiptUrl) {
+        await sb('PATCH', `orders?id=eq.${pendingOrderId}`, { receipt_url: receiptUrl });
+      }
+    } catch(scriptErr) {
+      console.warn('Apps Script / Drive upload error:', scriptErr);
+      // مشکلی نیست — وضعیت سفارش از قبل در Supabase ثبت شده
+    }
+
+    // ۳. توقف تایمر
+    if (paymentTimer) clearInterval(paymentTimer);
+
+    sucEl.textContent = '✅ رسید شما با موفقیت ارسال و ذخیره شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
+    sucEl.classList.add('visible');
+    btn.textContent = '✅ ارسال شد';
+
+    setTimeout(() => {
+      show('screen-dashboard');
+      showDashboard();
+    }, 3000);
+
+  } catch(e) {
+    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
+    setLang(currentLang);
+  }
+}
+
+/* ═══════════════════════════════════════════
+   AI EXPLANATION
+═══════════════════════════════════════════ */
+/* ── FALLBACK EXPLANATIONS ── */
+const FALLBACK_FA = {
+  yirgacheffe: {
+    floral:      'ذائقه‌ات دقیقاً با روح این دانه هم‌خوانی داره. Ethiopia Yirgacheffe با نت‌های یاسمن و هلو، معطرترین قهوه دنیاست و برای کسی که طعم‌های گلی رو دوست داره انتخاب بی‌نظیریه. هر فنجان یه تجربه ظریف و به‌یادماندنیه.',
+    sweet:       'شیرینی طبیعی Ethiopia Yirgacheffe بدون هیچ تلخی اضافه‌ای، دقیقاً چیزیه که دنبالش بودی. نت‌های هلو و چای سبز با هم یه هارمونی شیرین و لطیف می‌سازن. این دانه برای کسی مثل تو که سبکی و شیرینی رو دوست داره ایده‌آله.',
+    chocolatey:  'شاید تعجب کنی ولی Ethiopia Yirgacheffe با وجود سبکی، یه پیچیدگی منحصربه‌فرد داره که عاشقان قهوه رو شگفت‌زده می‌کنه. پروفایل طعمیت نشون میده که آماده‌ای تجربه جدیدی داشته باشی. این دانه دنیای قهوه رو از زاویه‌ای متفاوت نشونت میده.',
+    bold:        'این دانه به‌عنوان یه تجربه متفاوت برات جالبه. Yirgacheffe سبک و گلی، یه کنتراست جذاب با سلیقه‌ی معمولت ایجاد می‌کنه و ممکنه افق‌های جدیدی از دنیای قهوه رو برات باز کنه.',
+  },
+  kenya: {
+    floral:      'Kenya AA با اسیدیته درخشان و نت‌های میوه‌ای قرمز، برای کسی که طعم‌های زنده و پُرانرژی رو دوست داره عالیه. تمشک و انگور قرمز در هر قطره این قهوه حس میشه. یه انتخاب هیجان‌انگیز برای ذائقه‌ای مثل تو.',
+    sweet:       'شیرینی خاص Kenya AA از نوع قند قهوه‌ایه — عمیق‌تر و پیچیده‌تر از شیرینی معمولی. پروفایل طعمیت با این دانه جذاب به‌خوبی جور در میاد. یه فنجان Kenya خوب، تعریف شیرینی رو برات عوض می‌کنه.',
+    chocolatey:  'Kenya AA یه ترکیب جالب از شکلات تلخ و میوه‌های قرمز داره که برای ذائقه‌ات عالیه. اسیدیته پُرانرژیش یه بُعد جدید به تجربه‌ات اضافه می‌کنه. این دانه برای کسی که عمق طعمی می‌خواد بی‌نظیره.',
+    bold:        'Kenya AA با اسیدیته جسور و طعم‌های میوه‌ای شدید، برای ذائقه‌ی پُرانرژی تو انتخاب درستیه. قدرت این دانه از جای دیگه‌ای میاد — نه از تلخی بلکه از شدت طعم. یه تجربه قوی و به‌یادماندنی.',
+  },
+  rwanda: {
+    floral:      'Rwanda Bourbon با طراوت هلو و زردآلو، یه تجربه گلی و میوه‌ای دلنشین داره. این دانه برای کسی که ظرافت و شیرینی طبیعی رو دوست داره ایده‌آله. هر فنجان مثل یه صبح بهاری شاداب و طراواته.',
+    sweet:       'Rwanda Bourbon شیرین‌ترین دانه‌ای هست که می‌تونی پیدا کنی. کاراملو میوه‌های قرمز با هم یه شیرینی طبیعی و دلنشین می‌سازن که نیازی به قند نداره. این دانه دقیقاً برای ذائقه‌ی شیرین‌دوست تو ساخته شده.',
+    chocolatey:  'Rwanda Bourbon یه تعادل زیبا بین شیرینی میوه‌ای و عمق طعمی داره. برای کسی که از شکلات شیری لذت می‌بره، این دانه یه جایگزین قهوه‌ای عالیه. ملایم، شیرین، و کاملاً دلنشین.',
+    bold:        'Rwanda Bourbon یه آرامش لذت‌بخش داره که می‌تونه تعادل خوبی با سلیقه‌ات ایجاد کنه. این دانه نشون میده که قهوه قوی همیشه لازم نیست تلخ باشه. یه تجربه متفاوت و شاید کشف یه ذائقه جدید.',
+  },
+  sidama: {
+    floral:      'Ethiopia Sidama Natural با فرآوری طبیعی، توت‌فرنگی و زغال‌اخته رو توی فنجانت میاره. برای کسی که طعم‌های میوه‌ای شدید رو دوست داره، این دانه یه کشف جذابه. پُرشدت، شیرین، و کاملاً استثنایی.',
+    sweet:       'Sidama Natural یکی از شیرین‌ترین قهوه‌های دنیاست. فرآوری طبیعیش باعث میشه شیرینی میوه مستقیماً وارد فنجانت بشه. برای ذائقه‌ای مثل تو که شیرینی اصیل رو دوست داره، این دانه یه هدیه‌ست.',
+    chocolatey:  'Sidama Natural ترکیب جادویی شکلات تلخ و میوه‌های قرمز رو داره. مثل یه شکلات تلخ با مغز توت‌فرنگی — عمق شکلاتی که عاشقشی با یه پیچش میوه‌ای سورپرایزکننده. کاملاً برای ذائقه‌ی تو.',
+    bold:        'Sidama Natural با شدت طعمی بالاش برای ذائقه‌ی جسور تو ایده‌آله. این دانه قوی‌ترین طعم‌های میوه‌ای رو داره — انگور قرمز و توت‌فرنگی در یه فنجان پُرانرژی. یه تجربه غنی و فراموش‌نشدنی.',
+  },
+  colombia: {
+    floral:      'Colombia Huila متعادل‌ترین قهوه دنیاست و برای هر ذائقه‌ای کار می‌کنه. شکلات تیره و پرتقال با هم یه هارمونی زیبا می‌سازن. برای کسی که تازه با specialty coffee آشنا میشه، یه نقطه شروع ایده‌آله.',
+    sweet:       'Colombia Huila با کاراملو گیلاس، شیرینی متعادل و دلنشینی داره. نه خیلی شیرین، نه خیلی تلخ — دقیقاً اون تعادلی که دنبالش بودی. این دانه برای هر موقعیتی مناسبه.',
+    chocolatey:  'Colombia Huila با نت‌های شکلات تیره و کاراملو گیلاس، دقیقاً برای ذائقه‌ی تو ساخته شده. عمق شکلاتی این دانه با یه شیرینی طبیعی همراهه که هر فنجان رو کامل می‌کنه. یه انتخاب کلاسیک و بی‌نقص.',
+    bold:        'Colombia Huila با وجود قدرتش، یه تعادل زیبا بین قوّت و شیرینی داره. این دانه نشون میده که قهوه جسور می‌تونه هم قوی باشه هم دلنشین. برای ذائقه‌ات یه انتخاب بی‌نقصه.',
+  },
+  brazil: {
+    floral:      'Brazil Natural با شکلات شیری و کاراملو وانیل، یه آرامش دلنشین داره. این دانه برای کسی که می‌خواد یه تجربه راحت و بدون دردسر داشته باشه عالیه. ساده، خوشایند، و همیشه قابل اعتماد.',
+    sweet:       'Brazil Natural با وانیل و کاراملو فندق، شیرین‌ترین و راحت‌ترین قهوه‌ای هست که می‌تونی پیدا کنی. برای ذائقه‌ی شیرین‌دوست تو، این دانه مثل یه لاته بدون شیر عمل می‌کنه. کاملاً برای تو.',
+    chocolatey:  'Brazil Natural بهترین دانه برای عاشقان شکلات شیریه. فندق، بادام، و شکلات شیری در هر قطره این قهوه وجود داره. اگه عاشق شکلات هستی، این دانه رویاهات رو به واقعیت تبدیل می‌کنه.',
+    bold:        'Brazil Natural با وجود بدنه‌ی غنی، یه ملایمت دلنشین داره. برای کسی که قهوه قوی دوست داره ولی می‌خواد از تلخی خبری نباشه، این دانه انتخاب هوشمندانه‌ایه. قوی، غنی، و راحت.',
+  },
+  guatemala: {
+    floral:      'Guatemala Antigua با آلو و دارچین، یه پیچیدگی جذاب داره که ذائقه‌ی کنجکاوت رو راضی می‌کنه. خاک آتشفشانیش یه طعم مینرال خاص بهش میده. یه کشف جذاب برای عاشق تنوع طعمی.',
+    sweet:       'Guatemala Antigua با آلو شیرین و کاراملو گردو، یه شیرینی عمیق و پیچیده داره. این شیرینی از جنس متفاوتیه — تیره‌تر و غنی‌تر از شیرینی‌های معمول. برای ذائقه‌ای که می‌خواد عمق داشته باشه.',
+    chocolatey:  'Guatemala Antigua بهترین گزینه برای عاشقان شکلات تلخه. آلو و دارچین با شکلات تیره ترکیب می‌شن و یه عمق طعمی استثنایی می‌سازن. اگه شکلات تلخ ۷۵٪ دوست داری، این قهوه برای توئه.',
+    bold:        'Guatemala Antigua با قوّت و پیچیدگیش، دقیقاً برای ذائقه‌ی جسور تو ایده‌آله. خاک آتشفشانی گواتمالا یه قدرت خاص به این دانه میده. یه تجربه‌ی عمیق، قوی، و فراموش‌نشدنی.',
+  },
+  sumatra: {
+    floral:      'Sumatra Mandheling یه تجربه کاملاً متفاوت از قهوه‌ست. خاکی، سدر، و تنباکو در یه فنجان سنگین و تأملی. برای کسی که می‌خواد از منطقه راحتش خارج بشه و چیز جدیدی کشف کنه.',
+    sweet:       'Sumatra Mandheling قهوه‌ای برای لحظات تأملی و عمیقه. سنگین، خاکی، و با شخصیت قوی. این دانه طرف‌داران وفادار خودش رو داره — کسایی که از پیچیدگی لذت می‌برن.',
+    chocolatey:  'Sumatra Mandheling با شکلات تیره و عطر سدر، یه عمق طعمی بی‌مثال داره. برای عاشقان شکلات تلخ که می‌خوان یه بُعد خاکی هم به تجربه‌شون اضافه بشه. قوی، عمیق، و اثرگذار.',
+    bold:        'Sumatra Mandheling دقیقاً همون قهوه‌ایه که دنبالش بودی. سنگین‌ترین، خاکی‌ترین، و قوی‌ترین قهوه دنیا. برای کسی که می‌خواد قهوه واقعی بخوره — بدون هیچ سازش و تعارفی.',
+  },
+};
+
+const FALLBACK_EN = {
+  yirgacheffe: "Ethiopia Yirgacheffe is the world's most aromatic coffee — jasmine, peach, and bergamot in every sip. Its light body and delicate complexity make it a perfect match for your flavor preferences. Brew it with care and it will reward you with an unforgettable experience.",
+  kenya: "Kenya AA's sparkling acidity and red fruit intensity match your bold preferences perfectly. Blackcurrant and pomegranate dance in every cup, leaving a long satisfying finish. This is coffee that demands your full attention — in the best possible way.",
+  rwanda: "Rwanda Bourbon is the sweetest and most approachable specialty coffee in the world. Peach, apricot and caramel create a naturally sweet cup that needs nothing added. It is the perfect companion for your relaxed moments.",
+  sidama: "Ethiopia Sidama Natural brings intense fruit sweetness through its natural processing method. Strawberries and blueberries leap from the cup in a way no other origin can replicate. A bold fruit-forward experience that matches your adventurous palate.",
+  colombia: "Colombia Huila is the world's most balanced coffee — dark chocolate, caramel and cherry in perfect harmony. It works beautifully with any brew method making it endlessly versatile. A reliable elegant choice for any moment of your day.",
+  brazil: "Brazil Natural is the foundation of great coffee comfort. Milk chocolate, hazelnut and vanilla create a smooth low-acid cup that is easy to love. Perfect for your relaxed moments and those long unhurried afternoons.",
+  guatemala: "Guatemala Antigua's volcanic soil gives it a distinctive mineral richness that sets it apart. Dark chocolate, plum and cinnamon create a complex satisfying cup. For those who appreciate depth and character in their coffee.",
+  sumatra: "Sumatra Mandheling is the boldest most earthy coffee on the planet. Cedar, tobacco and dark chocolate in a syrupy full-bodied cup — built for contemplation and depth. This is coffee for those who want nothing held back."
+};
+
+function getFallbackExplanation(rec) {
+  const lang = currentLang;
+  const name = currentUser?.name ? currentUser.name + ' عزیز، ' : '';
+  const nameEN = currentUser?.name ? currentUser.name + ', ' : '';
+  if (lang === 'fa') {
+    const beanFallbacks = FALLBACK_FA[rec.id];
+    if (beanFallbacks) {
+      const text = beanFallbacks[ans.taste] || beanFallbacks['floral'] || '';
+      return name + text;
+    }
+  } else {
+    const text = FALLBACK_EN[rec.id] || '';
+    return nameEN + text;
+  }
+  return '';
+}
+
+async function getAIExplanation(rec) {
+  const el = document.getElementById('ai-text-content');
+  if (!el) return;
+
+  const userName = currentUser?.name || '';
+  const lang = currentLang;
+
+  const tasteLabels = { floral:'طعم‌های گلی و میوه‌ای', sweet:'طعم‌های شیرین و ملایم', chocolatey:'طعم‌های شکلاتی و آجیلی', bold:'طعم‌های تند و چوبی' };
+  const bodyLabels  = { light:'قهوه سبک و لطیف', medium:'قهوه متوسط و روان', full:'قهوه غنی و پُربدنه' };
+  const contextLabels = { morning:'صبح', work:'جلسه کاری', reading:'مطالعه', friends:'با دوستان', afterdinner:'بعد از شام', weekend:'آخر هفته' };
+  const brewLabels  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'روش دلخواه' };
+
+  const namePrefix = userName ? `${userName} عزیز` : '';
+  const prompt = lang === 'fa'
+    ? `تو یک متخصص قهوه فارسی‌زبان هستی. دقیقاً ۲ جمله کوتاه، گرم و ساده به فارسی روان بنویس (حداکثر ۳۵ کلمه). فقط از کلمات فارسی و انگلیسی رایج استفاده کن — هیچ کلمه عربی سنگین یا کاراکتر غیرفارسی نداشته باشد. ${namePrefix ? `با "${namePrefix}،" شروع کن.` : ''} توضیح بده چرا ${rec.name} با نت‌های ${rec.flavors.slice(0,2).join(' و ')} برای کسی که طعم ${tasteLabels[ans.taste]||ans.taste} دوست داره و با ${brewLabels[ans.brew]||ans.brew} دم می‌کنه عالیه.`
+    : `Coffee expert. ${userName ? `Start with "${userName},"` : ''} Write exactly 2 short warm sentences (max 35 words) explaining why ${rec.name} with its ${rec.flavors.slice(0,2).join(' and ')} notes is perfect for someone who loves ${ans.taste} flavors and brews ${ans.brew}. Only those 2 sentences.`;
+
+  let text = '';
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000); // 10 ثانیه timeout
+    // از Apps Script به عنوان proxy استفاده می‌کنیم — key در سرور مخفیه
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ type: 'ai_explanation', prompt }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    const data = await response.json();
+    text = data.text || '';
+  } catch(e) {
+    console.warn('AI via proxy unavailable — using fallback:', e.message);
+  }
+
+  // اگه API جواب نداد یا متن خالی بود → fallback
+  if (!text) {
+    text = getFallbackExplanation(rec);
+  }
+
+  if (text) {
+    el.innerHTML = `<div class="ai-text">${text}</div>`;
+  } else {
+    el.style.display = 'none';
+    document.getElementById('ai-explanation-card').style.display = 'none';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   DARK MODE
+═══════════════════════════════════════════ */
+function toggleDarkMode() {
+  const isDark = document.body.classList.toggle('dark-mode');
+  document.getElementById('btn-dark-toggle').textContent = isDark ? '☀️' : '🌙';
+  try { localStorage.setItem('coffeeIdentityDarkMode', isDark ? '1' : '0'); } catch (e) {}
+}
+
+function initDarkMode() {
+  let saved = null;
+  try { saved = localStorage.getItem('coffeeIdentityDarkMode'); } catch (e) {}
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const shouldBeDark = saved !== null ? saved === '1' : prefersDark;
+  if (shouldBeDark) {
+    document.body.classList.add('dark-mode');
+    document.getElementById('btn-dark-toggle').textContent = '☀️';
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SHARE PREFERENCES (اختیاری، قبل از اشتراک‌گذاری)
+═══════════════════════════════════════════ */
+let selectedShareStyle = 'surprise';
+
+function populateShareBirthSelects() {
+  const dayEl = document.getElementById('share-birth-day');
+  const monthEl = document.getElementById('share-birth-month');
+  if (dayEl.options.length <= 1) {
+    for (let d = 1; d <= 31; d++) {
+      const opt = document.createElement('option');
+      opt.value = d; opt.textContent = d;
+      dayEl.appendChild(opt);
+    }
+  }
+  if (monthEl.options.length <= 1) {
+    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+    months.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i + 1; opt.textContent = m;
+      monthEl.appendChild(opt);
+    });
+  }
+}
+
+function openSharePrefsModal() {
+  if (!rec) return;
+  populateShareBirthSelects();
+  selectedShareStyle = 'surprise';
+  document.querySelectorAll('#share-prefs-overlay .option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('share-prefs-overlay').style.display = 'flex';
+}
+
+function closeSharePrefsModal() {
+  document.getElementById('share-prefs-overlay').style.display = 'none';
+}
+
+function selectShareStyle(style) {
+  selectedShareStyle = style;
+  document.querySelectorAll('#share-prefs-overlay .option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('style-opt-' + style).classList.add('selected');
+}
+
+async function saveSharePrefs(style, day, month) {
+  if (!currentUser) return;
+  try {
+    await sb('POST', 'share_preferences', {
+      user_id: currentUser.id,
+      style: style,
+      birth_day: day || null,
+      birth_month: month || null
+    });
+  } catch (e) { /* اختیاریه، اگه ذخیره نشد مشکلی نیست */ }
+}
+
+function submitSharePrefs() {
+  const day = document.getElementById('share-birth-day').value;
+  const month = document.getElementById('share-birth-month').value;
+  closeSharePrefsModal();
+  saveSharePrefs(selectedShareStyle, day, month);
+  shareResultCard(selectedShareStyle, day, month);
+}
+
+function skipSharePrefs() {
+  closeSharePrefsModal();
+  shareResultCard('surprise', null, null);
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+initDarkMode();
+setLang('fa');
+checkAutoLogin();
+</script>
+
+<!-- Share Preferences Modal (اختیاری، شفاف) -->
+<div id="share-prefs-overlay" style="display:none;position:fixed;inset:0;background:rgba(44,26,14,0.55);z-index:10000;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--white);border-radius:22px;padding:26px 24px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;direction:rtl;">
+    <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">کارتت رو شخصی‌تر کنیم؟</div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:18px;">کاملاً اختیاریه — می‌تونی رد کنی و همون کارت پیش‌فرض رو بگیری</div>
+
+    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">کارتت رو چه‌جوری بسازم؟</div>
+    <div class="options cols-1" style="gap:8px;margin-bottom:18px;">
+      <div class="option-card" id="style-opt-feminine" onclick="selectShareStyle('feminine')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">👗</span> <span style="font-size:14px;">خانومی</span>
+      </div>
+      <div class="option-card" id="style-opt-masculine" onclick="selectShareStyle('masculine')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">🎩</span> <span style="font-size:14px;">مثل آقاها</span>
+      </div>
+      <div class="option-card" id="style-opt-surprise" onclick="selectShareStyle('surprise')" style="padding:12px 14px;text-align:right;">
+        <span style="font-size:20px;">✨</span> <span style="font-size:14px;">فرقی نمی‌کنه، غافلگیرم کن</span>
+      </div>
+    </div>
+
+    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">
+      اگه دوست داری، روز تولدت رو بگو تا یادم نره براش یه هدیه بفرستم 🎂
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:22px;">
+      <select id="share-birth-day" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">روز</option>
+      </select>
+      <select id="share-birth-month" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">ماه</option>
+      </select>
+    </div>
+
+    <button class="btn-primary" onclick="submitSharePrefs()" style="margin-bottom:10px;">🎉 بساز و به اشتراک بذار</button>
+    <button class="btn-primary btn-ghost" onclick="skipSharePrefs()">رد کن، همون پیش‌فرض</button>
+  </div>
+</div>
+
+</body>
+</html>
