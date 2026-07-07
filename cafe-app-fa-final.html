@@ -3082,6 +3082,7 @@ let selectedShareStyle = 'surprise';
 function populateShareBirthSelects() {
   const dayEl = document.getElementById('share-birth-day');
   const monthEl = document.getElementById('share-birth-month');
+  const yearEl = document.getElementById('share-birth-year');
   if (dayEl.options.length <= 1) {
     for (let d = 1; d <= 31; d++) {
       const opt = document.createElement('option');
@@ -3096,6 +3097,14 @@ function populateShareBirthSelects() {
       opt.value = i + 1; opt.textContent = m;
       monthEl.appendChild(opt);
     });
+  }
+  if (yearEl.options.length <= 1) {
+    // سال شمسی، هماهنگ با بقیهٔ تاریخ‌های اپ
+    for (let y = 1410; y >= 1335; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      yearEl.appendChild(opt);
+    }
   }
 }
 
@@ -3117,14 +3126,15 @@ function selectShareStyle(style) {
   document.getElementById('style-opt-' + style).classList.add('selected');
 }
 
-async function saveSharePrefs(style, day, month) {
+async function saveSharePrefs(style, day, month, year) {
   if (!currentUser) return;
   try {
     await sb('POST', 'share_preferences', {
       user_id: currentUser.id,
       style: style,
       birth_day: day || null,
-      birth_month: month || null
+      birth_month: month || null,
+      birth_year: year || null
     });
   } catch (e) { /* اختیاریه، اگه ذخیره نشد مشکلی نیست */ }
 }
@@ -3132,8 +3142,9 @@ async function saveSharePrefs(style, day, month) {
 function submitSharePrefs() {
   const day = document.getElementById('share-birth-day').value;
   const month = document.getElementById('share-birth-month').value;
+  const year = document.getElementById('share-birth-year').value;
   closeSharePrefsModal();
-  saveSharePrefs(selectedShareStyle, day, month);
+  saveSharePrefs(selectedShareStyle, day, month, year);
   shareResultCard(selectedShareStyle, day, month);
 }
 
@@ -3179,6 +3190,12 @@ checkAutoLogin();
       </select>
       <select id="share-birth-month" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
         <option value="">ماه</option>
+      </select>
+      <select id="share-birth-year" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">سال</option>
+      </select>
+      <select id="share-birth-year" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
+        <option value="">سال</option>
       </select>
     </div>
 
