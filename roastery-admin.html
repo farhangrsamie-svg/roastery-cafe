@@ -885,7 +885,7 @@ async function loadCustomers() {
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
   try {
-    const users = await sb('GET', 'users?select=*&order=created_at.desc');
+    const users = await sb('GET', 'users?select=id,name,phone,created_at&order=created_at.desc');
     const profiles = await sb('GET', 'coffee_profiles?select=user_id');
     const orders = await sb('GET', 'orders?select=user_id');
     const profileCount = {};

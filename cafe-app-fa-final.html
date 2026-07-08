@@ -1252,6 +1252,11 @@ function switchTab(tab) {
   document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
 }
 
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function doRegister() {
   const name  = document.getElementById('reg-name').value.trim();
   const phone = document.getElementById('reg-phone').value.trim();
@@ -1268,17 +1273,16 @@ async function doRegister() {
   btn.textContent = '...';
 
   try {
-    // بررسی کاربر تکراری
-    const existing = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=id`);
-    if (existing && existing.length > 0) {
-      return showErr(errEl, 'این شماره قبلاً ثبت شده. لطفاً وارد شوید.');
-    }
-    // ذخیره کاربر (رمز رو به صورت ساده ذخیره می‌کنیم - در production باید hash بشه)
-    const users = await sb('POST', 'users', { phone, name, password_hash: btoa(pass) });
+    // ذخیرهٔ کاربر با هش واقعی رمز عبور
+    const users = await sb('POST', 'users', { phone, name, password_hash: await sha256Hex(pass) });
     const user = users[0];
     loginUser(user);
   } catch (e) {
-    showErr(errEl, 'خطا: ' + e.message);
+    if (/duplicate|unique/i.test(e.message)) {
+      showErr(errEl, 'این شماره قبلاً ثبت شده. لطفاً وارد شوید.');
+    } else {
+      showErr(errEl, 'خطا: ' + e.message);
+    }
   } finally {
     btn.disabled = false;
     btn.innerHTML = '<span class="en-only">Create Account →</span><span class="fa-only">ایجاد حساب →</span>';
@@ -1300,11 +1304,9 @@ async function doLogin() {
   btn.textContent = '...';
 
   try {
-    const users = await sb('GET', `users?phone=eq.${encodeURIComponent(phone)}&select=*`);
-    if (!users || users.length === 0) return showErr(errEl, 'شماره موبایل یافت نشد');
-    const user = users[0];
-    if (user.password_hash !== btoa(pass)) return showErr(errEl, 'رمز عبور اشتباه است');
-    loginUser(user);
+    const result = await sb('POST', 'rpc/login_check', { p_phone: phone, p_password: pass });
+    if (!result || result.length === 0) return showErr(errEl, 'شماره موبایل یا رمز عبور اشتباه است');
+    loginUser(result[0]);
   } catch (e) {
     showErr(errEl, 'خطا: ' + e.message);
   } finally {
