@@ -1274,7 +1274,7 @@ async function doRegister() {
 
   try {
     // ذخیرهٔ کاربر با هش واقعی رمز عبور
-    const users = await sb('POST', 'users', { phone, name, password_hash: await sha256Hex(pass) });
+    const users = await sb('POST', 'users?select=id,name,phone,created_at', { phone, name, password_hash: await sha256Hex(pass) });
     const user = users[0];
     loginUser(user);
   } catch (e) {
