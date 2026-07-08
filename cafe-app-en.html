@@ -1114,6 +1114,11 @@ function switchTab(tab) {
   document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
 }
 
+async function sha256Hex(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 async function doRegister() {
   const name  = document.getElementById('reg-name').value.trim();
   const email = document.getElementById('reg-email').value.trim();
@@ -1136,7 +1141,7 @@ async function doRegister() {
       return showErr(errEl, currentLang === 'fi' ? 'Tämä sähköposti on jo rekisteröity. Kirjaudu sisään.' : 'This email is already registered. Please log in.');
     }
     // Save user
-    const users = await sb('POST', 'coffee_users', { email, name, password: pass, language: currentLang });
+    const users = await sb('POST', 'coffee_users?select=id,name,email,language,created_at', { email, name, password: await sha256Hex(pass), language: currentLang });
     const user = users[0];
     sendWelcomeEmail(user).catch(()=>{});
     loginUser(user);
@@ -1163,11 +1168,9 @@ async function doLogin() {
   btn.textContent = '...';
 
   try {
-    const users = await sb('GET', `coffee_users?email=eq.${encodeURIComponent(email)}&select=*`);
-    if (!users || users.length === 0) return showErr(errEl, currentLang === 'fi' ? 'Sähköpostia ei löytynyt' : 'Email not found');
-    const user = users[0];
-    if (user.password !== pass) return showErr(errEl, currentLang === 'fi' ? 'Väärä salasana' : 'Incorrect password');
-    loginUser(user);
+    const result = await sb('POST', 'rpc/login_check_en', { p_email: email, p_password: pass });
+    if (!result || result.length === 0) return showErr(errEl, currentLang === 'fi' ? 'Väärä sähköposti tai salasana' : 'Incorrect email or password');
+    loginUser(result[0]);
   } catch (e) {
     showErr(errEl, (currentLang === 'fi' ? 'Virhe: ' : 'Error: ') + e.message);
   } finally {
