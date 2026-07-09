@@ -214,6 +214,11 @@ body {
   border-radius: 18px; padding: 18px 20px; margin-bottom: 14px;
   animation: fadeUp 0.4s ease;
 }
+.alt-cards-row {
+  display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 14px;
+}
+.alt-cards-row .alt-bean-card { margin-bottom: 0; flex: 1 1 240px; min-width: 240px; }
+.alt-cards-row #brew-alt-btn { flex: 1 1 240px; min-width: 240px; margin-bottom: 0; }
 .alt-bean-label {
   font-size: 13px; color: var(--caramel); font-weight: 700; font-family: 'Arial', sans-serif;
   display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
@@ -945,33 +950,34 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </div>
   </div>
 
-  <!-- Alternative Bean Suggestion (طعمی) -->
-  <div class="alt-bean-card" id="alt-bean-card" style="display:none;">
-    <div class="alt-bean-label">
-      <span class="alt-bean-icon">💡</span>
-      <span class="fa-only">شاید این یکی هم دوست داشته باشید</span>
-      <span class="en-only">You might also enjoy</span>
+  <!-- Alternative Suggestions (طعمی + سازگار با دستگاه) — کنار هم روی صفحه‌های بزرگ‌تر -->
+  <div class="alt-cards-row">
+    <div class="alt-bean-card" id="alt-bean-card" style="display:none;">
+      <div class="alt-bean-label">
+        <span class="alt-bean-icon">💡</span>
+        <span class="fa-only">شاید این یکی هم دوست داشته باشید</span>
+        <span class="en-only">You might also enjoy</span>
+      </div>
+      <div class="alt-bean-name" id="alt-bean-name">—</div>
+      <div class="alt-bean-origin" id="alt-bean-origin">—</div>
+      <div class="alt-bean-flavors" id="alt-bean-flavors"></div>
     </div>
-    <div class="alt-bean-name" id="alt-bean-name">—</div>
-    <div class="alt-bean-origin" id="alt-bean-origin">—</div>
-    <div class="alt-bean-flavors" id="alt-bean-flavors"></div>
-  </div>
 
-  <!-- Brew-Compatibility Alternative (فقط وقتی ناسازگاری واقعی هست نمایش داده می‌شه) -->
-  <button class="btn-primary btn-ghost" id="brew-alt-btn" style="display:none;margin-bottom:14px;" onclick="showBrewAlternative()">
-    ☕ <span class="fa-only">این دونه رو با دستگاه من هم پیشنهاد بده</span>
-    <span class="en-only">Suggest one that fits my brewer</span>
-  </button>
-  <div class="alt-bean-card" id="brew-alt-card" style="display:none;">
-    <div class="alt-bean-label">
-      <span class="alt-bean-icon">☕</span>
-      <span class="fa-only">سازگار با دستگاه شما</span>
-      <span class="en-only">Fits your brewer</span>
+    <button class="btn-primary btn-ghost" id="brew-alt-btn" style="display:none;" onclick="showBrewAlternative()">
+      ☕ <span class="fa-only">این دونه رو با دستگاه من هم پیشنهاد بده</span>
+      <span class="en-only">Suggest one that fits my brewer</span>
+    </button>
+    <div class="alt-bean-card" id="brew-alt-card" style="display:none;">
+      <div class="alt-bean-label">
+        <span class="alt-bean-icon">☕</span>
+        <span class="fa-only">سازگار با دستگاه شما</span>
+        <span class="en-only">Fits your brewer</span>
+      </div>
+      <div class="alt-bean-name" id="brew-alt-name">—</div>
+      <div class="alt-bean-origin" id="brew-alt-origin">—</div>
+      <div class="alt-bean-flavors" id="brew-alt-flavors"></div>
+      <div style="font-size:13px;color:var(--medium-brown);margin-top:10px;line-height:1.7;" id="brew-alt-note"></div>
     </div>
-    <div class="alt-bean-name" id="brew-alt-name">—</div>
-    <div class="alt-bean-origin" id="brew-alt-origin">—</div>
-    <div class="alt-bean-flavors" id="brew-alt-flavors"></div>
-    <div style="font-size:13px;color:var(--medium-brown);margin-top:10px;line-height:1.7;" id="brew-alt-note"></div>
   </div>
 
   <div class="card" id="why-card">
@@ -1478,6 +1484,17 @@ const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', mokapot:'�
 const tastePrefFA = { black_dark:'خالص + شکلات تلخ', black_milk:'خالص + شکلات شیری', milk_dark:'با شیر + شکلات تلخ', milk_milk:'با شیر + شکلات شیری' };
 const acidityFA = { bright:'زنده و ترش', balanced:'متعادل', smooth:'نرم' };
 const stateFA = { energised:'پرانرژی', focused:'متمرکز', creative:'خلاق', relaxed:'آرام', reflective:'تأملی' };
+const flavorFA = {
+  'Jasmine':'یاسمن', 'Peach':'هلو', 'Green Tea':'چای سبز', 'Citrus':'مرکبات', 'Bergamot':'برگاموت',
+  'Blackcurrant':'ریبس سیاه', 'Red Currant':'ریبس قرمز', 'Pomegranate':'انار', 'Brown Sugar':'قند قهوه‌ای',
+  'Apricot':'زردآلو', 'Caramel':'کارامل', 'Red Berry':'توت قرمز', 'Strawberry':'توت‌فرنگی', 'Blueberry':'بلوبری',
+  'Dark Chocolate':'شکلات تلخ', 'Red Wine':'شراب قرمز', 'Cherry':'گیلاس', 'Orange':'پرتقال',
+  'Milk Chocolate':'شکلات شیری', 'Hazelnut':'فندق', 'Almond':'بادام', 'Vanilla':'وانیل', 'Plum':'آلو',
+  'Cinnamon':'دارچین', 'Walnut':'گردو', 'Cedar':'سدر', 'Tobacco':'تنباکو', 'Earth':'خاک', 'Molasses':'ملاس'
+};
+function trFlavor(f) {
+  return (currentLang === 'fa' && flavorFA[f]) ? flavorFA[f] : f;
+}
 
 async function loadProfiles() {
   const container = document.getElementById('dash-profiles');
@@ -1706,7 +1723,7 @@ function viewProfile(p) {
       <div class="alt-bean-label"><span class="alt-bean-icon">💡</span>شاید این یکی هم دوست داشته باشید</div>
       <div class="alt-bean-name">${rec._runnerBean.name}</div>
       <div class="alt-bean-origin">${rec._runnerBean.origin || ''}</div>
-      <div class="alt-bean-flavors">${(rec._runnerBean.flavors || []).slice(0,4).map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('')}</div>
+      <div class="alt-bean-flavors">${(rec._runnerBean.flavors || []).slice(0,4).map(f => `<span class="alt-bean-flavor-tag">${trFlavor(f)}</span>`).join('')}</div>
     </div>
     ` : ''}
     <div class="card" style="direction:rtl;">
@@ -1866,7 +1883,7 @@ function showBrewAlternative() {
   document.getElementById('brew-alt-name').textContent = alt.name;
   document.getElementById('brew-alt-origin').textContent = alt.origin || '';
   document.getElementById('brew-alt-flavors').innerHTML = (alt.flavors || []).slice(0, 4)
-    .map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('');
+    .map(f => `<span class="alt-bean-flavor-tag">${trFlavor(f)}</span>`).join('');
   const brewLabel = brewFA[ans.brew] || ans.brew || '';
   const isSameAsFlavorAlt = rec._runnerBean && rec._runnerBean.id === alt.id;
   let note;
@@ -2105,7 +2122,7 @@ function showErr(el, msg) {
    BEAN DATABASE
 ═══════════════════════════════════════════ */
 const BEANS = [
-  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.',
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', descFA:'معطرترین قهوهٔ دنیا. نت‌های ظریف گلی و میوه‌ای که هیچ مبدأ دیگه‌ای نمی‌تونه تکرارش کنه.',
     s:{
       // طعم
       floral:10, sweet:4, chocolatey:0, bold:0,
@@ -2120,7 +2137,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:4, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.',
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', descFA:'اسیدیتهٔ درخشان و شاداب، بی‌نظیر در بین قهوه‌ها. طعم‌های میوه‌ای پررنگ با ته‌مزهٔ طولانی.',
     s:{
       floral:5, sweet:5, chocolatey:2, bold:4,
       light:7, medium:8, full:2,
@@ -2130,7 +2147,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:5, mokapot:3, espressohome:4, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.',
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', descFA:'شیرین، دلنشین و به‌آرومی میوه‌ای. بهترین نقطهٔ شروع برای ورود به دنیای قهوهٔ تخصصی.',
     s:{
       floral:6, sweet:10, chocolatey:3, bold:2,
       light:6, medium:8, full:3,
@@ -2140,7 +2157,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:6, mokapot:4, espressohome:5, aeropress:9, coldbrew:6, other:6 }
   },
-  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.',
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', descFA:'قهوهٔ اتیوپیایی با فرآوری Natural و شیرینی میوه‌ای قوی. توت‌فرنگی، بلوبری و حس شرابی.',
     s:{
       floral:5, sweet:9, chocolatey:4, bold:3,
       light:3, medium:8, full:7,
@@ -2150,7 +2167,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
-  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.',
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', descFA:'متعادل‌ترین قهوهٔ دنیا. هماهنگی کامل بین شیرینی، اسیدیته و بدنه.',
     s:{
       floral:2, sweet:8, chocolatey:7, bold:4,
       light:3, medium:9, full:5,
@@ -2160,7 +2177,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:7, espressohome:7, aeropress:7, coldbrew:6, other:7 }
   },
-  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.',
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', descFA:'پایهٔ یک اسپرسوی عالی. نرم، کم‌اسید و آرامش‌بخش، با شکلات شیری و شیرینی آجیلی.',
     s:{
       floral:0, sweet:7, chocolatey:10, bold:4,
       light:1, medium:7, full:9,
@@ -2170,7 +2187,7 @@ const BEANS = [
     },
     brewFit:{ v60:5, frenchpress:8, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:7 }
   },
-  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.',
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', descFA:'پرورش‌یافته روی خاک آتشفشانی با غنای معدنی خاص. شکلات تلخ و آلو همراه با ادویه.',
     s:{
       floral:0, sweet:5, chocolatey:9, bold:7,
       light:1, medium:5, full:8,
@@ -2180,7 +2197,7 @@ const BEANS = [
     },
     brewFit:{ v60:5, frenchpress:8, mokapot:8, espressohome:9, aeropress:5, coldbrew:5, other:6 }
   },
-  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.',
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', descFA:'سنگین‌ترین و خاکی‌ترین قهوه. سدر، تنباکو و شکلات تلخ در یک فنجان غلیظ و پررنگ.',
     s:{
       floral:0, sweet:2, chocolatey:6, bold:10,
       light:0, medium:2, full:10,
@@ -2629,7 +2646,7 @@ function render(r) {
   document.getElementById('r-brew').textContent = r.brew;
   document.getElementById('r-temp').textContent = r.temp;
   document.getElementById('r-ratio').textContent = r.ratio;
-  document.getElementById('r-desc').textContent = r.desc;
+  document.getElementById('r-desc').textContent = (currentLang === 'fa' && r.descFA) ? r.descFA : r.desc;
 
   // Roast guide
   if (r.roastInfo) {
@@ -2641,7 +2658,7 @@ function render(r) {
 
   // Flavor Notes
   const fl = document.getElementById('r-flavors');
-  fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${f}</span>`).join('');
+  fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${trFlavor(f)}</span>`).join('');
 
   // Flavor Radar
   document.getElementById('r-radar-chart').innerHTML = buildFlavorRadar(r, ans.taste);
@@ -2653,7 +2670,7 @@ function render(r) {
     document.getElementById('alt-bean-origin').textContent = r._runnerBean.origin || '';
     const altFlavorsEl = document.getElementById('alt-bean-flavors');
     altFlavorsEl.innerHTML = (r._runnerBean.flavors || []).slice(0, 4)
-      .map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('');
+      .map(f => `<span class="alt-bean-flavor-tag">${trFlavor(f)}</span>`).join('');
     altCard.style.display = 'block';
   } else if (altCard) {
     altCard.style.display = 'none';
