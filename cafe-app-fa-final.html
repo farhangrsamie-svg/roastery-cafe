@@ -1868,9 +1868,18 @@ function showBrewAlternative() {
   document.getElementById('brew-alt-flavors').innerHTML = (alt.flavors || []).slice(0, 4)
     .map(f => `<span class="alt-bean-flavor-tag">${f}</span>`).join('');
   const brewLabel = brewFA[ans.brew] || ans.brew || '';
-  document.getElementById('brew-alt-note').textContent = currentLang === 'fa'
-    ? `چون شما با ${brewLabel} دم می‌کنید، این دونه احتمالاً نتیجهٔ بهتری براتون می‌ده.`
-    : `Since you brew with ${brewLabel}, this bean will likely give you better results.`;
+  const isSameAsFlavorAlt = rec._runnerBean && rec._runnerBean.id === alt.id;
+  let note;
+  if (isSameAsFlavorAlt) {
+    note = currentLang === 'fa'
+      ? `این دقیقاً همون دونه‌ایه که به‌عنوان «پیشنهاد جایگزین طعمی» هم دیدید — یعنی هم به ذائقه‌تون نزدیکه، هم با ${brewLabel} نتیجهٔ بهتری می‌ده. دو دلیل مستقل، یک انتخاب.`
+      : `This is the same bean shown as your flavor-based alternative — it's both close to your taste and works great with ${brewLabel}. Two independent reasons, one pick.`;
+  } else {
+    note = currentLang === 'fa'
+      ? `چون شما با ${brewLabel} دم می‌کنید، این دونه احتمالاً نتیجهٔ بهتری براتون می‌ده.`
+      : `Since you brew with ${brewLabel}, this bean will likely give you better results.`;
+  }
+  document.getElementById('brew-alt-note').textContent = note;
   document.getElementById('brew-alt-card').style.display = 'block';
   document.getElementById('brew-alt-btn').style.display = 'none';
 }
