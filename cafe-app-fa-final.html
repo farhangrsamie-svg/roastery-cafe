@@ -231,6 +231,14 @@ body {
   background: var(--white); border: 1px solid var(--light-caramel); border-radius: 20px;
   padding: 4px 12px; font-size: 12px; color: var(--medium-brown); font-family: 'Arial', sans-serif;
 }
+.alt-bean-order-btn {
+  display: block; width: 100%; margin-top: 12px; padding: 10px;
+  background: transparent; border: 1.5px solid var(--caramel); border-radius: 12px;
+  color: var(--caramel); font-size: 13px; font-weight: 700; font-family: 'Arial', sans-serif;
+  cursor: pointer; transition: all 0.2s ease;
+}
+.alt-bean-order-btn:hover { background: var(--caramel); color: var(--white); }
+.alt-bean-order-btn:active { transform: scale(0.97); }
 
 /* ── AI EXPLANATION CARD ── */
 .ai-card {
@@ -961,6 +969,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <div class="alt-bean-name" id="alt-bean-name">—</div>
       <div class="alt-bean-origin" id="alt-bean-origin">—</div>
       <div class="alt-bean-flavors" id="alt-bean-flavors"></div>
+      <button class="alt-bean-order-btn" onclick="goToOrder(rec._runnerBean)">
+        🛒 <span class="fa-only">سفارش همین دونه</span><span class="en-only">Order this bean</span>
+      </button>
     </div>
 
     <button class="btn-primary btn-ghost" id="brew-alt-btn" style="display:none;" onclick="showBrewAlternative()">
@@ -977,6 +988,9 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <div class="alt-bean-origin" id="brew-alt-origin">—</div>
       <div class="alt-bean-flavors" id="brew-alt-flavors"></div>
       <div style="font-size:13px;color:var(--medium-brown);margin-top:10px;line-height:1.7;" id="brew-alt-note"></div>
+      <button class="alt-bean-order-btn" onclick="goToOrder(rec._brewAlt)">
+        🛒 <span class="fa-only">سفارش همین دونه</span><span class="en-only">Order this bean</span>
+      </button>
     </div>
   </div>
 
@@ -1282,6 +1296,7 @@ async function sb(method, path, body = null) {
 let currentUser = null; // { id, name, phone }
 let ans = { taste: null, body: null, state: null, acidity: null, tastepref: null, brew: null };
 let rec = null;
+let orderBean = null;
 let currentPersona = null;
 let currentProfileId = null;
 let selectedAmount = null;
@@ -1724,6 +1739,7 @@ function viewProfile(p) {
       <div class="alt-bean-name">${rec._runnerBean.name}</div>
       <div class="alt-bean-origin">${rec._runnerBean.origin || ''}</div>
       <div class="alt-bean-flavors">${(rec._runnerBean.flavors || []).slice(0,4).map(f => `<span class="alt-bean-flavor-tag">${trFlavor(f)}</span>`).join('')}</div>
+      <button class="alt-bean-order-btn" onclick="goToOrder(rec._runnerBean)">🛒 سفارش همین دونه</button>
     </div>
     ` : ''}
     <div class="card" style="direction:rtl;">
@@ -1981,9 +1997,10 @@ async function saveProfile(rec) {
 ═══════════════════════════════════════════ */
 let selectedRoastery = null;
 
-function goToOrder() {
+function goToOrder(bean) {
+  orderBean = bean || rec;
   // اول رستری انتخاب بشه
-  document.getElementById('roastery-screen-bean').textContent = rec ? rec.name : '—';
+  document.getElementById('roastery-screen-bean').textContent = orderBean ? orderBean.name : '—';
   show('screen-roastery');
   loadRoasteries();
 }
@@ -1996,8 +2013,8 @@ function goToOrderDirect() {
   document.getElementById('order-notes').value = '';
   document.getElementById('order-error').classList.remove('visible');
   document.getElementById('order-success').classList.remove('visible');
-  document.getElementById('order-bean-name').textContent = rec ? rec.name + (rec.detail ? ' (' + rec.detail + ')' : '') : '—';
-  document.getElementById('order-bean-origin').textContent = rec ? rec.origin : '—';
+  document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
+  document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
   // نمایش رستری انتخاب‌شده
   if (selectedRoastery) {
     const roasteryInfo = document.getElementById('order-roastery-info');
@@ -2017,7 +2034,7 @@ async function loadRoasteries() {
       container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div></div>';
       return;
     }
-    const beanName = rec ? rec.name : '';
+    const beanName = orderBean ? orderBean.name : '';
     container.innerHTML = roasteries.map(r => {
       const stars = '⭐'.repeat(Math.round(r.rating || 5));
       const hasBeen = r.beans && r.beans.some(b => b.includes(beanName.split('(')[0].trim()));
@@ -2088,7 +2105,7 @@ async function submitOrder() {
       notes,
       status: 'pending',
       payment_status: 'unpaid',
-      bean_name: rec ? (rec.name + (rec.detail ? ' (' + rec.detail + ')' : '')) : null,
+      bean_name: orderBean ? (orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '')) : null,
       roastery_id: selectedRoastery ? selectedRoastery.id : null,
       roastery_name: selectedRoastery ? selectedRoastery.name : null
     });
@@ -2824,7 +2841,7 @@ function goToPayment() {
   const price = PRICES[selectedAmount] || 0;
   document.getElementById('pay-amount').textContent = price.toLocaleString('fa-IR');
   document.getElementById('pay-order-summary').textContent =
-    `${selectedAmount}g — ${rec ? rec.name : ''}`;
+    `${selectedAmount}g — ${orderBean ? orderBean.name : ''}`;
 
   // پاک کردن فرم
   document.getElementById('transaction-id').value = '';
@@ -2961,7 +2978,7 @@ async function confirmPayment() {
         receipt_base64: receiptBase64,
         name: currentUser ? currentUser.name : '',
         phone: currentUser ? currentUser.phone : '',
-        bean: rec ? rec.name : '',
+        bean: orderBean ? orderBean.name : '',
         amount: selectedAmount ? selectedAmount + 'g' : '',
         price: (PRICES[selectedAmount] || 0).toLocaleString()
       };
