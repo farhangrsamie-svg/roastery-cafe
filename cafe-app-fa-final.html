@@ -32,6 +32,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>هویت قهوه — پلتفرم رست شخصی</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --cream: #F5F0E8;
@@ -65,7 +68,8 @@ body.dark-mode {
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Vazirmatn', 'Georgia', 'Times New Roman', serif;
+  font-weight: 500;
   background: var(--cream);
   min-height: 100vh;
   color: var(--dark-brown);
@@ -89,8 +93,21 @@ body {
 .screen {
   display: none; min-height: 100vh; padding: 40px 28px 36px;
   flex-direction: column; animation: fadeUp 0.35s ease;
+  position: relative; overflow: hidden;
 }
 .screen.active { display: flex; }
+
+/* ── DECORATIVE QUESTION BACKGROUND (e.g. brew-method equipment) ── */
+.q-bg-icon {
+  position: absolute; top: -30px; left: 50%; transform: translateX(-50%) rotate(-8deg);
+  width: 340px; height: 340px; pointer-events: none; z-index: 0;
+  color: var(--medium-brown); opacity: 0.07;
+  transition: opacity 0.4s ease;
+}
+.q-bg-icon svg { width: 100%; height: 100%; }
+.screen > .progress-wrap, .screen > .q-header, .screen > .options, .screen > .spacer, .screen > .btn-primary, .screen > .btn-back {
+  position: relative; z-index: 1;
+}
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -131,7 +148,7 @@ body {
 /* ── QUESTION ── */
 .q-header { margin-bottom: 28px; }
 .q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 4px; line-height: 1.3; }
-.q-text-fa { font-size: 16px; color: var(--medium-brown); font-style: italic; }
+.q-text-fa { font-size: 16px; color: var(--medium-brown); font-weight: 600; }
 
 /* ── OPTION CARDS ── */
 .options { display: grid; gap: 12px; }
@@ -149,8 +166,22 @@ body {
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; display: flex; justify-content: center; }
 .option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
 .option-card.selected .option-icon svg { color: var(--caramel); }
+
+/* ── Photo-style equipment icon (brew-method question) ── */
+.option-icon-photo {
+  width: 58px; height: 58px; margin: 0 auto 10px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: radial-gradient(circle at 35% 30%, var(--tint), var(--white) 75%);
+  box-shadow: inset 0 0 0 1px var(--light-caramel), 0 3px 8px var(--shadow);
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
+}
+.option-card.selected .option-icon-photo {
+  box-shadow: inset 0 0 0 2px var(--caramel), 0 4px 14px rgba(196,149,106,0.35);
+}
+.option-icon-photo svg { width: 32px; height: 32px; color: var(--medium-brown); transition: color 0.2s ease; }
+.option-card.selected .option-icon-photo svg { color: var(--caramel); }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
-.option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-style: italic; }
+.option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-weight: 600; }
 .option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
@@ -194,7 +225,7 @@ body {
 .match-score-fill { height: 100%; background: #E8C99A; border-radius: 4px; }
 .match-score-pct { font-size: 16px; color: #F0DAB8; font-family: 'Arial', sans-serif; font-weight: 700; }
 .result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
-.result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-style: italic; }
+.result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-weight: 600; }
 .flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .flavor-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
@@ -225,7 +256,7 @@ body {
 }
 .alt-bean-icon { font-size: 15px; }
 .alt-bean-name { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 3px; }
-.alt-bean-origin { font-size: 13px; color: var(--medium-brown); font-style: italic; margin-bottom: 10px; }
+.alt-bean-origin { font-size: 13px; color: var(--medium-brown); margin-bottom: 10px; font-weight: 600; }
 .alt-bean-flavors { display: flex; flex-wrap: wrap; gap: 6px; }
 .alt-bean-flavor-tag {
   background: var(--white); border: 1px solid var(--light-caramel); border-radius: 20px;
@@ -541,7 +572,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .profile-card-new:active { transform: scale(0.99); }
 .profile-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
 .profile-bean-name { font-size: 16px; font-weight: bold; color: var(--dark-brown); }
-.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-style: italic; }
+.profile-bean-detail { font-size: 11px; color: var(--caramel); margin-top: 2px; font-weight: 600; }
 .profile-date-badge { background: #F5F0E8; border-radius: 10px; padding: 4px 10px; font-size: 10px; color: var(--gray-light); font-family: Arial,sans-serif; white-space: nowrap; }
 .profile-card-tags-new { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .profile-tag-new { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 5px 13px; font-size: 13px; color: var(--medium-brown); font-family: Arial,sans-serif; font-weight: 600; }
@@ -561,7 +592,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 /* ── PROFILE DETAIL SCREEN ── */
 .detail-header { background: #6B3F2A; margin: 0 -28px; padding: 24px 28px 20px; margin-bottom: 20px; text-align: center; }
 .detail-bean-name { font-size: 24px; font-weight: bold; color: #FEFEFE; margin-bottom: 6px; }
-.detail-origin { font-size: 14px; color: var(--caramel); font-style: italic; }
+.detail-origin { font-size: 14px; color: var(--caramel); font-weight: 600; }
 </style>
 </head>
 <body class="lang-fa">
@@ -880,6 +911,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 </div>
 
 <div class="screen" id="screen-6">
+  <div class="q-bg-icon" id="brew-bg-icon"></div>
   <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4A2C17"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -894,13 +926,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
-    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg></div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
-    <div class="option-card" onclick="pick(this,'brew','mokapot')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l2-5h8l2 5-3 4H9z"/><rect x="8" y="13" width="8" height="7" rx="1"/></svg></div><div class="option-en">Moka Pot</div><div class="option-fa" style="direction:rtl">موکاپات</div></div>
-    <div class="option-card" onclick="pick(this,'brew','espressohome')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="9" rx="1.5"/><rect x="9" y="13" width="6" height="3"/><line x1="12" y1="16" x2="12" y2="20"/><circle cx="7" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Espresso Machine</div><div class="option-fa" style="direction:rtl">دستگاه اسپرسو خانگی</div></div>
-    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
-    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg></div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
-    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6z"/></svg></div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
+    <div class="option-card" onclick="pick(this,'brew','v60')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg></div><div class="option-en">Pour Over</div><div class="option-fa" style="direction:rtl">پور اور</div><div class="option-desc">V60, Chemex, Kalita</div></div>
+    <div class="option-card" onclick="pick(this,'brew','frenchpress')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg></div><div class="option-en">French Press</div><div class="option-fa" style="direction:rtl">فرنچ پرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','mokapot')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l2-5h8l2 5-3 4H9z"/><rect x="8" y="13" width="8" height="7" rx="1"/></svg></div><div class="option-en">Moka Pot</div><div class="option-fa" style="direction:rtl">موکاپات</div></div>
+    <div class="option-card" onclick="pick(this,'brew','espressohome')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="9" rx="1.5"/><rect x="9" y="13" width="6" height="3"/><line x1="12" y1="16" x2="12" y2="20"/><circle cx="7" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Espresso Machine</div><div class="option-fa" style="direction:rtl">دستگاه اسپرسو خانگی</div></div>
+    <div class="option-card" onclick="pick(this,'brew','aeropress')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg></div><div class="option-en">AeroPress</div><div class="option-fa" style="direction:rtl">ایروپرس</div></div>
+    <div class="option-card" onclick="pick(this,'brew','coldbrew')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg></div><div class="option-en">Cold Brew</div><div class="option-fa" style="direction:rtl">کولد برو</div></div>
+    <div class="option-card" onclick="pick(this,'brew','other')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.9 6.4.6-4.8 4.3 1.4 6.3L12 17l-5.6 3.1 1.4-6.3-4.8-4.3 6.4-.6z"/></svg></div><div class="option-en">Other / Flexible</div><div class="option-fa" style="direction:rtl">روش دیگر</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -1103,7 +1135,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="order-summary" id="order-bean-summary">
     <div style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
-    <div style="font-size:12px;color:var(--caramel);font-style:italic;" id="order-bean-origin">—</div>
+    <div style="font-size:12px;color:var(--caramel);" id="order-bean-origin">—</div>
     <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
   </div>
 
@@ -1723,7 +1755,7 @@ function viewProfile(p) {
     <div class="card" style="direction:rtl;">
       <div class="card-title">دانه پیشنهادی</div>
       <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
-      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);font-style:italic;">${beanDetail}</div>` : ''}
+      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);">${beanDetail}</div>` : ''}
     </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title">طعم‌شناسی</div>
@@ -1868,6 +1900,32 @@ function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
+  if (id === 'screen-6') setBrewBackground();
+}
+
+// ── تصاویر تزئینی پس‌زمینهٔ تصادفی برای سؤال روش دم‌آوری ──
+const BREW_BG_ICONS = [
+  // V60 / Pour Over
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg>',
+  // French Press
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg>',
+  // Moka Pot
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 9l2-5h8l2 5-3 4H9z"/><rect x="8" y="13" width="8" height="7" rx="1"/></svg>',
+  // Espresso Machine
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="4" width="16" height="9" rx="1.5"/><rect x="9" y="13" width="6" height="3"/><line x1="12" y1="16" x2="12" y2="20"/><circle cx="7" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg>',
+  // AeroPress
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>',
+  // Cold Brew jar
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg>',
+];
+function setBrewBackground() {
+  const el = document.getElementById('brew-bg-icon');
+  if (!el) return;
+  const pick = BREW_BG_ICONS[Math.floor(Math.random() * BREW_BG_ICONS.length)];
+  const rotations = ['-10deg', '-4deg', '6deg', '12deg', '-14deg'];
+  const rot = rotations[Math.floor(Math.random() * rotations.length)];
+  el.style.transform = `translateX(-50%) rotate(${rot})`;
+  el.innerHTML = pick;
 }
 
 function findBrewAlternative(winner) {
