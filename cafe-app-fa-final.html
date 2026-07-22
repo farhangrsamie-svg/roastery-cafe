@@ -751,7 +751,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <div style="padding: 0 0 32px;">
     <!-- Persistent Identity Card (radar + persona, always visible) -->
-    <div class="identity-persistent-card" id="dash-identity-card" style="display:none;" onclick="goToLatestProfile()">
+    <div class="identity-persistent-card" id="dash-identity-card" style="display:none;" onclick="scrollToProfilesList()">
       <div class="identity-persistent-label">
         <span class="fa-only">هویت قهوهٔ شما</span><span class="en-only">Your Coffee Identity</span>
       </div>
@@ -764,7 +764,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
         </div>
       </div>
       <div class="identity-persistent-cta">
-        <span class="fa-only">مشاهده کامل ←</span><span class="en-only">View full profile ←</span>
+        <span class="fa-only">مشاهدهٔ پروفایل‌ها ↓</span><span class="en-only">See your profiles ↓</span>
       </div>
     </div>
     <div class="identity-persistent-empty" id="dash-identity-empty" style="display:none;">
@@ -1616,7 +1616,7 @@ async function loadProfiles() {
     // ذخیره در Map برای دسترسی امن
     window._profilesMap = {};
     profiles.forEach(p => { window._profilesMap[p.id] = p; });
-    renderDashboardIdentity(profiles[0]);
+    renderDashboardIdentity(profiles);
     container.innerHTML = profiles.map(p => {
       const beanFull = p.recommended_bean || '—';
       const beanName = beanFull.split('(')[0].trim();
@@ -1657,11 +1657,57 @@ async function loadProfiles() {
   }
 }
 
-// ── کارت هویت همیشه‌حاضر داشبورد (پیشنهاد #۶: رادار طعمی + پرسونا) ──
-function renderDashboardIdentity(p) {
+// ── کارت هویت همیشه‌حاضر داشبورد (پیشنهاد #۶: هویت ترکیبی از میانگین همه پروفایل‌ها) ──
+function modeOf(arr) {
+  const counts = {};
+  arr.filter(Boolean).forEach(v => { counts[v] = (counts[v] || 0) + 1; });
+  let best = null, bestCount = 0;
+  for (const k in counts) if (counts[k] > bestCount) { bestCount = counts[k]; best = k; }
+  return best;
+}
+
+function computeCombinedPersona(profiles) {
+  const keys = Object.keys(PERSONAS);
+  const totals = {};
+  keys.forEach(k => totals[k] = 0);
+  profiles.forEach(p => {
+    const a = { taste: p.flavor, body: p.body, state: p.mood, acidity: p.acidity, tastepref: p.tastepref };
+    keys.forEach(key => {
+      const ps = PERSONAS[key].s;
+      let score = 0;
+      score += (ps[a.taste]     || 0) * 3.0;
+      score += (ps[a.body]      || 0) * 2.5;
+      score += (ps[a.state]     || 0) * 1.5;
+      score += (ps[a.acidity]   || 0) * 1.5;
+      score += (ps[a.tastepref] || 0) * 1.5;
+      totals[key] += score;
+    });
+  });
+  let bestKey = null, bestAvg = -1;
+  keys.forEach(key => {
+    const avg = totals[key] / profiles.length;
+    if (avg > bestAvg) { bestAvg = avg; bestKey = key; }
+  });
+  return PERSONAS[bestKey];
+}
+
+function computeCombinedRadarBean(profiles) {
+  const axes = ['floral', 'sweet', 'chocolatey', 'bold'];
+  const matchedBeans = profiles
+    .map(p => BEANS.find(b => (p.recommended_bean || '').startsWith(b.name)))
+    .filter(Boolean);
+  if (!matchedBeans.length) return null;
+  const avgS = {};
+  axes.forEach(ax => {
+    avgS[ax] = matchedBeans.reduce((sum, b) => sum + ((b.s && b.s[ax]) || 0), 0) / matchedBeans.length;
+  });
+  return { s: avgS };
+}
+
+function renderDashboardIdentity(profiles) {
   const card  = document.getElementById('dash-identity-card');
   const empty = document.getElementById('dash-identity-empty');
-  if (!p) {
+  if (!profiles || profiles.length === 0) {
     card.style.display = 'none';
     empty.style.display = 'block';
     return;
@@ -1669,36 +1715,36 @@ function renderDashboardIdentity(p) {
   empty.style.display = 'none';
   card.style.display = 'block';
 
-  const a = {
-    taste: p.flavor || null, body: p.body || null, state: p.mood || null,
-    acidity: p.acidity || null, tastepref: p.tastepref || null,
-  };
-  const persona = determinePersonaFrom(a);
-  const beanFull = p.recommended_bean || '';
-  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+  const persona = computeCombinedPersona(profiles);
+  const radarBean = computeCombinedRadarBean(profiles);
 
-  document.getElementById('dash-identity-radar').innerHTML = matchedBean
-    ? buildFlavorRadarMini(matchedBean)
+  document.getElementById('dash-identity-radar').innerHTML = radarBean
+    ? buildFlavorRadarMini(radarBean)
     : '<div style="font-size:28px;opacity:0.3;">☕</div>';
 
   document.getElementById('dash-identity-name').textContent =
     persona ? (persona.icon + ' ' + persona.fa) : '—';
-  document.getElementById('dash-identity-tagline').textContent =
-    persona ? persona.tagFa : '';
+
+  const countLabel = profiles.length === 1
+    ? (currentLang === 'fa' ? 'بر اساس ۱ پروفایل' : 'Based on 1 profile')
+    : (currentLang === 'fa' ? `بر اساس ${profiles.length} پروفایل` : `Based on ${profiles.length} profiles`);
+  document.getElementById('dash-identity-tagline').innerHTML =
+    (persona ? persona.tagFa : '') + `<br><span style="font-size:11px;color:var(--medium-brown);font-weight:500;">${countLabel}</span>`;
 
   const tags = [
-    p.flavor ? (tasteFA[p.flavor] || p.flavor) : null,
-    p.body   ? (bodyFA[p.body]   || p.body)   : null,
-    p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
+    modeOf(profiles.map(p => p.flavor)) ? (tasteFA[modeOf(profiles.map(p => p.flavor))] || modeOf(profiles.map(p => p.flavor))) : null,
+    modeOf(profiles.map(p => p.body))   ? (bodyFA[modeOf(profiles.map(p => p.body))]   || modeOf(profiles.map(p => p.body)))   : null,
+    modeOf(profiles.map(p => p.mood))   ? (stateFA[modeOf(profiles.map(p => p.mood))]  || modeOf(profiles.map(p => p.mood)))  : null,
   ].filter(Boolean);
   document.getElementById('dash-identity-tags').innerHTML =
     tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('');
 
-  window._latestProfileId = p.id;
+  window._latestProfileId = profiles[0].id;
 }
 
-function goToLatestProfile() {
-  if (window._latestProfileId) viewProfileById(window._latestProfileId);
+function scrollToProfilesList() {
+  const el = document.getElementById('dash-profiles');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
 }
 
 async function loadOrders() {
