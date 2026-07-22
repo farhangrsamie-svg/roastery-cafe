@@ -541,6 +541,33 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 .dash-stat-num { font-size: 22px; font-weight: bold; color: var(--white); line-height: 1; }
 .dash-stat-label { font-size: 9px; color: var(--caramel); text-transform: uppercase; letter-spacing: 1px; font-family: Arial,sans-serif; margin-top: 4px; }
 
+/* ── PERSISTENT IDENTITY CARD (dashboard) ── */
+.identity-persistent-card {
+  background: var(--white); border-radius: 20px; padding: 18px 20px;
+  box-shadow: 0 3px 16px var(--shadow); margin: 18px 0 20px;
+  border: 1px solid var(--light-caramel); cursor: pointer; transition: all 0.2s;
+}
+.identity-persistent-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(196,149,106,0.22); }
+.identity-persistent-card:active { transform: scale(0.99); }
+.identity-persistent-label {
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--caramel);
+  font-family: Arial,sans-serif; font-weight: bold; margin-bottom: 10px;
+}
+.identity-persistent-top { display: flex; align-items: center; gap: 6px; }
+.identity-persistent-radar {
+  width: 96px; height: 96px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.identity-persistent-text { flex: 1; min-width: 0; }
+.identity-persistent-name { font-size: 18px; font-weight: bold; color: var(--dark-brown); margin-bottom: 3px; }
+.identity-persistent-tagline { font-size: 12.5px; color: var(--caramel); font-weight: 600; line-height: 1.5; margin-bottom: 8px; }
+.identity-persistent-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.identity-persistent-cta { font-size: 11px; color: var(--medium-brown); font-family: Arial,sans-serif; margin-top: 10px; }
+.identity-persistent-empty {
+  background: var(--tint); border: 1px dashed var(--light-caramel); border-radius: 20px;
+  padding: 20px; text-align: center; margin: 18px 0 20px;
+}
+.identity-persistent-empty-text { font-size: 13px; color: var(--medium-brown); line-height: 1.7; }
+
 /* ── NEW PROFILE BTN ── */
 .new-profile-btn {
   background: linear-gradient(135deg, var(--caramel), #D4A574);
@@ -723,6 +750,30 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <div style="padding: 0 0 32px;">
+    <!-- Persistent Identity Card (radar + persona, always visible) -->
+    <div class="identity-persistent-card" id="dash-identity-card" style="display:none;" onclick="goToLatestProfile()">
+      <div class="identity-persistent-label">
+        <span class="fa-only">هویت قهوهٔ شما</span><span class="en-only">Your Coffee Identity</span>
+      </div>
+      <div class="identity-persistent-top">
+        <div class="identity-persistent-radar" id="dash-identity-radar"></div>
+        <div class="identity-persistent-text">
+          <div class="identity-persistent-name" id="dash-identity-name">—</div>
+          <div class="identity-persistent-tagline" id="dash-identity-tagline"></div>
+          <div class="identity-persistent-tags" id="dash-identity-tags"></div>
+        </div>
+      </div>
+      <div class="identity-persistent-cta">
+        <span class="fa-only">مشاهده کامل ←</span><span class="en-only">View full profile ←</span>
+      </div>
+    </div>
+    <div class="identity-persistent-empty" id="dash-identity-empty" style="display:none;">
+      <div class="identity-persistent-empty-text">
+        <span class="fa-only">هنوز هویت قهوه‌ای نساختی — اولین پروفایلتو بساز تا اینجا نمودار طعم و پرسونات همیشه در دسترست باشه.</span>
+        <span class="en-only">You haven't built a coffee identity yet — start your first profile to see your flavor radar and persona here.</span>
+      </div>
+    </div>
+
     <!-- New Profile Button -->
     <button class="new-profile-btn" onclick="startNewProfile()">
       <div class="new-profile-icon">✨</div>
@@ -1557,6 +1608,7 @@ async function loadProfiles() {
     document.getElementById('stat-profiles-badge').textContent = count;
     if (!profiles || count === 0) {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">☕</div><div class="fa-only">هنوز پروفایلی نداری. اولین سفرت رو شروع کن!</div><div class="en-only">No profiles yet. Start your journey!</div></div>`;
+      renderDashboardIdentity(null);
       return;
     }
     // مرتب‌سازی: علاقه‌مندها اول
@@ -1564,6 +1616,7 @@ async function loadProfiles() {
     // ذخیره در Map برای دسترسی امن
     window._profilesMap = {};
     profiles.forEach(p => { window._profilesMap[p.id] = p; });
+    renderDashboardIdentity(profiles[0]);
     container.innerHTML = profiles.map(p => {
       const beanFull = p.recommended_bean || '—';
       const beanName = beanFull.split('(')[0].trim();
@@ -1602,6 +1655,50 @@ async function loadProfiles() {
   } catch(e) {
     container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
   }
+}
+
+// ── کارت هویت همیشه‌حاضر داشبورد (پیشنهاد #۶: رادار طعمی + پرسونا) ──
+function renderDashboardIdentity(p) {
+  const card  = document.getElementById('dash-identity-card');
+  const empty = document.getElementById('dash-identity-empty');
+  if (!p) {
+    card.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  card.style.display = 'block';
+
+  const a = {
+    taste: p.flavor || null, body: p.body || null, state: p.mood || null,
+    acidity: p.acidity || null, tastepref: p.tastepref || null,
+  };
+  const persona = determinePersonaFrom(a);
+  const beanFull = p.recommended_bean || '';
+  const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
+
+  document.getElementById('dash-identity-radar').innerHTML = matchedBean
+    ? buildFlavorRadarMini(matchedBean)
+    : '<div style="font-size:28px;opacity:0.3;">☕</div>';
+
+  document.getElementById('dash-identity-name').textContent =
+    persona ? (persona.icon + ' ' + persona.fa) : '—';
+  document.getElementById('dash-identity-tagline').textContent =
+    persona ? persona.tagFa : '';
+
+  const tags = [
+    p.flavor ? (tasteFA[p.flavor] || p.flavor) : null,
+    p.body   ? (bodyFA[p.body]   || p.body)   : null,
+    p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
+  ].filter(Boolean);
+  document.getElementById('dash-identity-tags').innerHTML =
+    tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('');
+
+  window._latestProfileId = p.id;
+}
+
+function goToLatestProfile() {
+  if (window._latestProfileId) viewProfileById(window._latestProfileId);
 }
 
 async function loadOrders() {
@@ -2370,19 +2467,22 @@ const PERSONAS = {
   }
 };
 
-function determinePersona() {
+function determinePersonaFrom(a) {
   let bestKey = null, bestScore = -1;
   for (const key in PERSONAS) {
     const p = PERSONAS[key];
     let score = 0;
-    score += (p.s[ans.taste]      || 0) * 3.0;
-    score += (p.s[ans.body]       || 0) * 2.5;
-    score += (p.s[ans.state]      || 0) * 1.5;
-    score += (p.s[ans.acidity]    || 0) * 1.5;
-    score += (p.s[ans.tastepref]  || 0) * 1.5;
+    score += (p.s[a.taste]      || 0) * 3.0;
+    score += (p.s[a.body]       || 0) * 2.5;
+    score += (p.s[a.state]      || 0) * 1.5;
+    score += (p.s[a.acidity]    || 0) * 1.5;
+    score += (p.s[a.tastepref]  || 0) * 1.5;
     if (score > bestScore) { bestScore = score; bestKey = key; }
   }
   return PERSONAS[bestKey];
+}
+function determinePersona() {
+  return determinePersonaFrom(ans);
 }
 
 /* ═══════════════════════════════════════════
@@ -2632,6 +2732,34 @@ function shareResultCard(style, birthDay, birthMonth) {
    نمودار رادار طعم بر اساس امتیاز ۴ بعد اصلی طعمی دانه؛
    محور مرتبط با طعم انتخابی کاربر رنگی و برجسته می‌شود
 ═══════════════════════════════════════════ */
+function buildFlavorRadarMini(bean) {
+  const axes = ['floral', 'sweet', 'chocolatey', 'bold'];
+  const cx = 48, cy = 48, maxR = 34;
+  const angleStep = (2 * Math.PI) / axes.length;
+  function pointAt(i, value) {
+    const angle = -Math.PI / 2 + i * angleStep;
+    const r = (Math.max(0, Math.min(10, value)) / 10) * maxR;
+    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)];
+  }
+  let grid = '';
+  [0.5, 1].forEach(frac => {
+    const pts = axes.map((a, i) => {
+      const angle = -Math.PI / 2 + i * angleStep;
+      const r = frac * maxR;
+      return (cx + r * Math.cos(angle)).toFixed(1) + ',' + (cy + r * Math.sin(angle)).toFixed(1);
+    }).join(' ');
+    grid += `<polygon points="${pts}" fill="none" stroke="rgba(107,63,42,0.18)" stroke-width="1"/>`;
+  });
+  const dataPts = axes.map((a, i) => {
+    const [x, y] = pointAt(i, (bean.s && bean.s[a]) || 0);
+    return x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+  return `<svg viewBox="0 0 96 96" width="96" height="96" xmlns="http://www.w3.org/2000/svg">
+    ${grid}
+    <polygon points="${dataPts}" fill="rgba(196,149,106,0.4)" stroke="#6B3F2A" stroke-width="1.5"/>
+  </svg>`;
+}
+
 function buildFlavorRadar(bean, highlightKey) {
   const axes = [
     { key: 'floral',     fa: 'گلی',     en: 'Floral' },
