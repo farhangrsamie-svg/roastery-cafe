@@ -226,6 +226,10 @@ body {
 .match-score-pct { font-size: 16px; color: #F0DAB8; font-family: 'Arial', sans-serif; font-weight: 700; }
 .result-bean-name { font-size: 24px; font-weight: bold; color: var(--dark-brown); }
 .result-origin { font-size: 15px; color: var(--caramel); margin-top: 4px; font-weight: 600; }
+.result-flavor-headline {
+  font-size: 19px; font-weight: 700; color: var(--dark-brown);
+  margin-top: 10px; letter-spacing: 0.2px; line-height: 1.5;
+}
 .flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .flavor-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
@@ -964,6 +968,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;">پیشنهاد امروز</div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
+    <div class="result-flavor-headline" id="r-flavor-headline"></div>
   </div>
 
   <!-- AI Explanation Card -->
@@ -1057,13 +1062,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
     <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fa-only">روش دم‌آوری شما</span></span><span class="info-value" id="r-your-brew"></span></div>
     <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
-    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
-    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
   </div>
 
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔥 راهنمای رست ▼</button>
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔧 جزئیات فنی ▼</button>
   <div class="card" id="roast-card" style="display:none;">
-    <div class="card-title">🔥 Roast Guide</div>
+    <div class="card-title">🔧 <span class="fa-only">جزئیات فنی</span><span class="en-only">Technical Details</span></div>
+    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
+    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
     <div class="info-row"><span class="info-label">⬆️ Charge Temp</span><span class="info-value" id="r-charge"></span></div>
     <div class="info-row"><span class="info-label">⬇️ Drop Temp</span><span class="info-value" id="r-drop"></span></div>
     <div class="info-row"><span class="info-label">⏱️ Total Time</span><span class="info-value" id="r-time"></span></div>
@@ -2717,6 +2722,7 @@ function render(r) {
   // Bean info
   document.getElementById('r-name').textContent = r.name;
   document.getElementById('r-origin').textContent = r.origin;
+  document.getElementById('r-flavor-headline').textContent = (r.flavors || []).slice(0, 3).map(trFlavor).join('، ');
   document.getElementById('r-roast').textContent = r.roast;
   document.getElementById('r-brew').textContent = r.brew;
   document.getElementById('r-temp').textContent = r.temp;
@@ -2779,7 +2785,7 @@ function toggleRoastGuide() {
   const btn  = document.querySelector('.staff-toggle');
   const visible = card.style.display !== 'none';
   card.style.display = visible ? 'none' : 'block';
-  btn.textContent = (visible ? '🔥 راهنمای رست ▼' : '🔥 راهنمای رست ▲');
+  btn.textContent = (visible ? '🔧 جزئیات فنی ▼' : '🔧 جزئیات فنی ▲');
 }
 
 /* ═══════════════════════════════════════════
