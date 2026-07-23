@@ -1680,21 +1680,28 @@ async function loadProfiles() {
   }
 }
 
-// ── کارت هویت همیشه‌حاضر داشبورد (پیشنهاد #۶: هویت ترکیبی از میانگین همه پروفایل‌ها) ──
-function modeOf(arr) {
-  const counts = {};
-  arr.filter(Boolean).forEach(v => { counts[v] = (counts[v] || 0) + 1; });
-  let best = null, bestCount = 0;
-  for (const k in counts) if (counts[k] > bestCount) { bestCount = counts[k]; best = k; }
+// ── کارت هویت همیشه‌حاضر داشبورد (پیشنهاد #۶: هویت ترکیبی، وزن‌دهی‌شده با تعداد سفارش هر پروفایل) ──
+function weightedModeOf(items) {
+  // items: [{ value, weight }]
+  const totals = {};
+  items.forEach(({ value, weight }) => {
+    if (!value) return;
+    totals[value] = (totals[value] || 0) + weight;
+  });
+  let best = null, bestTotal = 0;
+  for (const k in totals) if (totals[k] > bestTotal) { bestTotal = totals[k]; best = k; }
   return best;
 }
 
-function computeCombinedPersona(profiles) {
+function computeCombinedPersona(weighted) {
+  // weighted: [{ profile, weight }]
   const keys = Object.keys(PERSONAS);
   const totals = {};
+  let weightSum = 0;
   keys.forEach(k => totals[k] = 0);
-  profiles.forEach(p => {
+  weighted.forEach(({ profile: p, weight }) => {
     const a = { taste: p.flavor, body: p.body, state: p.mood, acidity: p.acidity, tastepref: p.tastepref };
+    weightSum += weight;
     keys.forEach(key => {
       const ps = PERSONAS[key].s;
       let score = 0;
@@ -1703,31 +1710,32 @@ function computeCombinedPersona(profiles) {
       score += (ps[a.state]     || 0) * 1.5;
       score += (ps[a.acidity]   || 0) * 1.5;
       score += (ps[a.tastepref] || 0) * 1.5;
-      totals[key] += score;
+      totals[key] += score * weight;
     });
   });
   let bestKey = null, bestAvg = -1;
   keys.forEach(key => {
-    const avg = totals[key] / profiles.length;
+    const avg = totals[key] / (weightSum || 1);
     if (avg > bestAvg) { bestAvg = avg; bestKey = key; }
   });
   return PERSONAS[bestKey];
 }
 
-function computeCombinedRadarBean(profiles) {
+function computeCombinedRadarBean(weighted) {
   const axes = ['floral', 'sweet', 'chocolatey', 'bold'];
-  const matchedBeans = profiles
-    .map(p => BEANS.find(b => (p.recommended_bean || '').startsWith(b.name)))
-    .filter(Boolean);
-  if (!matchedBeans.length) return null;
+  const matched = weighted
+    .map(({ profile: p, weight }) => ({ bean: BEANS.find(b => (p.recommended_bean || '').startsWith(b.name)), weight }))
+    .filter(m => m.bean);
+  if (!matched.length) return null;
+  const weightSum = matched.reduce((sum, m) => sum + m.weight, 0);
   const avgS = {};
   axes.forEach(ax => {
-    avgS[ax] = matchedBeans.reduce((sum, b) => sum + ((b.s && b.s[ax]) || 0), 0) / matchedBeans.length;
+    avgS[ax] = matched.reduce((sum, m) => sum + ((m.bean.s && m.bean.s[ax]) || 0) * m.weight, 0) / weightSum;
   });
   return { s: avgS };
 }
 
-function renderDashboardIdentity(profiles) {
+async function renderDashboardIdentity(profiles) {
   const card  = document.getElementById('dash-identity-card');
   const empty = document.getElementById('dash-identity-empty');
   if (!profiles || profiles.length === 0) {
@@ -1738,8 +1746,21 @@ function renderDashboardIdentity(profiles) {
   empty.style.display = 'none';
   card.style.display = 'block';
 
-  const persona = computeCombinedPersona(profiles);
-  const radarBean = computeCombinedRadarBean(profiles);
+  // وزن هر پروفایل = ۱ (خودِ ساخته‌شدن پروفایل) + تعداد سفارش‌های واقعی ثبت‌شده از همان پروفایل
+  // یعنی پروفایلی که چند بار از روش سفارش داده شده، تأثیر بیشتری در هویت ترکیبی داره
+  let orderCounts = {};
+  try {
+    const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&select=profile_id`);
+    (orders || []).forEach(o => {
+      if (o.profile_id) orderCounts[o.profile_id] = (orderCounts[o.profile_id] || 0) + 1;
+    });
+  } catch (e) { /* در صورت خطا، بدون وزن سفارش ادامه می‌دهیم */ }
+
+  const weighted = profiles.map(p => ({ profile: p, weight: 1 + (orderCounts[p.id] || 0) }));
+  const totalOrders = Object.values(orderCounts).reduce((a, b) => a + b, 0);
+
+  const persona = computeCombinedPersona(weighted);
+  const radarBean = computeCombinedRadarBean(weighted);
 
   document.getElementById('dash-identity-radar').innerHTML = radarBean
     ? buildFlavorRadarMini(radarBean)
@@ -1748,16 +1769,26 @@ function renderDashboardIdentity(profiles) {
   document.getElementById('dash-identity-name').textContent =
     persona ? (persona.icon + ' ' + persona.fa) : '—';
 
-  const countLabel = profiles.length === 1
-    ? (currentLang === 'fa' ? 'بر اساس ۱ پروفایل' : 'Based on 1 profile')
-    : (currentLang === 'fa' ? `بر اساس ${profiles.length} پروفایل` : `Based on ${profiles.length} profiles`);
+  const profileWord = profiles.length === 1 ? 'پروفایل' : 'پروفایل';
+  let countLabel = currentLang === 'fa'
+    ? `بر اساس ${profiles.length} ${profileWord}`
+    : `Based on ${profiles.length} profile${profiles.length === 1 ? '' : 's'}`;
+  if (totalOrders > 0) {
+    countLabel += currentLang === 'fa' ? ` و ${totalOrders} سفارش` : ` and ${totalOrders} order${totalOrders === 1 ? '' : 's'}`;
+  }
   document.getElementById('dash-identity-tagline').innerHTML =
     (persona ? persona.tagFa : '') + `<br><span style="font-size:11px;color:var(--medium-brown);font-weight:500;">${countLabel}</span>`;
 
+  const flavorItems = weighted.map(w => ({ value: w.profile.flavor, weight: w.weight }));
+  const bodyItems   = weighted.map(w => ({ value: w.profile.body,   weight: w.weight }));
+  const moodItems   = weighted.map(w => ({ value: w.profile.mood,   weight: w.weight }));
+  const topFlavor = weightedModeOf(flavorItems);
+  const topBody   = weightedModeOf(bodyItems);
+  const topMood   = weightedModeOf(moodItems);
   const tags = [
-    modeOf(profiles.map(p => p.flavor)) ? (tasteFA[modeOf(profiles.map(p => p.flavor))] || modeOf(profiles.map(p => p.flavor))) : null,
-    modeOf(profiles.map(p => p.body))   ? (bodyFA[modeOf(profiles.map(p => p.body))]   || modeOf(profiles.map(p => p.body)))   : null,
-    modeOf(profiles.map(p => p.mood))   ? (stateFA[modeOf(profiles.map(p => p.mood))]  || modeOf(profiles.map(p => p.mood)))  : null,
+    topFlavor ? (tasteFA[topFlavor] || topFlavor) : null,
+    topBody   ? (bodyFA[topBody]   || topBody)   : null,
+    topMood   ? (stateFA[topMood]  || topMood)   : null,
   ].filter(Boolean);
   document.getElementById('dash-identity-tags').innerHTML =
     tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('');
@@ -2475,7 +2506,7 @@ const BEANS = [
     },
     brewFit:{ v60:5, frenchpress:8, mokapot:8, espressohome:9, aeropress:5, coldbrew:5, other:6 }
   },
-  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', descFA:'سنگین‌ترین و خاکی‌ترین قهوه. سدر، تنباکو و شکلات تلخ در یک فنجان غلیظ و پررنگ.',
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'Espresso / French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', descFA:'سنگین‌ترین و خاکی‌ترین قهوه. سدر، تنباکو و شکلات تلخ در یک فنجان غلیظ و پررنگ.',
     s:{
       floral:0, sweet:2, chocolatey:6, bold:10,
       light:0, medium:2, full:10,
