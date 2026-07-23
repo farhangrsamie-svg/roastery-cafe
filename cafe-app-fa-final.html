@@ -132,7 +132,7 @@ body {
 .input-field.error { border-color: #C0392B; }
 
 /* ── PROGRESS ── */
-.progress-wrap { margin-bottom: 24px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.progress-wrap { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .progress-bean { display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 2px 6px var(--shadow)); }
 .progress-bean svg { transition: fill 0.3s ease; }
 .bean-pulse { animation: beanPulse 0.4s ease; }
@@ -146,22 +146,40 @@ body {
 .progress-fill { background: var(--caramel); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 
 /* ── QUESTION ── */
-.q-header { margin-bottom: 28px; }
-.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 4px; line-height: 1.3; }
-.q-text-fa { font-size: 16px; color: var(--medium-brown); font-weight: 600; }
+.q-header { margin-bottom: 34px; }
+.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 6px; line-height: 1.3; }
+.q-text-fa { font-size: 17px; color: var(--medium-brown); font-weight: 600; line-height: 1.6; }
 
 /* ── OPTION CARDS ── */
-.options { display: grid; gap: 12px; }
+.options { display: grid; gap: 14px; }
 .options.cols-2 { grid-template-columns: 1fr 1fr; }
 .options.cols-1 { grid-template-columns: 1fr; }
 .option-card {
   background: var(--white); border: 2px solid transparent; border-radius: 18px;
-  padding: 18px 14px; cursor: pointer; transition: all 0.18s ease;
+  padding: 20px 16px; cursor: pointer; transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
   box-shadow: 0 2px 10px var(--shadow); text-align: center;
   user-select: none; -webkit-user-select: none;
 }
 .option-card:active { transform: scale(0.96); }
-.option-card.selected { border-color: var(--caramel); background: var(--tint); box-shadow: 0 4px 20px rgba(196,149,106,0.28); }
+.option-card.selected { border-color: var(--caramel); background: var(--tint); box-shadow: 0 4px 20px rgba(196,149,106,0.28); animation: optionSelectPulse 0.32s ease; }
+
+@keyframes optionPopIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes optionSelectPulse {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+.screen.active .option-card {
+  animation: optionPopIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.screen.active .option-card:nth-child(1) { animation-delay: 0.02s; }
+.screen.active .option-card:nth-child(2) { animation-delay: 0.07s; }
+.screen.active .option-card:nth-child(3) { animation-delay: 0.12s; }
+.screen.active .option-card:nth-child(4) { animation-delay: 0.17s; }
+.screen.active .option-card:nth-child(5) { animation-delay: 0.22s; }
 .option-card.full-row { grid-column: span 2; }
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; display: flex; justify-content: center; }
 .option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
@@ -848,6 +866,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
 <!-- ══════ SCREENS 1–6: QUIZ ══════ -->
 <div class="screen" id="screen-1">
+  <div class="q-bg-icon" id="q-bg-icon-1"></div>
   <button class="btn-back" onclick="goBack(1)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7CB342"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -858,16 +877,17 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">چه طعم‌هایی شما را جذب می‌کند؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="12" cy="6" r="2.6"/><circle cx="17" cy="9.5" r="2.6"/><circle cx="15" cy="16" r="2.6"/><circle cx="9" cy="16" r="2.6"/><circle cx="7" cy="9.5" r="2.6"/></svg></div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
-    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8.2 6 11a6 6 0 0 1-12 0c0-2.8 2-6 6-11z"/><line x1="8.3" y1="15" x2="15.7" y2="15"/></svg></div><div class="option-en">Sweet & Mellow</div><div class="option-fa" style="direction:rtl">شیرین و ملایم</div><div class="option-desc">Caramel, honey, cherry</div></div>
-    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
-    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5 8h-3l4 6H6l4-6H7l5-8z"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="option-en">Bold & Woodsy</div><div class="option-fa" style="direction:rtl">تند و چوبی</div><div class="option-desc">Strong, deep, woodsy</div></div>
+    <div class="option-card" onclick="pick(this,'taste','floral')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="12" cy="6" r="2.6"/><circle cx="17" cy="9.5" r="2.6"/><circle cx="15" cy="16" r="2.6"/><circle cx="9" cy="16" r="2.6"/><circle cx="7" cy="9.5" r="2.6"/></svg></div><div class="option-en">Floral & Fruity</div><div class="option-fa" style="direction:rtl">گلی و میوه‌ای</div><div class="option-desc">Jasmine, peach, citrus</div></div>
+    <div class="option-card" onclick="pick(this,'taste','sweet')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6 8.2 6 11a6 6 0 0 1-12 0c0-2.8 2-6 6-11z"/><line x1="8.3" y1="15" x2="15.7" y2="15"/></svg></div><div class="option-en">Sweet & Mellow</div><div class="option-fa" style="direction:rtl">شیرین و ملایم</div><div class="option-desc">Caramel, honey, cherry</div></div>
+    <div class="option-card" onclick="pick(this,'taste','chocolatey')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg></div><div class="option-en">Chocolatey & Nutty</div><div class="option-fa" style="direction:rtl">شکلاتی و آجیلی</div><div class="option-desc">Dark chocolate, hazelnut</div></div>
+    <div class="option-card" onclick="pick(this,'taste','bold')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l5 8h-3l4 6H6l4-6H7l5-8z"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="option-en">Bold & Woodsy</div><div class="option-fa" style="direction:rtl">تند و چوبی</div><div class="option-desc">Strong, deep, woodsy</div></div>
   </div>
   <div class="spacer"></div>
 
 </div>
 
 <div class="screen" id="screen-2">
+  <div class="q-bg-icon" id="q-bg-icon-2"></div>
   <button class="btn-back" onclick="goBack(2)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#729839"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -878,15 +898,16 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه‌تان را چگونه دوست دارید؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c8 0 14-6 14-15-9 0-15 6-15 14 0 .5 0 1 .3 1z"/><path d="M6 18c3-3 6-6 9-11"/></svg></div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
-    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a8 8 0 0 1 16 0"/><line x1="12" y1="16" x2="16" y2="11"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
-    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
+    <div class="option-card" onclick="pick(this,'body','light')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c8 0 14-6 14-15-9 0-15 6-15 14 0 .5 0 1 .3 1z"/><path d="M6 18c3-3 6-6 9-11"/></svg></div><div class="option-en">Light & Delicate</div><div class="option-fa" style="direction:rtl">سبک و لطیف</div><div class="option-desc">Tea-like, clear, bright</div></div>
+    <div class="option-card" onclick="pick(this,'body','medium')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16a8 8 0 0 1 16 0"/><line x1="12" y1="16" x2="16" y2="11"/><circle cx="12" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Medium & Smooth</div><div class="option-fa" style="direction:rtl">متوسط و روان</div><div class="option-desc">Balanced and comfortable</div></div>
+    <div class="option-card" onclick="pick(this,'body','full')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></div><div class="option-en">Rich & Full</div><div class="option-fa" style="direction:rtl">غنی و پرقدرت</div><div class="option-desc">Heavy, coating, intense</div></div>
   </div>
   <div class="spacer"></div>
 
 </div>
 
 <div class="screen" id="screen-3">
+  <div class="q-bg-icon" id="q-bg-icon-3"></div>
   <button class="btn-back" onclick="goBack(3)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#687D31"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -897,17 +918,18 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">امروز دنبال چه نوع لحظه‌ای هستید؟</div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
-    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
-    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 8 0 1 0 0 16c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-6-9-6z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
-    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
-    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
+    <div class="option-card" onclick="pick(this,'state','energised')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg></div><div class="option-en">Energised</div><div class="option-fa" style="direction:rtl">پرانرژی</div></div>
+    <div class="option-card" onclick="pick(this,'state','focused')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Focused</div><div class="option-fa" style="direction:rtl">متمرکز</div></div>
+    <div class="option-card" onclick="pick(this,'state','creative')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 8 0 1 0 0 16c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-6-9-6z"/><circle cx="7.5" cy="10.5" r="1" fill="currentColor" stroke="none"/><circle cx="11" cy="7.5" r="1" fill="currentColor" stroke="none"/><circle cx="15.5" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Creative</div><div class="option-fa" style="direction:rtl">خلاق</div></div>
+    <div class="option-card" onclick="pick(this,'state','relaxed')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg></div><div class="option-en">Relaxed</div><div class="option-fa" style="direction:rtl">آرام</div></div>
+    <div class="option-card full-row" onclick="pick(this,'state','reflective')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg></div><div class="option-en">Reflective</div><div class="option-fa" style="direction:rtl">تأملی</div></div>
   </div>
   <div class="spacer"></div>
 
 </div>
 
 <div class="screen" id="screen-4">
+  <div class="q-bg-icon" id="q-bg-icon-4"></div>
   <button class="btn-back" onclick="goBack(4)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#5E6228"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -918,14 +940,15 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">ترشی و طراوت قهوه رو چطور دوست داری؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'acidity','bright')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg></div><div class="option-en">Bright & Citrusy</div><div class="option-fa" style="direction:rtl">زنده و ترش</div><div class="option-desc">Lively, juicy, tea-like</div></div>
-    <div class="option-card" onclick="pick(this,'acidity','balanced')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div><div class="option-en">Balanced</div><div class="option-fa" style="direction:rtl">متعادل</div><div class="option-desc">Not too sharp, not too flat</div></div>
-    <div class="option-card" onclick="pick(this,'acidity','smooth')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 8-8"/><path d="M12 4a4 4 0 1 0 4 4"/><circle cx="16" cy="8" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Smooth & Low-Acid</div><div class="option-fa" style="direction:rtl">نرم و بدون ترشی</div><div class="option-desc">Mellow, heavy, no sharpness</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','bright')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg></div><div class="option-en">Bright & Citrusy</div><div class="option-fa" style="direction:rtl">زنده و ترش</div><div class="option-desc">Lively, juicy, tea-like</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','balanced')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/><line x1="9" y1="21" x2="15" y2="21"/></svg></div><div class="option-en">Balanced</div><div class="option-fa" style="direction:rtl">متعادل</div><div class="option-desc">Not too sharp, not too flat</div></div>
+    <div class="option-card" onclick="pick(this,'acidity','smooth')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 8-8"/><path d="M12 4a4 4 0 1 0 4 4"/><circle cx="16" cy="8" r="1.3" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Smooth & Low-Acid</div><div class="option-fa" style="direction:rtl">نرم و بدون ترشی</div><div class="option-desc">Mellow, heavy, no sharpness</div></div>
   </div>
   <div class="spacer"></div>
 </div>
 
 <div class="screen" id="screen-5">
+  <div class="q-bg-icon" id="q-bg-icon-5"></div>
   <button class="btn-back" onclick="goBack(5)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#544720"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -936,10 +959,10 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه و شکلاتت رو چه‌جوری دوست داری؟</div>
   </div>
   <div class="options cols-1">
-    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6.5 8.5 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 11.5 8 8 12 3z" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Black coffee, dark chocolate</div><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z" fill="currentColor" stroke="none"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/></svg></div><div class="option-en">Black coffee, milk chocolate</div><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M17 11.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M10.5 3c1.2 1.6 2 2.7 2 3.8a2 2 0 1 1-4 0c0-1.1.8-2.2 2-3.8z" fill="currentColor" stroke="none"/></svg></div><div class="option-en">With milk, dark chocolate</div><div class="option-fa" style="direction:rtl">با شیر + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M17 11.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M10.5 3c1.2 1.6 2 2.7 2 3.8a2 2 0 1 1-4 0c0-1.1.8-2.2 2-3.8z" fill="currentColor" stroke="none"/><circle cx="14" cy="4" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">With milk, milk chocolate</div><div class="option-fa" style="direction:rtl">با شیر + شکلات شیری</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c4 5 6.5 8.5 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 11.5 8 8 12 3z" fill="currentColor" stroke="none"/></svg></div><div class="option-en">Black coffee, dark chocolate</div><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z" fill="currentColor" stroke="none"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/></svg></div><div class="option-en">Black coffee, milk chocolate</div><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M17 11.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M10.5 3c1.2 1.6 2 2.7 2 3.8a2 2 0 1 1-4 0c0-1.1.8-2.2 2-3.8z" fill="currentColor" stroke="none"/></svg></div><div class="option-en">With milk, dark chocolate</div><div class="option-fa" style="direction:rtl">با شیر + شکلات تلخ</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-icon-photo"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/><path d="M17 11.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M10.5 3c1.2 1.6 2 2.7 2 3.8a2 2 0 1 1-4 0c0-1.1.8-2.2 2-3.8z" fill="currentColor" stroke="none"/><circle cx="14" cy="4" r="1" fill="currentColor" stroke="none"/></svg></div><div class="option-en">With milk, milk chocolate</div><div class="option-fa" style="direction:rtl">با شیر + شکلات شیری</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -966,7 +989,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 </div>
 
 <div class="screen" id="screen-6">
-  <div class="q-bg-icon" id="brew-bg-icon"></div>
+  <div class="q-bg-icon" id="q-bg-icon-6"></div>
   <button class="btn-back" onclick="goBack(6)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4A2C17"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
@@ -2048,28 +2071,60 @@ function show(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
-  if (id === 'screen-6') setBrewBackground();
+  const qNum = id.replace('screen-', '');
+  if (Q_BG_ICONS[qNum]) setQuestionBackground(qNum);
 }
 
-// ── تصاویر تزئینی پس‌زمینهٔ تصادفی برای سؤال روش دم‌آوری ──
-const BREW_BG_ICONS = [
-  // V60 / Pour Over
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg>',
-  // French Press
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg>',
-  // Moka Pot
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 9l2-5h8l2 5-3 4H9z"/><rect x="8" y="13" width="8" height="7" rx="1"/></svg>',
-  // Espresso Machine
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="4" width="16" height="9" rx="1.5"/><rect x="9" y="13" width="6" height="3"/><line x1="12" y1="16" x2="12" y2="20"/><circle cx="7" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg>',
-  // AeroPress
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>',
-  // Cold Brew jar
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg>',
-];
-function setBrewBackground() {
-  const el = document.getElementById('brew-bg-icon');
-  if (!el) return;
-  const pick = BREW_BG_ICONS[Math.floor(Math.random() * BREW_BG_ICONS.length)];
+// ── تصاویر تزئینی پس‌زمینهٔ تصادفی برای هر سؤال کوییز (مرتبط با موضوع همان سؤال) ──
+const Q_BG_ICONS = {
+  // سؤال ۱ — طیف طعمی: گلی / مرکبات / شکلات / تند-چوبی
+  1: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="2.3"/><circle cx="12" cy="6" r="2.6"/><circle cx="17" cy="9.5" r="2.6"/><circle cx="15" cy="16" r="2.6"/><circle cx="9" cy="16" r="2.6"/><circle cx="7" cy="9.5" r="2.6"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 3l5 8h-3l4 6H6l4-6H7l5-8z"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+  ],
+  // سؤال ۲ — بدنه: سبک / متوسط / پرمایه
+  2: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M5 19c8 0 14-6 14-15-9 0-15 6-15 14 0 .5 0 1 .3 1z"/><path d="M6 18c3-3 6-6 9-11"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 16a8 8 0 0 1 16 0"/><line x1="12" y1="16" x2="16" y2="11"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 15c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg>',
+  ],
+  // سؤال ۳ — حالت ذهنی: پرانرژی / متمرکز / خلاق / آرام / تأملی
+  3: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 3a9 8 0 1 0 0 16c1.2 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.2-.3-.3-.5-.7-.5-1.2 0-1 .8-1.8 1.8-1.8H17a4 4 0 0 0 4-4c0-4.4-4-6-9-6z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 21V8"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 17c0-3-3-5-6-5 0 3 3 5 6 5z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>',
+  ],
+  // سؤال ۴ — اسیدیته: زنده و ترش / متعادل / نرم
+  4: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><ellipse cx="12" cy="12.5" rx="7.5" ry="6.5"/><path d="M18.5 8c1.5-1.5 3-2 3.5-1.5s0 2-1.5 3.5"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><line x1="12" y1="3" x2="12" y2="21"/><line x1="5" y1="7" x2="19" y2="7"/><path d="M5 7l-3 6a3 3 0 0 0 6 0z"/><path d="M19 7l-3 6a3 3 0 0 0 6 0z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 12a8 8 0 1 0 8-8"/><path d="M12 4a4 4 0 1 0 4 4"/></svg>',
+  ],
+  // سؤال ۵ — قهوه و شکلات: دانه / شکلات / فنجان با شیر
+  5: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 3c4 5 6.5 8.5 6.5 11.5a6.5 6.5 0 0 1-13 0C5.5 11.5 8 8 12 3z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="6" width="16" height="12" rx="1.5"/><line x1="9.3" y1="6" x2="9.3" y2="18"/><line x1="14.7" y1="6" x2="14.7" y2="18"/><line x1="4" y1="12" x2="20" y2="12"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/></svg>',
+  ],
+  // سؤال ۶ — روش دم‌آوری: پوراور / فرنچ‌پرس / موکاپات / اسپرسوساز / ایروپرس / کولدبرو
+  6: [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 8h13v6a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8z"/><path d="M17 9.5h1.5a2.5 2.5 0 0 1 0 5H17"/><path d="M8 3.5c-.7.9-.7 1.6 0 2.5M12 3.5c-.7.9-.7 1.6 0 2.5"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M4 11h2a6 6 0 0 0 12 0h2"/><path d="M6 11a6 6 0 0 1 12 0v2.5a4.5 4.5 0 0 1-4.5 4.5h-3A4.5 4.5 0 0 1 6 13.5V11z"/><line x1="12" y1="4" x2="12" y2="6.5"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M6 9l2-5h8l2 5-3 4H9z"/><rect x="8" y="13" width="8" height="7" rx="1"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="4" y="4" width="16" height="9" rx="1.5"/><rect x="9" y="13" width="6" height="3"/><line x1="12" y1="16" x2="12" y2="20"/><circle cx="7" cy="8.5" r="1" fill="currentColor" stroke="none"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2-2 2.6-2.6z"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="5" y="5" width="14" height="14" rx="1.5"/><line x1="5" y1="9.5" x2="19" y2="9.5"/><line x1="5" y1="14.5" x2="19" y2="14.5"/><line x1="9.5" y1="5" x2="9.5" y2="19"/><line x1="14.5" y1="5" x2="14.5" y2="19"/></svg>',
+  ],
+};
+function setQuestionBackground(qNum) {
+  const el = document.getElementById('q-bg-icon-' + qNum);
+  const icons = Q_BG_ICONS[qNum];
+  if (!el || !icons || !icons.length) return;
+  const pick = icons[Math.floor(Math.random() * icons.length)];
   const rotations = ['-10deg', '-4deg', '6deg', '12deg', '-14deg'];
   const rot = rotations[Math.floor(Math.random() * rotations.length)];
   el.style.transform = `translateX(-50%) rotate(${rot})`;
