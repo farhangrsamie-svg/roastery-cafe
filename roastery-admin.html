@@ -515,7 +515,9 @@ const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 const ADMIN_EMAIL_DOMAIN = '@app.local'; // ایمیل مصنوعی پشت‌صحنه؛ در دیتابیس فقط admin@app.local فعاله
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { storageKey: 'roastery-admin-auth' }
+});
 
 function adminUsernameToEmail(username) {
   return username.trim().toLowerCase() + ADMIN_EMAIL_DOMAIN;
