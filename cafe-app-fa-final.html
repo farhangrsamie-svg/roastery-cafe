@@ -248,6 +248,10 @@ body {
   font-size: 19px; font-weight: 700; color: var(--dark-brown);
   margin-top: 10px; letter-spacing: 0.2px; line-height: 1.5;
 }
+.result-origin-story {
+  font-size: 13px; color: var(--medium-brown); font-weight: 500;
+  margin-top: 10px; line-height: 1.7; padding: 0 8px;
+}
 .flavor-tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .flavor-tag { background: var(--tint); border: 1px solid var(--light-caramel); border-radius: 20px; padding: 6px 16px; font-size: 14px; color: var(--medium-brown); font-family: 'Arial', sans-serif; }
 .info-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid #F0EAE0; font-family: 'Arial', sans-serif; }
@@ -1043,6 +1047,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
     <div class="result-flavor-headline" id="r-flavor-headline"></div>
+    <div class="result-origin-story" id="r-origin-story"></div>
   </div>
 
   <!-- AI Explanation Card -->
@@ -2431,7 +2436,7 @@ function showErr(el, msg) {
    BEAN DATABASE
 ═══════════════════════════════════════════ */
 const BEANS = [
-  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', descFA:'معطرترین قهوهٔ دنیا. نت‌های ظریف گلی و میوه‌ای که هیچ مبدأ دیگه‌ای نمی‌تونه تکرارش کنه.',
+  { id:'yirgacheffe', name:'Ethiopia Yirgacheffe', detail:'Washed', origin:'Ethiopia · 1700–2200 m', flavors:['Jasmine','Peach','Green Tea','Citrus','Bergamot'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'198°C',dtr:'19%',time:'10 min'}, desc:'The most aromatic coffee in the world. Delicate floral and fruit notes that no other origin can replicate.', descFA:'معطرترین قهوهٔ دنیا. نت‌های ظریف گلی و میوه‌ای که هیچ مبدأ دیگه‌ای نمی‌تونه تکرارش کنه.', storyFA:'اتیوپی زادگاه قهوه‌ست؛ در ییرگاچف، درخت‌های قهوه هنوز روی همون تپه‌های بلندی می‌رویند که قرن‌ها پیش قهوه اولین‌بار از همون‌جا کشف شد.',
     s:{
       // طعم
       floral:10, sweet:4, chocolatey:0, bold:0,
@@ -2446,7 +2451,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:4, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', descFA:'اسیدیتهٔ درخشان و شاداب، بی‌نظیر در بین قهوه‌ها. طعم‌های میوه‌ای پررنگ با ته‌مزهٔ طولانی.',
+  { id:'kenya', name:'Kenya AA', detail:'Washed', origin:'Kenya · 1400–2100 m', flavors:['Blackcurrant','Red Currant','Pomegranate','Brown Sugar'], roast:'Light–Medium', brew:'V60 / Kalita Wave', temp:'91–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'192°C',drop:'208°C',dtr:'20%',time:'10 min'}, desc:'A sparkling, juicy acidity unlike any other coffee. Bold fruit flavors with a long finish.', descFA:'اسیدیتهٔ درخشان و شاداب، بی‌نظیر در بین قهوه‌ها. طعم‌های میوه‌ای پررنگ با ته‌مزهٔ طولانی.', storyFA:'در ارتفاعات کنیا، خاک آتشفشانی و فرآوری دقیق Washed باعث می‌شه دونه‌ها اسیدیته‌ای به‌همون درخشانی داشته باشن که آفتاب صبح روی دامنه‌های کوه کنیا.',
     s:{
       floral:5, sweet:5, chocolatey:2, bold:4,
       light:7, medium:8, full:2,
@@ -2456,7 +2461,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:5, mokapot:3, espressohome:4, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', descFA:'شیرین، دلنشین و به‌آرومی میوه‌ای. بهترین نقطهٔ شروع برای ورود به دنیای قهوهٔ تخصصی.',
+  { id:'rwanda', name:'Rwanda Bourbon', detail:'Washed', origin:'Rwanda · 1400–1800 m', flavors:['Peach','Apricot','Caramel','Red Berry'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–94 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'Sweet, approachable and gently fruity. The perfect entry point to specialty coffee.', descFA:'شیرین، دلنشین و به‌آرومی میوه‌ای. بهترین نقطهٔ شروع برای ورود به دنیای قهوهٔ تخصصی.', storyFA:'رواندا از تازه‌ترین کشورهاییه که وارد دنیای قهوه‌ی تخصصی شده؛ کشاورزان خرد روی تپه‌های هزارمتری، با دقتی نوپا، این دونه‌ها رو پرورش می‌دن.',
     s:{
       floral:6, sweet:10, chocolatey:3, bold:2,
       light:6, medium:8, full:3,
@@ -2466,7 +2471,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:6, mokapot:4, espressohome:5, aeropress:9, coldbrew:6, other:6 }
   },
-  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', descFA:'قهوهٔ اتیوپیایی با فرآوری Natural و شیرینی میوه‌ای قوی. توت‌فرنگی، بلوبری و حس شرابی.',
+  { id:'sidama', name:'Ethiopia Sidama', detail:'Natural', origin:'Ethiopia · 1500–2000 m', flavors:['Strawberry','Blueberry','Dark Chocolate','Red Wine'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'Natural processed Ethiopian with intense fruit sweetness. Strawberries, blueberries and wine.', descFA:'قهوهٔ اتیوپیایی با فرآوری Natural و شیرینی میوه‌ای قوی. توت‌فرنگی، بلوبری و حس شرابی.', storyFA:'فرآوری Natural یعنی دونه‌ها پیش از جدا شدن از میوه، روزها زیر آفتاب اتیوپی خشک می‌شن؛ همین صبر باعث می‌شه شیرینی میوه‌ای این‌قدر عمیق تو فنجون بشینه.',
     s:{
       floral:5, sweet:9, chocolatey:4, bold:3,
       light:3, medium:8, full:7,
@@ -2476,7 +2481,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
-  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', descFA:'متعادل‌ترین قهوهٔ دنیا. هماهنگی کامل بین شیرینی، اسیدیته و بدنه.',
+  { id:'colombia', name:'Colombia Huila', detail:'Washed', origin:'Colombia · 1200–2100 m', flavors:['Dark Chocolate','Caramel','Cherry','Orange'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'The most balanced coffee in the world. Perfect harmony between sweetness, acidity, and body.', descFA:'متعادل‌ترین قهوهٔ دنیا. هماهنگی کامل بین شیرینی، اسیدیته و بدنه.', storyFA:'کلمبیا برای تعادلش شناخته می‌شه؛ کشاورزان هوئیلا نسل‌هاست همین دقت رو حفظ کردن که هیچ ویژگی‌ای—نه شیرینی، نه اسیدیته، نه بدنه—روی بقیه غالب نشه.',
     s:{
       floral:2, sweet:8, chocolatey:7, bold:4,
       light:3, medium:9, full:5,
@@ -2486,7 +2491,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:7, espressohome:7, aeropress:7, coldbrew:6, other:7 }
   },
-  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', descFA:'پایهٔ یک اسپرسوی عالی. نرم، کم‌اسید و آرامش‌بخش، با شکلات شیری و شیرینی آجیلی.',
+  { id:'brazil', name:'Brazil Natural', detail:'Cerrado · Natural', origin:'Brazil · 700–1300 m', flavors:['Milk Chocolate','Hazelnut','Almond','Caramel','Vanilla'], roast:'Medium', brew:'Espresso / French Press / Moka Pot', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'195°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'The foundation of great espresso. Smooth, low-acid and comforting with milk chocolate and nutty sweetness.', descFA:'پایهٔ یک اسپرسوی عالی. نرم، کم‌اسید و آرامش‌بخش، با شکلات شیری و شیرینی آجیلی.', storyFA:'برزیل بزرگ‌ترین تولیدکننده‌ی قهوه‌ی دنیاست؛ مزارع کم‌ارتفاع Cerrado دونه‌هایی نرم و کم‌اسید می‌دن که پایه‌ی اغلب اسپرسوهای دنیا رو می‌سازن.',
     s:{
       floral:0, sweet:7, chocolatey:10, bold:4,
       light:1, medium:7, full:9,
@@ -2496,7 +2501,7 @@ const BEANS = [
     },
     brewFit:{ v60:5, frenchpress:8, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:7 }
   },
-  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', descFA:'پرورش‌یافته روی خاک آتشفشانی با غنای معدنی خاص. شکلات تلخ و آلو همراه با ادویه.',
+  { id:'guatemala', name:'Guatemala Antigua', detail:'Washed', origin:'Guatemala · 1200–1800 m', flavors:['Dark Chocolate','Plum','Cinnamon','Walnut'], roast:'Medium–Dark', brew:'Espresso / Moka Pot / French Press', temp:'87–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'193°C',drop:'215°C',dtr:'25%',time:'12 min'}, desc:'Grown on volcanic soil giving a distinctive mineral richness. Dark chocolate and plum with spice.', descFA:'پرورش‌یافته روی خاک آتشفشانی با غنای معدنی خاص. شکلات تلخ و آلو همراه با ادویه.', storyFA:'دره‌ی آنتیگوا بین سه آتشفشان جا گرفته؛ همین خاک آتشفشانیه که اون غنای معدنی خاص رو به دونه‌ها می‌ده.',
     s:{
       floral:0, sweet:5, chocolatey:9, bold:7,
       light:1, medium:5, full:8,
@@ -2506,7 +2511,7 @@ const BEANS = [
     },
     brewFit:{ v60:5, frenchpress:8, mokapot:8, espressohome:9, aeropress:5, coldbrew:5, other:6 }
   },
-  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'Espresso / French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', descFA:'سنگین‌ترین و خاکی‌ترین قهوه. سدر، تنباکو و شکلات تلخ در یک فنجان غلیظ و پررنگ.',
+  { id:'sumatra', name:'Sumatra Mandheling', detail:'Wet-Hulled', origin:'Indonesia · 1000–1500 m', flavors:['Dark Chocolate','Cedar','Tobacco','Earth','Molasses'], roast:'Medium–Dark', brew:'Espresso / French Press / Moka Pot', temp:'86–90 °C', ratio:'1g : 15g', roastInfo:{charge:'195°C',drop:'218°C',dtr:'27%',time:'13 min'}, desc:'The heaviest, most earthy coffee. Cedar, tobacco and dark chocolate in a syrupy, bold cup.', descFA:'سنگین‌ترین و خاکی‌ترین قهوه. سدر، تنباکو و شکلات تلخ در یک فنجان غلیظ و پررنگ.', storyFA:'Wet-Hulled یه روش فرآوری سنتی اندونزیاییه که تقریباً فقط همون‌جا انجام می‌شه؛ همین روش غیرمعمول، اون بدنه‌ی سنگین و خاکی رو به این دونه می‌ده.',
     s:{
       floral:0, sweet:2, chocolatey:6, bold:10,
       light:0, medium:2, full:10,
@@ -2983,6 +2988,7 @@ function render(r) {
   document.getElementById('r-name').textContent = r.name;
   document.getElementById('r-origin').textContent = r.origin;
   document.getElementById('r-flavor-headline').textContent = (r.flavors || []).slice(0, 3).map(trFlavor).join('، ');
+  document.getElementById('r-origin-story').textContent = r.storyFA || '';
   document.getElementById('r-roast').textContent = r.roast;
   document.getElementById('r-brew').textContent = r.brew;
   document.getElementById('r-temp').textContent = r.temp;
