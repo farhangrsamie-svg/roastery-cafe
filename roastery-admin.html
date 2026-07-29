@@ -253,6 +253,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 .page { display: none; }
 .page.active { display: block; }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -512,23 +513,26 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 ═══════════════════════════════════════════ */
 const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+const ADMIN_EMAIL_DOMAIN = '@app.local'; // ایمیل مصنوعی پشت‌صحنه؛ در دیتابیس فقط admin@app.local فعاله
 
-// ادمین‌های مجاز — بعداً از Supabase بخوان
-const ADMINS = [
-  { username: 'admin', password: 'roastery2026', name: 'مدیر رستری' },
-  { username: 'farhang', password: 'coffee1401', name: 'فرهنگ' },
-];
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function adminUsernameToEmail(username) {
+  return username.trim().toLowerCase() + ADMIN_EMAIL_DOMAIN;
+}
 
 /* ═══════════════════════════════════════════
-   SUPABASE HELPER
+   SUPABASE HELPER (REST — با توکن نشست واقعی ادمین)
 ═══════════════════════════════════════════ */
 async function sb(method, path, body = null) {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  const token = session ? session.access_token : SUPABASE_KEY;
   const opts = {
     method,
     headers: {
       'Content-Type': 'application/json',
       'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Authorization': 'Bearer ' + token,
       'Prefer': method === 'POST' ? 'return=representation' : ''
     }
   };
@@ -546,24 +550,40 @@ async function sb(method, path, body = null) {
 ═══════════════════════════════════════════ */
 let currentAdmin = null;
 
-function doAdminLogin() {
+async function doAdminLogin() {
   const u = document.getElementById('admin-username').value.trim();
   const p = document.getElementById('admin-password').value;
-  const admin = ADMINS.find(a => a.username === u && a.password === p);
-  if (!admin) {
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
+
+  if (!u || !p) { errEl.classList.add('visible'); return; }
+
+  try {
+    const email = adminUsernameToEmail(u);
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: p });
+    if (error) throw error;
+
+    // فقط کاربرهایی که واقعاً تو جدول public.admins هستن اجازه‌ی ورود به پنل دارن
+    const isAdmin = await sb('POST', 'rpc/is_admin', {});
+    if (!isAdmin) {
+      await supabaseClient.auth.signOut();
+      throw new Error('دسترسی ادمین ندارید');
+    }
+
+    currentAdmin = { username: u, name: 'مدیر رستری' };
+    localStorage.setItem('roastery_admin', JSON.stringify(currentAdmin));
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'flex';
+    document.getElementById('admin-name-display').textContent = currentAdmin.name;
+    document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    initAdmin();
+  } catch (e) {
     document.getElementById('login-error').classList.add('visible');
-    return;
   }
-  currentAdmin = admin;
-  localStorage.setItem('roastery_admin', JSON.stringify(admin));
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('admin-screen').style.display = 'flex';
-  document.getElementById('admin-name-display').textContent = admin.name;
-  document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  initAdmin();
 }
 
-function doAdminLogout() {
+async function doAdminLogout() {
+  await supabaseClient.auth.signOut();
   currentAdmin = null;
   localStorage.removeItem('roastery_admin');
   document.getElementById('admin-screen').style.display = 'none';
@@ -572,21 +592,25 @@ function doAdminLogout() {
   document.getElementById('admin-password').value = '';
 }
 
-function checkAdminAutoLogin() {
-  const saved = localStorage.getItem('roastery_admin');
-  if (saved) {
-    try {
-      const admin = JSON.parse(saved);
-      if (ADMINS.find(a => a.username === admin.username)) {
-        currentAdmin = admin;
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('admin-screen').style.display = 'flex';
-        document.getElementById('admin-name-display').textContent = admin.name;
-        document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-        initAdmin();
-        return;
-      }
-    } catch(e) {}
+async function checkAdminAutoLogin() {
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (!session) { localStorage.removeItem('roastery_admin'); return; }
+
+  try {
+    const isAdmin = await sb('POST', 'rpc/is_admin', {});
+    if (!isAdmin) {
+      await supabaseClient.auth.signOut();
+      localStorage.removeItem('roastery_admin');
+      return;
+    }
+    currentAdmin = { username: 'admin', name: 'مدیر رستری' };
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screen').style.display = 'flex';
+    document.getElementById('admin-name-display').textContent = currentAdmin.name;
+    document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+    initAdmin();
+  } catch (e) {
+    // نشست نامعتبر یا خطای شبکه؛ باید دوباره وارد بشه
   }
 }
 
