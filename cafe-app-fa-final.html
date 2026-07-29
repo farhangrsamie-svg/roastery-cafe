@@ -1385,7 +1385,9 @@ const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxI-lBDN7fQJHESYHKxPmOwEyyLT06iTsZMRWaYIG6nY0fd931h1BTqnvhHL1Z1uAi37Q/exec';
 const AUTH_EMAIL_DOMAIN = '@app.local'; // ایمیل مصنوعی پشت‌صحنه؛ کاربر هرگز آن را نمی‌بیند
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { storageKey: 'roastery-consumer-auth' }
+});
 
 function phoneToEmail(phone) {
   return phone.replace(/\D/g, '') + AUTH_EMAIL_DOMAIN;
@@ -3482,7 +3484,7 @@ async function getAIExplanation(rec) {
   let text = '';
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000); // 10 ثانیه timeout
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15 ثانیه — Apps Script موقع cold start کند است
     // از Apps Script به عنوان proxy استفاده می‌کنیم — key در سرور مخفیه
     const response = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
