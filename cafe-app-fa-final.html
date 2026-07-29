@@ -1453,7 +1453,8 @@ async function doRegister() {
   errEl.classList.remove('visible');
 
   if (!name)  return showErr(errEl, 'نام را وارد کنید');
-  if (phone.length < 10) return showErr(errEl, 'شماره موبایل معتبر وارد کنید');
+  const phoneDigits = phone.replace(/\D/g, '');
+  if (!/^09\d{9}$/.test(phoneDigits)) return showErr(errEl, 'شماره موبایل باید ۱۱ رقم و به‌شکل 09xxxxxxxxx باشد');
   if (pass.length < 6)  return showErr(errEl, 'رمز عبور باید حداقل ۶ کاراکتر باشد');
 
   const btn = document.getElementById('btn-register');
@@ -1461,10 +1462,10 @@ async function doRegister() {
   btn.textContent = '...';
 
   try {
-    const email = phoneToEmail(phone);
+    const email = phoneToEmail(phoneDigits);
     const { data, error } = await supabaseClient.auth.signUp({
       email, password: pass,
-      options: { data: { phone, name } }
+      options: { data: { phone: phoneDigits, name } }
     });
     if (error) throw error;
     if (!data.session) {
