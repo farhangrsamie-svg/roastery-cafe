@@ -32,6 +32,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>هویت قهوه — پلتفرم رست شخصی</title>
+
+<!-- ═══ PWA ═══ -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2C1A0E">
+<meta name="background-color" content="#F5F0E8">
+<link rel="icon" type="image/png" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="قهوتو">
+<meta name="mobile-web-app-capable" content="yes">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -650,6 +662,15 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body class="lang-fa">
+
+<!-- ═══ PWA INSTALL BANNER ═══ -->
+<div id="pwa-install-banner" style="display:none; position:fixed; left:0; right:0; bottom:0; z-index:9999; background:var(--dark-brown); color:var(--cream); padding:14px 20px; box-shadow:0 -4px 16px rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:space-between; gap:12px; font-family:'Vazirmatn',sans-serif;">
+  <div style="flex:1; font-size:13px; line-height:1.6;" id="pwa-install-text">قهوتو رو رو صفحه‌ی اصلی گوشیت نصب کن</div>
+  <div style="display:flex; gap:8px; flex-shrink:0;">
+    <button id="pwa-install-btn" style="background:var(--caramel); color:var(--dark-brown); border:none; border-radius:20px; padding:8px 16px; font-size:12px; font-weight:700; cursor:pointer; font-family:'Vazirmatn',sans-serif;">نصب</button>
+    <button id="pwa-install-dismiss" style="background:transparent; color:var(--cream); border:1px solid rgba(255,255,255,0.3); border-radius:20px; padding:8px 14px; font-size:12px; cursor:pointer; font-family:'Vazirmatn',sans-serif;">بعداً</button>
+  </div>
+</div>
 
 <!-- Dark Mode Toggle -->
 <button class="dark-toggle" id="btn-dark-toggle" onclick="toggleDarkMode()" title="حالت تاریک">🌙</button>
@@ -3617,6 +3638,62 @@ function skipSharePrefs() {
 initDarkMode();
 setLang('fa');
 checkAutoLogin();
+
+/* ═══════════════════════════════════════════
+   PWA: service worker + دکمه‌ی نصب
+═══════════════════════════════════════════ */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('service-worker.js').catch(() => {});
+  });
+}
+
+(function initPwaInstall() {
+  const banner = document.getElementById('pwa-install-banner');
+  const btnInstall = document.getElementById('pwa-install-btn');
+  const btnDismiss = document.getElementById('pwa-install-dismiss');
+  const textEl = document.getElementById('pwa-install-text');
+  if (!banner) return;
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  if (isStandalone) return; // از قبل نصب شده، نیازی به بنر نیست
+
+  const dismissedAt = localStorage.getItem('pwa_install_dismissed_at');
+  if (dismissedAt && Date.now() - Number(dismissedAt) < 7 * 24 * 60 * 60 * 1000) return; // ۷ روز صبر بعد از رد کردن
+
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  let deferredPrompt = null;
+
+  if (isIOS) {
+    // سافاری iOS رویداد beforeinstallprompt نداره؛ راهنمای دستی نشون بده
+    textEl.textContent = 'برای نصب قهوتو: دکمه‌ی اشتراک‌گذاری Safari رو بزن، بعد «Add to Home Screen» رو انتخاب کن';
+    btnInstall.style.display = 'none';
+    banner.style.display = 'flex';
+  } else {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      banner.style.display = 'flex';
+    });
+  }
+
+  btnInstall.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    banner.style.display = 'none';
+  });
+
+  btnDismiss.addEventListener('click', () => {
+    localStorage.setItem('pwa_install_dismissed_at', String(Date.now()));
+    banner.style.display = 'none';
+  });
+
+  window.addEventListener('appinstalled', () => {
+    banner.style.display = 'none';
+  });
+})();
 </script>
 
 <!-- Share Preferences Modal (اختیاری، شفاف) -->
