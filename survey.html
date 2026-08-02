@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>نظرسنجی — هویت قهوه</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream: #F5F0E8;
+  --dark-brown: #2C1A0E;
+  --medium-brown: #6B3F2A;
+  --caramel: #C4956A;
+  --tint: #FDF5E8;
+  --white: #FFFFFF;
+  --gray-light: #A89684;
+  --success: #4C7A5E;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Vazirmatn', 'Georgia', serif;
+  background: var(--cream);
+  color: var(--dark-brown);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+.wrap { max-width: 640px; margin: 0 auto; padding: 0 20px; }
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark-brown);
+  color: var(--tint);
+  padding: 32px 20px 26px;
+  text-align: center;
+  margin-bottom: 8px;
+}
+.header .eyebrow {
+  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--caramel); font-family: Arial, sans-serif; font-weight: 700; margin-bottom: 8px;
+}
+.header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.header p { font-size: 13.5px; color: #D9C6B3; line-height: 1.7; max-width: 480px; margin: 0 auto; }
+
+/* ── SECTIONS ── */
+.section {
+  background: var(--white);
+  border-radius: 16px;
+  padding: 22px 20px;
+  margin: 16px auto;
+  box-shadow: 0 1px 3px rgba(44,26,14,0.06);
+}
+.section-title {
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--caramel); font-family: Arial, sans-serif; font-weight: 700;
+  margin-bottom: 4px;
+}
+.section-desc { font-size: 12.5px; color: var(--gray-light); margin-bottom: 18px; font-family: Arial, sans-serif; }
+
+/* ── QUESTIONS ── */
+.q { margin-bottom: 22px; }
+.q:last-child { margin-bottom: 0; }
+.q-label { font-size: 15px; font-weight: 600; color: var(--dark-brown); line-height: 1.6; margin-bottom: 12px; }
+.q-optional { font-size: 11px; color: var(--gray-light); font-weight: 400; font-family: Arial, sans-serif; }
+
+/* rating scale (1-5) */
+.scale { display: flex; gap: 8px; direction: ltr; }
+.scale-btn {
+  flex: 1; aspect-ratio: 1; border: 2px solid #EDE3D6; background: var(--tint);
+  border-radius: 12px; font-size: 16px; font-weight: 700; color: var(--medium-brown);
+  cursor: pointer; transition: all 0.15s; font-family: Arial, sans-serif;
+  display: flex; align-items: center; justify-content: center;
+}
+.scale-btn.active { background: var(--medium-brown); border-color: var(--medium-brown); color: var(--white); transform: scale(1.05); }
+.scale-caption { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--gray-light); margin-top: 6px; font-family: Arial, sans-serif; direction: ltr; }
+
+/* choice pills */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill {
+  padding: 11px 18px; border: 2px solid #EDE3D6; background: var(--tint);
+  border-radius: 24px; font-size: 13.5px; font-weight: 600; color: var(--medium-brown);
+  cursor: pointer; transition: all 0.15s; font-family: 'Vazirmatn', sans-serif;
+}
+.pill.active { background: var(--medium-brown); border-color: var(--medium-brown); color: var(--white); }
+
+/* NPS scale (0-10) */
+.nps-scale { display: flex; gap: 5px; direction: ltr; flex-wrap: wrap; }
+.nps-btn {
+  flex: 1; min-width: 28px; aspect-ratio: 1; border: 2px solid #EDE3D6; background: var(--tint);
+  border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--medium-brown);
+  cursor: pointer; font-family: Arial, sans-serif;
+}
+.nps-btn.active { background: var(--dark-brown); border-color: var(--dark-brown); color: var(--white); }
+.nps-caption { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--gray-light); margin-top: 6px; font-family: Arial, sans-serif; }
+
+/* text inputs */
+input[type=text], textarea {
+  width: 100%; padding: 13px 16px; border: 2px solid #EDE3D6; border-radius: 12px;
+  font-size: 14px; font-family: 'Vazirmatn', sans-serif; background: var(--tint); color: var(--dark-brown);
+  outline: none; transition: border-color 0.15s;
+}
+input[type=text]:focus, textarea:focus { border-color: var(--caramel); }
+textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
+
+/* submit */
+.submit-wrap { padding: 8px 20px 0; }
+.btn-submit {
+  width: 100%; padding: 17px; border: none; border-radius: 14px;
+  background: var(--medium-brown); color: var(--white); font-size: 15.5px; font-weight: 700;
+  font-family: 'Vazirmatn', sans-serif; cursor: pointer; transition: opacity 0.15s;
+}
+.btn-submit:active { opacity: 0.85; }
+.btn-submit:disabled { opacity: 0.5; }
+.error-msg { color: #B23A3A; font-size: 12.5px; text-align: center; margin-top: 10px; font-family: Arial, sans-serif; display: none; }
+.error-msg.visible { display: block; }
+
+/* thank you screen */
+#thankyou { display: none; text-align: center; padding: 80px 24px; }
+#thankyou .icon { font-size: 48px; margin-bottom: 18px; }
+#thankyou h2 { font-size: 21px; margin-bottom: 10px; }
+#thankyou p { font-size: 14px; color: var(--medium-brown); line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<div id="form-view">
+  <div class="header">
+    <div class="eyebrow">Coffee Identity</div>
+    <h1>نظر تو برامون مهمه</h1>
+    <p>چند دقیقه وقت بذار و درباره‌ی تجربه‌ت با اپلیکیشن بهمون بگو. پاسخ‌هات کاملاً محرمانه می‌مونه و مستقیم به تیم توسعه می‌رسه.</p>
+  </div>
+
+  <div class="wrap">
+
+    <div class="section">
+      <div class="section-title">شناسایی (اختیاری)</div>
+      <div class="section-desc">اگه بخوای، این اطلاعات کمک می‌کنه نظرت رو به پروفایلی که تو اپ ساختی وصل کنیم.</div>
+      <div class="q">
+        <div class="q-label">اسمت <span class="q-optional">(اختیاری)</span></div>
+        <input type="text" id="f-name" placeholder="مثلاً آرمین">
+      </div>
+      <div class="q">
+        <div class="q-label">شماره موبایلی که تو اپ ثبت کردی <span class="q-optional">(اختیاری)</span></div>
+        <input type="text" id="f-phone" placeholder="09xxxxxxxxx" dir="ltr" style="text-align:right">
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">ظاهر و طراحی</div>
+      <div class="section-desc">۱ = اصلاً راضی نبودم، ۵ = خیلی راضی بودم</div>
+
+      <div class="q">
+        <div class="q-label">حس کلی از ظاهر اپ چطور بود؟</div>
+        <div class="scale" data-field="visual_overall">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">رنگ‌بندی و حس‌وحال بصری چقدر برات دلنشین بود؟</div>
+        <div class="scale" data-field="visual_colors">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">متن‌ها و اطلاعات چقدر خوانا و واضح بودن؟</div>
+        <div class="scale" data-field="visual_readability">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">پیدا کردن راه و جابه‌جایی بین صفحه‌ها چقدر راحت بود؟</div>
+        <div class="scale" data-field="ease_navigation">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">مسیر استفاده</div>
+      <div class="section-desc">۱ = خیلی سخت بود، ۵ = خیلی راحت بود</div>
+
+      <div class="q">
+        <div class="q-label">ثبت‌نام و ورود به اپ چقدر راحت بود؟</div>
+        <div class="scale" data-field="ease_registration">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">سؤالات کوئیز چقدر برات واضح و قابل‌فهم بود؟</div>
+        <div class="scale" data-field="quiz_clarity">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">طول کوئیز به‌نظرت چطور بود؟</div>
+        <div class="pills" data-field="quiz_length">
+          <button type="button" class="pill" data-val="too_short">خیلی کوتاه بود</button>
+          <button type="button" class="pill" data-val="just_right">اندازه‌ش خوب بود</button>
+          <button type="button" class="pill" data-val="too_long">خیلی طولانی بود</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">ثبت سفارش چقدر راحت بود؟</div>
+        <div class="scale" data-field="ease_ordering">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">مسیر پرداخت چقدر روشن و بدون دردسر بود؟</div>
+        <div class="scale" data-field="ease_payment">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">سرعت و روانی کلی اپ رو چطور دیدی؟</div>
+        <div class="scale" data-field="app_speed">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">هویت قهوه و پیشنهاد</div>
+
+      <div class="q">
+        <div class="q-label">پرسونا و پیشنهادی که اپ برات ساخت، چقدر احساس کردی واقعاً «خودتی»؟</div>
+        <div class="scale" data-field="persona_accuracy">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">چرا این امتیاز رو دادی؟ <span class="q-optional">(اختیاری)</span></div>
+        <textarea id="f-persona-feedback" placeholder="مثلاً: دقیقاً همون طعمی بود که دنبالش بودم..."></textarea>
+      </div>
+
+      <div class="q">
+        <div class="q-label">دانه‌ی پیشنهادی رو واقعاً امتحان می‌کنی؟</div>
+        <div class="pills" data-field="would_try_recommended_bean">
+          <button type="button" class="pill" data-val="yes">بله، حتماً</button>
+          <button type="button" class="pill" data-val="maybe">شاید</button>
+          <button type="button" class="pill" data-val="no">نه، جذبم نکرد</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">جمع‌بندی</div>
+
+      <div class="q">
+        <div class="q-label">چقدر این اپ رو به یه دوست پیشنهاد می‌دی؟</div>
+        <div class="nps-scale" data-field="nps_score">
+          <button type="button" class="nps-btn" data-val="0">۰</button>
+          <button type="button" class="nps-btn" data-val="1">۱</button>
+          <button type="button" class="nps-btn" data-val="2">۲</button>
+          <button type="button" class="nps-btn" data-val="3">۳</button>
+          <button type="button" class="nps-btn" data-val="4">۴</button>
+          <button type="button" class="nps-btn" data-val="5">۵</button>
+          <button type="button" class="nps-btn" data-val="6">۶</button>
+          <button type="button" class="nps-btn" data-val="7">۷</button>
+          <button type="button" class="nps-btn" data-val="8">۸</button>
+          <button type="button" class="nps-btn" data-val="9">۹</button>
+          <button type="button" class="nps-btn" data-val="10">۱۰</button>
+        </div>
+        <div class="nps-caption"><span>اصلاً پیشنهاد نمی‌دم</span><span>حتماً پیشنهاد می‌دم</span></div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">بیشتر از همه چی رو دوست داشتی؟ <span class="q-optional">(اختیاری)</span></div>
+        <textarea id="f-strength"></textarea>
+      </div>
+
+      <div class="q">
+        <div class="q-label">چی رو دوست نداشتی یا فکر می‌کنی باید بهتر بشه؟ <span class="q-optional">(اختیاری)</span></div>
+        <textarea id="f-weakness"></textarea>
+      </div>
+
+      <div class="q">
+        <div class="q-label">حرف دیگه‌ای هست بزنی؟ <span class="q-optional">(اختیاری)</span></div>
+        <textarea id="f-comments"></textarea>
+      </div>
+    </div>
+
+    <div class="submit-wrap">
+      <button class="btn-submit" id="btn-submit" onclick="submitSurvey()">ارسال نظرسنجی</button>
+      <div class="error-msg" id="error-msg">مشکلی پیش اومد. دوباره امتحان کن یا به مسئول تست خبر بده.</div>
+    </div>
+  </div>
+</div>
+
+<div id="thankyou">
+  <div class="icon">☕️</div>
+  <h2>ممنون از وقتی که گذاشتی</h2>
+  <p>نظرت ثبت شد و مستقیم به تیم توسعه می‌رسه.<br>واقعاً قدردانیم.</p>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
+
+const answers = {};
+
+// scale (1-5) buttons
+document.querySelectorAll('.scale').forEach(group => {
+  const field = group.dataset.field;
+  group.querySelectorAll('.scale-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      answers[field] = parseInt(btn.dataset.val, 10);
+    });
+  });
+});
+
+// NPS (0-10) buttons
+document.querySelectorAll('.nps-scale').forEach(group => {
+  const field = group.dataset.field;
+  group.querySelectorAll('.nps-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      answers[field] = parseInt(btn.dataset.val, 10);
+    });
+  });
+});
+
+// pill (single-select text) buttons
+document.querySelectorAll('.pills').forEach(group => {
+  const field = group.dataset.field;
+  group.querySelectorAll('.pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.pill').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      answers[field] = btn.dataset.val;
+    });
+  });
+});
+
+async function submitSurvey() {
+  const btn = document.getElementById('btn-submit');
+  const errEl = document.getElementById('error-msg');
+  errEl.classList.remove('visible');
+  btn.disabled = true;
+  btn.textContent = 'در حال ارسال...';
+
+  const payload = {
+    name: document.getElementById('f-name').value.trim() || null,
+    phone: document.getElementById('f-phone').value.trim() || null,
+    persona_feedback: document.getElementById('f-persona-feedback').value.trim() || null,
+    biggest_strength: document.getElementById('f-strength').value.trim() || null,
+    biggest_weakness: document.getElementById('f-weakness').value.trim() || null,
+    additional_comments: document.getElementById('f-comments').value.trim() || null,
+    ...answers
+  };
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/pilot_survey_responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('submit failed');
+
+    document.getElementById('form-view').style.display = 'none';
+    document.getElementById('thankyou').style.display = 'block';
+    window.scrollTo(0, 0);
+  } catch (e) {
+    errEl.classList.add('visible');
+    btn.disabled = false;
+    btn.textContent = 'ارسال نظرسنجی';
+  }
+}
+</script>
+</body>
+</html>
