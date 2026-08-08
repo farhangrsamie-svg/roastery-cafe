@@ -212,6 +212,8 @@ body {
 .option-card.selected .option-icon-photo svg { color: var(--caramel); }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
 .option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-weight: 600; }
+.option-label-full { font-size: 14.5px; color: var(--dark-brown); font-weight: 600; line-height: 1.6; }
+.level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700; margin-bottom: 12px; background: color-mix(in srgb, var(--level-color, var(--caramel)) 15%, var(--white)); color: var(--level-color, var(--caramel)); border: 1.5px solid var(--level-color, var(--caramel)); font-family: 'Vazirmatn', sans-serif; }
 .option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
@@ -896,12 +898,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-en">What happened the last time you picked a coffee?</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">آخرین باری که قهوه انتخاب کردی چه اتفاقی افتاد؟</div>
   </div>
-  <div class="options" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">هر چی بود خوردم</div></div>
-    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">از روی برند یا قیمت انتخاب کردم</div></div>
-    <div class="option-card" onclick="selectLevel('regular')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">دنبال خاستگاه (Origin) قهوه بودم</div></div>
-    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">روش فرآوری یا Cupping Score رو بررسی کردم</div></div>
-    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">من باریستا یا رستر هستم</div></div>
+  <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
+    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هر چی بود خوردم</div></div>
+    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">از روی برند یا قیمت انتخاب کردم</div></div>
+    <div class="option-card" onclick="selectLevel('regular')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">دنبال خاستگاه (Origin) قهوه بودم</div></div>
+    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">روش فرآوری یا Cupping Score رو بررسی کردم</div></div>
+    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">من باریستا یا رستر هستم</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -909,13 +911,14 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <!-- ══════ HEALTH Q1 (اختیاری، فقط مبتدی/معمولی) ══════ -->
 <div class="screen" id="screen-health1">
   <div class="q-header">
+    <div class="level-badge" id="health1-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl;font-size:13px;color:var(--caramel);margin-bottom:6px;">دو تا سؤال کوچیک — فقط برای اینکه بهتر مراقبت کنیم. اختیاریه.</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">معمولاً بعد از قهوه چه حسی داری؟</div>
   </div>
-  <div class="options" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="pickHealth(this,'h1','normal')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">هیچی، کاملاً عادیه</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h1','mild')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">گاهی یک‌کم بی‌قرار یا تندخو می‌شم</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h1','sensitive')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">قلبم تند می‌زنه یا دست‌هام می‌لرزه</div></div>
+  <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
+    <div class="option-card" onclick="pickHealth(this,'h1','normal')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هیچی، کاملاً عادیه</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h1','mild')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">گاهی یک‌کم بی‌قرار یا تندخو می‌شم</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h1','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">قلبم تند می‌زنه یا دست‌هام می‌لرزه</div></div>
   </div>
   <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span></button>
   <div class="spacer"></div>
@@ -924,12 +927,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <!-- ══════ HEALTH Q2 (اختیاری، فقط مبتدی/معمولی) ══════ -->
 <div class="screen" id="screen-health2">
   <div class="q-header">
+    <div class="level-badge" id="health2-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">اگه عصر یا شب قهوه بخوری چی می‌شه؟</div>
   </div>
-  <div class="options" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="pickHealth(this,'h2','normal')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">هیچ فرقی نداره</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h2','mild')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">گاهی خوابم یک‌کم دیر می‌بره</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h2','sensitive')" style="text-align:right;padding:16px;"><div class="option-fa" style="direction:rtl">اگه بعدازظهر بخورم، شبم کامل خراب می‌شه</div></div>
+  <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
+    <div class="option-card" onclick="pickHealth(this,'h2','normal')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هیچ فرقی نداره</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h2','mild')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">گاهی خوابم یک‌کم دیر می‌بره</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h2','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">اگه بعدازظهر بخورم، شبم کامل خراب می‌شه</div></div>
   </div>
   <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span></button>
   <div class="spacer"></div>
@@ -1025,14 +1029,15 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-7"></div>
   </div>
   <div class="q-header">
+    <div class="level-badge" id="q7-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه و شکلاتت رو چه‌جوری دوست داری؟</div>
     <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;"><span class="fa-only">این سؤال به پیشنهاد نهایی هم اثر می‌ذاره — اگه با شیر انتخاب کنی، دانه‌های ملایم‌تر و کم‌اسیدتر اولویت می‌گیرن</span></div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-fa" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-fa" style="direction:rtl">با شیر + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-fa" style="direction:rtl">با شیر + شکلات شیری</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-label-full" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-label-full" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-label-full" style="direction:rtl">با شیر + شکلات تلخ</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-label-full" style="direction:rtl">با شیر + شکلات شیری</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -1573,19 +1578,33 @@ function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
   document.getElementById('q-title-' + screenNum).textContent = q.title[level];
   document.getElementById('progress-label-' + screenNum).innerHTML = '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span>';
+
+  // نشان رنگی سطح (سبز/آبی/بنفش) — بالای عنوان سؤال
+  const badgeId = 'q-level-badge-' + screenNum;
+  let badge = document.getElementById(badgeId);
+  const header = document.getElementById('q-title-' + screenNum).closest('.q-header');
+  if (!badge) {
+    badge = document.createElement('div');
+    badge.className = 'level-badge';
+    badge.id = badgeId;
+    header.insertBefore(badge, header.firstChild);
+  }
+  badge.textContent = LEVEL_META[level].emoji + ' ' + LEVEL_META[level].label;
+
   const eduEl = document.getElementById('q-edu-' + screenNum);
   const eduText = q.edu[level]; // فقط beginner/regular مقدار دارن؛ متخصص عمداً خالیه
   if (eduText) { eduEl.textContent = '💡 ' + eduText; eduEl.style.display = 'block'; }
   else { eduEl.style.display = 'none'; }
 
   const optsWrap = document.getElementById('q-options-' + screenNum);
+  const opts = q.options[level];
+  optsWrap.className = 'options ' + (opts.length % 2 === 0 && opts.length <= 4 ? 'cols-2' : 'cols-1');
   optsWrap.innerHTML = '';
-  q.options[level].forEach(opt => {
+  opts.forEach(opt => {
     const card = document.createElement('div');
     card.className = 'option-card';
     card.style.textAlign = 'right';
-    card.style.padding = '16px';
-    card.innerHTML = '<div class="option-fa" style="direction:rtl">' + opt.l + '</div>';
+    card.innerHTML = '<div class="option-label-full" style="direction:rtl">' + opt.l + '</div>';
     card.onclick = () => pickDynamic(card, axis, opt.v, screenNum);
     optsWrap.appendChild(card);
   });
@@ -1600,6 +1619,8 @@ function renderAllQuestions(level) {
   renderQuestion(6, 'moment', level);
   renderQuestion(8, 'brew', level);
   document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span>';
+  const q7b = document.getElementById('q7-badge');
+  if (q7b) q7b.textContent = LEVEL_META[level].emoji + ' ' + LEVEL_META[level].label;
 }
 
 function pickDynamic(el, axis, value, screenNum) {
@@ -1622,6 +1643,10 @@ function selectLevel(level) {
 
   document.documentElement.style.setProperty('--level-color', LEVEL_META[currentLevel].color);
   renderAllQuestions(currentLevel);
+
+  const badgeText = LEVEL_META[currentLevel].emoji + ' ' + LEVEL_META[currentLevel].label;
+  const h1b = document.getElementById('health1-badge'); if (h1b) h1b.textContent = badgeText;
+  const h2b = document.getElementById('health2-badge'); if (h2b) h2b.textContent = badgeText;
 
   if (currentLevel === 'expert') show('screen-1'); // مسیر متخصص سؤالات سلامت رو نمی‌بینه
   else show('screen-health1');
@@ -2889,18 +2914,38 @@ const PERSONAS = {
   }
 };
 
+// میانگین هر کلید سیگنال روی همه‌ی دونه‌های فعال — برای امتیازدهی نسبی (نه مطلق)
+// بدون این کار، دونه‌هایی که همه‌جا امتیاز «نسبتاً بالا» دارن (نه فقط تو نقطه‌قوت خودشون)
+// همیشه برنده می‌شدن، حتی وقتی پاسخ کاربر اصلاً به نفعشون نبود.
+function computeAxisAverages() {
+  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  const sums = {}, counts = {};
+  pool.forEach(b => {
+    for (const k in b.s) {
+      sums[k] = (sums[k] || 0) + b.s[k];
+      counts[k] = (counts[k] || 0) + 1;
+    }
+  });
+  const avgs = {};
+  for (const k in sums) avgs[k] = sums[k] / counts[k];
+  return avgs;
+}
+const AXIS_AVG = computeAxisAverages();
+
 // محاسبه‌ی امتیاز یک موجودیت (دانه یا پرسونا) بر اساس بردار پاسخ کاربر و جدول وزن‌دهی سطح
+// هر مقدار نسبت به میانگین همان کلید در کل کاتالوگ سنجیده می‌شه (امتیاز نسبی، نه مطلق)
 function computeAxisScore(entityS, a, weights) {
+  const rel = (key) => (entityS[key] !== undefined ? entityS[key] - (AXIS_AVG[key] || 0) : 0);
   let score = 0;
-  score += (entityS[a.taste] || 0) * (weights.taste / 10);
-  score += (entityS['body_' + a.body] || 0) * (weights.body / 10);
-  score += (entityS[a.acidity] || 0) * (weights.acidity / 10);
+  score += rel(a.taste) * (weights.taste / 10);
+  score += rel('body_' + a.body) * (weights.body / 10);
+  score += rel(a.acidity) * (weights.acidity / 10);
   const bKey = a.bitterness === 'medium' ? 'medium_bt' : a.bitterness;
-  score += (entityS[bKey] || 0) * (weights.bitterness / 10);
-  score += (entityS[a.mood] || 0) * (weights.mood / 10);
-  score += (entityS[a.moment] || 0) * (weights.moment / 10);
+  score += rel(bKey) * (weights.bitterness / 10);
+  score += rel(a.mood) * (weights.mood / 10);
+  score += rel(a.moment) * (weights.moment / 10);
   // ترکیب شیر/شکلات: خارج از جدول رسمی ۷بُعدی سند، فقط برای ظرافت اضافه نگه داشته می‌شه
-  score += (entityS[a.tastepref] || 0) * 1.0;
+  score += rel(a.tastepref) * 1.0;
   return score;
 }
 
