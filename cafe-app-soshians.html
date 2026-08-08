@@ -213,7 +213,7 @@ body {
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
 .option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-weight: 600; }
 .option-label-full { font-size: 14.5px; color: var(--dark-brown); font-weight: 600; line-height: 1.6; }
-.level-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 20px; font-size: 11.5px; font-weight: 700; margin-bottom: 12px; background: color-mix(in srgb, var(--level-color, var(--caramel)) 15%, var(--white)); color: var(--level-color, var(--caramel)); border: 1.5px solid var(--level-color, var(--caramel)); font-family: 'Vazirmatn', sans-serif; }
+.level-badge { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; font-size: 17px; margin-bottom: 12px; background: color-mix(in srgb, var(--level-color, var(--caramel)) 15%, var(--white)); border: 2px solid var(--level-color, var(--caramel)); }
 .option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
 /* ── BUTTONS ── */
@@ -953,7 +953,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="q-edu" id="q-edu-1" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-1"></div>
   <div class="spacer"></div>
-</div></div>
+</div>
 
 <div class="screen" id="screen-2">
   <div class="q-bg-icon" id="q-bg-icon-2"></div>
@@ -1589,7 +1589,7 @@ function renderQuestion(screenNum, axis, level) {
     badge.id = badgeId;
     header.insertBefore(badge, header.firstChild);
   }
-  badge.textContent = LEVEL_META[level].emoji + ' ' + LEVEL_META[level].label;
+  badge.textContent = LEVEL_META[level].emoji;
 
   const eduEl = document.getElementById('q-edu-' + screenNum);
   const eduText = q.edu[level]; // فقط beginner/regular مقدار دارن؛ متخصص عمداً خالیه
@@ -1620,7 +1620,7 @@ function renderAllQuestions(level) {
   renderQuestion(8, 'brew', level);
   document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span>';
   const q7b = document.getElementById('q7-badge');
-  if (q7b) q7b.textContent = LEVEL_META[level].emoji + ' ' + LEVEL_META[level].label;
+  if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
 
 function pickDynamic(el, axis, value, screenNum) {
@@ -1644,7 +1644,7 @@ function selectLevel(level) {
   document.documentElement.style.setProperty('--level-color', LEVEL_META[currentLevel].color);
   renderAllQuestions(currentLevel);
 
-  const badgeText = LEVEL_META[currentLevel].emoji + ' ' + LEVEL_META[currentLevel].label;
+  const badgeText = LEVEL_META[currentLevel].emoji;
   const h1b = document.getElementById('health1-badge'); if (h1b) h1b.textContent = badgeText;
   const h2b = document.getElementById('health2-badge'); if (h2b) h2b.textContent = badgeText;
 
@@ -2501,15 +2501,28 @@ function showLoading() {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-loading').classList.add('visible');
   setTimeout(async () => {
-    rec = recommend();
-    rec._brewAlt = findBrewAlternative(rec);
-    currentPersona = determinePersona();
-    render(rec);
-    await saveProfile(rec);
-    document.getElementById('screen-loading').classList.remove('visible');
-    show('screen-result');
-    // AI explanation در پس‌زمینه لود میشه
-    getAIExplanation(rec);
+    try {
+      rec = recommend();
+      rec._brewAlt = findBrewAlternative(rec);
+      currentPersona = determinePersona();
+      render(rec);
+      await saveProfile(rec);
+      document.getElementById('screen-loading').classList.remove('visible');
+      show('screen-result');
+      // AI explanation در پس‌زمینه لود میشه
+      getAIExplanation(rec);
+    } catch (e) {
+      // به‌جای گیر کردن خاموش رو صفحه‌ی لودینگ، خطا رو واضح نشون بده
+      console.error('خطا در ساخت پروفایل:', e);
+      const loadingEl = document.getElementById('screen-loading');
+      loadingEl.innerHTML =
+        '<div style="text-align:center;padding:20px;direction:rtl;">' +
+        '<div style="font-size:40px;margin-bottom:14px;">⚠️</div>' +
+        '<div style="font-size:15px;color:var(--dark-brown);font-weight:700;margin-bottom:8px;">مشکلی تو ساخت پروفایل پیش اومد</div>' +
+        '<div style="font-size:12px;color:var(--gray);margin-bottom:18px;">' + (e && e.message ? e.message : 'خطای نامشخص') + '</div>' +
+        '<button class="btn-primary" style="max-width:220px;margin:0 auto;" onclick="location.reload()">تلاش دوباره</button>' +
+        '</div>';
+    }
   }, 2000);
 }
 
