@@ -1773,6 +1773,11 @@ async function doLogout() {
   await supabaseClient.auth.signOut();
   currentUser = null;
   localStorage.removeItem('roastery_user');
+  // پاک کردن فیلدهای فرم ثبت‌نام/ورود، تا کاربر بعدی اطلاعات کاربر قبلی رو نبینه
+  ['reg-name', 'reg-phone', 'reg-pass', 'login-phone', 'login-pass'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   show('screen-auth');
 }
 
