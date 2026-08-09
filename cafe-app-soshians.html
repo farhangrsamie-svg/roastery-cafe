@@ -2996,8 +2996,13 @@ function recommend() {
   scored.sort((a, b) => b._score - a._score);
   const best = scored[0];
 
-  const maxPossible = 10 * (weights.taste + weights.body + weights.acidity + weights.bitterness + weights.mood + weights.moment) / 10 + 10;
-  best._matchPct = Math.min(98, Math.round((best._score / maxPossible) * 100));
+  // درصد تطابق: نسبی به بقیه‌ی کاتالوگ (softmax) نه یه سقف مطلق فرضی
+  // temperature بالاتر یعنی برنده‌ی واضح، درصد بالاتری می‌گیره
+  const TEMP = 0.6;
+  const maxScore = Math.max(...scored.map(s => s._score));
+  const expScores = scored.map(s => Math.exp((s._score - maxScore) * TEMP));
+  const sumExp = expScores.reduce((a, b) => a + b, 0);
+  best._matchPct = Math.min(97, Math.max(35, Math.round((expScores[0] / sumExp) * 100)));
 
   best._runnerBean = scored[1] || null;
   best._runner1 = scored[1]?.name || null;
