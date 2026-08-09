@@ -1636,10 +1636,10 @@ function pickDynamic(el, axis, value, screenNum) {
 function selectLevel(level) {
   currentLevel = level;
 
-  // قانون Upgrade: اگه دفعه‌ی قبل به‌عنوان مبتدی، آشنایی با «خاستگاه» رو نشون داده بود
-  if (level === 'beginner' && localStorage.getItem('coffee_identity_upgrade_eligible') === 'true') {
-    currentLevel = 'regular';
-  }
+  // نکته: قانون Upgrade (ارتقای خودکار مبتدی→معمولی بر اساس localStorage) عمداً
+  // برای نسخه‌ی تست پایلوت (تبلت مشترک) غیرفعال شده — چون رو یه دستگاه مشترک،
+  // بعد از اولین trigger، سطح مبتدی برای همه‌ی تسترهای بعدی دیگه نشون داده نمی‌شد.
+  // برای نسخه‌ی نهایی/تک‌کاربره می‌شه دوباره فعالش کرد.
 
   document.documentElement.style.setProperty('--level-color', LEVEL_META[currentLevel].color);
   renderAllQuestions(currentLevel);
