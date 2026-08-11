@@ -1085,6 +1085,88 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="spacer"></div>
 </div>
 
+<!-- ══════ فاز ۲ — کشف تدریجی هویت (فقط کاربر برگشتی) ══════ -->
+<div class="screen" id="screen-context">
+  <button class="btn-back" onclick="show('screen-health1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7A5C3E"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۱ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 1 of 5 (deeper phase)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-context" style="text-align:right;direction:rtl"></div>
+  </div>
+  <div class="q-edu" id="q-edu-context" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-context"></div>
+  <div class="spacer"></div>
+</div>
+
+<div class="screen" id="screen-ritual">
+  <button class="btn-back" onclick="show('screen-context')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#6E5236"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۲ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 2 of 5 (deeper phase)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-ritual" style="text-align:right;direction:rtl"></div>
+  </div>
+  <div class="q-edu" id="q-edu-ritual" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-ritual"></div>
+  <div class="spacer"></div>
+</div>
+
+<div class="screen" id="screen-evolution">
+  <button class="btn-back" onclick="show('screen-ritual')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#62492F"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۳ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 3 of 5 (deeper phase)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-evolution" style="text-align:right;direction:rtl"></div>
+  </div>
+  <div class="q-edu" id="q-edu-evolution" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-evolution"></div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══════ سؤالات روایی Memory Identity — اختیاری، بدون امتیاز، فقط ذخیره‌ی متن خصوصی ══════ -->
+<div class="screen" id="screen-memory1">
+  <button class="btn-back" onclick="show('screen-evolution')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۴ از ۵ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 4 of 5 (memory, optional)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-memory1" style="text-align:right;direction:rtl"></div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
+      <span class="fa-only">کاملاً خصوصیه، فقط پیش خودت می‌مونه</span>
+      <span class="en-only">Completely private — stays only with you</span>
+    </div>
+  </div>
+  <textarea id="memory-input-1" class="textarea-field" rows="5" style="width:100%;margin-bottom:16px;"></textarea>
+  <button class="btn-primary" onclick="show('screen-memory2')"><span class="fa-only">بعدی ←</span><span class="en-only">Next →</span></button>
+  <button class="btn-back" style="position:static;margin-top:12px;width:100%;text-align:center;" onclick="show('screen-memory2')"><span class="fa-only">رد شدن</span><span class="en-only">Skip</span></button>
+  <div class="spacer"></div>
+</div>
+
+<div class="screen" id="screen-memory2">
+  <button class="btn-back" onclick="show('screen-memory1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۵ از ۵ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 5 of 5 (memory, optional)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
+      <span class="fa-only">کاملاً خصوصیه، فقط پیش خودت می‌مونه</span>
+      <span class="en-only">Completely private — stays only with you</span>
+    </div>
+  </div>
+  <textarea id="memory-input-2" class="textarea-field" rows="5" style="width:100%;margin-bottom:16px;"></textarea>
+  <button class="btn-primary" onclick="finishPhase2()"><span class="fa-only">تموم شد →</span><span class="en-only">Done →</span></button>
+  <button class="btn-back" style="position:static;margin-top:12px;width:100%;text-align:center;" onclick="finishPhase2()"><span class="fa-only">رد شدن</span><span class="en-only">Skip</span></button>
+  <div class="spacer"></div>
+</div>
+
 <!-- ══════ LOADING ══════ -->
 <div id="screen-loading">
   <div class="spinner">☕</div>
@@ -1189,6 +1271,10 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="flavor-tags" id="r-flavors"></div>
     <div class="result-desc" id="r-desc" style="margin-top:16px;"></div>
     <div id="r-health-note" style="display:none;margin-top:14px;padding:12px 14px;background:var(--tint);border-radius:10px;font-size:12.5px;color:var(--medium-brown);line-height:1.8;direction:rtl;text-align:right;font-family:'Vazirmatn',sans-serif;"></div>
+    <div id="r-phase2-note" style="display:none;margin-top:10px;padding:8px 14px;background:#EFE6DC;border-radius:20px;font-size:11.5px;color:var(--medium-brown);text-align:center;font-family:'Vazirmatn',sans-serif;">
+      <span class="fa-only">🔍 این نتیجه بر اساس شناخت عمیق‌تری از توئه — چون قبلاً هم باهام آشنا شده بودی</span>
+      <span class="en-only">🔍 This result is based on a deeper understanding of you — since we've met before</span>
+    </div>
   </div>
 
   <div class="card">
@@ -1491,7 +1577,7 @@ async function sb(method, path, body = null) {
    APP STATE
 ═══════════════════════════════════════════ */
 let currentUser = null; // { id, name, phone }
-let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null };
+let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null };
 let rec = null;
 let currentLevel = 'regular'; // beginner | regular | expert
 let currentPersona = null;
@@ -1509,9 +1595,9 @@ const LEVEL_META = {
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:10, brew:5 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:13, brew:10 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:13, brew:15 }
+  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:10, brew:5, context:12, ritual:12, evolution:12 },
+  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:13, brew:10, context:12, ritual:12, evolution:12 },
+  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:13, brew:15, context:12, ritual:12, evolution:12 }
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
@@ -1627,16 +1713,82 @@ const QUESTIONS = {
       regular:  [ {v:'espressohome', fa:'اسپرسو / موکاپات', en:'Espresso / Moka pot'}, {v:'v60', fa:'پوراُور (V60 / Chemex)', en:'Pour-over (V60 / Chemex)'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'aeropress', fa:'AeroPress', en:'AeroPress'} ],
       expert:   [ {v:'espressohome', fa:'Espresso', en:'Espresso'}, {v:'v60', fa:'Pour-over (V60 / Kalita)', en:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', fa:'Immersion (French Press / AeroPress)', en:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', fa:'Cold Brew', en:'Cold Brew'}, {v:'other', fa:'Siphon', en:'Siphon'} ]
     }
+  },
+  // ═══ فاز ۲ — محورهای جدید (فقط برای کاربرهای برگشتی) ═══
+  context: {
+    title: {
+      beginner: { fa:'معمولاً کجا این قهوه رو می‌خوری؟', en:'Where do you usually drink this coffee?' },
+      regular:  { fa:'زمینهٔ اصلی مصرف این قهوه چیه؟', en:"What's the main context you drink this coffee in?" },
+      expert:   { fa:'Primary Consumption Context؟', en:'Primary consumption context?' }
+    },
+    edu: {
+      beginner: { fa:'مکان و همراهی که قهوه می‌خوری، روی چیزی که ازش می‌خوای اثر می‌ذاره.', en:'Where and with whom you drink coffee affects what you want from it.' },
+      regular:  { fa:'زمینهٔ مصرف (خانه، کار، دورهمی) روی انتخاب دونه و روش دم‌آوری هم اثر داره.', en:'Consumption context (home, work, social) also influences bean and brew choice.' }
+    },
+    options: {
+      beginner: [ {v:'home_alone', fa:'تنها، تو خونه', en:'Alone, at home'}, {v:'work_focus', fa:'سر کار یا حین انجام کار', en:'At work or while working'}, {v:'social', fa:'با دوستام یا خانواده', en:'With friends or family'}, {v:'on_the_go', fa:'بیرون از خونه، در حال رفت‌وآمد', en:'Out and about'} ],
+      regular:  [ {v:'home_alone', fa:'خانه، تنها', en:'Home, alone'}, {v:'work_focus', fa:'محل کار', en:'Workplace'}, {v:'social', fa:'دورهمی با دوستان/خانواده', en:'Social gathering'}, {v:'on_the_go', fa:'کافه یا در مسیر', en:'Café or on the move'} ],
+      expert:   [ {v:'home_alone', fa:'Solo / Home', en:'Solo / Home'}, {v:'work_focus', fa:'Workplace / Focus', en:'Workplace / Focus'}, {v:'social', fa:'Social Gathering', en:'Social Gathering'}, {v:'on_the_go', fa:'Café / On-the-go', en:'Café / On-the-go'} ]
+    }
+  },
+  ritual: {
+    title: {
+      beginner: { fa:'وقتی یه قهوه‌ی جدید می‌بینی چیکار می‌کنی؟', en:'What do you do when you see a new coffee?' },
+      regular:  { fa:'رابطه‌ت با روتین و کشف قهوه‌ی جدید چطوره؟', en:'How do you relate to routine vs. discovering new coffee?' },
+      expert:   { fa:'Ritual vs Exploration Tendency؟', en:'Ritual vs exploration tendency?' }
+    },
+    edu: {
+      beginner: { fa:'بعضی‌ها عاشق قهوه‌ی همیشگی‌ان، بعضی‌ها دنبال کشف مداوم.', en:'Some love their usual coffee, others always seek discovery.' },
+      regular:  { fa:'این محور نشون می‌ده چقدر به تنوع در انتخاب دونه نیاز داری.', en:'This axis shows how much variety you need in bean selection.' }
+    },
+    options: {
+      beginner: [ {v:'routine', fa:'همون قهوه‌ی همیشگی رو می‌خوام', en:'I want my usual coffee'}, {v:'mixed', fa:'گاهی امتحان می‌کنم، ولی برمی‌گردم به قبلی', en:'I try sometimes, but return to my usual'}, {v:'explorer', fa:'همیشه دنبال یه چیز تازه‌ام', en:"I'm always looking for something new"} ],
+      regular:  [ {v:'routine', fa:'ثابت و قابل‌پیش‌بینی (Routine)', en:'Consistent & predictable (Routine)'}, {v:'mixed', fa:'ترکیبی — گاهی امتحان، گاهی تکرار', en:'Mixed — sometimes new, sometimes repeat'}, {v:'explorer', fa:'کاوشگر — همیشه چیز تازه (Explorer)', en:'Explorer — always something new'} ],
+      expert:   [ {v:'routine', fa:'Ritual / Consistency-seeking', en:'Ritual / Consistency-seeking'}, {v:'mixed', fa:'Balanced Novelty-seeking', en:'Balanced Novelty-seeking'}, {v:'explorer', fa:'High Novelty-seeking', en:'High Novelty-seeking'} ]
+    }
+  },
+  evolution: {
+    title: {
+      beginner: { fa:'دوست داری قهوه‌ی جدید رو چطوری پیدا کنی؟', en:'How do you like to discover new coffee?' },
+      regular:  { fa:'روش یادگیری و کشف سلیقه‌ت تو قهوه چیه؟', en:'How do you learn about and discover your coffee taste?' },
+      expert:   { fa:'Preference Learning Style؟', en:'Preference learning style?' }
+    },
+    edu: {
+      beginner: { fa:'بعضی‌ها دوست دارن کسی راهنماییشون کنه، بعضی‌ها دوست دارن خودشون کشف کنن.', en:'Some like guidance, others prefer to discover on their own.' },
+      regular:  { fa:'این محور کمک می‌کنه بفهمیم چقدر توضیح فنی یا صرفاً پیشنهاد ساده بهت بدیم.', en:'This helps us know whether to give technical detail or simple suggestions.' }
+    },
+    options: {
+      beginner: [ {v:'guided', fa:'دوست دارم یکی بهم پیشنهاد بده', en:'I like someone to recommend it to me'}, {v:'self_taught', fa:'دوست دارم خودم امتحان و کشف کنم', en:'I like to try and discover myself'}, {v:'analytical', fa:'دوست دارم بدونم چرا این طعم اینه', en:'I like to understand why it tastes this way'} ],
+      regular:  [ {v:'guided', fa:'راهنمایی‌شده (پیشنهاد دیگران)', en:'Guided (recommendations from others)'}, {v:'self_taught', fa:'اکتشافی (امتحان شخصی)', en:'Exploratory (personal trial)'}, {v:'analytical', fa:'تحلیلی (فهم علت و اصول)', en:'Analytical (understanding the reasoning)'} ],
+      expert:   [ {v:'guided', fa:'Guided Discovery', en:'Guided Discovery'}, {v:'self_taught', fa:'Experiential Learning', en:'Experiential Learning'}, {v:'analytical', fa:'Analytical / Technical Learning', en:'Analytical / Technical Learning'} ]
+    }
   }
 };
+
+// سؤالات روایی Memory Identity — بدون امتیازدهی، فقط ذخیره‌ی متن خام (خصوصی، جدول جدا)
+const MEMORY_QUESTIONS = [
+  {
+    key: 'first_memory',
+    title: { fa:'اولین قهوه‌ای که یادت مونده رو کجا خوردی؟', en:'Where did you drink the first coffee you remember?' },
+    placeholder: { fa:'هر چیزی که یادت میاد بنویس...', en:'Write whatever you remember...' }
+  },
+  {
+    key: 'best_cup',
+    title: { fa:'اگه قهوه یه فصل بود، کدوم فصل بود؟ چرا؟', en:'If coffee were a season, which one would it be? Why?' },
+    placeholder: { fa:'جواب درست یا غلط نداره، هرچی به ذهنت میاد...', en:"There's no right answer, whatever comes to mind..." }
+  }
+];
 
 function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
   document.getElementById('q-title-' + screenNum).innerHTML =
     '<span class="fa-only" style="direction:rtl">' + q.title[level].fa + '</span>' +
     '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + q.title[level].en + '</span>';
-  document.getElementById('progress-label-' + screenNum).innerHTML =
-    '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
+  const progressLabelEl = document.getElementById('progress-label-' + screenNum);
+  if (progressLabelEl) {
+    progressLabelEl.innerHTML =
+      '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
+  }
 
   // نشان رنگی سطح (سبز/آبی/بنفش) — بالای عنوان سؤال
   const badgeId = 'q-level-badge-' + screenNum;
@@ -1675,6 +1827,8 @@ function renderQuestion(screenNum, axis, level) {
   });
 }
 
+let isPhase2 = false;
+
 function renderAllQuestions(level) {
   renderQuestion(1, 'taste', level);
   renderQuestion(2, 'body', level);
@@ -1688,14 +1842,52 @@ function renderAllQuestions(level) {
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
 
+// فاز ۲ — فقط ۳ محور جدید امتیازدهی‌شونده + ۲ سؤال روایی
+function renderPhase2Questions(level) {
+  renderQuestion('context', 'context', level);
+  renderQuestion('ritual', 'ritual', level);
+  renderQuestion('evolution', 'evolution', level);
+
+  MEMORY_QUESTIONS.forEach((mq, i) => {
+    const n = i + 1;
+    document.getElementById('q-title-memory' + n).innerHTML =
+      '<span class="fa-only" style="direction:rtl">' + mq.title.fa + '</span>' +
+      '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + mq.title.en + '</span>';
+    const input = document.getElementById('memory-input-' + n);
+    input.placeholder = currentLang === 'en' ? mq.placeholder.en : mq.placeholder.fa;
+    input.dir = currentLang === 'en' ? 'ltr' : 'rtl';
+    input.value = '';
+  });
+}
+
 function pickDynamic(el, axis, value, screenNum) {
   el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   ans[axis] = value;
   updateProgressBean(axis);
   if (screenNum === 8) { setTimeout(showLoading, 280); return; }
+  if (screenNum === 'context') { setTimeout(() => show('screen-ritual'), 280); return; }
+  if (screenNum === 'ritual') { setTimeout(() => show('screen-evolution'), 280); return; }
+  if (screenNum === 'evolution') { setTimeout(() => show('screen-memory1'), 280); return; }
   const nextScreen = { 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 }[screenNum];
   if (nextScreen) setTimeout(() => go(nextScreen), 280);
+}
+
+// وقتی کاربر روایت‌های Memory Identity رو تموم کرد (یا رد کرد)
+async function finishPhase2() {
+  const m1 = document.getElementById('memory-input-1').value.trim();
+  const m2 = document.getElementById('memory-input-2').value.trim();
+  try {
+    if (currentUser && (m1 || m2)) {
+      const rows = [];
+      if (m1) rows.push({ user_id: currentUser.id, question_key: MEMORY_QUESTIONS[0].key, answer_text: m1 });
+      if (m2) rows.push({ user_id: currentUser.id, question_key: MEMORY_QUESTIONS[1].key, answer_text: m2 });
+      await sb('POST', 'memory_identity_responses', rows);
+    }
+  } catch(e) {
+    console.warn('memory identity save error:', e); // خصوصیه؛ اگه ذخیره نشد، جلوی ادامه‌ی فرآیند رو نمی‌گیریم
+  }
+  showLoading();
 }
 
 function selectLevel(level) {
@@ -1707,6 +1899,13 @@ function selectLevel(level) {
   // برای نسخه‌ی نهایی/تک‌کاربره می‌شه دوباره فعالش کرد.
 
   document.documentElement.style.setProperty('--level-color', LEVEL_META[currentLevel].color);
+
+  if (isPhase2) {
+    renderPhase2Questions(currentLevel);
+    show('screen-context');
+    return;
+  }
+
   renderAllQuestions(currentLevel);
 
   const badgeText = LEVEL_META[currentLevel].emoji;
@@ -1725,12 +1924,15 @@ function pickHealth(el, q, value) {
   el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   healthAns[q] = value;
-  setTimeout(() => { show(q === 'h1' ? 'screen-health2' : 'screen-1'); }, 280);
+  setTimeout(() => {
+    if (q === 'h1') { show('screen-health2'); return; }
+    show(isPhase2 ? 'screen-context' : 'screen-1');
+  }, 280);
 }
 function skipHealth() {
   const onH1 = document.getElementById('screen-health1').classList.contains('active');
   if (onH1) { healthAns.h1 = null; show('screen-health2'); }
-  else { healthAns.h2 = null; show('screen-1'); }
+  else { healthAns.h2 = null; show(isPhase2 ? 'screen-context' : 'screen-1'); }
 }
 let orderBean = null;
 let selectedAmount = null;
@@ -2439,17 +2641,33 @@ function reorderProfile() {
 /* ═══════════════════════════════════════════
    QUIZ
 ═══════════════════════════════════════════ */
-function startNewProfile() {
-  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null };
+async function startNewProfile() {
+  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null };
   healthAns = { h1: null, h2: null };
   rec = null;
   currentPersona = null;
   currentProfileId = null;
+  isPhase2 = false;
   document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6','btn-7','btn-8'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.disabled = true;
   });
+
+  // بررسی کاربر برگشتی — طبق سند معماری: فاز ۲ (کشف تدریجی) به‌جای تکرار فاز ۱
+  try {
+    if (currentUser) {
+      const existing = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&limit=1&select=*`);
+      if (existing && existing.length > 0) {
+        const last = existing[0];
+        ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
+        ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
+        ans.tastepref = last.tastepref; ans.brew = last.brew;
+        isPhase2 = true;
+      }
+    }
+  } catch(e) { console.warn('could not check for returning user:', e); }
+
   show('screen-level');
 }
 
@@ -2642,6 +2860,10 @@ async function saveProfile(rec) {
       acidity: ans.acidity,
       bitterness: ans.bitterness,
       moment: ans.moment,
+      context: ans.context,
+      ritual: ans.ritual,
+      evolution: ans.evolution,
+      is_phase2: isPhase2,
       experience_level: currentLevel,
       persona: currentPersona ? currentPersona.en : null,
       recommended_bean: rec.name + ' (' + rec.detail + ')'
@@ -2857,7 +3079,10 @@ const BEANS = [
       body_light:3, body_medium:8, body_full:4,
       focus:6, relax:7, sensory:5, social:6,
       morning:6, midday:8, afternoon:6,
-      black_dark:6, black_milk:7, milk_dark:6, milk_milk:7
+      black_dark:6, black_milk:7, milk_dark:6, milk_milk:7,
+      home_alone:7, work_focus:6, social:6, on_the_go:6,
+      routine:8, mixed:6, explorer:3,
+      guided:7, self_taught:5, analytical:5
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
@@ -2869,7 +3094,10 @@ const BEANS = [
       body_light:5, body_medium:7, body_full:3,
       focus:6, relax:6, sensory:9, social:5,
       morning:8, midday:6, afternoon:4,
-      black_dark:7, black_milk:7, milk_dark:5, milk_milk:5
+      black_dark:7, black_milk:7, milk_dark:5, milk_milk:5,
+      home_alone:5, work_focus:4, social:8, on_the_go:6,
+      routine:4, mixed:6, explorer:8,
+      guided:5, self_taught:7, analytical:6
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
@@ -2881,7 +3109,10 @@ const BEANS = [
       body_light:2, body_medium:8, body_full:5,
       focus:5, relax:8, sensory:4, social:6,
       morning:5, midday:8, afternoon:7,
-      black_dark:6, black_milk:6, milk_dark:7, milk_milk:7
+      black_dark:6, black_milk:6, milk_dark:7, milk_milk:7,
+      home_alone:8, work_focus:6, social:5, on_the_go:5,
+      routine:8, mixed:5, explorer:2,
+      guided:7, self_taught:4, analytical:4
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
@@ -2893,7 +3124,10 @@ const BEANS = [
       body_light:4, body_medium:7, body_full:5,
       focus:5, relax:6, sensory:9, social:7,
       morning:7, midday:7, afternoon:5,
-      black_dark:6, black_milk:7, milk_dark:6, milk_milk:6
+      black_dark:6, black_milk:7, milk_dark:6, milk_milk:6,
+      home_alone:5, work_focus:4, social:9, on_the_go:6,
+      routine:2, mixed:6, explorer:9,
+      guided:4, self_taught:8, analytical:6
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -2905,7 +3139,10 @@ const BEANS = [
       body_light:2, body_medium:7, body_full:6,
       focus:5, relax:9, sensory:6, social:7,
       morning:5, midday:7, afternoon:8,
-      black_dark:6, black_milk:8, milk_dark:6, milk_milk:9
+      black_dark:6, black_milk:8, milk_dark:6, milk_milk:9,
+      home_alone:8, work_focus:5, social:7, on_the_go:5,
+      routine:5, mixed:7, explorer:5,
+      guided:6, self_taught:6, analytical:5
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
@@ -2917,7 +3154,10 @@ const BEANS = [
       body_light:8, body_medium:4, body_full:1,
       focus:6, relax:5, sensory:10, social:4,
       morning:8, midday:5, afternoon:3,
-      black_dark:7, black_milk:6, milk_dark:3, milk_milk:3
+      black_dark:7, black_milk:6, milk_dark:3, milk_milk:3,
+      home_alone:6, work_focus:3, social:9, on_the_go:3,
+      routine:1, mixed:4, explorer:10,
+      guided:3, self_taught:6, analytical:9
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
@@ -2929,7 +3169,10 @@ const BEANS = [
       body_light:3, body_medium:8, body_full:4,
       focus:4, relax:9, sensory:7, social:6,
       morning:5, midday:7, afternoon:7,
-      black_dark:6, black_milk:8, milk_dark:5, milk_milk:8
+      black_dark:6, black_milk:8, milk_dark:5, milk_milk:8,
+      home_alone:7, work_focus:5, social:7, on_the_go:5,
+      routine:5, mixed:7, explorer:5,
+      guided:6, self_taught:6, analytical:5
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -2941,7 +3184,10 @@ const BEANS = [
       body_light:9, body_medium:3, body_full:1,
       focus:7, relax:6, sensory:9, social:5,
       morning:7, midday:5, afternoon:4,
-      black_dark:6, black_milk:6, milk_dark:3, milk_milk:3
+      black_dark:6, black_milk:6, milk_dark:3, milk_milk:3,
+      home_alone:6, work_focus:5, social:7, on_the_go:4,
+      routine:3, mixed:5, explorer:8,
+      guided:4, self_taught:7, analytical:7
     },
     brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
   },
@@ -2969,7 +3215,10 @@ const PERSONAS = {
       body_light:6, body_medium:5, body_full:5,
       focus:7, relax:2, sensory:9, social:5,
       morning:6, midday:6, afternoon:5,
-      black_dark:8, black_milk:6, milk_dark:5, milk_milk:4
+      black_dark:8, black_milk:6, milk_dark:5, milk_milk:4,
+      home_alone:4, work_focus:3, social:8, on_the_go:8,
+      routine:1, mixed:4, explorer:10,
+      guided:3, self_taught:8, analytical:6
     }
   },
   comfort: {
@@ -2985,7 +3234,10 @@ const PERSONAS = {
       body_light:3, body_medium:6, body_full:8,
       focus:2, relax:10, sensory:4, social:6,
       morning:4, midday:6, afternoon:8,
-      black_dark:4, black_milk:7, milk_dark:6, milk_milk:9
+      black_dark:4, black_milk:7, milk_dark:6, milk_milk:9,
+      home_alone:9, work_focus:5, social:6, on_the_go:3,
+      routine:9, mixed:5, explorer:2,
+      guided:8, self_taught:4, analytical:3
     }
   },
   bold: {
@@ -3001,7 +3253,10 @@ const PERSONAS = {
       body_light:1, body_medium:4, body_full:9,
       focus:9, relax:2, sensory:5, social:4,
       morning:8, midday:6, afternoon:3,
-      black_dark:8, black_milk:5, milk_dark:7, milk_milk:4
+      black_dark:8, black_milk:5, milk_dark:7, milk_milk:4,
+      home_alone:6, work_focus:9, social:4, on_the_go:6,
+      routine:7, mixed:4, explorer:4,
+      guided:5, self_taught:6, analytical:6
     }
   },
   creative: {
@@ -3017,7 +3272,10 @@ const PERSONAS = {
       body_light:8, body_medium:5, body_full:2,
       focus:6, relax:6, sensory:10, social:4,
       morning:6, midday:6, afternoon:5,
-      black_dark:7, black_milk:7, milk_dark:4, milk_milk:4
+      black_dark:7, black_milk:7, milk_dark:4, milk_milk:4,
+      home_alone:7, work_focus:6, social:6, on_the_go:5,
+      routine:3, mixed:6, explorer:8,
+      guided:4, self_taught:7, analytical:8
     }
   },
   weekend: {
@@ -3033,7 +3291,10 @@ const PERSONAS = {
       body_light:4, body_medium:6, body_full:6,
       focus:2, relax:9, sensory:5, social:9,
       morning:3, midday:7, afternoon:7,
-      black_dark:4, black_milk:6, milk_dark:6, milk_milk:8
+      black_dark:4, black_milk:6, milk_dark:6, milk_milk:8,
+      home_alone:5, work_focus:2, social:9, on_the_go:6,
+      routine:5, mixed:7, explorer:5,
+      guided:7, self_taught:5, analytical:3
     }
   }
 };
@@ -3059,7 +3320,7 @@ const AXIS_AVG = computeAxisAverages();
 // محاسبه‌ی امتیاز یک موجودیت (دانه یا پرسونا) بر اساس بردار پاسخ کاربر و جدول وزن‌دهی سطح
 // هر مقدار نسبت به میانگین همان کلید در کل کاتالوگ سنجیده می‌شه (امتیاز نسبی، نه مطلق)
 function computeAxisScore(entityS, a, weights) {
-  const rel = (key) => (entityS[key] !== undefined ? entityS[key] - (AXIS_AVG[key] || 0) : 0);
+  const rel = (key) => (key && entityS[key] !== undefined ? entityS[key] - (AXIS_AVG[key] || 0) : 0);
   let score = 0;
   score += rel(a.taste) * (weights.taste / 10);
   score += rel('body_' + a.body) * (weights.body / 10);
@@ -3070,6 +3331,10 @@ function computeAxisScore(entityS, a, weights) {
   score += rel(a.moment) * (weights.moment / 10);
   // ترکیب شیر/شکلات: خارج از جدول رسمی ۷بُعدی سند، فقط برای ظرافت اضافه نگه داشته می‌شه
   score += rel(a.tastepref) * 1.0;
+  // فاز ۲ — محورهای عمیق‌تر (فقط وقتی کاربر برگشتی این‌ها رو پاسخ داده باشه مقدار دارن)
+  score += rel(a.context) * (weights.context / 10);
+  score += rel(a.ritual) * (weights.ritual / 10);
+  score += rel(a.evolution) * (weights.evolution / 10);
   return score;
 }
 
@@ -3468,6 +3733,9 @@ function render(r) {
     currentLang === 'fa' ? persona.tagFa : persona.tagEn;
   document.getElementById('r-persona-desc').textContent =
     currentLang === 'fa' ? persona.descFa : persona.descEn;
+
+  const phase2El = document.getElementById('r-phase2-note');
+  if (phase2El) phase2El.style.display = isPhase2 ? 'block' : 'none';
 
   // Badge tags
   const badge = document.getElementById('r-identity-badge');
