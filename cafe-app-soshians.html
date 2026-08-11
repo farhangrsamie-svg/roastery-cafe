@@ -1109,7 +1109,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </div>
 
   <div style="text-align:center;padding:4px 0 16px;">
-    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;">پیشنهاد امروز</div>
+    <div style="font-size:10px;letter-spacing:3px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:4px;"><span class="fa-only">پیشنهاد امروز</span><span class="en-only">Today's Pick</span></div>
     <div class="result-bean-name" id="r-name"></div>
     <div class="result-origin" id="r-origin"></div>
     <div class="result-flavor-headline" id="r-flavor-headline"></div>
@@ -1210,7 +1210,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
   </div>
 
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔧 جزئیات فنی ▼</button>
+  <button class="staff-toggle" onclick="toggleRoastGuide()">🔧 <span class="fa-only">جزئیات فنی ▼</span><span class="en-only">Technical Details ▼</span></button>
   <div class="card" id="roast-card" style="display:none;">
     <div class="card-title">🔧 <span class="fa-only">جزئیات فنی</span><span class="en-only">Technical Details</span></div>
     <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
@@ -1223,11 +1223,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;">
     <p style="font-size:13px;color:var(--medium-brown);line-height:1.7;font-family:Arial,sans-serif;">
-      ⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.
+      <span class="fa-only">⏰ <strong>مهم:</strong> دانه‌های تازه رست‌شده به <strong>چند روز استراحت</strong> نیاز دارند تا به اوج طعم برسند.</span>
+      <span class="en-only">⏰ <strong>Important:</strong> Freshly roasted beans need <strong>a few days' rest</strong> to reach peak flavor.</span>
     </p>
   </div>
 
-  <div class="success-msg" id="save-success">✅ پروفایل ذخیره شد!</div>
+  <div class="success-msg" id="save-success">✅ <span class="fa-only">پروفایل ذخیره شد!</span><span class="en-only">Profile saved!</span></div>
 
   <!-- Order CTA -->
   <button class="btn-primary" onclick="goToOrder()" style="margin-bottom:10px;">
@@ -1255,18 +1256,19 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="en-only">Choose Roastery</span>
     </h2>
     <p style="font-size:13px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;">
-      رستری مورد نظرت رو انتخاب کن
+      <span class="fa-only">رستری مورد نظرت رو انتخاب کن</span>
+      <span class="en-only">Pick the roastery you'd like</span>
     </p>
   </div>
 
   <!-- Bean being ordered -->
   <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center;">
-    <div style="font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:4px;">دانه انتخابی شما</div>
+    <div style="font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:4px;"><span class="fa-only">دانه انتخابی شما</span><span class="en-only">Your selected bean</span></div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
   </div>
 
   <div id="roastery-list">
-    <div class="empty-state"><div class="empty-icon">⏳</div><div class="fa-only">در حال بارگذاری رستری‌ها...</div></div>
+    <div class="empty-state"><div class="empty-icon">⏳</div><div class="fa-only">در حال بارگذاری رستری‌ها...</div><div class="en-only">Loading roasteries...</div></div>
   </div>
 </div>
 
@@ -1360,7 +1362,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <!-- Timer -->
   <div class="payment-timer">
-    <div class="timer-text">⏰ لطفاً ظرف ۳۰ دقیقه پرداخت کنید</div>
+    <div class="timer-text"><span class="fa-only">⏰ لطفاً ظرف ۳۰ دقیقه پرداخت کنید</span><span class="en-only">⏰ Please pay within 30 minutes</span></div>
     <div class="timer-count" id="payment-timer">30:00</div>
   </div>
 
@@ -1369,15 +1371,15 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="display:flex;align-items:flex-start;gap:12px;">
       <div class="payment-step-num">۱</div>
       <div class="payment-step-content">
-        <div class="payment-step-title">مبلغ قابل پرداخت</div>
+        <div class="payment-step-title"><span class="fa-only">مبلغ قابل پرداخت</span><span class="en-only">Amount Due</span></div>
         <div class="amount-due-box">
           <div>
-            <div class="amount-due-label">سفارش شما</div>
+            <div class="amount-due-label"><span class="fa-only">سفارش شما</span><span class="en-only">Your order</span></div>
             <div style="font-size:12px;color:var(--caramel);font-family:Arial,sans-serif;" id="pay-order-summary">—</div>
           </div>
           <div style="text-align:left;">
             <div class="amount-due-value" id="pay-amount">—</div>
-            <div class="amount-due-currency">تومان</div>
+            <div class="amount-due-currency"><span class="fa-only">تومان</span><span class="en-only">Toman</span></div>
           </div>
         </div>
       </div>
@@ -1389,13 +1391,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="display:flex;align-items:flex-start;gap:12px;">
       <div class="payment-step-num">۲</div>
       <div class="payment-step-content" style="width:100%;">
-        <div class="payment-step-title">واریز به شماره کارت</div>
+        <div class="payment-step-title"><span class="fa-only">واریز به شماره کارت</span><span class="en-only">Transfer to Card Number</span></div>
         <div class="card-number-box">
           <div class="card-number" id="shop-card-number">6219 8619 xxxx xxxx</div>
           <div class="card-owner" id="shop-card-owner">Roastery Platform</div>
-          <button class="copy-btn" onclick="copyCardNumber()">📋 کپی شماره کارت</button>
+          <button class="copy-btn" onclick="copyCardNumber()">📋 <span class="fa-only">کپی شماره کارت</span><span class="en-only">Copy card number</span></button>
         </div>
-        <div class="payment-step-desc">به نام صاحب حساب واریز کنید و شناسه پرداخت رو یادداشت کنید.</div>
+        <div class="payment-step-desc"><span class="fa-only">به نام صاحب حساب واریز کنید و شناسه پرداخت رو یادداشت کنید.</span><span class="en-only">Transfer under the account holder's name and note the payment reference.</span></div>
       </div>
     </div>
   </div>
@@ -1405,17 +1407,17 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="display:flex;align-items:flex-start;gap:12px;">
       <div class="payment-step-num">۳</div>
       <div class="payment-step-content" style="width:100%;">
-        <div class="payment-step-title">ارسال تصویر رسید</div>
+        <div class="payment-step-title"><span class="fa-only">ارسال تصویر رسید</span><span class="en-only">Upload Receipt Image</span></div>
         <div class="upload-area" onclick="document.getElementById('receipt-input').click()">
           <input type="file" id="receipt-input" accept="image/*" onchange="handleReceiptUpload(this)">
           <div class="upload-icon" id="upload-icon">🧾</div>
-          <div class="upload-text" id="upload-text">تصویر رسید را انتخاب کنید</div>
-          <div class="upload-sub">PNG, JPG تا ۵ مگابایت</div>
-          <img class="upload-preview" id="upload-preview" src="" alt="رسید">
+          <div class="upload-text" id="upload-text"><span class="fa-only">تصویر رسید را انتخاب کنید</span><span class="en-only">Select a receipt image</span></div>
+          <div class="upload-sub"><span class="fa-only">PNG, JPG تا ۵ مگابایت</span><span class="en-only">PNG, JPG up to 5MB</span></div>
+          <img class="upload-preview" id="upload-preview" src="" alt="Receipt">
         </div>
         <!-- Transaction ID -->
         <div class="input-group" style="margin-top:10px;">
-          <label class="input-label">شناسه / کد پیگیری پرداخت</label>
+          <label class="input-label"><span class="fa-only">شناسه / کد پیگیری پرداخت</span><span class="en-only">Payment ID / Tracking Code</span></label>
           <input class="input-field" id="transaction-id" type="text" placeholder="مثلاً: ۱۲۳۴۵۶۷۸" dir="rtl" />
         </div>
       </div>
@@ -1430,7 +1432,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <span class="en-only">✅ Confirm Payment</span>
   </button>
   <p style="text-align:center;font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:12px;">
-    بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.
+    <span class="fa-only">بعد از بررسی رسید، سفارش شما تأیید و ارسال خواهد شد.</span>
+    <span class="en-only">Once your receipt is reviewed, your order will be confirmed and shipped.</span>
   </p>
 </div>
 
@@ -2692,40 +2695,50 @@ function goToOrderDirect() {
   show('screen-order');
 }
 
+const LOCATION_EN = {
+  'شمال تهران': 'North Tehran', 'شمال شرق تهران': 'Northeast Tehran', 'شمال غرب تهران': 'Northwest Tehran',
+  'شرق تهران': 'East Tehran', 'غرب تهران': 'West Tehran', 'جنوب تهران': 'South Tehran',
+  'جنوب شرق تهران': 'Southeast Tehran', 'جنوب غرب تهران': 'Southwest Tehran',
+  'گیلاوند و دماوند': 'Gilavand & Damavand', 'کرج': 'Karaj'
+};
+const DESC_EN = 'Specialty roastery with hand-picked, top-quality beans';
+
 async function loadRoasteries() {
   const container = document.getElementById('roastery-list');
+  const en = currentLang === 'en';
   try {
     const roasteries = await sb('GET', 'roasteries?is_active=eq.true&order=rating.desc&select=*');
     if (!roasteries || !roasteries.length) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div></div>';
+      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div><div class="en-only">No active roasteries found</div></div>';
       return;
     }
     const beanName = orderBean ? orderBean.name : '';
     container.innerHTML = roasteries.map(r => {
       const stars = '⭐'.repeat(Math.round(r.rating || 5));
       const hasBeen = r.beans && r.beans.some(b => b.includes(beanName.split('(')[0].trim()));
-      const matchBadge = hasBeen ? '<span style="background:#E8F5E8;color:#2E7D32;border-radius:20px;padding:2px 10px;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;border:1px solid #A5D6A7;">✓ این دانه رو داره</span>' : '';
+      const matchBadge = hasBeen ? `<span style="background:#E8F5E8;color:#2E7D32;border-radius:20px;padding:2px 10px;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;border:1px solid #A5D6A7;">✓ ${en ? 'Has this bean' : 'این دانه رو داره'}</span>` : '';
+      const locationText = en ? (LOCATION_EN[r.location] || r.location || '—') : (r.location || '—');
+      const descText = en ? DESC_EN : (r.description || '');
       return `<div class="roastery-card" id="rcard-${r.id}">
         <div class="roastery-card-top">
           <div class="roastery-logo">${r.logo_emoji || '☕'}</div>
           <div>
             <div class="roastery-name">${r.name}</div>
-            <div class="roastery-location">📍 ${r.location || '—'}</div>
+            <div class="roastery-location">📍 ${locationText}</div>
           </div>
         </div>
         <div class="roastery-stats">
           <div class="roastery-stat">${stars} <span>${r.rating || 5}</span></div>
-          <div class="roastery-stat">🚚 <span>${r.delivery_days || 3}</span> روز</div>
-          <div class="roastery-stat">📦 از <span>${r.min_order || 50}</span>g</div>
+          <div class="roastery-stat">🚚 <span>${r.delivery_days || 3}</span> ${en ? (r.delivery_days === 1 ? 'day' : 'days') : 'روز'}</div>
+          <div class="roastery-stat">📦 ${en ? 'from' : 'از'} <span>${r.min_order || 50}</span>g</div>
         </div>
         ${matchBadge}
-        <div class="roastery-desc" style="margin-top:8px;">${r.description || ''}</div>
+        <div class="roastery-desc" style="margin-top:8px;">${descText}</div>
         <button class="roastery-select-btn" onclick="selectRoastery(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-          انتخاب این رستری ←
+          ${en ? 'Select this roastery →' : 'انتخاب این رستری ←'}
         </button>
       </div>`;
     }).join('');
-    setLang(currentLang);
   } catch(e) {
     container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
   }
@@ -2751,12 +2764,13 @@ async function submitOrder() {
   const sucEl = document.getElementById('order-success');
   errEl.classList.remove('visible');
   sucEl.classList.remove('visible');
+  const en = currentLang === 'en';
 
   const address = document.getElementById('order-address').value.trim();
   const notes   = document.getElementById('order-notes').value.trim();
 
-  if (!selectedAmount) return showErr(errEl, 'مقدار را انتخاب کنید (۵۰g یا ۱۰۰g)');
-  if (!address) return showErr(errEl, 'آدرس تحویل را وارد کنید');
+  if (!selectedAmount) return showErr(errEl, en ? 'Please select an amount (50g or 100g)' : 'مقدار را انتخاب کنید (۵۰g یا ۱۰۰g)');
+  if (!address) return showErr(errEl, en ? 'Please enter a delivery address' : 'آدرس تحویل را وارد کنید');
 
   const btn = document.getElementById('btn-submit-order');
   btn.disabled = true;
@@ -2784,12 +2798,12 @@ async function submitOrder() {
 
     // رفتن به صفحه پرداخت
     setTimeout(() => goToPayment(), 800);
-    sucEl.textContent = '✅ سفارش ثبت شد! در حال انتقال به صفحه پرداخت...';
+    sucEl.textContent = en ? '✅ Order placed! Redirecting to payment...' : '✅ سفارش ثبت شد! در حال انتقال به صفحه پرداخت...';
     sucEl.classList.add('visible');
-    btn.textContent = '✅ ثبت شد';
+    btn.textContent = en ? '✅ Submitted' : '✅ ثبت شد';
 
   } catch(e) {
-    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
+    showErr(errEl, (en ? 'Error submitting order: ' : 'خطا در ثبت سفارش: ') + e.message);
     btn.disabled = false;
     btn.innerHTML = '<span class="en-only">✅ Submit Order</span><span class="fa-only">✅ ثبت سفارش</span>';
     setLang(currentLang);
@@ -2805,7 +2819,7 @@ function showErr(el, msg) {
    BEAN DATABASE
 ═══════════════════════════════════════════ */
 const BEANS = [
-  { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.',
+  { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.', story:"From the Tolima region, deep in Colombia's mountains; traditional Washed processing keeps this bean's clarity and balance.",
     s:{
       fruity:6, choc_nutty:7, floral:2, spicy:1,
       low:2, medium:7, bright:5,
@@ -2817,7 +2831,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
-  { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.',
+  { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Light–Medium', brew:'Chemex / French Press', temp:'91–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'187°C',drop:'208°C',dtr:'22%',time:'11 min'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.', story:"From the Guji zone, one of Ethiopia's emerging regions; Natural processing intensifies the bean's fruity sweetness.",
     s:{
       fruity:9, choc_nutty:3, floral:5, spicy:1,
       low:1, medium:5, bright:8,
@@ -2829,7 +2843,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
-  { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.',
+  { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Any method', temp:'88–92 °C', ratio:'1g : 15g', roastInfo:{charge:'192°C',drop:'212°C',dtr:'23%',time:'11 min'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.', story:'From Huancayo, deep in the Andes; smallholder farming at altitude produces a balanced, unpretentious bean.',
     s:{
       fruity:2, choc_nutty:9, floral:1, spicy:1,
       low:6, medium:7, bright:2,
@@ -2841,7 +2855,7 @@ const BEANS = [
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
-  { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.',
+  { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Light–Medium', brew:'V60 / AeroPress', temp:'90–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.', story:"Extended aerobic fermentation pushes this lot's sweetness and fruit complexity way up — a very different experience from typical Colombian coffee.",
     s:{
       fruity:9, choc_nutty:3, floral:4, spicy:1,
       low:2, medium:6, bright:8,
@@ -2853,7 +2867,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
-  { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Moka Pot', temp:'88–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.',
+  { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Moka Pot', temp:'88–91 °C', ratio:'1g : 2g (espresso)', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.', story:"The same aerobic fermentation, but a completely different profile — showing how much processing can transform an origin's identity.",
     s:{
       fruity:3, choc_nutty:9, floral:2, spicy:2,
       low:5, medium:6, bright:3,
@@ -2865,7 +2879,7 @@ const BEANS = [
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
-  { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', flavors:['Lavender','Lemon Candy','Mint'], roast:'Light', brew:'V60 / AeroPress', temp:'92–94 °C', ratio:'1g : 16–17g', roastInfo:{charge:'187°C',drop:'205°C',dtr:'20%',time:'10 min'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.',
+  { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', flavors:['Lavender','Lemon Candy','Mint'], roast:'Light', brew:'V60 / AeroPress', temp:'92–94 °C', ratio:'1g : 16–17g', roastInfo:{charge:'187°C',drop:'205°C',dtr:'20%',time:'10 min'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.', story:"Geisha is the world's most expensive commercial coffee variety; this Colombian take, with anaerobic processing, creates a flavor unlike any other coffee.",
     s:{
       fruity:6, choc_nutty:0, floral:10, spicy:1,
       low:1, medium:4, bright:9,
@@ -2877,7 +2891,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Light–Medium', brew:'Chemex / AeroPress', temp:'90–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.',
+  { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Light–Medium', brew:'Chemex / AeroPress', temp:'90–93 °C', ratio:'1g : 15–16g', roastInfo:{charge:'190°C',drop:'210°C',dtr:'22%',time:'11 min'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.', story:"Ethiopia's Heirloom variety carries thousands of wild genotypes; aerobic fermentation pushes this lot toward deep, honeyed sweetness.",
     s:{
       fruity:5, choc_nutty:4, floral:3, spicy:1,
       low:4, medium:6, bright:5,
@@ -2889,7 +2903,7 @@ const BEANS = [
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
-  { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Jasmine','Rose Petal','Lily'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'205°C',dtr:'19%',time:'10 min'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.',
+  { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Jasmine','Rose Petal','Lily'], roast:'Light', brew:'V60 / Chemex', temp:'92–95 °C', ratio:'1g : 15–17g', roastInfo:{charge:'187°C',drop:'205°C',dtr:'19%',time:'10 min'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.', story:'Same region, closely related variety — but different processing this time highlights the floral side instead of the honeyed one.',
     s:{
       fruity:3, choc_nutty:0, floral:10, spicy:1,
       low:2, medium:5, bright:8,
@@ -3390,18 +3404,27 @@ function getHealthCautionText() {
   if (!h1 && !h2) return null; // رد شده یا مسیر متخصص (سؤالات سلامت رو ندیده)
   const sensitiveCount = [h1, h2].filter(v => v === 'sensitive').length;
   const anyElevated = [h1, h2].some(v => v === 'sensitive' || v === 'mild');
+  const en = currentLang === 'en';
 
   if (sensitiveCount === 2) {
-    return 'چون گفتی عصرها خوابت به‌هم می‌ریزه و به بی‌قراری هم حساسی، بهتره این قهوه رو تا قبل ظهر و با کافئین متوسط‌به‌پایین امتحان کنی.';
+    return en
+      ? "Since you mentioned evening coffee disrupts your sleep and you're sensitive to jitters, it's best to try this coffee before noon and with medium-to-low caffeine."
+      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه و به بی‌قراری هم حساسی، بهتره این قهوه رو تا قبل ظهر و با کافئین متوسط‌به‌پایین امتحان کنی.';
   }
   if (h2 === 'sensitive') {
-    return 'چون گفتی عصرها خوابت به‌هم می‌ریزه، این قهوه رو تا قبل ظهر امتحان کن.';
+    return en
+      ? 'Since evening coffee disrupts your sleep, try this one before noon.'
+      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه، این قهوه رو تا قبل ظهر امتحان کن.';
   }
   if (h1 === 'sensitive') {
-    return 'قهوهٔ پیشنهادی: کافئین متوسط‌به‌پایین — مناسب کسی که به بی‌قراری حساسه.';
+    return en
+      ? 'Suggested coffee: medium-to-low caffeine — good for anyone sensitive to jitters.'
+      : 'قهوهٔ پیشنهادی: کافئین متوسط‌به‌پایین — مناسب کسی که به بی‌قراری حساسه.';
   }
   if (anyElevated) {
-    return 'اگه به کافئین حساسی، بهتره این قهوه رو صبح یا اوایل روز امتحان کنی.';
+    return en
+      ? "If you're sensitive to caffeine, it's best to try this coffee in the morning or early in the day."
+      : 'اگه به کافئین حساسی، بهتره این قهوه رو صبح یا اوایل روز امتحان کنی.';
   }
   return null;
 }
@@ -3429,8 +3452,8 @@ function render(r) {
   // Bean info
   document.getElementById('r-name').textContent = r.name;
   document.getElementById('r-origin').textContent = r.origin;
-  document.getElementById('r-flavor-headline').textContent = (r.flavors || []).slice(0, 3).map(trFlavor).join('، ');
-  document.getElementById('r-origin-story').textContent = r.storyFA || '';
+  document.getElementById('r-flavor-headline').textContent = (r.flavors || []).slice(0, 3).map(trFlavor).join(currentLang === 'en' ? ', ' : '، ');
+  document.getElementById('r-origin-story').textContent = (currentLang === 'en' ? r.story : r.storyFA) || r.storyFA || '';
   document.getElementById('r-roast').textContent = r.roast;
   document.getElementById('r-brew').textContent = r.brew;
   document.getElementById('r-temp').textContent = r.temp;
@@ -3478,7 +3501,13 @@ function render(r) {
   if (brewAltBtn) brewAltBtn.style.display = r._brewAlt ? 'block' : 'none';
 
   // Why this coffee
-  const whyMap = {
+  const en = currentLang === 'en';
+  const whyMap = en ? {
+    fruity: 'The fruity, tart character of this bean matches your taste',
+    choc_nutty: 'The rich chocolate and nutty notes of this coffee are ideal for you',
+    floral: 'The floral, fragrant character of this bean is exactly what you were after',
+    spicy: 'The spicy depth of this bean matches your coffee personality'
+  } : {
     fruity: 'میوه‌ای و ترش بودن این دانه با ذائقه شما هماهنگ است',
     choc_nutty: 'نت‌های شکلاتی و آجیلی غنی این قهوه برای شما ایده‌آل است',
     floral: 'گلی و معطر بودن این دانه دقیقاً چیزی است که دنبالش هستید',
@@ -3487,9 +3516,9 @@ function render(r) {
   const why = document.getElementById('why-list');
   const reasons = [
     whyMap[ans.taste] || '',
-    ans.body === 'light' ? 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد' :
-    ans.body === 'full'  ? 'قدرت و غنای این قهوه با خواسته شما هماهنگ است' : '',
-    ans.acidity === 'bright' ? 'طراوت و شادابی این دانه دقیقاً همونیه که دنبالش بودید' : ''
+    ans.body === 'light' ? (en ? "This coffee's light body matches your preference" : 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد') :
+    ans.body === 'full'  ? (en ? "This coffee's strength and richness matches what you wanted" : 'قدرت و غنای این قهوه با خواسته شما هماهنگ است') : '',
+    ans.acidity === 'bright' ? (en ? 'This bean\u2019s brightness is exactly what you were after' : 'طراوت و شادابی این دانه دقیقاً همونیه که دنبالش بودید') : ''
   ].filter(Boolean);
   why.innerHTML = reasons.map(r => `<div class="why-item"><div class="why-check">✓</div>${r}</div>`).join('');
 }
@@ -3499,7 +3528,8 @@ function toggleRoastGuide() {
   const btn  = document.querySelector('.staff-toggle');
   const visible = card.style.display !== 'none';
   card.style.display = visible ? 'none' : 'block';
-  btn.textContent = (visible ? '🔧 جزئیات فنی ▼' : '🔧 جزئیات فنی ▲');
+  const arrow = visible ? '▼' : '▲';
+  btn.innerHTML = '🔧 <span class="fa-only">جزئیات فنی ' + arrow + '</span><span class="en-only">Technical Details ' + arrow + '</span>';
 
   // قانون Upgrade: کاربر مبتدی که خودش سراغ جزئیات فنی/خاستگاه می‌ره، آشنایی نشون داده
   if (!visible && currentLevel === 'beginner') {
@@ -3517,6 +3547,18 @@ function setLang(lang) {
   document.body.style.direction = lang === 'fa' ? 'rtl' : 'ltr';
   document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
   document.getElementById('btn-lang-fa').classList.toggle('active', lang === 'fa');
+
+  // placeholder‌ها attribute هستن، با CSS قابل تغییر نیستن — دستی سوییچ می‌شن
+  const PLACEHOLDERS = {
+    'reg-name':      { fa:'نام خود را وارد کنید', en:'Enter your name' },
+    'order-address': { fa:'آدرس کامل خود را وارد کنید...', en:'Enter your full address...' },
+    'order-notes':   { fa:'هر توضیح اضافه‌ای...', en:'Any additional notes...' }
+  };
+  Object.entries(PLACEHOLDERS).forEach(([id, txt]) => {
+    const el = document.getElementById(id);
+    if (el) el.placeholder = txt[lang] || txt.fa;
+  });
+
   if (rec) {
     const radarEl = document.getElementById('r-radar-chart');
     if (radarEl) radarEl.innerHTML = buildFlavorRadar(rec, ans.taste);
@@ -3622,7 +3664,7 @@ function goToPayment() {
 
   // مبلغ
   const price = PRICES[selectedAmount] || 0;
-  document.getElementById('pay-amount').textContent = price.toLocaleString('fa-IR');
+  document.getElementById('pay-amount').textContent = price.toLocaleString(currentLang === 'en' ? 'en-US' : 'fa-IR');
   document.getElementById('pay-order-summary').textContent =
     `${selectedAmount}g — ${orderBean ? orderBean.name : ''}`;
 
@@ -3630,7 +3672,7 @@ function goToPayment() {
   document.getElementById('transaction-id').value = '';
   document.getElementById('upload-preview').style.display = 'none';
   document.getElementById('upload-icon').style.display = 'block';
-  document.getElementById('upload-text').textContent = 'تصویر رسید را انتخاب کنید';
+  document.getElementById('upload-text').innerHTML = '<span class="fa-only">تصویر رسید را انتخاب کنید</span><span class="en-only">Select a receipt image</span>';
   document.getElementById('payment-error').classList.remove('visible');
   document.getElementById('payment-success').classList.remove('visible');
   document.getElementById('btn-confirm-payment').disabled = false;
@@ -3665,10 +3707,13 @@ function startPaymentTimer(seconds) {
 }
 
 function copyCardNumber() {
+  const en = currentLang === 'en';
+  const doneTxt = en ? '✅ Copied!' : '✅ کپی شد!';
+  const restoreHTML = '📋 <span class="fa-only">کپی شماره کارت</span><span class="en-only">Copy card number</span>';
   navigator.clipboard.writeText(SHOP_CARD.replace(/\s/g, '')).then(() => {
     const btn = document.querySelector('.copy-btn');
-    btn.textContent = '✅ کپی شد!';
-    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+    btn.textContent = doneTxt;
+    setTimeout(() => { btn.innerHTML = restoreHTML; }, 2000);
   }).catch(() => {
     // fallback
     const el = document.createElement('textarea');
@@ -3678,16 +3723,17 @@ function copyCardNumber() {
     document.execCommand('copy');
     document.body.removeChild(el);
     const btn = document.querySelector('.copy-btn');
-    btn.textContent = '✅ کپی شد!';
-    setTimeout(() => { btn.textContent = '📋 کپی شماره کارت'; }, 2000);
+    btn.textContent = doneTxt;
+    setTimeout(() => { btn.innerHTML = restoreHTML; }, 2000);
   });
 }
 
 function handleReceiptUpload(input) {
   const file = input.files[0];
   if (!file) return;
+  const en = currentLang === 'en';
   if (file.size > 5 * 1024 * 1024) {
-    showErr(document.getElementById('payment-error'), 'حجم فایل باید کمتر از ۵ مگابایت باشد');
+    showErr(document.getElementById('payment-error'), en ? 'File size must be under 5MB' : 'حجم فایل باید کمتر از ۵ مگابایت باشد');
     return;
   }
   const reader = new FileReader();
@@ -3697,7 +3743,7 @@ function handleReceiptUpload(input) {
     preview.src = receiptBase64;
     preview.style.display = 'block';
     document.getElementById('upload-icon').style.display = 'none';
-    document.getElementById('upload-text').textContent = '✅ رسید انتخاب شد';
+    document.getElementById('upload-text').textContent = en ? '✅ Receipt selected' : '✅ رسید انتخاب شد';
   };
   reader.readAsDataURL(file);
 }
@@ -3710,7 +3756,9 @@ async function autoCancelOrder() {
       payment_status: 'cancelled'
     });
     const errEl = document.getElementById('payment-error');
-    showErr(errEl, '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
+    showErr(errEl, currentLang === 'en'
+      ? '⏰ Payment time expired. Your order was cancelled due to non-payment.'
+      : '⏰ زمان پرداخت به پایان رسید. سفارش شما به دلیل عدم پرداخت کنسل شد.');
     document.getElementById('btn-confirm-payment').disabled = true;
   } catch(e) {
     console.warn('Auto cancel error:', e);
@@ -3723,27 +3771,28 @@ async function confirmPayment() {
   const sucEl = document.getElementById('payment-success');
   errEl.classList.remove('visible');
   sucEl.classList.remove('visible');
+  const en = currentLang === 'en';
 
   const txId = document.getElementById('transaction-id').value.trim();
 
-  if (!receiptBase64) return showErr(errEl, 'لطفاً تصویر رسید را آپلود کنید');
-  if (!txId) return showErr(errEl, 'لطفاً کد پیگیری پرداخت را وارد کنید');
+  if (!receiptBase64) return showErr(errEl, en ? 'Please upload a receipt image' : 'لطفاً تصویر رسید را آپلود کنید');
+  if (!txId) return showErr(errEl, en ? 'Please enter the payment tracking code' : 'لطفاً کد پیگیری پرداخت را وارد کنید');
 
   const btn = document.getElementById('btn-confirm-payment');
   btn.disabled = true;
-  btn.textContent = '...در حال ارسال رسید';
+  btn.textContent = en ? 'Sending receipt...' : '...در حال ارسال رسید';
 
   // اگه pendingOrderId نداریم، نباید ادامه بدیم
   if (!pendingOrderId) {
     btn.disabled = false;
     btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
     setLang(currentLang);
-    return showErr(errEl, 'خطا: شناسه سفارش یافت نشد. لطفاً دوباره سفارش بده.');
+    return showErr(errEl, en ? 'Error: Order ID not found. Please place the order again.' : 'خطا: شناسه سفارش یافت نشد. لطفاً دوباره سفارش بده.');
   }
 
   try {
     // ۱. آپدیت Supabase — این مهم‌ترین قدمه، باید همیشه انجام بشه
-    btn.textContent = '...در حال ثبت اطلاعات';
+    btn.textContent = en ? 'Saving details...' : '...در حال ثبت اطلاعات';
     await sb('PATCH', `orders?id=eq.${pendingOrderId}`, {
       status: 'receipt_submitted',
       payment_status: 'receipt_submitted',
@@ -3751,7 +3800,7 @@ async function confirmPayment() {
     });
 
     // ۲. ارسال رسید به Apps Script → Google Drive (جداگانه، نباید کل فرآیند رو fail کنه)
-    btn.textContent = '...در حال آپلود تصویر';
+    btn.textContent = en ? 'Uploading image...' : '...در حال آپلود تصویر';
     let receiptUrl = '';
     try {
       const receiptData = {
@@ -3784,9 +3833,11 @@ async function confirmPayment() {
     // ۳. توقف تایمر
     if (paymentTimer) clearInterval(paymentTimer);
 
-    sucEl.textContent = '✅ رسید شما با موفقیت ارسال و ذخیره شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
+    sucEl.textContent = en
+      ? '✅ Your receipt was sent and saved successfully! Once the roastery team confirms it, your order will be prepared.'
+      : '✅ رسید شما با موفقیت ارسال و ذخیره شد! پس از تأیید تیم رستری، سفارش آماده‌سازی می‌شود.';
     sucEl.classList.add('visible');
-    btn.textContent = '✅ ارسال شد';
+    btn.textContent = en ? '✅ Sent' : '✅ ارسال شد';
 
     setTimeout(() => {
       show('screen-dashboard');
@@ -3794,7 +3845,7 @@ async function confirmPayment() {
     }, 3000);
 
   } catch(e) {
-    showErr(errEl, 'خطا در ثبت سفارش: ' + e.message);
+    showErr(errEl, (en ? 'Error submitting order: ' : 'خطا در ثبت سفارش: ') + e.message);
     btn.disabled = false;
     btn.innerHTML = '<span class="fa-only">✅ تأیید و ارسال رسید</span><span class="en-only">✅ Confirm Payment</span>';
     setLang(currentLang);
