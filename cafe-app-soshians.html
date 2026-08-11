@@ -129,7 +129,7 @@ body {
 /* ── LOGO ── */
 .logo { text-align: center; margin-bottom: 32px; }
 .logo-icon { font-size: 52px; margin-bottom: 10px; line-height: 1; }
-.logo h1 { font-size: 26px; color: var(--medium-brown); letter-spacing: 4px; text-transform: uppercase; font-weight: normal; }
+.logo h1 { font-size: 22px; color: var(--medium-brown); letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
 .logo-sub { font-size: 11px; color: var(--caramel); letter-spacing: 5px; text-transform: uppercase; margin-top: 6px; }
 
 /* ── INPUTS ── */
@@ -159,8 +159,8 @@ body {
 
 /* ── QUESTION ── */
 .q-header { margin-bottom: 34px; }
-.q-text-en { font-size: 22px; color: var(--dark-brown); margin-bottom: 6px; line-height: 1.3; }
-.q-text-fa { font-size: 17px; color: var(--medium-brown); font-weight: 600; line-height: 1.6; }
+.q-text-en { font-size: 22px; color: var(--dark-brown); font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
+.q-text-fa { font-size: 19px; color: var(--dark-brown); font-weight: 700; line-height: 1.6; }
 
 /* ── OPTION CARDS ── */
 .options { display: grid; gap: 14px; }
@@ -212,7 +212,7 @@ body {
 .option-card.selected .option-icon-photo svg { color: var(--caramel); }
 .option-en { font-size: 14px; font-weight: bold; color: var(--dark-brown); }
 .option-fa { font-size: 11px; color: var(--caramel); margin-top: 3px; font-weight: 600; }
-.option-label-full { font-size: 14.5px; color: var(--dark-brown); font-weight: 600; line-height: 1.6; }
+.option-label-full { font-size: 15px; color: var(--dark-brown); font-weight: 600; line-height: 1.6; }
 .level-badge { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; font-size: 17px; margin-bottom: 12px; background: color-mix(in srgb, var(--level-color, var(--caramel)) 15%, var(--white)); border: 2px solid var(--level-color, var(--caramel)); }
 .option-desc { font-size: 10px; color: var(--gray-light); margin-top: 6px; line-height: 1.5; font-family: 'Arial', sans-serif; }
 
@@ -689,8 +689,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen active" id="screen-auth">
   <div class="logo">
     <div class="logo-icon">☕</div>
-    <h1>Roastery</h1>
-    <div class="logo-sub">پلتفرم رست شخصی</div>
+    <h1><span class="fa-only">هویت قهوه</span><span class="en-only">Coffee Identity</span></h1>
+    <div class="logo-sub"><span class="fa-only">کشف هویت قهوه‌ی خودت</span><span class="en-only">Discover Your Coffee Identity</span></div>
   </div>
 
   <div class="auth-tabs">
@@ -1912,14 +1912,15 @@ async function loadUserMessages() {
     }
 
     // نمایش پیام‌ها
+    const enMsg = currentLang === 'en';
     container.innerHTML = msgs.map(m => {
-      const timeFA = new Date(m.created_at).toLocaleDateString('fa-IR', {
-        month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'
-      });
+      const timeStr = enMsg
+        ? new Date(m.created_at).toLocaleDateString('en-US', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' })
+        : new Date(m.created_at).toLocaleDateString('fa-IR', { month:'long', day:'numeric', hour:'2-digit', minute:'2-digit' });
       return `<div class="msg-card ${!m.is_read ? 'unread' : ''}" onclick="markMsgRead('${m.id}', this)">
         <div class="msg-card-header">
-          <div class="msg-card-from">☕ رستری قهوه ${!m.is_read ? '<span class="msg-unread-badge">جدید</span>' : ''}</div>
-          <div class="msg-card-time">${timeFA}</div>
+          <div class="msg-card-from">☕ ${enMsg ? 'Roastery' : 'رستری قهوه'} ${!m.is_read ? `<span class="msg-unread-badge">${enMsg ? 'New' : 'جدید'}</span>` : ''}</div>
+          <div class="msg-card-time">${timeStr}</div>
         </div>
         <div class="msg-card-text">${m.text}</div>
       </div>`;
@@ -1958,11 +1959,17 @@ function scrollToMessages() {
 }
 
 const tasteFA = { fruity:'میوه‌ای و ترش', choc_nutty:'شکلاتی و آجیلی', floral:'گلی و معطر', spicy:'ادویه‌ای' };
+const tasteEN = { fruity:'Fruity & Tart', choc_nutty:'Chocolate & Nutty', floral:'Floral & Fragrant', spicy:'Spicy' };
 const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
+const bodyEN  = { light:'Light', medium:'Medium', full:'Full' };
 const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', mokapot:'موکاپات', espressohome:'دستگاه اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+const brewEN  = { v60:'Pour Over', frenchpress:'French Press', mokapot:'Moka Pot', espressohome:'Espresso Machine', aeropress:'AeroPress', coldbrew:'Cold Brew', other:'Other' };
 const tastePrefFA = { black_dark:'خالص + شکلات تلخ', black_milk:'خالص + شکلات شیری', milk_dark:'با شیر + شکلات تلخ', milk_milk:'با شیر + شکلات شیری' };
+const tastePrefEN = { black_dark:'Black + Dark Chocolate', black_milk:'Black + Milk Chocolate', milk_dark:'With Milk + Dark Chocolate', milk_milk:'With Milk + Milk Chocolate' };
 const acidityFA = { low:'ملایم', medium:'متعادل', bright:'زنده و ترش' };
+const acidityEN = { low:'Mild', medium:'Balanced', bright:'Bright & Tart' };
 const stateFA = { focus:'تمرکز', relax:'آرام', sensory:'کاوش حسی', social:'دورهمی' };
+const stateEN = { focus:'Focus', relax:'Relax', sensory:'Sensory Exploration', social:'Social' };
 const flavorFA = {
   'Jasmine':'یاسمن', 'Peach':'هلو', 'Green Tea':'چای سبز', 'Citrus':'مرکبات', 'Bergamot':'برگاموت',
   'Blackcurrant':'ریبس سیاه', 'Red Currant':'ریبس قرمز', 'Pomegranate':'انار', 'Brown Sugar':'قند قهوه‌ای',
@@ -1971,6 +1978,12 @@ const flavorFA = {
   'Milk Chocolate':'شکلات شیری', 'Hazelnut':'فندق', 'Almond':'بادام', 'Vanilla':'وانیل', 'Plum':'آلو',
   'Cinnamon':'دارچین', 'Walnut':'گردو', 'Cedar':'سدر', 'Tobacco':'تنباکو', 'Earth':'خاک', 'Molasses':'ملاس'
 };
+function trTag(dictFa, dictEn, key) {
+  if (!key) return null;
+  const dict = currentLang === 'en' ? dictEn : dictFa;
+  return (dict && dict[key]) || key;
+}
+
 function trFlavor(f) {
   return (currentLang === 'fa' && flavorFA[f]) ? flavorFA[f] : f;
 }
@@ -1997,12 +2010,14 @@ async function loadProfiles() {
       const beanFull = p.recommended_bean || '—';
       const beanName = beanFull.split('(')[0].trim();
       const beanDetail = beanFull.includes('(') ? beanFull.match(/\(([^)]+)\)/)?.[1] || '' : '';
-      const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      const dateStr = currentLang === 'en'
+        ? new Date(p.created_at).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})
+        : new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
       const tags = [
-        p.flavor ? (tasteFA[p.flavor] || p.flavor) : null,
-        p.body   ? (bodyFA[p.body]   || p.body)   : null,
-        p.tastepref ? (tastePrefFA[p.tastepref] || p.tastepref) : null,
-        p.mood   ? (stateFA[p.mood]  || p.mood)   : null,
+        trTag(tasteFA, tasteEN, p.flavor),
+        trTag(bodyFA, bodyEN, p.body),
+        trTag(tastePrefFA, tastePrefEN, p.tastepref),
+        trTag(stateFA, stateEN, p.mood),
       ].filter(Boolean);
       const pJson = JSON.stringify(p).replace(/'/g, "\'");
       return `<div class="profile-card-new" id="pcard-${p.id}">
@@ -2013,7 +2028,7 @@ async function loadProfiles() {
               <div class="profile-bean-name">${beanName}</div>
               ${beanDetail ? `<div class="profile-bean-detail">${beanDetail}</div>` : ''}
             </div>
-            <div class="profile-date-badge">${dateFA}</div>
+            <div class="profile-date-badge">${dateStr}</div>
           </div>
           <div class="profile-card-tags-new">
             ${tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('')}
@@ -2021,7 +2036,7 @@ async function loadProfiles() {
         </div>
         <div class="profile-card-actions">
           <button class="btn-fav ${p.is_favorite ? 'active' : ''}" onclick="toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)">
-            ${p.is_favorite ? '⭐ علاقه‌مند' : '☆ علاقه‌مندی'}
+            ${p.is_favorite ? (currentLang === 'en' ? '⭐ Favorited' : '⭐ علاقه‌مند') : (currentLang === 'en' ? '☆ Favorite' : '☆ علاقه‌مندی')}
           </button>
           <button class="btn-del" onclick="deleteProfile('${p.id}')">🗑️</button>
         </div>
@@ -2120,7 +2135,7 @@ async function renderDashboardIdentity(profiles) {
     : '<div style="font-size:28px;opacity:0.3;">☕</div>';
 
   document.getElementById('dash-identity-name').textContent =
-    persona ? (persona.icon + ' ' + persona.fa) : '—';
+    persona ? (persona.icon + ' ' + (currentLang === 'fa' ? persona.fa : persona.en)) : '—';
 
   const profileWord = profiles.length === 1 ? 'پروفایل' : 'پروفایل';
   let countLabel = currentLang === 'fa'
@@ -2130,7 +2145,7 @@ async function renderDashboardIdentity(profiles) {
     countLabel += currentLang === 'fa' ? ` و ${totalOrders} سفارش` : ` and ${totalOrders} order${totalOrders === 1 ? '' : 's'}`;
   }
   document.getElementById('dash-identity-tagline').innerHTML =
-    (persona ? persona.tagFa : '') + `<br><span style="font-size:11px;color:var(--medium-brown);font-weight:500;">${countLabel}</span>`;
+    (persona ? (currentLang === 'fa' ? persona.tagFa : persona.tagEn) : '') + `<br><span style="font-size:11px;color:var(--medium-brown);font-weight:500;">${countLabel}</span>`;
 
   const flavorItems = weighted.map(w => ({ value: w.profile.flavor, weight: w.weight }));
   const bodyItems   = weighted.map(w => ({ value: w.profile.body,   weight: w.weight }));
@@ -2139,9 +2154,9 @@ async function renderDashboardIdentity(profiles) {
   const topBody   = weightedModeOf(bodyItems);
   const topMood   = weightedModeOf(moodItems);
   const tags = [
-    topFlavor ? (tasteFA[topFlavor] || topFlavor) : null,
-    topBody   ? (bodyFA[topBody]   || topBody)   : null,
-    topMood   ? (stateFA[topMood]  || topMood)   : null,
+    trTag(tasteFA, tasteEN, topFlavor),
+    trTag(bodyFA, bodyEN, topBody),
+    trTag(stateFA, stateEN, topMood),
   ].filter(Boolean);
   document.getElementById('dash-identity-tags').innerHTML =
     tags.map(t => `<span class="profile-tag-new">${t}</span>`).join('');
@@ -2156,6 +2171,7 @@ function scrollToProfilesList() {
 
 async function loadOrders() {
   const container = document.getElementById('dash-orders');
+  const en = currentLang === 'en';
   try {
     const orders = await sb('GET', `orders?user_id=eq.${currentUser.id}&order=created_at.desc&select=*`);
     const count = orders ? orders.length : 0;
@@ -2173,6 +2189,15 @@ async function loadOrders() {
       paid:'پرداخت شده', 
       shipped:'ارسال شده',
       cancelled:'کنسل شد ❌'
+    };
+    const statusEN = {
+      pending:'Awaiting payment',
+      receipt_submitted:'Receipt sent — pending confirmation',
+      pending_review:'Under review',
+      confirmed:'Confirmed ✅',
+      paid:'Paid',
+      shipped:'Shipped',
+      cancelled:'Cancelled ❌'
     };
     const statusIcon = { 
       pending:'⏳', 
@@ -2192,25 +2217,28 @@ async function loadOrders() {
       shipped:'status-shipped',
       cancelled:'status-pending'
     };
+    const statusLabels = en ? statusEN : statusFA;
     container.innerHTML = orders.map(o => {
-      const dateFA = new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
+      const dateStr = en
+        ? new Date(o.created_at).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})
+        : new Date(o.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric'});
       const canDelete = o.status === 'cancelled';
       return `<div class="order-card-new" id="ocard-${o.id}">
         <div class="order-card-top">
           <div>
             <div class="order-amount-big">${o.amount}g${o.bean_name ? ' — ' + o.bean_name.split('(')[0].trim() : ''}</div>
-            <div class="order-bean-small">${dateFA}</div>
+            <div class="order-bean-small">${dateStr}</div>
           </div>
-          <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusFA[o.status]||o.status}</div>
+          <div class="order-card-status ${statusClass[o.status]||'status-pending'}">${statusIcon[o.status]||'⏳'} ${statusLabels[o.status]||o.status}</div>
         </div>
         ${o.address ? `<div class="order-address-new">📍 ${o.address}</div>` : ''}
         ${o.notes ? `<div style="font-size:11px;color:var(--gray-light);margin-top:6px;font-family:Arial,sans-serif;">💬 ${o.notes}</div>` : ''}
-        ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;direction:ltr;text-align:right;">🔖 کد پیگیری: ${o.transaction_id}</div>` : ''}
-        ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">🗑️ حذف این سفارش</button>` : ''}
+        ${o.transaction_id ? `<div style="font-size:12px;color:var(--medium-brown);margin-top:6px;font-family:Arial,sans-serif;direction:ltr;text-align:right;">🔖 ${en ? 'Tracking code' : 'کد پیگیری'}: ${o.transaction_id}</div>` : ''}
+        ${canDelete ? `<button class="btn-del" style="width:100%;margin-top:10px;" onclick="deleteOrder('${o.id}')">🗑️ ${en ? 'Delete this order' : 'حذف این سفارش'}</button>` : ''}
       </div>`;
     }).join('');
   } catch(e) {
-    container.innerHTML = '<div class="empty-state">خطا در بارگذاری</div>';
+    container.innerHTML = `<div class="empty-state">${en ? 'Error loading' : 'خطا در بارگذاری'}</div>`;
   }
 }
 
@@ -2287,20 +2315,22 @@ function viewProfile(p) {
   document.getElementById('detail-bean-origin').textContent = beanDetail;
 
   const tags = [
-    p.flavor      ? `<span class="profile-tag-new">${tasteFA[p.flavor]||p.flavor}</span>` : '',
-    p.body        ? `<span class="profile-tag-new">${bodyFA[p.body]||p.body}</span>` : '',
-    p.tastepref   ? `<span class="profile-tag-new">${tastePrefFA[p.tastepref]||p.tastepref}</span>` : '',
-    p.brew        ? `<span class="profile-tag-new">${brewFA[p.brew]||p.brew}</span>` : '',
-    p.mood        ? `<span class="profile-tag-new">${stateFA[p.mood]||p.mood}</span>` : '',
-    p.acidity  ? `<span class="profile-tag-new">${acidityFA[p.acidity]||p.acidity}</span>` : '',
+    trTag(tasteFA, tasteEN, p.flavor) ? `<span class="profile-tag-new">${trTag(tasteFA, tasteEN, p.flavor)}</span>` : '',
+    trTag(bodyFA, bodyEN, p.body) ? `<span class="profile-tag-new">${trTag(bodyFA, bodyEN, p.body)}</span>` : '',
+    trTag(tastePrefFA, tastePrefEN, p.tastepref) ? `<span class="profile-tag-new">${trTag(tastePrefFA, tastePrefEN, p.tastepref)}</span>` : '',
+    trTag(brewFA, brewEN, p.brew) ? `<span class="profile-tag-new">${trTag(brewFA, brewEN, p.brew)}</span>` : '',
+    trTag(stateFA, stateEN, p.mood) ? `<span class="profile-tag-new">${trTag(stateFA, stateEN, p.mood)}</span>` : '',
+    trTag(acidityFA, acidityEN, p.acidity) ? `<span class="profile-tag-new">${trTag(acidityFA, acidityEN, p.acidity)}</span>` : '',
   ].filter(Boolean).join('');
 
-  const dateFA = new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  const dateFA = currentLang === 'en'
+    ? new Date(p.created_at).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'})
+    : new Date(p.created_at).toLocaleDateString('fa-IR', {year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'});
   const pid = p.id;
 
-  const personaFa = currentPersona ? (currentPersona.icon + ' ' + currentPersona.fa) : '';
-  const personaTagline = currentPersona ? currentPersona.tagFa : '';
-  const personaDesc = currentPersona ? currentPersona.descFa : '';
+  const personaFa = currentPersona ? (currentPersona.icon + ' ' + (currentLang === 'en' ? currentPersona.en : currentPersona.fa)) : '';
+  const personaTagline = currentPersona ? (currentLang === 'en' ? currentPersona.tagEn : currentPersona.tagFa) : '';
+  const personaDesc = currentPersona ? (currentLang === 'en' ? currentPersona.descEn : currentPersona.descFa) : '';
 
   document.getElementById('detail-content').innerHTML = `
     <div class="card" style="direction:rtl;text-align:center;">
@@ -2550,7 +2580,7 @@ function showBrewAlternative() {
   document.getElementById('brew-alt-origin').textContent = alt.origin || '';
   document.getElementById('brew-alt-flavors').innerHTML = (alt.flavors || []).slice(0, 4)
     .map(f => `<span class="alt-bean-flavor-tag">${trFlavor(f)}</span>`).join('');
-  const brewLabel = brewFA[ans.brew] || ans.brew || '';
+  const brewLabel = trTag(brewFA, brewEN, ans.brew) || '';
   const isSameAsFlavorAlt = rec._runnerBean && rec._runnerBean.id === alt.id;
   let note;
   if (isSameAsFlavorAlt) {
@@ -2929,7 +2959,7 @@ const PERSONAS = {
   explorer: {
     icon: '🧭',
     fa: 'کاوشگر', en: 'The Explorer',
-    tagFa: 'همیشه دنبال یک تجربهٔ تازه',
+    tagFa: 'همیشه دنبال یک تجربهٔ تازه', tagEn: 'Always chasing a new experience',
     descFa: 'کنجکاوی موتور محرک شماست؛ دانه‌های غیرمعمول و روش‌های دم‌آوری جدید را به تکرار ترجیح می‌دهید.',
     descEn: 'Curiosity drives you — unusual beans and new brew methods beat repeating the familiar.',
     s: {
@@ -2945,7 +2975,7 @@ const PERSONAS = {
   comfort: {
     icon: '☕',
     fa: 'آرامش‌جو', en: 'The Comfort Lover',
-    tagFa: 'قهوه یعنی یک لحظهٔ گرم و آشنا',
+    tagFa: 'قهوه یعنی یک لحظهٔ گرم و آشنا', tagEn: 'Coffee means a warm, familiar moment',
     descFa: 'برایتان قهوه بیش از هر چیز باید آرامش‌بخش و آشنا باشد؛ طعم‌های شیرین و ملایم را به هیجان ترجیح می‌دهید.',
     descEn: 'Coffee is comfort first — sweet, gentle flavors over intensity.',
     s: {
@@ -2961,7 +2991,7 @@ const PERSONAS = {
   bold: {
     icon: '⚡',
     fa: 'جسور', en: 'The Bold Drinker',
-    tagFa: 'قهوه باید حس حضورش را نشان بدهد',
+    tagFa: 'قهوه باید حس حضورش را نشان بدهد', tagEn: 'Coffee should make its presence known',
     descFa: 'طعم‌های قوی و پرقدرت را دوست دارید و از قهوه انرژی و تمرکز واقعی می‌خواهید.',
     descEn: 'You want coffee that makes its presence known — strong, intense, energising.',
     s: {
@@ -2977,7 +3007,7 @@ const PERSONAS = {
   creative: {
     icon: '🎨',
     fa: 'خلاق', en: 'The Creative Mood',
-    tagFa: 'قهوه بخشی از فرآیند فکری شماست',
+    tagFa: 'قهوه بخشی از فرآیند فکری شماست', tagEn: 'Coffee is part of your thinking process',
     descFa: 'قهوه همراه لحظات تمرکز و ایده‌پردازی‌تان است؛ طعم‌های پیچیده و لایه‌دار را می‌پسندید.',
     descEn: 'Coffee accompanies your focus and ideas — layered, complex flavors appeal to you.',
     s: {
@@ -2993,7 +3023,7 @@ const PERSONAS = {
   weekend: {
     icon: '🌤️',
     fa: 'آخرهفته‌ای', en: 'The Weekend Sipper',
-    tagFa: 'قهوه یعنی وقت‌گذرانی بی‌عجله',
+    tagFa: 'قهوه یعنی وقت‌گذرانی بی‌عجله', tagEn: 'Coffee means unhurried time together',
     descFa: 'قهوه‌تان را در کنار دوستان و بدون عجله می‌نوشید؛ لذت بردن برایتان مهم‌تر از پیچیدگی است.',
     descEn: 'You sip slowly with friends — enjoyment matters more than complexity.',
     s: {
@@ -3235,7 +3265,7 @@ function shareResultCard(style, birthDay, birthMonth) {
 
   ctx.fillStyle = pal.accent;
   ctx.font = '600 30px Arial';
-  ctx.fillText(currentLang === 'fa' ? persona.tagFa : '', W / 2, 505);
+  ctx.fillText(currentLang === 'fa' ? persona.tagFa : persona.tagEn, W / 2, 505);
 
   ctx.strokeStyle = 'rgba(254,254,254,0.25)';
   ctx.lineWidth = 2;
@@ -3435,7 +3465,7 @@ function render(r) {
   document.getElementById('r-identity-name').textContent =
     persona.icon + ' ' + (currentLang === 'fa' ? persona.fa : persona.en);
   document.getElementById('r-persona-tagline').textContent =
-    currentLang === 'fa' ? persona.tagFa : '';
+    currentLang === 'fa' ? persona.tagFa : persona.tagEn;
   document.getElementById('r-persona-desc').textContent =
     currentLang === 'fa' ? persona.descFa : persona.descEn;
 
