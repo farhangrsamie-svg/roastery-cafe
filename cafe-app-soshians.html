@@ -4061,9 +4061,9 @@ function populateShareBirthSelects() {
   const monthPlaceholder = document.createElement('option');
   monthPlaceholder.value = ''; monthPlaceholder.textContent = en ? 'Month' : 'ماه';
   monthEl.appendChild(monthPlaceholder);
-  // سال شمسی، هماهنگ با بقیهٔ تاریخ‌های اپ — اسم ماه‌ها بسته به زبان
+  // فارسی: تقویم شمسی (هماهنگ با بقیهٔ تاریخ‌های اپ) — انگلیسی: تقویم میلادی واقعی، نه صرفاً ترجمهٔ اسم ماه‌های شمسی
   const monthsFA = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
-  const monthsEN = ['Farvardin','Ordibehesht','Khordad','Tir','Mordad','Shahrivar','Mehr','Aban','Azar','Dey','Bahman','Esfand'];
+  const monthsEN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   (en ? monthsEN : monthsFA).forEach((m, i) => {
     const opt = document.createElement('option');
     opt.value = i + 1; opt.textContent = m;
@@ -4073,10 +4073,19 @@ function populateShareBirthSelects() {
   const yearPlaceholder = document.createElement('option');
   yearPlaceholder.value = ''; yearPlaceholder.textContent = en ? 'Year' : 'سال';
   yearEl.appendChild(yearPlaceholder);
-  for (let y = 1410; y >= 1335; y--) {
-    const opt = document.createElement('option');
-    opt.value = y; opt.textContent = y;
-    yearEl.appendChild(opt);
+  // فارسی: سال شمسی ۱۳۳۵ تا ۱۴۱۰ — انگلیسی: سال میلادی معادل، نه همون اعداد شمسی
+  if (en) {
+    for (let y = 2026; y >= 1945; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      yearEl.appendChild(opt);
+    }
+  } else {
+    for (let y = 1410; y >= 1335; y--) {
+      const opt = document.createElement('option');
+      opt.value = y; opt.textContent = y;
+      yearEl.appendChild(opt);
+    }
   }
 }
 
