@@ -1634,7 +1634,7 @@ function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
   document.getElementById('q-title-' + screenNum).innerHTML =
     '<span class="fa-only" style="direction:rtl">' + q.title[level].fa + '</span>' +
-    '<span class="en-only" style="direction:ltr">' + q.title[level].en + '</span>';
+    '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + q.title[level].en + '</span>';
   document.getElementById('progress-label-' + screenNum).innerHTML =
     '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
 
@@ -1655,7 +1655,7 @@ function renderQuestion(screenNum, axis, level) {
   if (eduText) {
     eduEl.innerHTML =
       '<span class="fa-only" style="direction:rtl">💡 ' + eduText.fa + '</span>' +
-      '<span class="en-only" style="direction:ltr">💡 ' + eduText.en + '</span>';
+      '<span class="en-only" style="direction:ltr;text-align:left;display:block;">💡 ' + eduText.en + '</span>';
     eduEl.style.display = 'block';
   } else { eduEl.style.display = 'none'; }
 
@@ -3580,13 +3580,17 @@ function setLang(lang) {
 
   // placeholder‌ها attribute هستن، با CSS قابل تغییر نیستن — دستی سوییچ می‌شن
   const PLACEHOLDERS = {
-    'reg-name':      { fa:'نام خود را وارد کنید', en:'Enter your name' },
-    'order-address': { fa:'آدرس کامل خود را وارد کنید...', en:'Enter your full address...' },
-    'order-notes':   { fa:'هر توضیح اضافه‌ای...', en:'Any additional notes...' }
+    'reg-name':        { fa:'نام خود را وارد کنید', en:'Enter your name' },
+    'order-address':   { fa:'آدرس کامل خود را وارد کنید...', en:'Enter your full address...' },
+    'order-notes':     { fa:'هر توضیح اضافه‌ای...', en:'Any additional notes...' },
+    'transaction-id':  { fa:'مثلاً: ۱۲۳۴۵۶۷۸', en:'e.g. 12345678' }
   };
   Object.entries(PLACEHOLDERS).forEach(([id, txt]) => {
     const el = document.getElementById(id);
-    if (el) el.placeholder = txt[lang] || txt.fa;
+    if (el) {
+      el.placeholder = txt[lang] || txt.fa;
+      el.dir = lang === 'en' ? 'ltr' : 'rtl';
+    }
   });
 
   if (rec) {
@@ -3681,6 +3685,7 @@ async function confirmDelete(profileId, overlay) {
 // تنظیمات رستری — بعداً از پنل ادمین می‌آد
 const SHOP_CARD = '6219 8619 1234 5678'; // شماره کارت رستری
 const SHOP_OWNER = 'فرهنگ سامیه';        // نام صاحب حساب
+const SHOP_OWNER_EN = 'Farhang Samie';   // transliteration for English mode
 const PRICES = { 50: 85000, 100: 160000 }; // قیمت‌ها به تومان
 
 let paymentTimer = null;
@@ -3690,7 +3695,7 @@ let pendingOrderId = null;
 function goToPayment() {
   // تنظیم شماره کارت
   document.getElementById('shop-card-number').textContent = SHOP_CARD;
-  document.getElementById('shop-card-owner').textContent = SHOP_OWNER;
+  document.getElementById('shop-card-owner').textContent = currentLang === 'en' ? SHOP_OWNER_EN : SHOP_OWNER;
 
   // مبلغ
   const price = PRICES[selectedAmount] || 0;
