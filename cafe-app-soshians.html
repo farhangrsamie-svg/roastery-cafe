@@ -3137,10 +3137,10 @@ function roundRect(ctx, x, y, w, h, r) {
 
 function drawCanvasRadar(ctx, bean, highlightKey, cx, cy, maxR) {
   const axes = [
-    { key: 'fruity',     fa: 'میوه‌ای' },
-    { key: 'floral',     fa: 'گلی' },
-    { key: 'choc_nutty', fa: 'شکلاتی/آجیلی' },
-    { key: 'spicy',      fa: 'ادویه‌ای' }
+    { key: 'fruity',     fa: 'میوه‌ای', en: 'Fruity' },
+    { key: 'floral',     fa: 'گلی', en: 'Floral' },
+    { key: 'choc_nutty', fa: 'شکلاتی/آجیلی', en: 'Chocolate/Nutty' },
+    { key: 'spicy',      fa: 'ادویه‌ای', en: 'Spicy' }
   ];
   const angleStep = (2 * Math.PI) / axes.length;
   function pointAt(i, value) {
@@ -3186,7 +3186,7 @@ function drawCanvasRadar(ctx, bean, highlightKey, cx, cy, maxR) {
     const isHi = a.key === highlightKey;
     ctx.fillStyle = isHi ? '#C4956A' : '#6B3F2A';
     ctx.font = (isHi ? 'bold ' : '') + '26px Arial';
-    ctx.fillText(a.fa, lx, ly);
+    ctx.fillText(currentLang === 'en' ? a.en : a.fa, lx, ly);
     const [dx, dy] = pointAt(i, (bean.s && bean.s[a.key]) || 0);
     ctx.beginPath();
     ctx.arc(dx, dy, isHi ? 9 : 6, 0, Math.PI * 2);
@@ -3254,7 +3254,7 @@ function shareResultCard(style, birthDay, birthMonth) {
 
   ctx.fillStyle = pal.accent;
   ctx.font = '600 32px Arial';
-  ctx.fillText(currentLang === 'fa' ? 'کافی آیدنتیتی' : 'COFFEE IDENTITY', W / 2, 130);
+  ctx.fillText(currentLang === 'fa' ? 'هویت قهوه' : 'COFFEE IDENTITY', W / 2, 130);
 
   ctx.font = '150px Arial';
   ctx.fillText(persona.icon, W / 2, 350);
@@ -4040,31 +4040,43 @@ function initDarkMode() {
 let selectedShareStyle = 'surprise';
 
 function populateShareBirthSelects() {
+  const en = currentLang === 'en';
   const dayEl = document.getElementById('share-birth-day');
   const monthEl = document.getElementById('share-birth-month');
   const yearEl = document.getElementById('share-birth-year');
-  if (dayEl.options.length <= 1) {
-    for (let d = 1; d <= 31; d++) {
-      const opt = document.createElement('option');
-      opt.value = d; opt.textContent = d;
-      dayEl.appendChild(opt);
-    }
+
+  dayEl.innerHTML = '';
+  monthEl.innerHTML = '';
+  yearEl.innerHTML = '';
+
+  const dayPlaceholder = document.createElement('option');
+  dayPlaceholder.value = ''; dayPlaceholder.textContent = en ? 'Day' : 'روز';
+  dayEl.appendChild(dayPlaceholder);
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d;
+    dayEl.appendChild(opt);
   }
-  if (monthEl.options.length <= 1) {
-    const months = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
-    months.forEach((m, i) => {
-      const opt = document.createElement('option');
-      opt.value = i + 1; opt.textContent = m;
-      monthEl.appendChild(opt);
-    });
-  }
-  if (yearEl.options.length <= 1) {
-    // سال شمسی، هماهنگ با بقیهٔ تاریخ‌های اپ
-    for (let y = 1410; y >= 1335; y--) {
-      const opt = document.createElement('option');
-      opt.value = y; opt.textContent = y;
-      yearEl.appendChild(opt);
-    }
+
+  const monthPlaceholder = document.createElement('option');
+  monthPlaceholder.value = ''; monthPlaceholder.textContent = en ? 'Month' : 'ماه';
+  monthEl.appendChild(monthPlaceholder);
+  // سال شمسی، هماهنگ با بقیهٔ تاریخ‌های اپ — اسم ماه‌ها بسته به زبان
+  const monthsFA = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+  const monthsEN = ['Farvardin','Ordibehesht','Khordad','Tir','Mordad','Shahrivar','Mehr','Aban','Azar','Dey','Bahman','Esfand'];
+  (en ? monthsEN : monthsFA).forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i + 1; opt.textContent = m;
+    monthEl.appendChild(opt);
+  });
+
+  const yearPlaceholder = document.createElement('option');
+  yearPlaceholder.value = ''; yearPlaceholder.textContent = en ? 'Year' : 'سال';
+  yearEl.appendChild(yearPlaceholder);
+  for (let y = 1410; y >= 1335; y--) {
+    const opt = document.createElement('option');
+    opt.value = y; opt.textContent = y;
+    yearEl.appendChild(opt);
   }
 }
 
@@ -4073,6 +4085,7 @@ function openSharePrefsModal() {
   populateShareBirthSelects();
   selectedShareStyle = 'surprise';
   document.querySelectorAll('#share-prefs-overlay .option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('share-prefs-box').style.direction = currentLang === 'en' ? 'ltr' : 'rtl';
   document.getElementById('share-prefs-overlay').style.display = 'flex';
 }
 
@@ -4179,41 +4192,52 @@ if ('serviceWorker' in navigator) {
 
 <!-- Share Preferences Modal (اختیاری، شفاف) -->
 <div id="share-prefs-overlay" style="display:none;position:fixed;inset:0;background:rgba(44,26,14,0.55);z-index:10000;align-items:center;justify-content:center;padding:20px;">
-  <div style="background:var(--white);border-radius:22px;padding:26px 24px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;direction:rtl;">
-    <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">کارتت رو شخصی‌تر کنیم؟</div>
-    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:18px;">کاملاً اختیاریه — می‌تونی رد کنی و همون کارت پیش‌فرض رو بگیری</div>
+  <div id="share-prefs-box" style="background:var(--white);border-radius:22px;padding:26px 24px;max-width:400px;width:100%;max-height:88vh;overflow-y:auto;direction:rtl;">
+    <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">
+      <span class="fa-only">کارتت رو شخصی‌تر کنیم؟</span><span class="en-only">Want to personalize your card?</span>
+    </div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:18px;">
+      <span class="fa-only">کاملاً اختیاریه — می‌تونی رد کنی و همون کارت پیش‌فرض رو بگیری</span>
+      <span class="en-only">Totally optional — you can skip and get the default card</span>
+    </div>
 
-    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">کارتت رو چه‌جوری بسازم؟</div>
+    <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">
+      <span class="fa-only">کارتت رو چه‌جوری بسازم؟</span><span class="en-only">How should I style your card?</span>
+    </div>
     <div class="options cols-1" style="gap:8px;margin-bottom:18px;">
       <div class="option-card" id="style-opt-feminine" onclick="selectShareStyle('feminine')" style="padding:12px 14px;text-align:right;">
-        <span style="font-size:20px;">👗</span> <span style="font-size:14px;">خانومی</span>
+        <span style="font-size:20px;">👗</span> <span style="font-size:14px;" class="fa-only">خانومی</span><span style="font-size:14px;" class="en-only">Feminine</span>
       </div>
       <div class="option-card" id="style-opt-masculine" onclick="selectShareStyle('masculine')" style="padding:12px 14px;text-align:right;">
-        <span style="font-size:20px;">🎩</span> <span style="font-size:14px;">مثل آقاها</span>
+        <span style="font-size:20px;">🎩</span> <span style="font-size:14px;" class="fa-only">مثل آقاها</span><span style="font-size:14px;" class="en-only">Masculine</span>
       </div>
       <div class="option-card" id="style-opt-surprise" onclick="selectShareStyle('surprise')" style="padding:12px 14px;text-align:right;">
-        <span style="font-size:20px;">✨</span> <span style="font-size:14px;">فرقی نمی‌کنه، غافلگیرم کن</span>
+        <span style="font-size:20px;">✨</span> <span style="font-size:14px;" class="fa-only">فرقی نمی‌کنه، غافلگیرم کن</span><span style="font-size:14px;" class="en-only">Doesn't matter, surprise me</span>
       </div>
     </div>
 
     <div style="font-size:13px;color:var(--medium-brown);font-weight:600;margin-bottom:8px;">
-      اگه دوست داری، روز تولدت رو بگو تا یادت باشیم و براش یه هدیه بفرستیم 🎂
-      <div style="font-size:11px;color:var(--gray);font-weight:400;margin-top:3px;">(فقط پیش ما می‌مونه، روی خود کارت نمایش داده نمی‌شه)</div>
+      <span class="fa-only">اگه دوست داری، روز تولدت رو بگو تا یادت باشیم و براش یه هدیه بفرستیم 🎂</span>
+      <span class="en-only">If you'd like, tell us your birthday so we can remember it and send a gift 🎂</span>
+      <div style="font-size:11px;color:var(--gray);font-weight:400;margin-top:3px;">
+        <span class="fa-only">(فقط پیش ما می‌مونه، روی خود کارت نمایش داده نمی‌شه)</span>
+        <span class="en-only">(This stays with us only — it won't appear on the card itself)</span>
+      </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:22px;">
       <select id="share-birth-day" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
-        <option value="">روز</option>
+        <option value="">—</option>
       </select>
       <select id="share-birth-month" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
-        <option value="">ماه</option>
+        <option value="">—</option>
       </select>
       <select id="share-birth-year" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:Arial,sans-serif;">
-        <option value="">سال</option>
+        <option value="">—</option>
       </select>
     </div>
 
-    <button class="btn-primary" onclick="submitSharePrefs()" style="margin-bottom:10px;">🎉 بساز و به اشتراک بذار</button>
-    <button class="btn-primary btn-ghost" onclick="skipSharePrefs()">رد کن، همون پیش‌فرض</button>
+    <button class="btn-primary" onclick="submitSharePrefs()" style="margin-bottom:10px;">🎉 <span class="fa-only">بساز و به اشتراک بذار</span><span class="en-only">Create & Share</span></button>
+    <button class="btn-primary btn-ghost" onclick="skipSharePrefs()"><span class="fa-only">رد کن، همون پیش‌فرض</span><span class="en-only">Skip, use default</span></button>
   </div>
 </div>
 
