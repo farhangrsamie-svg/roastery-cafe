@@ -899,11 +899,11 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="q-text-fa" style="text-align:right;direction:rtl">آخرین باری که قهوه انتخاب کردی چه اتفاقی افتاد؟</div>
   </div>
   <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هر چی بود خوردم</div></div>
-    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">از روی برند یا قیمت انتخاب کردم</div></div>
-    <div class="option-card" onclick="selectLevel('regular')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">دنبال خاستگاه (Origin) قهوه بودم</div></div>
-    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">روش فرآوری یا Cupping Score رو بررسی کردم</div></div>
-    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">من باریستا یا رستر هستم</div></div>
+    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">هر چی بود خوردم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">I drank whatever was available</div></div>
+    <div class="option-card" onclick="selectLevel('beginner')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">از روی برند یا قیمت انتخاب کردم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">I picked by brand or price</div></div>
+    <div class="option-card" onclick="selectLevel('regular')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">دنبال خاستگاه (Origin) قهوه بودم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">I looked for the coffee's origin</div></div>
+    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">روش فرآوری یا Cupping Score رو بررسی کردم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">I checked the processing method or cupping score</div></div>
+    <div class="option-card" onclick="selectLevel('expert')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">من باریستا یا رستر هستم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">I'm a barista or roaster</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -913,14 +913,16 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="q-header">
     <div class="level-badge" id="health1-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl;font-size:13px;color:var(--caramel);margin-bottom:6px;">دو تا سؤال کوچیک — فقط برای اینکه بهتر مراقبت کنیم. اختیاریه.</div>
+    <div class="q-text-en" style="font-size:13px;color:var(--caramel);margin-bottom:6px;">Two quick questions — just so we can look out for you better. Optional.</div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">معمولاً بعد از قهوه چه حسی داری؟</div>
+    <div class="q-text-en">How do you usually feel after coffee?</div>
   </div>
   <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="pickHealth(this,'h1','normal')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هیچی، کاملاً عادیه</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h1','mild')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">گاهی یک‌کم بی‌قرار یا تندخو می‌شم</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h1','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">قلبم تند می‌زنه یا دست‌هام می‌لرزه</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h1','normal')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">هیچی، کاملاً عادیه</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">Nothing, totally normal</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h1','mild')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">گاهی یک‌کم بی‌قرار یا تندخو می‌شم</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">Sometimes a bit jittery or irritable</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h1','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">قلبم تند می‌زنه یا دست‌هام می‌لرزه</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">My heart races or my hands shake</div></div>
   </div>
-  <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span></button>
+  <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span><span class="en-only">Skip →</span></button>
   <div class="spacer"></div>
 </div>
 
@@ -929,13 +931,14 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="q-header">
     <div class="level-badge" id="health2-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">اگه عصر یا شب قهوه بخوری چی می‌شه؟</div>
+    <div class="q-text-en">What happens if you drink coffee in the evening or at night?</div>
   </div>
   <div class="options cols-1" style="display:flex;flex-direction:column;gap:10px;">
-    <div class="option-card" onclick="pickHealth(this,'h2','normal')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">هیچ فرقی نداره</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h2','mild')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">گاهی خوابم یک‌کم دیر می‌بره</div></div>
-    <div class="option-card" onclick="pickHealth(this,'h2','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full" style="direction:rtl">اگه بعدازظهر بخورم، شبم کامل خراب می‌شه</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h2','normal')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">هیچ فرقی نداره</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">No difference at all</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h2','mild')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">گاهی خوابم یک‌کم دیر می‌بره</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">Sometimes I fall asleep a bit later</div></div>
+    <div class="option-card" onclick="pickHealth(this,'h2','sensitive')" style="text-align:right;padding:16px;"><div class="option-label-full fa-only" style="direction:rtl">اگه بعدازظهر بخورم، شبم کامل خراب می‌شه</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">If I drink it in the afternoon, my whole night is ruined</div></div>
   </div>
-  <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span></button>
+  <button class="btn-back" style="position:static;margin-top:20px;" onclick="skipHealth()"><span class="fa-only">رد شدن ←</span><span class="en-only">Skip →</span></button>
   <div class="spacer"></div>
 </div>
 
@@ -1031,13 +1034,14 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="q-header">
     <div class="level-badge" id="q7-badge"></div>
     <div class="q-text-fa" style="text-align:right;direction:rtl">قهوه و شکلاتت رو چه‌جوری دوست داری؟</div>
-    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;"><span class="fa-only">این سؤال به پیشنهاد نهایی هم اثر می‌ذاره — اگه با شیر انتخاب کنی، دانه‌های ملایم‌تر و کم‌اسیدتر اولویت می‌گیرن</span></div>
+    <div class="q-text-en">How do you like your coffee & chocolate?</div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;"><span class="fa-only">این سؤال به پیشنهاد نهایی هم اثر می‌ذاره — اگه با شیر انتخاب کنی، دانه‌های ملایم‌تر و کم‌اسیدتر اولویت می‌گیرن</span><span class="en-only">This also affects your final recommendation — choosing milk prioritizes milder, lower-acid beans</span></div>
   </div>
   <div class="options cols-2">
-    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-label-full" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-label-full" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-label-full" style="direction:rtl">با شیر + شکلات تلخ</div></div>
-    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-label-full" style="direction:rtl">با شیر + شکلات شیری</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_dark')"><div class="option-label-full fa-only" style="direction:rtl">قهوهٔ خالص + شکلات تلخ</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">Black coffee + dark chocolate</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','black_milk')"><div class="option-label-full fa-only" style="direction:rtl">قهوهٔ خالص + شکلات شیری</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">Black coffee + milk chocolate</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_dark')"><div class="option-label-full fa-only" style="direction:rtl">با شیر + شکلات تلخ</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">With milk + dark chocolate</div></div>
+    <div class="option-card" onclick="pick(this,'tastepref','milk_milk')"><div class="option-label-full fa-only" style="direction:rtl">با شیر + شکلات شیری</div><div class="option-label-full en-only" style="direction:ltr;text-align:left;">With milk + milk chocolate</div></div>
   </div>
   <div class="spacer"></div>
 </div>
@@ -1510,74 +1514,126 @@ const LEVEL_WEIGHTS = {
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
 const QUESTIONS = {
   taste: {
-    title: { beginner:'وقتی این قهوه رو می‌چشی، بیشتر یاد کدوم مزه می‌افتی؟', regular:'کدوم خانواده طعمی رو بیشتر ترجیح می‌دی؟', expert:'کدوم دسته از Flavor Wheel رو ترجیح می‌دهید؟' },
-    edu: { beginner:'طعم قهوه شبیه میوه‌ها و شیرینی‌های آشناست — کافیه به اولین حسی که بهت دست می‌ده فکر کنی.', regular:'در دنیای قهوه به این ویژگی‌ها «نوت‌های طعمی» (Flavor Notes) می‌گن؛ مثلاً قهوه‌های اتیوپی معمولاً نوت گل و توت دارن.' },
+    title: {
+      beginner: { fa:'وقتی این قهوه رو می‌چشی، بیشتر یاد کدوم مزه می‌افتی؟', en:'Which taste sounds more like you?' },
+      regular:  { fa:'کدوم خانواده طعمی رو بیشتر ترجیح می‌دی؟', en:'Which flavor family do you prefer?' },
+      expert:   { fa:'کدوم دسته از Flavor Wheel رو ترجیح می‌دهید؟', en:'Which Flavor Wheel category do you prefer?' }
+    },
+    edu: {
+      beginner: { fa:'طعم قهوه شبیه میوه‌ها و شیرینی‌های آشناست — کافیه به اولین حسی که بهت دست می‌ده فکر کنی.', en:'Coffee flavors are like familiar fruits and sweets — just go with your first instinct.' },
+      regular:  { fa:'در دنیای قهوه به این ویژگی‌ها «نوت‌های طعمی» (Flavor Notes) می‌گن؛ مثلاً قهوه‌های اتیوپی معمولاً نوت گل و توت دارن.', en:"These are called 'flavor notes' — Ethiopian coffees, for example, often have floral and berry notes." }
+    },
     options: {
-      beginner: [ {v:'fruity', l:'میوه‌های ترش، مثل پرتقال یا آلبالو'}, {v:'choc_nutty', l:'شکلات و کارامل'}, {v:'choc_nutty', l:'آجیل و بادام برشته'}, {v:'floral', l:'گل و گیاهان معطر'} ],
-      regular:  [ {v:'fruity', l:'میوه‌ای / توتی (Fruity – Berry)'}, {v:'choc_nutty', l:'شکلاتی / آجیلی (Chocolate – Nutty)'}, {v:'floral', l:'گلی / چای‌مانند (Floral – Tea-like)'}, {v:'spicy', l:'ادویه‌ای (Spicy)'} ],
-      expert:   [ {v:'fruity', l:'Fruity (Berry / Citrus / Stone Fruit)'}, {v:'choc_nutty', l:'Sweet / Brown Sugar / Chocolate'}, {v:'choc_nutty', l:'Nutty / Cocoa'}, {v:'floral', l:'Floral'}, {v:'spicy', l:'Spices'} ]
+      beginner: [ {v:'fruity', fa:'میوه‌های ترش، مثل پرتقال یا آلبالو', en:'Tart fruits, like orange or sour cherry'}, {v:'choc_nutty', fa:'شکلات و کارامل', en:'Chocolate and caramel'}, {v:'choc_nutty', fa:'آجیل و بادام برشته', en:'Nuts and roasted almonds'}, {v:'floral', fa:'گل و گیاهان معطر', en:'Flowers and fragrant herbs'} ],
+      regular:  [ {v:'fruity', fa:'میوه‌ای / توتی (Fruity – Berry)', en:'Fruity / Berry'}, {v:'choc_nutty', fa:'شکلاتی / آجیلی (Chocolate – Nutty)', en:'Chocolate / Nutty'}, {v:'floral', fa:'گلی / چای‌مانند (Floral – Tea-like)', en:'Floral / Tea-like'}, {v:'spicy', fa:'ادویه‌ای (Spicy)', en:'Spicy'} ],
+      expert:   [ {v:'fruity', fa:'Fruity (Berry / Citrus / Stone Fruit)', en:'Fruity (Berry / Citrus / Stone Fruit)'}, {v:'choc_nutty', fa:'Sweet / Brown Sugar / Chocolate', en:'Sweet / Brown Sugar / Chocolate'}, {v:'choc_nutty', fa:'Nutty / Cocoa', en:'Nutty / Cocoa'}, {v:'floral', fa:'Floral', en:'Floral'}, {v:'spicy', fa:'Spices', en:'Spices'} ]
     }
   },
   body: {
-    title: { beginner:'دوست داری قهوه‌ت توی دهنت چه حسی داشته باشه؟', regular:'چه سطحی از Body رو ترجیح می‌دی؟', expert:'ترجیح Mouthfeel / Body؟' },
-    edu: { beginner:'بدنه یعنی قهوه توی دهنت چقدر «سنگین» یا «سبک» حس می‌شه؛ مثل فرق شیر کامل با آب.', regular:'Body به بافت و وزن قهوه روی زبان اشاره داره؛ اسپرسوهای برزیلی معمولاً Body بالاتری دارن.' },
+    title: {
+      beginner: { fa:'دوست داری قهوه‌ت توی دهنت چه حسی داشته باشه؟', en:'How do you want your coffee to feel in your mouth?' },
+      regular:  { fa:'چه سطحی از Body رو ترجیح می‌دی؟', en:'What level of Body do you prefer?' },
+      expert:   { fa:'ترجیح Mouthfeel / Body؟', en:'Mouthfeel / Body preference?' }
+    },
+    edu: {
+      beginner: { fa:'بدنه یعنی قهوه توی دهنت چقدر «سنگین» یا «سبک» حس می‌شه؛ مثل فرق شیر کامل با آب.', en:'Body means how heavy or light coffee feels in your mouth — like the difference between whole milk and water.' },
+      regular:  { fa:'Body به بافت و وزن قهوه روی زبان اشاره داره؛ اسپرسوهای برزیلی معمولاً Body بالاتری دارن.', en:'Body refers to the texture and weight of coffee on your tongue; Brazilian espressos usually have higher body.' }
+    },
     options: {
-      beginner: [ {v:'light', l:'سبک و شفاف، مثل چای'}, {v:'medium', l:'متوسط و نرم'}, {v:'full', l:'پرمایه و غلیظ، مثل خامه'} ],
-      regular:  [ {v:'light', l:'سبک (Light-bodied)'}, {v:'medium', l:'متوسط (Medium-bodied)'}, {v:'full', l:'سنگین (Full-bodied)'} ],
-      expert:   [ {v:'light', l:'Light / Tea-like'}, {v:'medium', l:'Medium / Silky'}, {v:'full', l:'Full / Syrupy'}, {v:'full', l:'Creamy / Velvety'} ]
+      beginner: [ {v:'light', fa:'سبک و شفاف، مثل چای', en:'Light and clear, like tea'}, {v:'medium', fa:'متوسط و نرم', en:'Medium and smooth'}, {v:'full', fa:'پرمایه و غلیظ، مثل خامه', en:'Rich and thick, like cream'} ],
+      regular:  [ {v:'light', fa:'سبک (Light-bodied)', en:'Light-bodied'}, {v:'medium', fa:'متوسط (Medium-bodied)', en:'Medium-bodied'}, {v:'full', fa:'سنگین (Full-bodied)', en:'Full-bodied'} ],
+      expert:   [ {v:'light', fa:'Light / Tea-like', en:'Light / Tea-like'}, {v:'medium', fa:'Medium / Silky', en:'Medium / Silky'}, {v:'full', fa:'Full / Syrupy', en:'Full / Syrupy'}, {v:'full', fa:'Creamy / Velvety', en:'Creamy / Velvety'} ]
     }
   },
   acidity: {
-    title: { beginner:'چقدر از حس ترش و طراوت‌بخش توی قهوه خوشت میاد؟', regular:'چه سطح Acidity رو ترجیح می‌دی؟', expert:'ترجیح Acidity Profile؟' },
-    edu: { beginner:'اسیدیته یعنی همون حس تُرش و شاداب‌کننده‌ای که بعضی قهوه‌ها دارن؛ شبیه حس گاز و تُرشی توی یک نوشیدنی خنک.', regular:'Acidity حس روشن و درخشان قهوه‌ست؛ قهوه‌های آفریقایی معمولاً اسیدیته بالاتری دارن، برزیلی‌ها پایین‌تر.' },
+    title: {
+      beginner: { fa:'چقدر از حس ترش و طراوت‌بخش توی قهوه خوشت میاد؟', en:'How much do you like that tart, refreshing feeling in coffee?' },
+      regular:  { fa:'چه سطح Acidity رو ترجیح می‌دی؟', en:'What level of Acidity do you prefer?' },
+      expert:   { fa:'ترجیح Acidity Profile؟', en:'Acidity profile preference?' }
+    },
+    edu: {
+      beginner: { fa:'اسیدیته یعنی همون حس تُرش و شاداب‌کننده‌ای که بعضی قهوه‌ها دارن؛ شبیه حس گاز و تُرشی توی یک نوشیدنی خنک.', en:'Acidity is that tart, bright feeling some coffees have — like the fizz in a cold drink.' },
+      regular:  { fa:'Acidity حس روشن و درخشان قهوه‌ست؛ قهوه‌های آفریقایی معمولاً اسیدیته بالاتری دارن، برزیلی‌ها پایین‌تر.', en:'Acidity is the bright, vivid character of coffee; African coffees are usually higher, Brazilian ones lower.' }
+    },
     options: {
-      beginner: [ {v:'low', l:'اصلاً دوست ندارم'}, {v:'medium', l:'کمی باشه خوبه'}, {v:'bright', l:'عاشق طراوت و ترشی‌شم'} ],
-      regular:  [ {v:'low', l:'پایین (Low Acidity)'}, {v:'medium', l:'متوسط (Medium)'}, {v:'bright', l:'بالا و درخشان (Bright / High)'} ],
-      expert:   [ {v:'low', l:'Low / Muted'}, {v:'medium', l:'Medium / Balanced'}, {v:'bright', l:'Bright / Citric'}, {v:'bright', l:'Malic / Vinous'} ]
+      beginner: [ {v:'low', fa:'اصلاً دوست ندارم', en:'Not a fan at all'}, {v:'medium', fa:'کمی باشه خوبه', en:'A little is nice'}, {v:'bright', fa:'عاشق طراوت و ترشی‌شم', en:'I love that bright, tart kick'} ],
+      regular:  [ {v:'low', fa:'پایین (Low Acidity)', en:'Low Acidity'}, {v:'medium', fa:'متوسط (Medium)', en:'Medium'}, {v:'bright', fa:'بالا و درخشان (Bright / High)', en:'Bright / High'} ],
+      expert:   [ {v:'low', fa:'Low / Muted', en:'Low / Muted'}, {v:'medium', fa:'Medium / Balanced', en:'Medium / Balanced'}, {v:'bright', fa:'Bright / Citric', en:'Bright / Citric'}, {v:'bright', fa:'Malic / Vinous', en:'Malic / Vinous'} ]
     }
   },
   bitterness: {
-    title: { beginner:'چقدر تلخی توی قهوه رو دوست داری؟', regular:'چه سطح تلخی و رست رو ترجیح می‌دی؟', expert:'ترجیح Bitterness / Roast Level؟' },
-    edu: { beginner:'تلخی همون حسیه که توی قهوه پررنگ یا شکلات تلخ حس می‌کنی.', regular:'Bitterness معمولاً با درجه رست رابطه مستقیم داره؛ رست تیره‌تر یعنی تلخی بیشتر.' },
+    title: {
+      beginner: { fa:'چقدر تلخی توی قهوه رو دوست داری؟', en:'How much bitterness do you like in coffee?' },
+      regular:  { fa:'چه سطح تلخی و رست رو ترجیح می‌دی؟', en:'What level of bitterness and roast do you prefer?' },
+      expert:   { fa:'ترجیح Bitterness / Roast Level؟', en:'Bitterness / Roast level preference?' }
+    },
+    edu: {
+      beginner: { fa:'تلخی همون حسیه که توی قهوه پررنگ یا شکلات تلخ حس می‌کنی.', en:'Bitterness is that intense taste you notice in strong coffee or dark chocolate.' },
+      regular:  { fa:'Bitterness معمولاً با درجه رست رابطه مستقیم داره؛ رست تیره‌تر یعنی تلخی بیشتر.', en:'Bitterness is usually tied to roast level — the darker the roast, the more bitterness.' }
+    },
     options: {
-      beginner: [ {v:'light', l:'اصلاً تلخ نباشه'}, {v:'medium', l:'یک‌کم تلخی خوبه'}, {v:'dark', l:'هرچی تلخ‌تر بهتر'} ],
-      regular:  [ {v:'light', l:'رست روشن، کم‌تلخ (Light Roast)'}, {v:'medium', l:'رست متوسط (Medium Roast)'}, {v:'dark', l:'رست تیره، پرتلخی (Dark Roast)'} ],
-      expert:   [ {v:'light', l:'Light / City'}, {v:'medium', l:'Medium / Full City'}, {v:'dark', l:'Dark / French–Italian'} ]
+      beginner: [ {v:'light', fa:'اصلاً تلخ نباشه', en:'Not bitter at all'}, {v:'medium', fa:'یک‌کم تلخی خوبه', en:'A little bitterness is nice'}, {v:'dark', fa:'هرچی تلخ‌تر بهتر', en:'The more bitter, the better'} ],
+      regular:  [ {v:'light', fa:'رست روشن، کم‌تلخ (Light Roast)', en:'Light Roast, low bitterness'}, {v:'medium', fa:'رست متوسط (Medium Roast)', en:'Medium Roast'}, {v:'dark', fa:'رست تیره، پرتلخی (Dark Roast)', en:'Dark Roast, high bitterness'} ],
+      expert:   [ {v:'light', fa:'Light / City', en:'Light / City'}, {v:'medium', fa:'Medium / Full City', en:'Medium / Full City'}, {v:'dark', fa:'Dark / French–Italian', en:'Dark / French–Italian'} ]
     }
   },
   mood: {
-    title: { beginner:'معمولاً وقتی قهوه می‌خوری دنبال چه حسی هستی؟', regular:'قهوه‌ت رو بیشتر برای کدوم حالت انتخاب می‌کنی؟', expert:'Primary Consumption Intent؟' },
-    edu: { beginner:'قهوه می‌تونه حال‌وهوای متفاوتی بهت بده — بعضی وقت‌ها انرژی می‌خوای، بعضی وقت‌ها فقط آرامش.', regular:'کافئین و پروفایل طعمی روی حس ذهنی که تجربه می‌کنی اثر می‌ذاره.' },
+    title: {
+      beginner: { fa:'معمولاً وقتی قهوه می‌خوری دنبال چه حسی هستی؟', en:'What feeling do you usually seek when drinking coffee?' },
+      regular:  { fa:'قهوه‌ت رو بیشتر برای کدوم حالت انتخاب می‌کنی؟', en:'Which mood do you usually pick coffee for?' },
+      expert:   { fa:'Primary Consumption Intent؟', en:'Primary consumption intent?' }
+    },
+    edu: {
+      beginner: { fa:'قهوه می‌تونه حال‌وهوای متفاوتی بهت بده — بعضی وقت‌ها انرژی می‌خوای، بعضی وقت‌ها فقط آرامش.', en:'Coffee can shift your mood — sometimes you want energy, sometimes just calm.' },
+      regular:  { fa:'کافئین و پروفایل طعمی روی حس ذهنی که تجربه می‌کنی اثر می‌ذاره.', en:'Caffeine level and flavor profile affect the mental state you experience.' }
+    },
     options: {
-      beginner: [ {v:'focus', l:'بیدار شدن و تمرکز'}, {v:'relax', l:'آرامش و لذت بردن'}, {v:'social', l:'لذت اجتماعی و دورهمی'} ],
-      regular:  [ {v:'focus', l:'تمرکز و بهره‌وری'}, {v:'relax', l:'ریلکسیشن'}, {v:'sensory', l:'تجربه حسی و کاوش طعم'} ],
-      expert:   [ {v:'focus', l:'Focus / Productivity'}, {v:'sensory', l:'Sensory Exploration'}, {v:'relax', l:'Ritual / Mindfulness'}, {v:'social', l:'Social'} ]
+      beginner: [ {v:'focus', fa:'بیدار شدن و تمرکز', en:'Waking up and focusing'}, {v:'relax', fa:'آرامش و لذت بردن', en:'Relaxing and enjoying'}, {v:'social', fa:'لذت اجتماعی و دورهمی', en:'Social enjoyment with others'} ],
+      regular:  [ {v:'focus', fa:'تمرکز و بهره‌وری', en:'Focus and productivity'}, {v:'relax', fa:'ریلکسیشن', en:'Relaxation'}, {v:'sensory', fa:'تجربه حسی و کاوش طعم', en:'Sensory experience and flavor exploration'} ],
+      expert:   [ {v:'focus', fa:'Focus / Productivity', en:'Focus / Productivity'}, {v:'sensory', fa:'Sensory Exploration', en:'Sensory Exploration'}, {v:'relax', fa:'Ritual / Mindfulness', en:'Ritual / Mindfulness'}, {v:'social', fa:'Social', en:'Social'} ]
     }
   },
   moment: {
-    title: { beginner:'معمولاً چه موقع از روز این قهوه رو می‌خوری؟', regular:'این قهوه رو بیشتر چه زمانی می‌نوشی؟', expert:'Primary Daypart؟' },
-    edu: { beginner:'زمان روزی که قهوه می‌خوری روی مزه‌ای که بهش نیاز داری اثر می‌ذاره.', regular:'قهوه‌های سبک‌تر و اسیددارتر صبح‌ها محبوب‌ترن؛ قهوه‌های سنگین‌تر عصرها.' },
+    title: {
+      beginner: { fa:'معمولاً چه موقع از روز این قهوه رو می‌خوری؟', en:'What time of day do you usually drink this coffee?' },
+      regular:  { fa:'این قهوه رو بیشتر چه زمانی می‌نوشی؟', en:'When do you mostly drink this coffee?' },
+      expert:   { fa:'Primary Daypart؟', en:'Primary daypart?' }
+    },
+    edu: {
+      beginner: { fa:'زمان روزی که قهوه می‌خوری روی مزه‌ای که بهش نیاز داری اثر می‌ذاره.', en:'The time of day you drink coffee affects the flavor you need.' },
+      regular:  { fa:'قهوه‌های سبک‌تر و اسیددارتر صبح‌ها محبوب‌ترن؛ قهوه‌های سنگین‌تر عصرها.', en:'Lighter, more acidic coffees are popular in the morning; heavier coffees in the afternoon.' }
+    },
     options: {
-      beginner: [ {v:'morning', l:'صبح زود'}, {v:'midday', l:'وسط روز'}, {v:'afternoon', l:'بعدازظهر یا عصر'} ],
-      regular:  [ {v:'morning', l:'صبح (Morning Brew)'}, {v:'midday', l:'میان‌وعده (Mid-day)'}, {v:'afternoon', l:'عصرانه (Afternoon)'} ],
-      expert:   [ {v:'morning', l:'AM / Wake-up'}, {v:'midday', l:'Midday Sustain'}, {v:'afternoon', l:'PM / Digestif'} ]
+      beginner: [ {v:'morning', fa:'صبح زود', en:'Early morning'}, {v:'midday', fa:'وسط روز', en:'Midday'}, {v:'afternoon', fa:'بعدازظهر یا عصر', en:'Afternoon or evening'} ],
+      regular:  [ {v:'morning', fa:'صبح (Morning Brew)', en:'Morning Brew'}, {v:'midday', fa:'میان‌وعده (Mid-day)', en:'Mid-day'}, {v:'afternoon', fa:'عصرانه (Afternoon)', en:'Afternoon'} ],
+      expert:   [ {v:'morning', fa:'AM / Wake-up', en:'AM / Wake-up'}, {v:'midday', fa:'Midday Sustain', en:'Midday Sustain'}, {v:'afternoon', fa:'PM / Digestif', en:'PM / Digestif'} ]
     }
   },
   brew: {
-    title: { beginner:'معمولاً قهوه رو چطور درست می‌کنی؟', regular:'با کدوم روش قهوه‌ت رو دم می‌کنی؟', expert:'Primary Brew Method؟' },
-    edu: { beginner:'منظور از دم‌آوری یعنی چطور قهوه رو درست می‌کنی — با دستگاه، فرنچ‌پرس یا موکاپات.', regular:'روش دم‌آوری مستقیماً روی نحوه استخراج طعم اثر می‌ذاره.' },
+    title: {
+      beginner: { fa:'معمولاً قهوه رو چطور درست می‌کنی؟', en:'How do you usually make your coffee?' },
+      regular:  { fa:'با کدوم روش قهوه‌ت رو دم می‌کنی؟', en:'Which method do you use to brew your coffee?' },
+      expert:   { fa:'Primary Brew Method؟', en:'Primary brew method?' }
+    },
+    edu: {
+      beginner: { fa:'منظور از دم‌آوری یعنی چطور قهوه رو درست می‌کنی — با دستگاه، فرنچ‌پرس یا موکاپات.', en:'This means how you make your coffee — with a machine, French press, or moka pot.' },
+      regular:  { fa:'روش دم‌آوری مستقیماً روی نحوه استخراج طعم اثر می‌ذاره.', en:'Brew method directly affects flavor extraction; it does not affect your bean match.' }
+    },
     options: {
-      beginner: [ {v:'espressohome', l:'دستگاه اسپرسوساز خانگی'}, {v:'frenchpress', l:'فرنچ‌پرس یا موکاپات'}, {v:'other', l:'قهوه فوری یا کپسولی'} ],
-      regular:  [ {v:'espressohome', l:'اسپرسو / موکاپات'}, {v:'v60', l:'پوراُور (V60 / Chemex)'}, {v:'frenchpress', l:'فرنچ‌پرس'}, {v:'aeropress', l:'AeroPress'} ],
-      expert:   [ {v:'espressohome', l:'Espresso'}, {v:'v60', l:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', l:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', l:'Cold Brew'}, {v:'other', l:'Siphon'} ]
+      beginner: [ {v:'espressohome', fa:'دستگاه اسپرسوساز خانگی', en:'Home espresso machine'}, {v:'frenchpress', fa:'فرنچ‌پرس یا موکاپات', en:'French press or moka pot'}, {v:'other', fa:'قهوه فوری یا کپسولی', en:'Instant or capsule coffee'} ],
+      regular:  [ {v:'espressohome', fa:'اسپرسو / موکاپات', en:'Espresso / Moka pot'}, {v:'v60', fa:'پوراُور (V60 / Chemex)', en:'Pour-over (V60 / Chemex)'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'aeropress', fa:'AeroPress', en:'AeroPress'} ],
+      expert:   [ {v:'espressohome', fa:'Espresso', en:'Espresso'}, {v:'v60', fa:'Pour-over (V60 / Kalita)', en:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', fa:'Immersion (French Press / AeroPress)', en:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', fa:'Cold Brew', en:'Cold Brew'}, {v:'other', fa:'Siphon', en:'Siphon'} ]
     }
   }
 };
 
 function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
-  document.getElementById('q-title-' + screenNum).textContent = q.title[level];
-  document.getElementById('progress-label-' + screenNum).innerHTML = '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span>';
+  document.getElementById('q-title-' + screenNum).innerHTML =
+    '<span class="fa-only" style="direction:rtl">' + q.title[level].fa + '</span>' +
+    '<span class="en-only" style="direction:ltr">' + q.title[level].en + '</span>';
+  document.getElementById('progress-label-' + screenNum).innerHTML =
+    '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
 
   // نشان رنگی سطح (سبز/آبی/بنفش) — بالای عنوان سؤال
   const badgeId = 'q-level-badge-' + screenNum;
@@ -1593,8 +1649,12 @@ function renderQuestion(screenNum, axis, level) {
 
   const eduEl = document.getElementById('q-edu-' + screenNum);
   const eduText = q.edu[level]; // فقط beginner/regular مقدار دارن؛ متخصص عمداً خالیه
-  if (eduText) { eduEl.textContent = '💡 ' + eduText; eduEl.style.display = 'block'; }
-  else { eduEl.style.display = 'none'; }
+  if (eduText) {
+    eduEl.innerHTML =
+      '<span class="fa-only" style="direction:rtl">💡 ' + eduText.fa + '</span>' +
+      '<span class="en-only" style="direction:ltr">💡 ' + eduText.en + '</span>';
+    eduEl.style.display = 'block';
+  } else { eduEl.style.display = 'none'; }
 
   const optsWrap = document.getElementById('q-options-' + screenNum);
   const opts = q.options[level];
@@ -1604,7 +1664,9 @@ function renderQuestion(screenNum, axis, level) {
     const card = document.createElement('div');
     card.className = 'option-card';
     card.style.textAlign = 'right';
-    card.innerHTML = '<div class="option-label-full" style="direction:rtl">' + opt.l + '</div>';
+    card.innerHTML =
+      '<div class="option-label-full fa-only" style="direction:rtl">' + opt.fa + '</div>' +
+      '<div class="option-label-full en-only" style="direction:ltr;text-align:left;">' + opt.en + '</div>';
     card.onclick = () => pickDynamic(card, axis, opt.v, screenNum);
     optsWrap.appendChild(card);
   });
@@ -1618,7 +1680,7 @@ function renderAllQuestions(level) {
   renderQuestion(5, 'mood', level);
   renderQuestion(6, 'moment', level);
   renderQuestion(8, 'brew', level);
-  document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span>';
+  document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span><span class="en-only">Question 7 of 8</span>';
   const q7b = document.getElementById('q7-badge');
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
