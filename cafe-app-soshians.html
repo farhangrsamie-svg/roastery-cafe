@@ -892,6 +892,26 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div id="detail-content" style="padding-bottom:32px;"></div>
 </div>
 
+<!-- ══════ SCREEN: PHASE 2 WELCOME (فقط کاربر برگشتی) ══════ -->
+<div class="screen" id="screen-phase2-intro">
+  <div style="text-align:center;padding-top:50px;">
+    <div style="font-size:56px;margin-bottom:18px;">🔍</div>
+    <div style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
+      <span class="fa-only">دوباره خوش اومدی</span><span class="en-only">Welcome back</span>
+    </div>
+    <div style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
+      <span class="fa-only">وقتشه عمیق‌تر بشناسیمت</span><span class="en-only">Time to get to know you deeper</span>
+    </div>
+    <div style="font-size:14px;color:var(--medium-brown);line-height:1.9;max-width:320px;margin:0 auto 34px;">
+      <span class="fa-only">این‌بار سؤالات جدید و متفاوتی داریم — دربارهٔ زمینهٔ مصرف، روحیهٔ کاوشگری، و حتی یکی‌دو خاطره — تا هویت قهوه‌ت هر بار دقیق‌تر بشه.</span>
+      <span class="en-only">This time we have new, different questions — about context, exploration style, and even a memory or two — so your coffee identity gets more precise each time.</span>
+    </div>
+    <button class="btn-primary" onclick="show('screen-level')" style="max-width:280px;margin:0 auto;">
+      <span class="fa-only">بریم! →</span><span class="en-only">Let's go! →</span>
+    </button>
+  </div>
+</div>
+
 <!-- ══════ SCREEN 0: LEVEL DETECTION (غیرمستقیم) ══════ -->
 <div class="screen" id="screen-level">
   <div class="q-header">
@@ -1290,7 +1310,13 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="en-only">How to Brew</span>
       <span class="fa-only">روش دم‌آوری</span>
     </div>
-    <div class="info-row"><span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span><span class="info-value" id="r-roast"></span></div>
+    <div class="info-row">
+      <span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span>
+      <span style="display:flex;align-items:center;gap:8px;">
+        <span class="info-value" id="r-roast"></span>
+        <span id="r-roast-dots" style="display:inline-flex;gap:3px;" title=""></span>
+      </span>
+    </div>
     <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
     <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fa-only">روش دم‌آوری شما</span></span><span class="info-value" id="r-your-brew"></span></div>
     <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
@@ -2668,7 +2694,7 @@ async function startNewProfile() {
     }
   } catch(e) { console.warn('could not check for returning user:', e); }
 
-  show('screen-level');
+  show(isPhase2 ? 'screen-phase2-intro' : 'screen-level');
 }
 
 function updateProgressBean(category) {
@@ -3724,6 +3750,30 @@ function getHealthCautionText() {
   return null;
 }
 
+// نمایش بصری سطح رست — مثل رو بسته‌بندی واقعی قهوه: هرچی دونه‌ها تیره‌تر، رست عمیق‌تر
+const ROAST_SCALE = {
+  'light': 1, 'light–medium': 2, 'light-medium': 2,
+  'medium': 3, 'medium–dark': 4, 'medium-dark': 4,
+  'dark': 5, 'very dark': 5
+};
+function renderRoastDots(roastLabel) {
+  const el = document.getElementById('r-roast-dots');
+  if (!el) return;
+  const key = (roastLabel || '').trim().toLowerCase();
+  const level = ROAST_SCALE[key] || 3; // پیش‌فرض: متوسط
+  const TOTAL = 5;
+  let html = '';
+  for (let i = 1; i <= TOTAL; i++) {
+    const filled = i <= level;
+    html += '<svg width="11" height="14" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg">' +
+      '<ellipse cx="12" cy="15" rx="10.5" ry="14" fill="' + (filled ? '#4A2C17' : 'none') + '" stroke="' + (filled ? '#4A2C17' : '#C9B8A5') + '" stroke-width="2"/>' +
+      '<path d="M12 2 C8 9, 8 21, 12 28" stroke="' + (filled ? 'rgba(255,255,255,0.4)' : '#C9B8A5') + '" stroke-width="1.6" fill="none"/>' +
+      '</svg>';
+  }
+  el.innerHTML = html;
+  el.title = (currentLang === 'en' ? 'Roast level: ' : 'سطح رست: ') + level + '/' + TOTAL;
+}
+
 function render(r) {
   // Persona (Coffee Personality Engine — بر اساس ترکیب هر ۶ جواب)
   const persona = currentPersona || determinePersona();
@@ -3753,6 +3803,7 @@ function render(r) {
   document.getElementById('r-flavor-headline').textContent = (r.flavors || []).slice(0, 3).map(trFlavor).join(currentLang === 'en' ? ', ' : '، ');
   document.getElementById('r-origin-story').textContent = (currentLang === 'en' ? r.story : r.storyFA) || r.storyFA || '';
   document.getElementById('r-roast').textContent = r.roast;
+  renderRoastDots(r.roast);
   document.getElementById('r-brew').textContent = r.brew;
   document.getElementById('r-temp').textContent = r.temp;
   document.getElementById('r-ratio').textContent = r.ratio;
@@ -3864,6 +3915,7 @@ function setLang(lang) {
   if (rec) {
     const radarEl = document.getElementById('r-radar-chart');
     if (radarEl) radarEl.innerHTML = buildFlavorRadar(rec, ans.taste);
+    renderRoastDots(rec.roast);
   }
 }
 
