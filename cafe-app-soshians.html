@@ -3380,9 +3380,58 @@ function determinePersona() {
 /* ═══════════════════════════════════════════
    RECOMMENDATION ENGINE — وزن‌دهی سطح‌محور + قانون Override
 ═══════════════════════════════════════════ */
+// آستانه‌ی فیلتر سخت‌گیرانه: فقط دونه‌هایی وارد رقابت نهایی می‌شن که حداقل این نسبت از
+// بهترین نمره‌ی همون محور (رو کل کاتالوگ) رو داشته باشن. مبتدی/معمولی حس فیزیکی رست/تلخی
+// رو فوری می‌فهمن، پس این محور «قطعی» می‌شه، نه فقط یکی از چند سیگنال وزنی.
+// متخصص چند محور کلیدی رو هم‌زمان دقیق می‌فهمه، پس فیلتر رو چندتا محور با هم اعمال می‌شه.
+const HARD_FILTER_RATIO = 0.7;
+
+function axisKeyFor(axis, val) {
+  if (!val) return null;
+  if (axis === 'bitterness') return val === 'medium' ? 'medium_bt' : val;
+  if (axis === 'body') return 'body_' + val;
+  return val;
+}
+
+// مجموعه‌ی id دونه‌هایی که رو یه محور خاص، به‌اندازه‌ی کافی نزدیک به خواسته‌ی کاربرن (نسبت به بهترین نمره‌ی همون محور رو کل کاتالوگ)
+function idsCloseOnAxis(pool, axis, val) {
+  const key = axisKeyFor(axis, val);
+  if (!key) return null; // این محور جواب نداده، فیلتر نمی‌کنیم
+  const scores = pool.map(b => b.s[key] || 0);
+  const max = Math.max(...scores);
+  if (max <= 0) return null;
+  const ids = new Set(pool.filter(b => (b.s[key] || 0) >= max * HARD_FILTER_RATIO).map(b => b.id));
+  return ids.size ? ids : null;
+}
+
+function applyHardFilter(pool) {
+  if (currentLevel === 'expert') {
+    // متخصص: چند محور کلیدی هم‌زمان باید نزدیک باشن (طعم + اسیدیته + تلخی)
+    const axes = ['taste', 'acidity', 'bitterness'];
+    const idSets = axes.map(axis => idsCloseOnAxis(pool, axis, ans[axis])).filter(Boolean);
+    if (!idSets.length) return { pool, noStrongMatch: false };
+    let intersection = idSets[0];
+    for (let i = 1; i < idSets.length; i++) {
+      intersection = new Set([...intersection].filter(id => idSets[i].has(id)));
+    }
+    if (intersection.size > 0) return { pool: pool.filter(b => intersection.has(b.id)), noStrongMatch: false };
+    // هیچ دونه‌ای هم‌زمان تو همه‌ی محورها نزدیک نبود — fallback بی‌صدا به کل کاتالوگ (بدون نمایش پیام خاص به کاربر)
+    return { pool, noStrongMatch: true };
+  }
+  // مبتدی/معمولی: فقط تلخی/رست، چون ساده‌ترین و فوری‌ترین سیگنال حسی‌ه
+  const ids = idsCloseOnAxis(pool, 'bitterness', ans.bitterness);
+  if (!ids) return { pool, noStrongMatch: false };
+  return { pool: pool.filter(b => ids.has(b.id)), noStrongMatch: false };
+}
+
 function recommend() {
-  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  let pool = BEANS.filter(b => AVAILABLE.includes(b.id));
   const baseWeights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
+
+  const { pool: filteredPool, noStrongMatch } = applyHardFilter(pool);
+  pool = filteredPool;
+  // نکته: noStrongMatch فقط برای لاگ/گزارش‌گیری داخلیه (طبق تصمیم برند)، هیچ پیامی به کاربر نشون داده نمی‌شه
+  if (noStrongMatch) console.info('[internal] no strong multi-axis match for expert — fell back to full catalog');
 
   // قانون Override: انتخاب «با شیر» → وزن اسیدیته ۳۰٪ کاهش می‌یابد
   const isMilk = ans.tastepref === 'milk_dark' || ans.tastepref === 'milk_milk';
