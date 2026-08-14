@@ -2892,7 +2892,9 @@ async function saveProfile(rec) {
       is_phase2: isPhase2,
       experience_level: currentLevel,
       persona: currentPersona ? currentPersona.en : null,
-      recommended_bean: rec.name + ' (' + rec.detail + ')'
+      recommended_bean: rec.name + ' (' + rec.detail + ')',
+      catalog_gap: !!rec._catalogGap,
+      catalog_gap_detail: rec._catalogGapDetail || null
     };
     const result = await sb('POST', 'coffee_profiles', supaData);
     if (result && result[0]) currentProfileId = result[0].id;
@@ -3404,34 +3406,51 @@ function idsCloseOnAxis(pool, axis, val) {
   return ids.size ? ids : null;
 }
 
+// آستانه‌ی «شکاف مطلق کاتالوگ»: اگه حتی بهترین دونه‌ی کاتالوگ رو یه محور، زیر این نمره باشه،
+// یعنی خواسته‌ی کاربر رو کاتالوگ فعلی اصلاً پاسخ نمی‌ده (نه اینکه فقط بهترین گزینه‌ی نسبی باشه)
+const ABSOLUTE_GAP_THRESHOLD = 5;
+
+function absoluteGapCheck(pool, axis, val) {
+  const key = axisKeyFor(axis, val);
+  if (!key) return null;
+  const max = Math.max(...pool.map(b => b.s[key] || 0));
+  if (max < ABSOLUTE_GAP_THRESHOLD) return axis + ':' + val + ' (بهترین نمره‌ی کاتالوگ: ' + max + '/10)';
+  return null;
+}
+
 function applyHardFilter(pool) {
   if (currentLevel === 'expert') {
     // متخصص: چند محور کلیدی هم‌زمان باید نزدیک باشن (طعم + اسیدیته + تلخی)
     const axes = ['taste', 'acidity', 'bitterness'];
+    const gaps = axes.map(axis => absoluteGapCheck(pool, axis, ans[axis])).filter(Boolean);
     const idSets = axes.map(axis => idsCloseOnAxis(pool, axis, ans[axis])).filter(Boolean);
-    if (!idSets.length) return { pool, noStrongMatch: false };
+    if (!idSets.length) return { pool, noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
     let intersection = idSets[0];
     for (let i = 1; i < idSets.length; i++) {
       intersection = new Set([...intersection].filter(id => idSets[i].has(id)));
     }
-    if (intersection.size > 0) return { pool: pool.filter(b => intersection.has(b.id)), noStrongMatch: false };
+    if (intersection.size > 0) {
+      return { pool: pool.filter(b => intersection.has(b.id)), noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
+    }
     // هیچ دونه‌ای هم‌زمان تو همه‌ی محورها نزدیک نبود — fallback بی‌صدا به کل کاتالوگ (بدون نمایش پیام خاص به کاربر)
-    return { pool, noStrongMatch: true };
+    return { pool, noStrongMatch: true, catalogGap: true, catalogGapDetail: gaps.length ? gaps.join(' | ') : 'ترکیب چندمحوره‌ی سازگار پیدا نشد' };
   }
   // مبتدی/معمولی: فقط تلخی/رست، چون ساده‌ترین و فوری‌ترین سیگنال حسی‌ه
+  const gap = absoluteGapCheck(pool, 'bitterness', ans.bitterness);
   const ids = idsCloseOnAxis(pool, 'bitterness', ans.bitterness);
-  if (!ids) return { pool, noStrongMatch: false };
-  return { pool: pool.filter(b => ids.has(b.id)), noStrongMatch: false };
+  if (!ids) return { pool, noStrongMatch: false, catalogGap: !!gap, catalogGapDetail: gap || '' };
+  return { pool: pool.filter(b => ids.has(b.id)), noStrongMatch: false, catalogGap: !!gap, catalogGapDetail: gap || '' };
 }
 
 function recommend() {
   let pool = BEANS.filter(b => AVAILABLE.includes(b.id));
   const baseWeights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
 
-  const { pool: filteredPool, noStrongMatch } = applyHardFilter(pool);
+  const { pool: filteredPool, noStrongMatch, catalogGap, catalogGapDetail } = applyHardFilter(pool);
   pool = filteredPool;
-  // نکته: noStrongMatch فقط برای لاگ/گزارش‌گیری داخلیه (طبق تصمیم برند)، هیچ پیامی به کاربر نشون داده نمی‌شه
+  // نکته: این‌ها فقط برای لاگ/گزارش‌گیری داخلیه (طبق تصمیم برند)، هیچ پیامی به کاربر نشون داده نمی‌شه
   if (noStrongMatch) console.info('[internal] no strong multi-axis match for expert — fell back to full catalog');
+  if (catalogGap) console.info('[internal] catalog gap detected:', catalogGapDetail);
 
   // قانون Override: انتخاب «با شیر» → وزن اسیدیته ۳۰٪ کاهش می‌یابد
   const isMilk = ans.tastepref === 'milk_dark' || ans.tastepref === 'milk_milk';
@@ -3458,6 +3477,10 @@ function recommend() {
   best._runnerBean = scored[1] || null;
   best._runner1 = scored[1]?.name || null;
   best._runner2 = scored[2]?.name || null;
+
+  // برای ذخیره‌ی بی‌صدا تو دیتابیس (saveProfile) — هیچ‌جا به کاربر نمایش داده نمی‌شه
+  best._catalogGap = !!catalogGap;
+  best._catalogGapDetail = catalogGapDetail || '';
 
   return best;
 }

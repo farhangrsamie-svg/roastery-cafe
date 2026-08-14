@@ -307,6 +307,10 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <div class="nav-item" onclick="showPage('customers')">
           <span class="nav-icon">👥</span> مشتریان
         </div>
+        <div class="nav-item" onclick="showPage('gaps')">
+          <span class="nav-icon">🔍</span> شکاف‌های کاتالوگ
+          <span class="nav-badge" id="nav-badge-gaps" style="display:none;">0</span>
+        </div>
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-admin" id="admin-name-display">ادمین</div>
@@ -481,6 +485,57 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         </div>
       </div>
 
+      <!-- ══════ صفحه: شکاف‌های کاتالوگ ══════ -->
+      <div class="page" id="page-gaps">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">🔍 شکاف‌های کاتالوگ</div>
+            <div class="page-sub">مواردی که خواسته‌ی کاربر با هیچ‌کدوم از دونه‌های موجود به‌اندازه‌ی کافی نزدیک نبود — این هیچ‌وقت به کاربر نشون داده نمی‌شه، فقط برای تصمیم‌گیری داخلی و مذاکره با تیم رستریه</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="stats-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-num" id="gaps-total-profiles">0</div>
+              <div class="stat-label">کل پروفایل‌های ثبت‌شده</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🔍</div>
+              <div class="stat-num" id="gaps-total-count">0</div>
+              <div class="stat-label">تعداد شکاف شناسایی‌شده</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📈</div>
+              <div class="stat-num" id="gaps-percent">۰٪</div>
+              <div class="stat-label">درصد از کل تسترها</div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div style="font-weight:700;margin-bottom:14px;">تفکیک بر اساس نوع شکاف</div>
+            <div id="gaps-breakdown">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">لیست کامل موارد (جزئیات)</div>
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>تاریخ</th>
+                  <th>سطح تجربه</th>
+                  <th>جزئیات شکاف</th>
+                  <th>دونه‌ی نهایی پیشنهادشده</th>
+                </tr>
+              </thead>
+              <tbody id="gaps-tbody">
+                <tr><td colspan="4" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main-content -->
   </div><!-- /admin-layout -->
 </div><!-- /admin-screen -->
@@ -628,6 +683,7 @@ function showPage(name) {
   if (name === 'profiles') loadProfiles();
   if (name === 'messages') loadMessages();
   if (name === 'customers') loadCustomers();
+  if (name === 'gaps') loadGapsReport();
 }
 
 /* ═══════════════════════════════════════════
@@ -934,6 +990,63 @@ async function loadCustomers() {
     }).join('');
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   شکاف‌های کاتالوگ — گزارش داخلی، هرگز به کاربر نمایش داده نمی‌شه
+═══════════════════════════════════════════ */
+async function loadGapsReport() {
+  const tbody = document.getElementById('gaps-tbody');
+  const breakdownEl = document.getElementById('gaps-breakdown');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  breakdownEl.innerHTML = '<div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>';
+  try {
+    const allProfiles = await sb('GET', 'coffee_profiles?select=id,created_at,experience_level,recommended_bean,catalog_gap,catalog_gap_detail&order=created_at.desc');
+    const total = (allProfiles || []).length;
+    const gaps = (allProfiles || []).filter(p => p.catalog_gap);
+    const gapCount = gaps.length;
+    const pct = total > 0 ? Math.round((gapCount / total) * 100) : 0;
+
+    document.getElementById('gaps-total-profiles').textContent = total.toLocaleString('fa-IR');
+    document.getElementById('gaps-total-count').textContent = gapCount.toLocaleString('fa-IR');
+    document.getElementById('gaps-percent').textContent = pct.toLocaleString('fa-IR') + '٪';
+
+    const badge = document.getElementById('nav-badge-gaps');
+    if (badge) {
+      if (gapCount > 0) { badge.style.display = 'inline-block'; badge.textContent = gapCount; }
+      else { badge.style.display = 'none'; }
+    }
+
+    // تفکیک بر اساس نوع محور شکاف (مثلاً bitterness:dark)
+    const breakdown = {};
+    gaps.forEach(g => {
+      const key = (g.catalog_gap_detail || 'نامشخص').split('(')[0].trim();
+      breakdown[key] = (breakdown[key] || 0) + 1;
+    });
+    const breakdownEntries = Object.entries(breakdown).sort((a, b) => b[1] - a[1]);
+    breakdownEl.innerHTML = breakdownEntries.length
+      ? breakdownEntries.map(([key, count]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${key}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز هیچ شکافی ثبت نشده — عالیه!</div>';
+
+    tbody.innerHTML = gaps.length ? gaps.map(g => {
+      const dateFA = new Date(g.created_at).toLocaleDateString('fa-IR', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+      const levelFA = { beginner:'🌱 مبتدی', regular:'☕ معمولی', expert:'🏆 متخصص' }[g.experience_level] || g.experience_level || '—';
+      return `<tr>
+        <td>${dateFA}</td>
+        <td>${levelFA}</td>
+        <td style="color:var(--medium-brown);">${g.catalog_gap_detail || '—'}</td>
+        <td>${(g.recommended_bean || '—').split('(')[0].trim()}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ شکافی ثبت نشده</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    breakdownEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
 
