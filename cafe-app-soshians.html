@@ -3419,27 +3419,31 @@ function absoluteGapCheck(pool, axis, val) {
 }
 
 function applyHardFilter(pool) {
+  // تلخی/رست اول و همیشه فیلتر می‌شه — برای هر سه سطح، بدون استثنا.
+  // این حسی‌ترین و فوری‌ترین سیگناله؛ حتی متخصص هم نباید هیچ‌وقت رو این محور نادیده گرفته بشه.
+  const bitternessGap = absoluteGapCheck(pool, 'bitterness', ans.bitterness);
+  const bitternessIds = idsCloseOnAxis(pool, 'bitterness', ans.bitterness);
+  const bitternessPool = bitternessIds ? pool.filter(b => bitternessIds.has(b.id)) : pool;
+
   if (currentLevel === 'expert') {
-    // متخصص: چند محور کلیدی هم‌زمان باید نزدیک باشن (طعم + اسیدیته + تلخی)
-    const axes = ['taste', 'acidity', 'bitterness'];
-    const gaps = axes.map(axis => absoluteGapCheck(pool, axis, ans[axis])).filter(Boolean);
-    const idSets = axes.map(axis => idsCloseOnAxis(pool, axis, ans[axis])).filter(Boolean);
-    if (!idSets.length) return { pool, noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
+    // متخصص: طعم + اسیدیته هم باید هم‌زمان نزدیک باشن — ولی فقط داخل همون زیرمجموعه‌ای
+    // که از قبل با تلخی سازگاره (نه کل کاتالوگ)، تا تلخی هیچ‌وقت کامل نادیده گرفته نشه
+    const axes = ['taste', 'acidity'];
+    const gaps = [bitternessGap, ...axes.map(axis => absoluteGapCheck(bitternessPool, axis, ans[axis]))].filter(Boolean);
+    const idSets = axes.map(axis => idsCloseOnAxis(bitternessPool, axis, ans[axis])).filter(Boolean);
+    if (!idSets.length) return { pool: bitternessPool, noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
     let intersection = idSets[0];
     for (let i = 1; i < idSets.length; i++) {
       intersection = new Set([...intersection].filter(id => idSets[i].has(id)));
     }
     if (intersection.size > 0) {
-      return { pool: pool.filter(b => intersection.has(b.id)), noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
+      return { pool: bitternessPool.filter(b => intersection.has(b.id)), noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
     }
-    // هیچ دونه‌ای هم‌زمان تو همه‌ی محورها نزدیک نبود — fallback بی‌صدا به کل کاتالوگ (بدون نمایش پیام خاص به کاربر)
-    return { pool, noStrongMatch: true, catalogGap: true, catalogGapDetail: gaps.length ? gaps.join(' | ') : 'ترکیب چندمحوره‌ی سازگار پیدا نشد' };
+    // طعم/اسیدیته هم‌زمان جور نشدن — fallback فقط به همون زیرمجموعه‌ی سازگار با تلخی (نه کل کاتالوگ)
+    return { pool: bitternessPool, noStrongMatch: true, catalogGap: true, catalogGapDetail: gaps.length ? gaps.join(' | ') : 'طعم و اسیدیته هم‌زمان با تلخی سازگار نبودن' };
   }
-  // مبتدی/معمولی: فقط تلخی/رست، چون ساده‌ترین و فوری‌ترین سیگنال حسی‌ه
-  const gap = absoluteGapCheck(pool, 'bitterness', ans.bitterness);
-  const ids = idsCloseOnAxis(pool, 'bitterness', ans.bitterness);
-  if (!ids) return { pool, noStrongMatch: false, catalogGap: !!gap, catalogGapDetail: gap || '' };
-  return { pool: pool.filter(b => ids.has(b.id)), noStrongMatch: false, catalogGap: !!gap, catalogGapDetail: gap || '' };
+  // مبتدی/معمولی: فقط همون فیلتر تلخی کافیه
+  return { pool: bitternessPool, noStrongMatch: false, catalogGap: !!bitternessGap, catalogGapDetail: bitternessGap || '' };
 }
 
 function recommend() {
