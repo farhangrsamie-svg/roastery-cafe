@@ -16,7 +16,7 @@
   ║   2. Dashboard (Profiles + Orders)                   ║
   ║   3. Quiz (6 questions)                              ║
   ║   4. Result (Coffee profile)                         ║
-  ║   5. Order (50g / 100g + address)                    ║
+  ║   5. Order (125g / 250g + address)                   ║
   ║   6. Payment (Manual card transfer)                  ║
   ║   7. Profile Detail                                  ║
   ║                                                       ║
@@ -1411,15 +1411,15 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">مقدار</span>
     </label>
     <div class="amount-selector">
-      <div class="amount-card" id="amt-50" onclick="selectAmount(50)">
-        <div class="amount-g">50g</div>
+      <div class="amount-card" id="amt-125" onclick="selectAmount(125)">
+        <div class="amount-g">125g</div>
         <div class="amount-label">
           <span class="en-only">Small</span>
           <span class="fa-only">کوچک</span>
         </div>
       </div>
-      <div class="amount-card" id="amt-100" onclick="selectAmount(100)">
-        <div class="amount-g">100g</div>
+      <div class="amount-card" id="amt-250" onclick="selectAmount(250)">
+        <div class="amount-g">250g</div>
         <div class="amount-label">
           <span class="en-only">Medium</span>
           <span class="fa-only">متوسط</span>
@@ -2945,6 +2945,7 @@ async function saveProfile(rec) {
    ORDER
 ═══════════════════════════════════════════ */
 let selectedRoastery = null;
+let currentPricePerGram = 680; // پیش‌فرض، تا قیمت واقعی از دیتابیس بیاد
 
 function goToOrder(bean) {
   orderBean = bean || rec;
@@ -2954,16 +2955,31 @@ function goToOrder(bean) {
   loadRoasteries();
 }
 
-function goToOrderDirect() {
+async function fetchBeanPricing(beanId) {
+  try {
+    const rows = await sb('GET', `bean_pricing?bean_id=eq.${beanId}&select=price_per_gram`);
+    currentPricePerGram = (rows && rows.length && rows[0].price_per_gram) ? Number(rows[0].price_per_gram) : 680;
+  } catch(e) {
+    console.warn('bean pricing fetch error:', e);
+    currentPricePerGram = 680;
+  }
+}
+
+function priceForAmount(amount) {
+  return Math.round(currentPricePerGram * amount);
+}
+
+async function goToOrderDirect() {
   selectedAmount = null;
-  document.getElementById('amt-50').classList.remove('selected');
-  document.getElementById('amt-100').classList.remove('selected');
+  document.getElementById('amt-125').classList.remove('selected');
+  document.getElementById('amt-250').classList.remove('selected');
   document.getElementById('order-address').value = '';
   document.getElementById('order-notes').value = '';
   document.getElementById('order-error').classList.remove('visible');
   document.getElementById('order-success').classList.remove('visible');
   document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
   document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
+  if (orderBean) await fetchBeanPricing(orderBean.id); // قیمت واقعی این دونه رو از دیتابیس بگیر
   // نمایش رستری انتخاب‌شده
   if (selectedRoastery) {
     const roasteryInfo = document.getElementById('order-roastery-info');
@@ -3035,8 +3051,8 @@ function selectRoastery(r) {
 
 function selectAmount(g) {
   selectedAmount = g;
-  document.getElementById('amt-50').classList.toggle('selected', g === 50);
-  document.getElementById('amt-100').classList.toggle('selected', g === 100);
+  document.getElementById('amt-125').classList.toggle('selected', g === 125);
+  document.getElementById('amt-250').classList.toggle('selected', g === 250);
 }
 
 async function submitOrder() {
@@ -3049,7 +3065,7 @@ async function submitOrder() {
   const address = document.getElementById('order-address').value.trim();
   const notes   = document.getElementById('order-notes').value.trim();
 
-  if (!selectedAmount) return showErr(errEl, en ? 'Please select an amount (50g or 100g)' : 'مقدار را انتخاب کنید (۵۰g یا ۱۰۰g)');
+  if (!selectedAmount) return showErr(errEl, en ? 'Please select an amount (125g or 250g)' : 'مقدار را انتخاب کنید (۱۲۵g یا ۲۵۰g)');
   if (!address) return showErr(errEl, en ? 'Please enter a delivery address' : 'آدرس تحویل را وارد کنید');
 
   const btn = document.getElementById('btn-submit-order');
@@ -4082,7 +4098,7 @@ async function confirmDelete(profileId, overlay) {
 const SHOP_CARD = '6219 8619 1234 5678'; // شماره کارت رستری
 const SHOP_OWNER = 'فرهنگ سامیه';        // نام صاحب حساب
 const SHOP_OWNER_EN = 'Farhang Samie';   // transliteration for English mode
-const PRICES = { 50: 85000, 100: 160000 }; // قیمت‌ها به تومان
+// قیمت‌ها دیگه هاردکد نیستن — از جدول bean_pricing خونده می‌شن (تابع priceForAmount بالاتر)
 
 let paymentTimer = null;
 let receiptBase64 = null;
@@ -4094,7 +4110,7 @@ function goToPayment() {
   document.getElementById('shop-card-owner').textContent = currentLang === 'en' ? SHOP_OWNER_EN : SHOP_OWNER;
 
   // مبلغ
-  const price = PRICES[selectedAmount] || 0;
+  const price = priceForAmount(selectedAmount);
   document.getElementById('pay-amount').textContent = price.toLocaleString(currentLang === 'en' ? 'en-US' : 'fa-IR');
   document.getElementById('pay-order-summary').textContent =
     `${selectedAmount}g — ${orderBean ? orderBean.name : ''}`;
@@ -4243,7 +4259,7 @@ async function confirmPayment() {
         phone: currentUser ? currentUser.phone : '',
         bean: orderBean ? orderBean.name : '',
         amount: selectedAmount ? selectedAmount + 'g' : '',
-        price: (PRICES[selectedAmount] || 0).toLocaleString()
+        price: priceForAmount(selectedAmount).toLocaleString()
       };
       const scriptRes = await fetch(APPS_SCRIPT_URL, {
         method: 'POST',

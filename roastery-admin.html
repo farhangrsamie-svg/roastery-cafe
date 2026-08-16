@@ -311,6 +311,9 @@ textarea.input-field { resize: vertical; min-height: 100px; }
           <span class="nav-icon">🔍</span> شکاف‌های کاتالوگ
           <span class="nav-badge" id="nav-badge-gaps" style="display:none;">0</span>
         </div>
+        <div class="nav-item" onclick="showPage('pricing')">
+          <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
+        </div>
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-admin" id="admin-name-display">ادمین</div>
@@ -536,6 +539,22 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         </div>
       </div>
 
+      <!-- ══════ صفحه: قیمت‌گذاری دونه‌ها ══════ -->
+      <div class="page" id="page-pricing">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">💰 قیمت‌گذاری دونه‌ها</div>
+            <div class="page-sub">قیمت به‌ازای هر گرم برای هر دونه — قیمت بسته‌های ۱۲۵ و ۲۵۰ گرمی خودکار از همین عدد محاسبه می‌شه</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div id="pricing-save-msg" style="display:none;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:13px;"></div>
+          <div id="pricing-list">
+            <div style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</div>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main-content -->
   </div><!-- /admin-layout -->
 </div><!-- /admin-screen -->
@@ -684,6 +703,7 @@ function showPage(name) {
   if (name === 'messages') loadMessages();
   if (name === 'customers') loadCustomers();
   if (name === 'gaps') loadGapsReport();
+  if (name === 'pricing') loadPricingForm();
 }
 
 /* ═══════════════════════════════════════════
@@ -1047,6 +1067,72 @@ async function loadGapsReport() {
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
     breakdownEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   قیمت‌گذاری دونه‌ها — مستقل برای هر دونه، بر اساس قیمت هر گرم
+═══════════════════════════════════════════ */
+async function loadPricingForm() {
+  const container = document.getElementById('pricing-list');
+  container.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</div>';
+  try {
+    const rows = await sb('GET', 'bean_pricing?select=*&order=bean_name.asc');
+    if (!rows || !rows.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">هیچ دونه‌ای ثبت نشده</div>';
+      return;
+    }
+    container.innerHTML = rows.map(r => {
+      const p125 = Math.round((r.price_per_gram || 0) * 125);
+      const p250 = Math.round((r.price_per_gram || 0) * 250);
+      return `
+      <div class="section-card" style="margin-bottom:14px;" id="pricing-card-${r.bean_id}">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div style="min-width:200px;">
+            <div style="font-weight:700;font-size:15px;">${r.bean_name || r.bean_id}</div>
+            <div style="font-size:12px;color:#999;margin-top:2px;" id="pricing-preview-${r.bean_id}">
+              ۱۲۵g: ${p125.toLocaleString('fa-IR')} تومان &nbsp;·&nbsp; ۲۵۰g: ${p250.toLocaleString('fa-IR')} تومان
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <input type="number" step="1" min="0" class="input-field" style="width:120px;padding:8px 10px;" id="pricing-input-${r.bean_id}" value="${r.price_per_gram || 0}" oninput="updatePricingPreview('${r.bean_id}')">
+            <span style="font-size:12px;color:#999;">تومان / گرم</span>
+            <button class="btn btn-view" onclick="saveBeanPrice('${r.bean_id}')">ذخیره</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</div>`;
+  }
+}
+
+function updatePricingPreview(beanId) {
+  const input = document.getElementById('pricing-input-' + beanId);
+  const preview = document.getElementById('pricing-preview-' + beanId);
+  const perGram = Number(input.value) || 0;
+  const p125 = Math.round(perGram * 125);
+  const p250 = Math.round(perGram * 250);
+  preview.textContent = `۱۲۵g: ${p125.toLocaleString('fa-IR')} تومان · ۲۵۰g: ${p250.toLocaleString('fa-IR')} تومان`;
+}
+
+async function saveBeanPrice(beanId) {
+  const input = document.getElementById('pricing-input-' + beanId);
+  const perGram = Number(input.value);
+  const msgEl = document.getElementById('pricing-save-msg');
+  if (!perGram || perGram <= 0) {
+    msgEl.style.cssText = 'display:block;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:13px;background:#FDECEC;color:#C0392B;';
+    msgEl.textContent = 'لطفاً یه عدد معتبر بزرگ‌تر از صفر وارد کنید.';
+    return;
+  }
+  try {
+    await sb('PATCH', `bean_pricing?bean_id=eq.${beanId}`, { price_per_gram: perGram, updated_at: new Date().toISOString() });
+    msgEl.style.cssText = 'display:block;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:13px;background:#E8F5E8;color:#2E7D32;';
+    msgEl.textContent = '✅ قیمت با موفقیت ذخیره شد.';
+    setTimeout(() => { msgEl.style.display = 'none'; }, 3000);
+  } catch(e) {
+    msgEl.style.cssText = 'display:block;margin-bottom:16px;padding:12px 16px;border-radius:10px;font-size:13px;background:#FDECEC;color:#C0392B;';
+    msgEl.textContent = 'خطا در ذخیره: ' + e.message;
   }
 }
 
