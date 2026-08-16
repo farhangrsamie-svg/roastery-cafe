@@ -1357,33 +1357,6 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   </button>
 </div>
 
-<!-- ══════ SCREEN: ROASTERY SELECT ══════ -->
-<div class="screen" id="screen-roastery">
-  <button class="btn-back" onclick="show('screen-result')">← <span class="fa-only">بازگشت</span><span class="en-only">Back</span></button>
-
-  <div style="text-align:center;margin-bottom:20px;">
-    <div style="font-size:40px;">🏪</div>
-    <h2 style="font-size:18px;color:var(--dark-brown);margin-top:8px;">
-      <span class="fa-only">انتخاب رستری</span>
-      <span class="en-only">Choose Roastery</span>
-    </h2>
-    <p style="font-size:13px;color:var(--gray-light);font-family:Arial,sans-serif;margin-top:4px;">
-      <span class="fa-only">رستری مورد نظرت رو انتخاب کن</span>
-      <span class="en-only">Pick the roastery you'd like</span>
-    </p>
-  </div>
-
-  <!-- Bean being ordered -->
-  <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:14px;padding:14px 18px;margin-bottom:20px;text-align:center;">
-    <div style="font-size:11px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:4px;"><span class="fa-only">دانه انتخابی شما</span><span class="en-only">Your selected bean</span></div>
-    <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="roastery-screen-bean">—</div>
-  </div>
-
-  <div id="roastery-list">
-    <div class="empty-state"><div class="empty-icon">⏳</div><div class="fa-only">در حال بارگذاری رستری‌ها...</div><div class="en-only">Loading roasteries...</div></div>
-  </div>
-</div>
-
 <!-- ══════ SCREEN: ORDER ══════ -->
 <div class="screen" id="screen-order">
   <button class="btn-back" onclick="show('screen-result')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
@@ -1401,7 +1374,6 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="font-size:12px;color:var(--gray-light);font-family:Arial,sans-serif;margin-bottom:8px;"><span class="fa-only">دانه انتخابی</span><span class="en-only">Selected Bean</span></div>
     <div style="font-size:16px;font-weight:bold;color:var(--dark-brown);" id="order-bean-name">—</div>
     <div style="font-size:12px;color:var(--caramel);" id="order-bean-origin">—</div>
-    <div id="order-roastery-info" style="display:none;margin-top:8px;font-size:13px;color:var(--medium-brown);font-family:Arial,sans-serif;padding-top:8px;border-top:1px solid #F0EAE0;"></div>
   </div>
 
   <!-- Amount Selector -->
@@ -2947,12 +2919,19 @@ async function saveProfile(rec) {
 let selectedRoastery = null;
 let currentPricePerGram = 680; // پیش‌فرض، تا قیمت واقعی از دیتابیس بیاد
 
-function goToOrder(bean) {
+// مشتری دیگه رستری انتخاب نمی‌کنه — طبق تصمیم برندی: سوشیانس هم تأمین‌کننده هم واسط،
+// این انتخاب کاملاً پشت صحنه و نامرئیه. اینجا فقط برای ثبت داخلی (کدوم رستری واقعاً تأمین کرد)
+// بی‌صدا رستری واقعی سوشیانس رو از دیتابیس می‌گیریم.
+async function goToOrder(bean) {
   orderBean = bean || rec;
-  // اول رستری انتخاب بشه
-  document.getElementById('roastery-screen-bean').textContent = orderBean ? orderBean.name : '—';
-  show('screen-roastery');
-  loadRoasteries();
+  try {
+    const rows = await sb('GET', `roasteries?name=eq.${encodeURIComponent('رستری سوشیانس')}&select=*`);
+    selectedRoastery = (rows && rows[0]) || null;
+  } catch(e) {
+    console.warn('could not fetch default roastery:', e);
+    selectedRoastery = null;
+  }
+  goToOrderDirect();
 }
 
 async function fetchBeanPricing(beanId) {
@@ -2980,74 +2959,11 @@ async function goToOrderDirect() {
   document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
   document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
   if (orderBean) await fetchBeanPricing(orderBean.id); // قیمت واقعی این دونه رو از دیتابیس بگیر
-  // نمایش رستری انتخاب‌شده
-  if (selectedRoastery) {
-    const roasteryInfo = document.getElementById('order-roastery-info');
-    if (roasteryInfo) {
-      roasteryInfo.textContent = selectedRoastery.logo_emoji + ' ' + selectedRoastery.name;
-      roasteryInfo.style.display = 'block';
-    }
-  }
+  // نکته: اطلاعات رستری تأمین‌کننده دیگه به مشتری نشون داده نمی‌شه (طبق تصمیم برندی) —
+  // selectedRoastery فقط برای ثبت داخلی تو orders.roastery_id/name استفاده می‌شه
   show('screen-order');
 }
 
-const LOCATION_EN = {
-  'شمال تهران': 'North Tehran', 'شمال شرق تهران': 'Northeast Tehran', 'شمال غرب تهران': 'Northwest Tehran',
-  'شرق تهران': 'East Tehran', 'غرب تهران': 'West Tehran', 'جنوب تهران': 'South Tehran',
-  'جنوب شرق تهران': 'Southeast Tehran', 'جنوب غرب تهران': 'Southwest Tehran',
-  'گیلاوند و دماوند': 'Gilavand & Damavand', 'کرج': 'Karaj'
-};
-const DESC_EN = 'Specialty roastery with hand-picked, top-quality beans';
-
-async function loadRoasteries() {
-  const container = document.getElementById('roastery-list');
-  const en = currentLang === 'en';
-  try {
-    const roasteries = await sb('GET', 'roasteries?is_active=eq.true&order=rating.desc&select=*');
-    if (!roasteries || !roasteries.length) {
-      container.innerHTML = '<div class="empty-state"><div class="empty-icon">🏪</div><div class="fa-only">رستری فعالی یافت نشد</div><div class="en-only">No active roasteries found</div></div>';
-      return;
-    }
-    const beanName = orderBean ? orderBean.name : '';
-    container.innerHTML = roasteries.map(r => {
-      const stars = '⭐'.repeat(Math.round(r.rating || 5));
-      const hasBeen = r.beans && r.beans.some(b => b.includes(beanName.split('(')[0].trim()));
-      const matchBadge = hasBeen ? `<span style="background:#E8F5E8;color:#2E7D32;border-radius:20px;padding:2px 10px;font-size:11px;font-family:Arial,sans-serif;font-weight:bold;border:1px solid #A5D6A7;">✓ ${en ? 'Has this bean' : 'این دانه رو داره'}</span>` : '';
-      const locationText = en ? (LOCATION_EN[r.location] || r.location || '—') : (r.location || '—');
-      const descText = en ? DESC_EN : (r.description || '');
-      return `<div class="roastery-card" id="rcard-${r.id}">
-        <div class="roastery-card-top">
-          <div class="roastery-logo">${r.logo_emoji || '☕'}</div>
-          <div>
-            <div class="roastery-name">${r.name}</div>
-            <div class="roastery-location">📍 ${locationText}</div>
-          </div>
-        </div>
-        <div class="roastery-stats">
-          <div class="roastery-stat">${stars} <span>${r.rating || 5}</span></div>
-          <div class="roastery-stat">🚚 <span>${r.delivery_days || 3}</span> ${en ? (r.delivery_days === 1 ? 'day' : 'days') : 'روز'}</div>
-          <div class="roastery-stat">📦 ${en ? 'from' : 'از'} <span>${r.min_order || 50}</span>g</div>
-        </div>
-        ${matchBadge}
-        <div class="roastery-desc" style="margin-top:8px;">${descText}</div>
-        <button class="roastery-select-btn" onclick="selectRoastery(${JSON.stringify(r).replace(/"/g, '&quot;')})">
-          ${en ? 'Select this roastery →' : 'انتخاب این رستری ←'}
-        </button>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><div>${e.message}</div></div>`;
-  }
-}
-
-function selectRoastery(r) {
-  if (typeof r === 'string') r = JSON.parse(r);
-  selectedRoastery = r;
-  // هایلایت کارت انتخاب‌شده
-  document.querySelectorAll('.roastery-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('rcard-' + r.id)?.classList.add('selected');
-  setTimeout(() => goToOrderDirect(), 300);
-}
 
 function selectAmount(g) {
   selectedAmount = g;
@@ -4095,9 +4011,9 @@ async function confirmDelete(profileId, overlay) {
    PAYMENT
 ═══════════════════════════════════════════ */
 // تنظیمات رستری — بعداً از پنل ادمین می‌آد
-const SHOP_CARD = '6219 8619 1234 5678'; // شماره کارت رستری
-const SHOP_OWNER = 'فرهنگ سامیه';        // نام صاحب حساب
-const SHOP_OWNER_EN = 'Farhang Samie';   // transliteration for English mode
+const SHOP_CARD = '6219 8619 1065 8698'; // شماره کارت رستری
+const SHOP_OWNER = 'کسری ورقایی';        // نام صاحب حساب
+const SHOP_OWNER_EN = 'Kasra Varaghaei'; // transliteration for English mode
 // قیمت‌ها دیگه هاردکد نیستن — از جدول bean_pricing خونده می‌شن (تابع priceForAmount بالاتر)
 
 let paymentTimer = null;
