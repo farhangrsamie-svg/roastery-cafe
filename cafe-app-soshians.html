@@ -3566,7 +3566,16 @@ async function submitOrder() {
     }
 
     // رفتن به صفحه پرداخت
-    setTimeout(() => goToPayment(), 800);
+    setTimeout(() => {
+      try {
+        goToPayment();
+      } catch (paymentErr) {
+        // قبلاً اگه اینجا خطا می‌داد، کاربر ساکت رو همین صفحه گیر می‌کرد بدون هیچ پیامی —
+        // الان حداقل خطا رو واضح نشون می‌دیم تا بدونیم دقیقاً کجا مشکل بوده
+        console.error('goToPayment error:', paymentErr);
+        showErr(errEl, (en ? 'Order was placed, but could not open payment page: ' : 'سفارش ثبت شد، ولی صفحه‌ی پرداخت باز نشد: ') + paymentErr.message);
+      }
+    }, 800);
     sucEl.textContent = en ? '✅ Order placed! Redirecting to payment...' : '✅ سفارش ثبت شد! در حال انتقال به صفحه پرداخت...';
     sucEl.classList.add('visible');
     btn.textContent = en ? '✅ Submitted' : '✅ ثبت شد';
