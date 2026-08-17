@@ -86,7 +86,7 @@ body {
 .content-area { padding: 24px 28px; }
 
 /* ── STATS ── */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
 .stat-card {
   background: var(--white); border-radius: 16px; padding: 20px;
   box-shadow: 0 2px 12px var(--shadow);
@@ -335,24 +335,29 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             <div class="page-title">داشبورد</div>
             <div class="page-sub" id="dashboard-date"></div>
           </div>
-          <button class="btn btn-primary" onclick="refreshAll()">🔄 بروزرسانی</button>
+          <button class="btn btn-primary" id="btn-refresh-dashboard" onclick="refreshAllWithFeedback()">🔄 بروزرسانی</button>
         </div>
         <div class="content-area">
           <div class="stats-grid">
             <div class="stat-card">
-              <div class="stat-icon">📦</div>
+              <div class="stat-icon">⏳</div>
               <div class="stat-num" id="stat-pending">—</div>
-              <div class="stat-label">در انتظار تأیید</div>
+              <div class="stat-label">در انتظار پرداخت</div>
             </div>
             <div class="stat-card">
               <div class="stat-icon">📋</div>
               <div class="stat-num" id="stat-receipts">—</div>
-              <div class="stat-label">رسید ارسال شده</div>
+              <div class="stat-label">رسید ارسال شده — منتظر تأیید شما</div>
             </div>
             <div class="stat-card">
               <div class="stat-icon">✅</div>
               <div class="stat-num" id="stat-confirmed">—</div>
               <div class="stat-label">تأیید شده امروز</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📦</div>
+              <div class="stat-num" id="stat-total-orders">—</div>
+              <div class="stat-label">کل سفارش‌ها</div>
             </div>
             <div class="stat-card">
               <div class="stat-icon">👥</div>
@@ -790,6 +795,27 @@ async function refreshAll() {
   loadOrders(currentFilter || 'all');
 }
 
+// همون refreshAll، فقط با بازخورد بصری رو دکمه — چون قبلاً اگه اعداد عوض نمی‌شدن،
+// هیچ نشونه‌ای از کارکردن دکمه دیده نمی‌شد و به نظر خراب می‌رسید
+async function refreshAllWithFeedback() {
+  const btn = document.getElementById('btn-refresh-dashboard');
+  if (!btn) { refreshAll(); return; }
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '⏳ در حال بروزرسانی...';
+  try {
+    await refreshAll();
+    btn.innerHTML = '✅ بروزرسانی شد';
+  } catch (e) {
+    btn.innerHTML = '❌ خطا در بروزرسانی';
+  } finally {
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.disabled = false;
+    }, 1200);
+  }
+}
+
 let currentFilter = 'all';
 let allOrders = [];
 let allUsers = [];
@@ -812,8 +838,10 @@ async function refreshDashboard() {
     const receipts = allOrders.filter(o => o.status === 'receipt_submitted').length;
     const today = new Date().toISOString().split('T')[0];
     const confirmed = allOrders.filter(o => o.status === 'confirmed' && o.created_at?.startsWith(today)).length;
+    const totalOrders = allOrders.length; // کل تاریخچه‌ی سفارش‌ها، بدون محدودیت وضعیت یا تاریخ
 
     document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-total-orders').textContent = totalOrders;
     document.getElementById('stat-receipts').textContent = receipts;
     document.getElementById('stat-confirmed').textContent = confirmed;
     document.getElementById('stat-customers').textContent = allUsers.length;
