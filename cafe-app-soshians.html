@@ -2915,7 +2915,10 @@ async function submitReview(profileId) {
 }
 
 function reorderProfile() {
-  show('screen-order');
+  // نکته‌ی مهم: قبلاً این تابع مستقیم می‌رفت screen-order بدون تنظیم orderBean/قیمت/ریست انتخاب‌ها —
+  // باعث می‌شد سفارش با اطلاعات ناقص/نامعتبر رد بشه و کاربر هیچ‌وقت به صفحه‌ی پرداخت نرسه.
+  // الان از همون مسیر goToOrder می‌ره که همه‌چیز رو درست آماده می‌کنه (دقیقاً مثل سفارش از صفحه‌ی نتیجه)
+  goToOrder(rec);
 }
 
 // وقتی کاربر تو صفحه‌ی «گیت سفارش» دکمه‌ی سفارش رو می‌زنه — پروفایل معلق رو بازسازی می‌کنه و می‌بره صفحه‌ی سفارش
@@ -3486,21 +3489,27 @@ function priceForAmount(amount) {
 }
 
 async function goToOrderDirect() {
-  selectedAmount = null;
-  selectedGrindPref = null;
-  document.getElementById('amt-125').classList.remove('selected');
-  document.getElementById('amt-250').classList.remove('selected');
-  document.getElementById('grind-self').classList.remove('selected');
-  document.getElementById('grind-roastery').classList.remove('selected');
-  document.getElementById('order-address').value = '';
-  document.getElementById('order-notes').value = '';
-  document.getElementById('order-error').classList.remove('visible');
-  document.getElementById('order-success').classList.remove('visible');
-  document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
-  document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
-  if (orderBean) await fetchBeanPricing(orderBean.id); // قیمت واقعی این دونه رو از دیتابیس بگیر
-  // نکته: اطلاعات رستری تأمین‌کننده دیگه به مشتری نشون داده نمی‌شه (طبق تصمیم برندی) —
-  // selectedRoastery فقط برای ثبت داخلی تو orders.roastery_id/name استفاده می‌شه
+  try {
+    selectedAmount = null;
+    selectedGrindPref = null;
+    document.getElementById('amt-125')?.classList.remove('selected');
+    document.getElementById('amt-250')?.classList.remove('selected');
+    document.getElementById('grind-self')?.classList.remove('selected');
+    document.getElementById('grind-roastery')?.classList.remove('selected');
+    document.getElementById('order-address').value = '';
+    document.getElementById('order-notes').value = '';
+    document.getElementById('order-error')?.classList.remove('visible');
+    document.getElementById('order-success')?.classList.remove('visible');
+    document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
+    document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
+    if (orderBean) await fetchBeanPricing(orderBean.id); // قیمت واقعی این دونه رو از دیتابیس بگیر
+    // نکته: اطلاعات رستری تأمین‌کننده دیگه به مشتری نشون داده نمی‌شه (طبق تصمیم برندی) —
+    // selectedRoastery فقط برای ثبت داخلی تو orders.roastery_id/name استفاده می‌شه
+  } catch (e) {
+    // حتی اگه بخشی از ریست فرم (مثلاً یه المان جدید که هنوز دیپلوی نشده) خطا بده،
+    // نباید کاربر از رفتن به صفحه‌ی سفارش گیر بیفته
+    console.warn('goToOrderDirect: non-fatal error while resetting order form:', e);
+  }
   show('screen-order');
 }
 
