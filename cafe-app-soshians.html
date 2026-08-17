@@ -1958,9 +1958,11 @@ function renderAllQuestions(level) {
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
 
-// فاز ۲ — موتور پوشش محور: رو phase2AxesToAsk (حداکثر ۳ محور) حلقه می‌زنه + ۲ سؤال روایی ثابت
+// فاز ۲ — موتور پوشش محور: رو phase2AxesToAsk (حداکثر ۳ محور) حلقه می‌زنه
+// + ۲ سؤال روایی ثابت (فقط برای مبتدی/معمولی — متخصص این سؤالات خاطره‌ای رو اصلاً نمی‌بینه)
 function renderPhase2Questions(level) {
-  const total = phase2AxesToAsk.length + 2; // + ۲ سؤال خاطره‌ای
+  const isExpert = level === 'expert';
+  const total = phase2AxesToAsk.length + (isExpert ? 0 : 2);
 
   phase2AxesToAsk.forEach((axis, i) => {
     const screenId = 'deep-' + (i + 1);
@@ -1972,6 +1974,8 @@ function renderPhase2Questions(level) {
         '<span class="en-only">Question ' + (i + 1) + ' of ' + total + ' (deeper phase)</span>';
     }
   });
+
+  if (isExpert) return; // متخصص مستقیم بعد از آخرین محور می‌ره سراغ نتیجه، سؤالات خاطره‌ای رو نمی‌بینه
 
   const memLabel1 = document.getElementById('progress-label-memory1');
   if (memLabel1) {
@@ -2021,6 +2025,9 @@ function pickDynamic(el, axis, value, screenNum) {
     const idx = parseInt(screenNum.split('-')[1], 10); // شماره‌ی ۱-پایه‌ی این صفحه
     if (idx < phase2AxesToAsk.length) {
       setTimeout(() => show('screen-deep-' + (idx + 1)), 280);
+    } else if (currentLevel === 'expert') {
+      // متخصص (باریستا/رستر) سؤالات خاطره‌ای/نوستالژیک رو نمی‌بینه — این سطح از سؤال براش مناسب نیست
+      setTimeout(showLoading, 280);
     } else {
       setTimeout(() => show('screen-memory1'), 280);
     }
