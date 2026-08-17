@@ -1110,7 +1110,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <button class="btn-back" onclick="show('screen-health1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7A5C3E"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۱ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 1 of 5 (deeper phase)</span></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۱ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 1 of 7 (deeper phase)</span></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-context" style="text-align:right;direction:rtl"></div>
@@ -1124,7 +1124,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <button class="btn-back" onclick="show('screen-context')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#6E5236"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۲ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 2 of 5 (deeper phase)</span></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۲ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 2 of 7 (deeper phase)</span></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-ritual" style="text-align:right;direction:rtl"></div>
@@ -1138,7 +1138,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <button class="btn-back" onclick="show('screen-ritual')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#62492F"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۳ از ۵ (فاز عمیق‌تر)</span><span class="en-only">Question 3 of 5 (deeper phase)</span></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۳ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 3 of 7 (deeper phase)</span></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-evolution" style="text-align:right;direction:rtl"></div>
@@ -1148,12 +1148,44 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="spacer"></div>
 </div>
 
-<!-- ══════ سؤالات روایی Memory Identity — اختیاری، بدون امتیاز، فقط ذخیره‌ی متن خصوصی ══════ -->
-<div class="screen" id="screen-memory1">
+<div class="screen" id="screen-finish">
   <button class="btn-back" onclick="show('screen-evolution')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#56412A"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۴ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 4 of 7 (deeper phase)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-finish" style="text-align:right;direction:rtl"></div>
+    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
+      <span class="fa-only">این فقط برای راهنمای دم‌آوریته، روی انتخاب دانه اثر نمی‌ذاره</span>
+      <span class="en-only">This is just for your brew guide, it doesn't affect your bean match</span>
+    </div>
+  </div>
+  <div class="q-edu" id="q-edu-finish" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-finish"></div>
+  <div class="spacer"></div>
+</div>
+
+<div class="screen" id="screen-sensory">
+  <button class="btn-back" onclick="show('screen-finish')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۴ از ۵ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 4 of 5 (memory, optional)</span></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۵ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 5 of 7 (deeper phase)</span></div>
+  </div>
+  <div class="q-header">
+    <div class="q-text-fa" id="q-title-sensory" style="text-align:right;direction:rtl"></div>
+  </div>
+  <div class="q-edu" id="q-edu-sensory" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-sensory"></div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══════ سؤالات روایی Memory Identity — اختیاری، بدون امتیاز، فقط ذخیره‌ی متن خصوصی ══════ -->
+<div class="screen" id="screen-memory1">
+  <button class="btn-back" onclick="show('screen-sensory')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۶ از ۷ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 6 of 7 (memory, optional)</span></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-memory1" style="text-align:right;direction:rtl"></div>
@@ -1172,7 +1204,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <button class="btn-back" onclick="show('screen-memory1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۵ از ۵ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 5 of 5 (memory, optional)</span></div>
+    <div class="progress-label"><span class="fa-only">سؤال ۷ از ۷ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 7 of 7 (memory, optional)</span></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
@@ -1575,7 +1607,7 @@ async function sb(method, path, body = null) {
    APP STATE
 ═══════════════════════════════════════════ */
 let currentUser = null; // { id, name, phone }
-let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null };
+let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null };
 let rec = null;
 let currentLevel = 'regular'; // beginner | regular | expert
 let currentPersona = null;
@@ -1593,9 +1625,9 @@ const LEVEL_META = {
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:10, brew:5, context:12, ritual:12, evolution:12 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:13, brew:10, context:12, ritual:12, evolution:12 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:13, brew:15, context:12, ritual:12, evolution:12 }
+  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:10, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 },
+  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:13, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 },
+  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:13, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 }
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
@@ -1760,6 +1792,38 @@ const QUESTIONS = {
       regular:  [ {v:'guided', fa:'راهنمایی‌شده (پیشنهاد دیگران)', en:'Guided (recommendations from others)'}, {v:'self_taught', fa:'اکتشافی (امتحان شخصی)', en:'Exploratory (personal trial)'}, {v:'analytical', fa:'تحلیلی (فهم علت و اصول)', en:'Analytical (understanding the reasoning)'} ],
       expert:   [ {v:'guided', fa:'Guided Discovery', en:'Guided Discovery'}, {v:'self_taught', fa:'Experiential Learning', en:'Experiential Learning'}, {v:'analytical', fa:'Analytical / Technical Learning', en:'Analytical / Technical Learning'} ]
     }
+  },
+  finish_preference: {
+    title: {
+      beginner: { fa:'بعد از قورت دادن قهوه، دوست داری طعمش چقدر تو دهنت بمونه؟', en:'After swallowing, how long do you want the taste to linger?' },
+      regular:  { fa:'پس‌مزه‌ی قهوه رو چطور دوست داری؟', en:'How do you like your coffee finish?' },
+      expert:   { fa:'Finish Preference؟', en:'Finish preference?' }
+    },
+    edu: {
+      beginner: { fa:'پس‌مزه یعنی طعمی که بعد از قورت دادن قهوه تو دهنت باقی می‌مونه.', en:'Finish is the taste that lingers after you swallow.' },
+      regular:  { fa:'قهوه‌های پردانسیته و شیرین معمولاً پس‌مزه‌ی طولانی‌تری دارن؛ قهوه‌های سبک و اسیددار معمولاً کوتاه و تمیزن.', en:'Sweet, dense coffees usually have a longer finish; light, acidic coffees tend to be short and clean.' }
+    },
+    options: {
+      beginner: [ {v:'short', fa:'زود تموم بشه', en:'Fades quickly'}, {v:'medium', fa:'یه‌کم بمونه', en:'Lingers a bit'}, {v:'long', fa:'تا مدت‌ها بمونه', en:'Stays for a while'} ],
+      regular:  [ {v:'short', fa:'کوتاه و تمیز (Clean)', en:'Short & Clean'}, {v:'medium', fa:'متوسط', en:'Medium'}, {v:'long', fa:'طولانی و ماندگار', en:'Long & Lingering'} ],
+      expert:   [ {v:'short', fa:'Clean / Short', en:'Clean / Short'}, {v:'medium', fa:'Medium', en:'Medium'}, {v:'long', fa:'Long / Lingering', en:'Long / Lingering'} ]
+    }
+  },
+  sensory_attention: {
+    title: {
+      beginner: { fa:'وقتی قهوه می‌خوری بیشتر به چی توجه می‌کنی؟', en:'What do you notice most when drinking coffee?' },
+      regular:  { fa:'تمرکز حسی‌ت بیشتر رو کدوم جنبه‌ست؟', en:'Which sensory aspect do you focus on most?' },
+      expert:   { fa:'Primary Sensory Focus؟', en:'Primary sensory focus?' }
+    },
+    edu: {
+      beginner: { fa:'بعضی‌ها بیشتر بو رو حس می‌کنن، بعضی‌ها بافت یا طعم باقی‌مونده رو.', en:'Some people notice smell most, others texture or the taste that lingers.' },
+      regular:  { fa:'این محور کمک می‌کنه بفهمیم توضیح دونه رو بیشتر رو کدوم جنبه‌ی حسی متمرکز کنیم.', en:'This helps us know which sensory aspect to emphasize when describing a bean to you.' }
+    },
+    options: {
+      beginner: [ {v:'aroma', fa:'بوش', en:'The smell'}, {v:'texture', fa:'حسی که تو دهنم داره', en:'How it feels in my mouth'}, {v:'aftertaste', fa:'طعمی که بعدش می‌مونه', en:'The taste that lingers after'}, {v:'balance', fa:'کل حسش با هم', en:'The whole experience together'} ],
+      regular:  [ {v:'aroma', fa:'عطر و رایحه (Aroma)', en:'Aroma'}, {v:'texture', fa:'بافت و بدنه (Mouthfeel)', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'پس‌مزه (Aftertaste)', en:'Aftertaste'}, {v:'balance', fa:'تعادل کلی (Balance)', en:'Overall Balance'} ],
+      expert:   [ {v:'aroma', fa:'Aroma', en:'Aroma'}, {v:'texture', fa:'Mouthfeel / Texture', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'Aftertaste', en:'Aftertaste'}, {v:'balance', fa:'Overall Balance', en:'Overall Balance'} ]
+    }
   }
 };
 
@@ -1840,11 +1904,13 @@ function renderAllQuestions(level) {
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
 
-// فاز ۲ — فقط ۳ محور جدید امتیازدهی‌شونده + ۲ سؤال روایی
+// فاز ۲ — ۵ محور امتیازدهی‌شونده (context/ritual/evolution + finish_preference/sensory_attention جدید) + ۲ سؤال روایی
 function renderPhase2Questions(level) {
   renderQuestion('context', 'context', level);
   renderQuestion('ritual', 'ritual', level);
   renderQuestion('evolution', 'evolution', level);
+  renderQuestion('finish', 'finish_preference', level);
+  renderQuestion('sensory', 'sensory_attention', level);
 
   MEMORY_QUESTIONS.forEach((mq, i) => {
     const n = i + 1;
@@ -1866,7 +1932,9 @@ function pickDynamic(el, axis, value, screenNum) {
   if (screenNum === 8) { setTimeout(showLoading, 280); return; }
   if (screenNum === 'context') { setTimeout(() => show('screen-ritual'), 280); return; }
   if (screenNum === 'ritual') { setTimeout(() => show('screen-evolution'), 280); return; }
-  if (screenNum === 'evolution') { setTimeout(() => show('screen-memory1'), 280); return; }
+  if (screenNum === 'evolution') { setTimeout(() => show('screen-finish'), 280); return; }
+  if (screenNum === 'finish') { setTimeout(() => show('screen-sensory'), 280); return; }
+  if (screenNum === 'sensory') { setTimeout(() => show('screen-memory1'), 280); return; }
   const nextScreen = { 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 }[screenNum];
   if (nextScreen) setTimeout(() => go(nextScreen), 280);
 }
@@ -2640,7 +2708,7 @@ function reorderProfile() {
    QUIZ
 ═══════════════════════════════════════════ */
 async function startNewProfile() {
-  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null };
+  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null };
   healthAns = { h1: null, h2: null };
   rec = null;
   currentPersona = null;
@@ -2861,6 +2929,8 @@ async function saveProfile(rec) {
       context: ans.context,
       ritual: ans.ritual,
       evolution: ans.evolution,
+      finish_preference: ans.finish_preference,
+      sensory_attention: ans.sensory_attention,
       is_phase2: isPhase2,
       experience_level: currentLevel,
       persona: currentPersona ? currentPersona.en : null,
@@ -3042,7 +3112,9 @@ const BEANS = [
       black_dark:6, black_milk:7, milk_dark:6, milk_milk:7,
       home_alone:7, work_focus:6, social:6, on_the_go:6,
       routine:8, mixed:6, explorer:3,
-      guided:7, self_taught:5, analytical:5
+      guided:7, self_taught:5, analytical:5,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:5, texture:7, aftertaste:8, balance:7
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
@@ -3057,7 +3129,9 @@ const BEANS = [
       black_dark:7, black_milk:7, milk_dark:5, milk_milk:5,
       home_alone:5, work_focus:4, social:8, on_the_go:6,
       routine:4, mixed:6, explorer:8,
-      guided:5, self_taught:7, analytical:6
+      guided:5, self_taught:7, analytical:6,
+      finish_short:4, finish_medium:9, finish_long:3,
+      aroma:9, texture:4, aftertaste:4, balance:5
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
@@ -3072,7 +3146,9 @@ const BEANS = [
       black_dark:6, black_milk:6, milk_dark:7, milk_milk:7,
       home_alone:8, work_focus:6, social:5, on_the_go:5,
       routine:8, mixed:5, explorer:2,
-      guided:7, self_taught:4, analytical:4
+      guided:7, self_taught:4, analytical:4,
+      finish_short:4, finish_medium:9, finish_long:3,
+      aroma:4, texture:5, aftertaste:5, balance:8
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
@@ -3087,7 +3163,9 @@ const BEANS = [
       black_dark:6, black_milk:7, milk_dark:6, milk_milk:6,
       home_alone:5, work_focus:4, social:9, on_the_go:6,
       routine:2, mixed:6, explorer:9,
-      guided:4, self_taught:8, analytical:6
+      guided:4, self_taught:8, analytical:6,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:8, texture:7, aftertaste:8, balance:6
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -3102,7 +3180,9 @@ const BEANS = [
       black_dark:6, black_milk:8, milk_dark:6, milk_milk:9,
       home_alone:8, work_focus:5, social:7, on_the_go:5,
       routine:5, mixed:7, explorer:5,
-      guided:6, self_taught:6, analytical:5
+      guided:6, self_taught:6, analytical:5,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:6, texture:7, aftertaste:8, balance:7
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
@@ -3117,7 +3197,9 @@ const BEANS = [
       black_dark:7, black_milk:6, milk_dark:3, milk_milk:3,
       home_alone:6, work_focus:3, social:9, on_the_go:3,
       routine:1, mixed:4, explorer:10,
-      guided:3, self_taught:6, analytical:9
+      guided:3, self_taught:6, analytical:9,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:10, texture:5, aftertaste:7, balance:4
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
@@ -3132,7 +3214,9 @@ const BEANS = [
       black_dark:6, black_milk:8, milk_dark:5, milk_milk:8,
       home_alone:7, work_focus:5, social:7, on_the_go:5,
       routine:5, mixed:7, explorer:5,
-      guided:6, self_taught:6, analytical:5
+      guided:6, self_taught:6, analytical:5,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:7, texture:6, aftertaste:8, balance:6
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -3147,7 +3231,9 @@ const BEANS = [
       black_dark:6, black_milk:6, milk_dark:3, milk_milk:3,
       home_alone:6, work_focus:5, social:7, on_the_go:4,
       routine:3, mixed:5, explorer:8,
-      guided:4, self_taught:7, analytical:7
+      guided:4, self_taught:7, analytical:7,
+      finish_short:2, finish_medium:4, finish_long:9,
+      aroma:9, texture:4, aftertaste:7, balance:5
     },
     brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
   },
@@ -3295,6 +3381,11 @@ function computeAxisScore(entityS, a, weights) {
   score += rel(a.context) * (weights.context / 10);
   score += rel(a.ritual) * (weights.ritual / 10);
   score += rel(a.evolution) * (weights.evolution / 10);
+  // پس‌مزه: پیشوند 'finish_' چون مقدار 'medium' با کلید اسیدیته/تلخی/بدنه تداخل داره
+  const finishKey = a.finish_preference ? 'finish_' + a.finish_preference : null;
+  score += rel(finishKey) * (weights.finish_preference / 10);
+  // توجه حسی: مقادیرش (aroma/texture/aftertaste/balance) با هیچ کلید دیگه‌ای تداخل ندارن
+  score += rel(a.sensory_attention) * (weights.sensory_attention / 10);
   return score;
 }
 
@@ -3324,6 +3415,7 @@ function axisKeyFor(axis, val) {
   if (!val) return null;
   if (axis === 'bitterness') return val === 'medium' ? 'medium_bt' : val;
   if (axis === 'body') return 'body_' + val;
+  if (axis === 'finish_preference') return 'finish_' + val;
   return val;
 }
 
