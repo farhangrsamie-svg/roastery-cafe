@@ -899,15 +899,39 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
       <span class="fa-only">دوباره خوش اومدی</span><span class="en-only">Welcome back</span>
     </div>
-    <div style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
+    <div id="phase2-intro-title" style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
       <span class="fa-only">وقتشه عمیق‌تر بشناسیمت</span><span class="en-only">Time to get to know you deeper</span>
     </div>
-    <div style="font-size:14px;color:var(--medium-brown);line-height:1.9;max-width:320px;margin:0 auto 34px;">
+    <div id="phase2-intro-desc" style="font-size:14px;color:var(--medium-brown);line-height:1.9;max-width:320px;margin:0 auto 34px;">
       <span class="fa-only">این‌بار سؤالات جدید و متفاوتی داریم — دربارهٔ زمینهٔ مصرف، روحیهٔ کاوشگری، و حتی یکی‌دو خاطره — تا هویت قهوه‌ت هر بار دقیق‌تر بشه.</span>
       <span class="en-only">This time we have new, different questions — about context, exploration style, and even a memory or two — so your coffee identity gets more precise each time.</span>
     </div>
     <button class="btn-primary" onclick="show('screen-level')" style="max-width:280px;margin:0 auto;">
       <span class="fa-only">بریم! →</span><span class="en-only">Let's go! →</span>
+    </button>
+  </div>
+</div>
+
+<!-- ══════ گیت سفارش — کاربر تا سفارش‌ندادن پروفایل قبلی، نمی‌تونه پروفایل جدید بسازه ══════ -->
+<div class="screen" id="screen-order-required">
+  <div style="text-align:center;padding-top:50px;">
+    <div style="font-size:56px;margin-bottom:18px;">🛒</div>
+    <div style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
+      <span class="fa-only">یه قدم مونده</span><span class="en-only">One step left</span>
+    </div>
+    <div style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
+      <span class="fa-only">اول این دونه رو سفارش بده</span><span class="en-only">Order this bean first</span>
+    </div>
+    <div id="order-required-bean-name" style="font-size:14px;color:var(--medium-brown);line-height:1.9;max-width:320px;margin:0 auto 12px;"></div>
+    <div style="font-size:14px;color:var(--medium-brown);line-height:1.9;max-width:320px;margin:0 auto 34px;">
+      <span class="fa-only">برای ساخت پروفایل جدید، اول باید قهوه‌ای که برات پیشنهاد شده رو سفارش بدی — این‌طوری هویت قهوه‌ت واقعی و دقیق می‌مونه.</span>
+      <span class="en-only">To build a new profile, you first need to order the bean we recommended — this keeps your coffee identity real and accurate.</span>
+    </div>
+    <button class="btn-primary" onclick="goOrderFromGate()" style="max-width:280px;margin:0 auto;">
+      <span class="fa-only">سفارش بدم →</span><span class="en-only">Order now →</span>
+    </button>
+    <button class="btn-back" style="position:static;margin-top:14px;width:100%;text-align:center;" onclick="showDashboard()">
+      <span class="fa-only">بازگشت به داشبورد</span><span class="en-only">Back to dashboard</span>
     </button>
   </div>
 </div>
@@ -1105,87 +1129,57 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="spacer"></div>
 </div>
 
-<!-- ══════ فاز ۲ — کشف تدریجی هویت (فقط کاربر برگشتی) ══════ -->
-<div class="screen" id="screen-context">
-  <button class="btn-back" onclick="show('screen-health1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+<!-- ══════ فاز ۲ — کشف تدریجی هویت (فقط کاربر برگشتی) ══════
+     موتور پوشش محور: این ۳ صفحه عمومی‌ان — هرکدوم می‌تونه هر محوری از DEEP_AXES رو نشون بده،
+     بسته به این‌که کدوم محورها برای این کاربر هنوز پرسیده نشدن (یا کدوم قدیمی‌ترینه، تو Refresh Mode) -->
+<div class="screen" id="screen-deep-1">
+  <button class="btn-back" onclick="goBackDeep(1)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#7A5C3E"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۱ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 1 of 7 (deeper phase)</span></div>
+    <div class="progress-label" id="progress-label-deep-1"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-context" style="text-align:right;direction:rtl"></div>
+    <div class="q-text-fa" id="q-title-deep-1" style="text-align:right;direction:rtl"></div>
   </div>
-  <div class="q-edu" id="q-edu-context" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
-  <div class="options" id="q-options-context"></div>
+  <div class="q-edu" id="q-edu-deep-1" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-deep-1"></div>
   <div class="spacer"></div>
 </div>
 
-<div class="screen" id="screen-ritual">
-  <button class="btn-back" onclick="show('screen-context')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+<div class="screen" id="screen-deep-2">
+  <button class="btn-back" onclick="goBackDeep(2)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#6E5236"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۲ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 2 of 7 (deeper phase)</span></div>
+    <div class="progress-label" id="progress-label-deep-2"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-ritual" style="text-align:right;direction:rtl"></div>
+    <div class="q-text-fa" id="q-title-deep-2" style="text-align:right;direction:rtl"></div>
   </div>
-  <div class="q-edu" id="q-edu-ritual" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
-  <div class="options" id="q-options-ritual"></div>
+  <div class="q-edu" id="q-edu-deep-2" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-deep-2"></div>
   <div class="spacer"></div>
 </div>
 
-<div class="screen" id="screen-evolution">
-  <button class="btn-back" onclick="show('screen-ritual')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+<div class="screen" id="screen-deep-3">
+  <button class="btn-back" onclick="goBackDeep(3)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#62492F"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۳ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 3 of 7 (deeper phase)</span></div>
+    <div class="progress-label" id="progress-label-deep-3"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-evolution" style="text-align:right;direction:rtl"></div>
+    <div class="q-text-fa" id="q-title-deep-3" style="text-align:right;direction:rtl"></div>
   </div>
-  <div class="q-edu" id="q-edu-evolution" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
-  <div class="options" id="q-options-evolution"></div>
-  <div class="spacer"></div>
-</div>
-
-<div class="screen" id="screen-finish">
-  <button class="btn-back" onclick="show('screen-evolution')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
-  <div class="progress-wrap">
-    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#56412A"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۴ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 4 of 7 (deeper phase)</span></div>
-  </div>
-  <div class="q-header">
-    <div class="q-text-fa" id="q-title-finish" style="text-align:right;direction:rtl"></div>
-    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
-      <span class="fa-only">این فقط برای راهنمای دم‌آوریته، روی انتخاب دانه اثر نمی‌ذاره</span>
-      <span class="en-only">This is just for your brew guide, it doesn't affect your bean match</span>
-    </div>
-  </div>
-  <div class="q-edu" id="q-edu-finish" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
-  <div class="options" id="q-options-finish"></div>
-  <div class="spacer"></div>
-</div>
-
-<div class="screen" id="screen-sensory">
-  <button class="btn-back" onclick="show('screen-finish')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
-  <div class="progress-wrap">
-    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۵ از ۷ (فاز عمیق‌تر)</span><span class="en-only">Question 5 of 7 (deeper phase)</span></div>
-  </div>
-  <div class="q-header">
-    <div class="q-text-fa" id="q-title-sensory" style="text-align:right;direction:rtl"></div>
-  </div>
-  <div class="q-edu" id="q-edu-sensory" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
-  <div class="options" id="q-options-sensory"></div>
+  <div class="q-edu" id="q-edu-deep-3" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-deep-3"></div>
   <div class="spacer"></div>
 </div>
 
 <!-- ══════ سؤالات روایی Memory Identity — اختیاری، بدون امتیاز، فقط ذخیره‌ی متن خصوصی ══════ -->
 <div class="screen" id="screen-memory1">
-  <button class="btn-back" onclick="show('screen-sensory')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <button class="btn-back" onclick="goBackFromMemory1()">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۶ از ۷ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 6 of 7 (memory, optional)</span></div>
+    <div class="progress-label" id="progress-label-memory1"></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-memory1" style="text-align:right;direction:rtl"></div>
@@ -1204,7 +1198,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <button class="btn-back" onclick="show('screen-memory1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
   <div class="progress-wrap">
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label"><span class="fa-only">سؤال ۷ از ۷ (خاطره‌ای، اختیاری)</span><span class="en-only">Question 7 of 7 (memory, optional)</span></div>
+    <div class="progress-label" id="progress-label-memory2"></div>
   </div>
   <div class="q-header">
     <div class="q-text-fa" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
@@ -1841,13 +1835,73 @@ const MEMORY_QUESTIONS = [
   }
 ];
 
+/* ═══════════════════════════════════════════
+   موتور «پوشش محور» (Axis Coverage Engine)
+   به‌جای فاز۲ ثابت (همیشه Context→Ritual→Evolution)، هر بار کاربر برگشتی وارد
+   می‌شه، سیستم خودش تشخیص می‌ده کدوم محورهای عمیق هنوز پرسیده نشدن و فقط
+   اون‌ها (حداکثر ۳ تا) رو می‌پرسه. وقتی همه‌ی محورها حداقل یه‌بار پاسخ داده
+   شدن («عمق کامل»)، حالت Refresh Mode فعال می‌شه: قدیمی‌ترین محور دوباره پرسیده می‌شه.
+═══════════════════════════════════════════ */
+const DEEP_AXES = ['context', 'ritual', 'evolution', 'sensory_attention', 'finish_preference'];
+let phase2AxesToAsk = [];   // محورهایی که این نشست باید پرسیده بشن (حداکثر ۳ تا)
+let isRefreshMode = false;  // true یعنی «عمق کامل» — داریم قدیمی‌ترین محور رو دوباره می‌پرسیم
+
+async function getUncoveredAxes(userId) {
+  let profiles = [];
+  try {
+    profiles = await sb('GET', `coffee_profiles?user_id=eq.${userId}&order=created_at.asc&select=context,ritual,evolution,sensory_attention,finish_preference,created_at`);
+  } catch (e) {
+    console.warn('getUncoveredAxes: خطا در گرفتن پروفایل‌های قبلی:', e);
+  }
+  const known = {};       // آخرین مقدار شناخته‌شده‌ی هر محور (از کل تاریخچه‌ی کاربر)
+  const lastSeenAt = {};  // آخرین باری که این محور پاسخ داده شده — برای تشخیص «قدیمی‌ترین» تو Refresh Mode
+  (profiles || []).forEach(p => {
+    DEEP_AXES.forEach(axis => {
+      if (p[axis] !== null && p[axis] !== undefined) {
+        known[axis] = p[axis];
+        lastSeenAt[axis] = p.created_at;
+      }
+    });
+  });
+  const uncovered = DEEP_AXES.filter(axis => !(axis in known));
+  if (uncovered.length > 0) {
+    return { axesToAsk: uncovered.slice(0, 3), isRefreshMode: false, knownValues: known };
+  }
+  // عمق کامل — همه‌ی ۵ محور حداقل یه‌بار پاسخ داده شدن؛ قدیمی‌ترین‌شون رو دوباره می‌پرسیم
+  let oldestAxis = DEEP_AXES[0];
+  DEEP_AXES.forEach(axis => {
+    if (lastSeenAt[axis] < lastSeenAt[oldestAxis]) oldestAxis = axis;
+  });
+  return { axesToAsk: [oldestAxis], isRefreshMode: true, knownValues: known };
+}
+
+// متن صفحه‌ی معرفی فاز۲ رو بسته به Refresh Mode بودن یا نبودن تنظیم می‌کنه
+function setPhase2IntroText(isRefresh) {
+  const titleEl = document.getElementById('phase2-intro-title');
+  const descEl = document.getElementById('phase2-intro-desc');
+  if (!titleEl || !descEl) return;
+  if (isRefresh) {
+    titleEl.innerHTML =
+      '<span class="fa-only">سلیقه‌ت عوض شده؟</span><span class="en-only">Has your taste changed?</span>';
+    descEl.innerHTML =
+      '<span class="fa-only">همه‌ی جنبه‌های هویت قهوه‌ت رو یه‌بار شناختیم — بذار یکی‌شون رو دوباره بپرسیم، شاید سلیقه‌ت عوض شده باشه.</span>' +
+      '<span class="en-only">We\'ve learned every side of your coffee identity once — let\'s revisit one of them, in case your taste has shifted.</span>';
+  } else {
+    titleEl.innerHTML =
+      '<span class="fa-only">وقتشه عمیق‌تر بشناسیمت</span><span class="en-only">Time to get to know you deeper</span>';
+    descEl.innerHTML =
+      '<span class="fa-only">این‌بار سؤالات جدید و متفاوتی داریم — دربارهٔ زمینهٔ مصرف، روحیهٔ کاوشگری، و حتی یکی‌دو خاطره — تا هویت قهوه‌ت هر بار دقیق‌تر بشه.</span>' +
+      '<span class="en-only">This time we have new, different questions — about context, exploration style, and even a memory or two — so your coffee identity gets more precise each time.</span>';
+  }
+}
+
 function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
   document.getElementById('q-title-' + screenNum).innerHTML =
     '<span class="fa-only" style="direction:rtl">' + q.title[level].fa + '</span>' +
     '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + q.title[level].en + '</span>';
   const progressLabelEl = document.getElementById('progress-label-' + screenNum);
-  if (progressLabelEl) {
+  if (progressLabelEl && typeof screenNum === 'number') {
     progressLabelEl.innerHTML =
       '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
   }
@@ -1904,13 +1958,35 @@ function renderAllQuestions(level) {
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
 
-// فاز ۲ — ۵ محور امتیازدهی‌شونده (context/ritual/evolution + finish_preference/sensory_attention جدید) + ۲ سؤال روایی
+// فاز ۲ — موتور پوشش محور: رو phase2AxesToAsk (حداکثر ۳ محور) حلقه می‌زنه + ۲ سؤال روایی ثابت
 function renderPhase2Questions(level) {
-  renderQuestion('context', 'context', level);
-  renderQuestion('ritual', 'ritual', level);
-  renderQuestion('evolution', 'evolution', level);
-  renderQuestion('finish', 'finish_preference', level);
-  renderQuestion('sensory', 'sensory_attention', level);
+  const total = phase2AxesToAsk.length + 2; // + ۲ سؤال خاطره‌ای
+
+  phase2AxesToAsk.forEach((axis, i) => {
+    const screenId = 'deep-' + (i + 1);
+    renderQuestion(screenId, axis, level);
+    const labelEl = document.getElementById('progress-label-' + screenId);
+    if (labelEl) {
+      labelEl.innerHTML =
+        '<span class="fa-only">سؤال ' + (i + 1) + ' از ' + total + ' (فاز عمیق‌تر)</span>' +
+        '<span class="en-only">Question ' + (i + 1) + ' of ' + total + ' (deeper phase)</span>';
+    }
+  });
+
+  const memLabel1 = document.getElementById('progress-label-memory1');
+  if (memLabel1) {
+    const n1 = phase2AxesToAsk.length + 1;
+    memLabel1.innerHTML =
+      '<span class="fa-only">سؤال ' + n1 + ' از ' + total + ' (خاطره‌ای، اختیاری)</span>' +
+      '<span class="en-only">Question ' + n1 + ' of ' + total + ' (memory, optional)</span>';
+  }
+  const memLabel2 = document.getElementById('progress-label-memory2');
+  if (memLabel2) {
+    const n2 = phase2AxesToAsk.length + 2;
+    memLabel2.innerHTML =
+      '<span class="fa-only">سؤال ' + n2 + ' از ' + total + ' (خاطره‌ای، اختیاری)</span>' +
+      '<span class="en-only">Question ' + n2 + ' of ' + total + ' (memory, optional)</span>';
+  }
 
   MEMORY_QUESTIONS.forEach((mq, i) => {
     const n = i + 1;
@@ -1924,17 +2000,32 @@ function renderPhase2Questions(level) {
   });
 }
 
+// برگشت از صفحات پویای فاز۲
+function goBackDeep(n) {
+  if (n === 1) { show('screen-level'); return; }
+  show('screen-deep-' + (n - 1));
+}
+// برگشت از اولین سؤال خاطره‌ای، به آخرین صفحه‌ی محور عمیق که این نشست پرسیده شد
+function goBackFromMemory1() {
+  const lastDeep = phase2AxesToAsk.length || 1;
+  show('screen-deep-' + lastDeep);
+}
+
 function pickDynamic(el, axis, value, screenNum) {
   el.closest('.options').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   ans[axis] = value;
   updateProgressBean(axis);
   if (screenNum === 8) { setTimeout(showLoading, 280); return; }
-  if (screenNum === 'context') { setTimeout(() => show('screen-ritual'), 280); return; }
-  if (screenNum === 'ritual') { setTimeout(() => show('screen-evolution'), 280); return; }
-  if (screenNum === 'evolution') { setTimeout(() => show('screen-finish'), 280); return; }
-  if (screenNum === 'finish') { setTimeout(() => show('screen-sensory'), 280); return; }
-  if (screenNum === 'sensory') { setTimeout(() => show('screen-memory1'), 280); return; }
+  if (typeof screenNum === 'string' && screenNum.indexOf('deep-') === 0) {
+    const idx = parseInt(screenNum.split('-')[1], 10); // شماره‌ی ۱-پایه‌ی این صفحه
+    if (idx < phase2AxesToAsk.length) {
+      setTimeout(() => show('screen-deep-' + (idx + 1)), 280);
+    } else {
+      setTimeout(() => show('screen-memory1'), 280);
+    }
+    return;
+  }
   const nextScreen = { 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 }[screenNum];
   if (nextScreen) setTimeout(() => go(nextScreen), 280);
 }
@@ -1968,7 +2059,7 @@ function selectLevel(level) {
 
   if (isPhase2) {
     renderPhase2Questions(currentLevel);
-    show('screen-context');
+    show('screen-deep-1');
     return;
   }
 
@@ -1992,15 +2083,16 @@ function pickHealth(el, q, value) {
   healthAns[q] = value;
   setTimeout(() => {
     if (q === 'h1') { show('screen-health2'); return; }
-    show(isPhase2 ? 'screen-context' : 'screen-1');
+    show(isPhase2 ? 'screen-deep-1' : 'screen-1');
   }, 280);
 }
 function skipHealth() {
   const onH1 = document.getElementById('screen-health1').classList.contains('active');
   if (onH1) { healthAns.h1 = null; show('screen-health2'); }
-  else { healthAns.h2 = null; show(isPhase2 ? 'screen-context' : 'screen-1'); }
+  else { healthAns.h2 = null; show(isPhase2 ? 'screen-deep-1' : 'screen-1'); }
 }
 let orderBean = null;
+let pendingGateProfile = null; // پروفایلی که کاربر باید اول سفارشش رو بده تا اجازه‌ی ساخت پروفایل جدید رو داشته باشه
 let selectedAmount = null;
 let currentLang = 'fa';
 
@@ -2704,6 +2796,13 @@ function reorderProfile() {
   show('screen-order');
 }
 
+// وقتی کاربر تو صفحه‌ی «گیت سفارش» دکمه‌ی سفارش رو می‌زنه — پروفایل معلق رو بازسازی می‌کنه و می‌بره صفحه‌ی سفارش
+function goOrderFromGate() {
+  if (!pendingGateProfile) { showDashboard(); return; }
+  viewProfile(pendingGateProfile); // rec و ans رو از رو همین پروفایل بازسازی می‌کنه
+  goToOrder(rec);
+}
+
 /* ═══════════════════════════════════════════
    QUIZ
 ═══════════════════════════════════════════ */
@@ -2714,6 +2813,8 @@ async function startNewProfile() {
   currentPersona = null;
   currentProfileId = null;
   isPhase2 = false;
+  phase2AxesToAsk = [];
+  isRefreshMode = false;
   document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   ['btn-1','btn-2','btn-3','btn-4','btn-5','btn-6','btn-7','btn-8'].forEach(id => {
     const el = document.getElementById(id);
@@ -2726,10 +2827,38 @@ async function startNewProfile() {
       const existing = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&limit=1&select=*`);
       if (existing && existing.length > 0) {
         const last = existing[0];
+
+        // گیت سفارش: تا وقتی کاربر واقعاً پروفایل قبلیش رو سفارش نداده، اجازه‌ی ساخت پروفایل جدید نداره
+        // (cancelled یعنی سفارش شروع شده ولی به دلیل عدم پرداخت خودکار کنسل شده — قبول نیست)
+        const lastOrders = await sb('GET', `orders?profile_id=eq.${last.id}&select=status`);
+        const hasRealOrder = (lastOrders || []).some(o => o.status !== 'cancelled');
+        if (!hasRealOrder) {
+          pendingGateProfile = last;
+          const beanFull = last.recommended_bean || '—';
+          const nameEl = document.getElementById('order-required-bean-name');
+          if (nameEl) {
+            nameEl.innerHTML =
+              '<span class="fa-only">آخرین پیشنهاد: <b>' + beanFull + '</b></span>' +
+              '<span class="en-only">Last recommendation: <b>' + beanFull + '</b></span>';
+          }
+          show('screen-order-required');
+          return;
+        }
+
         ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
         ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
         ans.tastepref = last.tastepref; ans.brew = last.brew;
         isPhase2 = true;
+
+        // موتور پوشش محور: کدوم محورهای عمیق هنوز پرسیده نشدن؟ (یا، تو Refresh Mode، کدومشون قدیمی‌ترینه؟)
+        const coverage = await getUncoveredAxes(currentUser.id);
+        phase2AxesToAsk = coverage.axesToAsk;
+        isRefreshMode = coverage.isRefreshMode;
+        // محورهایی که از قبل جواب داریم، همین نشست هم اعمال بشن — تا پیشنهاد دقیق‌تر بمونه
+        // حتی وقتی این نشست دوباره ازشون پرسیده نمی‌شه
+        DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
+
+        setPhase2IntroText(isRefreshMode);
       }
     }
   } catch(e) { console.warn('could not check for returning user:', e); }
