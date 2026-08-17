@@ -311,6 +311,10 @@ textarea.input-field { resize: vertical; min-height: 100px; }
           <span class="nav-icon">🔍</span> شکاف‌های کاتالوگ
           <span class="nav-badge" id="nav-badge-gaps" style="display:none;">0</span>
         </div>
+        <div class="nav-item" onclick="showPage('feedback')">
+          <span class="nav-icon">💬</span> بازخورد سفارش‌ها
+          <span class="nav-badge" id="nav-badge-feedback" style="display:none;">0</span>
+        </div>
         <div class="nav-item" onclick="showPage('pricing')">
           <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
         </div>
@@ -539,6 +543,71 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         </div>
       </div>
 
+      <!-- ══════ صفحه: بازخورد سفارش‌ها ══════ -->
+      <div class="page" id="page-feedback">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">💬 بازخورد سفارش‌ها</div>
+            <div class="page-sub">تجربه‌ی واقعی مشتری‌ها بعد از مصرف دونه — رضایت، روش دم‌آوری واقعی، و نوع آسیاب</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="stats-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-icon">💬</div>
+              <div class="stat-num" id="feedback-total-count">0</div>
+              <div class="stat-label">کل بازخوردهای ثبت‌شده</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⭐</div>
+              <div class="stat-num" id="feedback-avg-satisfaction">—</div>
+              <div class="stat-label">میانگین رضایت (از ۵)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🏠</div>
+              <div class="stat-num" id="feedback-self-grind-pct">۰٪</div>
+              <div class="stat-label">درصد ترجیح آسیاب خودشون</div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div style="font-weight:700;margin-bottom:14px;">میانگین رضایت به تفکیک دونه</div>
+            <div id="feedback-by-bean">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">تفکیک روش دم‌آوری واقعی</div>
+            <div id="feedback-by-brew">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">تفکیک نوع آسیاب (فقط سفارش‌های self_ground)</div>
+            <div id="feedback-by-grind">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">لیست کامل بازخوردها</div>
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>تاریخ</th>
+                  <th>دونه</th>
+                  <th>رضایت</th>
+                  <th>دم‌آوری واقعی</th>
+                  <th>آسیاب</th>
+                  <th>توضیحات</th>
+                </tr>
+              </thead>
+              <tbody id="feedback-tbody">
+                <tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- ══════ صفحه: قیمت‌گذاری دونه‌ها ══════ -->
       <div class="page" id="page-pricing">
         <div class="top-bar">
@@ -703,6 +772,7 @@ function showPage(name) {
   if (name === 'messages') loadMessages();
   if (name === 'customers') loadCustomers();
   if (name === 'gaps') loadGapsReport();
+  if (name === 'feedback') loadFeedbackReport();
   if (name === 'pricing') loadPricingForm();
 }
 
@@ -1067,6 +1137,119 @@ async function loadGapsReport() {
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
     breakdownEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   بازخورد سفارش‌ها — تجربه‌ی واقعی مشتری بعد از مصرف دونه
+═══════════════════════════════════════════ */
+async function loadFeedbackReport() {
+  const tbody = document.getElementById('feedback-tbody');
+  const byBeanEl = document.getElementById('feedback-by-bean');
+  const byBrewEl = document.getElementById('feedback-by-brew');
+  const byGrindEl = document.getElementById('feedback-by-grind');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  byBeanEl.innerHTML = byBrewEl.innerHTML = byGrindEl.innerHTML = '<div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>';
+
+  const brewFA = { v60:'پور اور (V60)', frenchpress:'فرنچ پرس', espressohome:'اسپرسو/موکاپات', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر/دستگاه کپسولی' };
+  const grindFA = { manual:'دستی', electric:'برقی خانگی', electric_flat:'برقی — تیغه‌ی تخت', electric_conical:'برقی — تیغه‌ی مخروطی', espresso_built_in:'داخل دستگاه اسپرسو' };
+
+  try {
+    const feedback = await sb('GET', 'order_feedback?select=*&order=created_at.desc');
+    const list = feedback || [];
+    const total = list.length;
+
+    document.getElementById('feedback-total-count').textContent = total.toLocaleString('fa-IR');
+
+    const badge = document.getElementById('nav-badge-feedback');
+    if (badge) {
+      if (total > 0) { badge.style.display = 'inline-block'; badge.textContent = total; }
+      else { badge.style.display = 'none'; }
+    }
+
+    const withSatisfaction = list.filter(f => f.satisfaction != null);
+    const avgSat = withSatisfaction.length
+      ? (withSatisfaction.reduce((s, f) => s + f.satisfaction, 0) / withSatisfaction.length)
+      : null;
+    document.getElementById('feedback-avg-satisfaction').textContent = avgSat != null ? avgSat.toFixed(1) : '—';
+
+    // ترجیح آسیاب موقع سفارش (self_ground در برابر roastery_ground) — از جدول orders، نه order_feedback
+    let selfGrindPct = 0;
+    try {
+      const orders = await sb('GET', 'orders?select=grind_preference&grind_preference=not.is.null');
+      const totalWithPref = (orders || []).length;
+      const selfCount = (orders || []).filter(o => o.grind_preference === 'self_ground').length;
+      selfGrindPct = totalWithPref > 0 ? Math.round((selfCount / totalWithPref) * 100) : 0;
+    } catch(e) { /* اگه گرفتن سفارش‌ها fail شد، همون ۰٪ می‌مونه */ }
+    document.getElementById('feedback-self-grind-pct').textContent = selfGrindPct.toLocaleString('fa-IR') + '٪';
+
+    // میانگین رضایت به تفکیک دونه
+    const byBean = {};
+    withSatisfaction.forEach(f => {
+      const name = (f.bean_name || 'نامشخص').split('(')[0].trim();
+      if (!byBean[name]) byBean[name] = { sum: 0, count: 0 };
+      byBean[name].sum += f.satisfaction;
+      byBean[name].count += 1;
+    });
+    const beanEntries = Object.entries(byBean).sort((a, b) => b[1].count - a[1].count);
+    byBeanEl.innerHTML = beanEntries.length
+      ? beanEntries.map(([name, d]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${name}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">⭐ ${(d.sum / d.count).toFixed(1)} (${d.count.toLocaleString('fa-IR')} بازخورد)</span>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز هیچ بازخوردی ثبت نشده</div>';
+
+    // تفکیک روش دم‌آوری واقعی
+    const byBrew = {};
+    list.forEach(f => {
+      if (!f.actual_brew) return;
+      const key = brewFA[f.actual_brew] || f.actual_brew;
+      byBrew[key] = (byBrew[key] || 0) + 1;
+    });
+    const brewEntries = Object.entries(byBrew).sort((a, b) => b[1] - a[1]);
+    byBrewEl.innerHTML = brewEntries.length
+      ? brewEntries.map(([key, count]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${key}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست</div>';
+
+    // تفکیک نوع آسیاب (فقط جایی که کاربر خودش آسیاب کرده)
+    const byGrind = {};
+    list.forEach(f => {
+      if (!f.grind_type) return;
+      const key = grindFA[f.grind_type] || f.grind_type;
+      byGrind[key] = (byGrind[key] || 0) + 1;
+    });
+    const grindEntries = Object.entries(byGrind).sort((a, b) => b[1] - a[1]);
+    byGrindEl.innerHTML = grindEntries.length
+      ? grindEntries.map(([key, count]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${key}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست (یا همه roastery_ground بودن)</div>';
+
+    tbody.innerHTML = list.length ? list.map(f => {
+      const dateFA = new Date(f.created_at).toLocaleDateString('fa-IR', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
+      const satStr = f.satisfaction != null ? '⭐'.repeat(f.satisfaction) : '—';
+      const brewStr = brewFA[f.actual_brew] || f.actual_brew || '—';
+      const grindStr = grindFA[f.grind_type] || f.grind_type || '—';
+      return `<tr>
+        <td>${dateFA}</td>
+        <td>${(f.bean_name || '—').split('(')[0].trim()}</td>
+        <td>${satStr}</td>
+        <td>${brewStr}</td>
+        <td>${grindStr}</td>
+        <td style="color:var(--medium-brown);max-width:280px;">${f.notes || '—'}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ بازخوردی ثبت نشده</td></tr>';
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    byBeanEl.innerHTML = byBrewEl.innerHTML = byGrindEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
 

@@ -820,6 +820,22 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       </div>
     </div>
 
+    <!-- Pending Feedback Card -->
+    <div class="new-profile-btn" id="dash-feedback-card" style="display:none;" onclick="startFeedbackFromDashboard()">
+      <div class="new-profile-icon">☕</div>
+      <div class="new-profile-text">
+        <div class="new-profile-title">
+          <span class="en-only">How was your last coffee?</span>
+          <span class="fa-only">قهوه‌ی قبلیت چطور بود؟</span>
+        </div>
+        <div class="new-profile-sub">
+          <span id="dash-feedback-bean-name"></span>
+          <span class="en-only">Tap to share quick feedback</span>
+          <span class="fa-only">بزن تا نظرتو سریع بگی</span>
+        </div>
+      </div>
+    </div>
+
     <!-- New Profile Button -->
     <button class="new-profile-btn" onclick="startNewProfile()">
       <div class="new-profile-icon">✨</div>
@@ -934,6 +950,69 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">بازگشت به داشبورد</span><span class="en-only">Back to dashboard</span>
     </button>
   </div>
+</div>
+
+<!-- ══════ SCREEN: بازخورد سفارش — قبل از محورهای عمیق فاز۲، یا از کارت داشبورد ══════ -->
+<div class="screen" id="screen-feedback">
+  <button class="btn-back" onclick="skipFeedback()">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="logo" style="margin-bottom:16px;">
+    <div class="logo-icon">☕</div>
+    <h1 style="font-size:19px;">
+      <span class="fa-only">قهوه‌ی قبلیت چطور بود؟</span>
+      <span class="en-only">How was your last coffee?</span>
+    </h1>
+  </div>
+  <div id="feedback-bean-name" style="font-size:14px;color:var(--caramel);font-weight:600;text-align:center;margin-bottom:22px;">—</div>
+
+  <div class="input-group">
+    <label class="input-label">
+      <span class="fa-only">رضایت کلی</span><span class="en-only">Overall satisfaction</span>
+    </label>
+    <div style="display:flex;justify-content:space-between;gap:6px;" id="feedback-satisfaction-row">
+      <div class="option-card" style="flex:1;text-align:center;padding:14px 4px;font-size:24px;" onclick="pickFeedbackSatisfaction(1, this)">😞</div>
+      <div class="option-card" style="flex:1;text-align:center;padding:14px 4px;font-size:24px;" onclick="pickFeedbackSatisfaction(2, this)">🙁</div>
+      <div class="option-card" style="flex:1;text-align:center;padding:14px 4px;font-size:24px;" onclick="pickFeedbackSatisfaction(3, this)">😐</div>
+      <div class="option-card" style="flex:1;text-align:center;padding:14px 4px;font-size:24px;" onclick="pickFeedbackSatisfaction(4, this)">🙂</div>
+      <div class="option-card" style="flex:1;text-align:center;padding:14px 4px;font-size:24px;" onclick="pickFeedbackSatisfaction(5, this)">😍</div>
+    </div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">
+      <span class="fa-only">واقعاً چطور دم کردی؟</span><span class="en-only">How did you actually brew it?</span>
+    </label>
+    <div class="options" id="feedback-brew-options"></div>
+  </div>
+
+  <div class="input-group" id="feedback-grind-group" style="display:none;">
+    <label class="input-label">
+      <span class="fa-only">با چی آسیاب کردی؟</span><span class="en-only">What did you grind it with?</span>
+    </label>
+    <div class="options" id="feedback-grind-options"></div>
+  </div>
+
+  <div class="input-group" id="feedback-uniformity-group" style="display:none;">
+    <label class="input-label">
+      <span class="fa-only">یکنواختی آسیاب</span><span class="en-only">Grind uniformity</span>
+    </label>
+    <div class="options" id="feedback-uniformity-options"></div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Notes (optional)</span><span class="fa-only">توضیحات (اختیاری)</span>
+    </label>
+    <textarea class="textarea-field" id="feedback-notes" placeholder="هر چیزی که دوست داری بگی..." style="min-height:70px;"></textarea>
+  </div>
+
+  <div class="error-msg" id="feedback-error"></div>
+  <div class="spacer"></div>
+  <button class="btn-primary" id="btn-submit-feedback" onclick="submitOrderFeedback()">
+    <span class="fa-only">✅ ثبت بازخورد</span><span class="en-only">✅ Submit Feedback</span>
+  </button>
+  <button class="btn-back" style="position:static;margin-top:12px;width:100%;text-align:center;" onclick="skipFeedback()">
+    <span class="fa-only">فعلاً رد شو</span><span class="en-only">Skip for now</span>
+  </button>
 </div>
 
 <!-- ══════ SCREEN 0: LEVEL DETECTION (غیرمستقیم) ══════ -->
@@ -1421,6 +1500,40 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
         <div class="amount-label">
           <span class="en-only">Medium</span>
           <span class="fa-only">متوسط</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grind Preference -->
+  <div class="input-group">
+    <label class="input-label">
+      <span class="en-only">Grinding</span>
+      <span class="fa-only">آسیاب</span>
+    </label>
+    <p style="font-size:12.5px;color:var(--medium-brown);line-height:1.7;font-family:'Vazirmatn',sans-serif;margin:-4px 0 10px;">
+      <span class="fa-only">دونه‌ها بعد از رست به چند روز استراحت نیاز دارن. دوست داری چطور تحویل بگیری؟</span>
+      <span class="en-only">Beans need a few days to rest after roasting. How would you like to receive them?</span>
+    </p>
+    <div class="amount-selector" style="grid-template-columns: 1fr 1fr;">
+      <div class="amount-card" id="grind-self" onclick="selectGrindPref('self_ground')">
+        <div class="amount-label" style="font-size:13px;font-weight:600;">
+          <span class="en-only">Whole bean</span>
+          <span class="fa-only">دونه‌ی کامل</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray-light);margin-top:4px;">
+          <span class="fa-only">خودم بعد از استراحت آسیاب می‌کنم</span>
+          <span class="en-only">I'll grind it myself after resting</span>
+        </div>
+      </div>
+      <div class="amount-card" id="grind-roastery" onclick="selectGrindPref('roastery_ground')">
+        <div class="amount-label" style="font-size:13px;font-weight:600;">
+          <span class="en-only">Ground for me</span>
+          <span class="fa-only">رستری آسیاب کنه</span>
+        </div>
+        <div style="font-size:11px;color:var(--gray-light);margin-top:4px;">
+          <span class="fa-only">بعد از استراحت، آسیاب‌شده برام بفرستید</span>
+          <span class="en-only">Grind after resting, then ship it ground</span>
         </div>
       </div>
     </div>
@@ -2101,6 +2214,7 @@ function skipHealth() {
 let orderBean = null;
 let pendingGateProfile = null; // پروفایلی که کاربر باید اول سفارشش رو بده تا اجازه‌ی ساخت پروفایل جدید رو داشته باشه
 let selectedAmount = null;
+let selectedGrindPref = null;
 let currentLang = 'fa';
 
 /* ═══════════════════════════════════════════
@@ -2241,6 +2355,7 @@ async function showDashboard() {
   loadProfiles();
   loadOrders();
   loadUserMessages();
+  checkPendingFeedbackCard();
 }
 
 async function loadUserMessages() {
@@ -2811,6 +2926,205 @@ function goOrderFromGate() {
 }
 
 /* ═══════════════════════════════════════════
+   بازخورد سفارش (Order Feedback)
+   بعد از حداقل ۵ روز از تأیید/ارسال سفارش، اگه هنوز بازخوردی نگرفتیم، ازش می‌پرسیم —
+   هم از داشبورد (کارت پیشنهادی)، هم قبل از محورهای عمیق فاز۲
+═══════════════════════════════════════════ */
+let pendingFeedbackOrder = null;
+let pendingFeedbackContinuation = null; // بعد از ثبت/ردکردن بازخورد، این تابع صدا زده می‌شه
+let feedbackSatisfaction = null;
+let feedbackBrewValue = null;
+let feedbackGrindType = null;
+let feedbackGrindUniformity = null;
+
+const GRIND_TYPE_OPTIONS = {
+  beginner: [
+    {v:'manual', fa:'آسیاب دستی', en:'Manual grinder'},
+    {v:'electric', fa:'آسیاب برقی خانگی', en:'Home electric grinder'},
+    {v:'espresso_built_in', fa:'خودِ دستگاه اسپرسوساز آسیاب می‌کنه', en:"My espresso machine's built-in grinder"}
+  ],
+  regular: [
+    {v:'manual', fa:'آسیاب دستی', en:'Manual grinder'},
+    {v:'electric', fa:'آسیاب برقی خانگی', en:'Home electric grinder'},
+    {v:'espresso_built_in', fa:'خودِ دستگاه اسپرسوساز آسیاب می‌کنه', en:"My espresso machine's built-in grinder"}
+  ],
+  expert: [
+    {v:'manual', fa:'آسیاب دستی', en:'Manual grinder'},
+    {v:'electric_flat', fa:'آسیاب برقی — تیغه‌ی تخت (Flat Burr)', en:'Electric — Flat Burr'},
+    {v:'electric_conical', fa:'آسیاب برقی — تیغه‌ی مخروطی (Conical Burr)', en:'Electric — Conical Burr'},
+    {v:'espresso_built_in', fa:'داخل دستگاه اسپرسو (Built-in)', en:'Built into espresso machine'}
+  ]
+};
+const GRIND_UNIFORMITY_OPTIONS = [
+  {v:'uniform', fa:'کاملاً یکنواخت', en:'Very uniform'},
+  {v:'slightly_uneven', fa:'کمی نامنظم', en:'Slightly uneven'},
+  {v:'very_uneven', fa:'خیلی نامنظم (Fines زیاد)', en:'Very uneven (lots of fines)'}
+];
+
+// کمکی عمومی برای رندر یه سری option-card تک‌انتخابی (همون الگوی renderQuestion)
+function renderOptionCards(containerId, options, onPick) {
+  const wrap = document.getElementById(containerId);
+  wrap.innerHTML = '';
+  wrap.className = 'options ' + (options.length % 2 === 0 && options.length <= 4 ? 'cols-2' : 'cols-1');
+  options.forEach(opt => {
+    const card = document.createElement('div');
+    card.className = 'option-card';
+    card.style.textAlign = 'right';
+    card.innerHTML =
+      '<div class="option-label-full fa-only" style="direction:rtl">' + opt.fa + '</div>' +
+      '<div class="option-label-full en-only" style="direction:ltr;text-align:left;">' + opt.en + '</div>';
+    card.onclick = () => {
+      wrap.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      onPick(opt.v);
+    };
+    wrap.appendChild(card);
+  });
+}
+
+function pickFeedbackSatisfaction(n, el) {
+  feedbackSatisfaction = n;
+  el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// آسیاب فقط وقتی می‌پرسیم که کاربر موقع سفارش گفته بود خودش آسیاب می‌کنه —
+// اگه رستری آسیاب کرده بود، کیفیتش زیر نظر خودمونه، نه دستگاه مشتری
+function renderFeedbackGrindSection(grindPreference) {
+  const grindGroup = document.getElementById('feedback-grind-group');
+  const uniformityGroup = document.getElementById('feedback-uniformity-group');
+  if (grindPreference !== 'self_ground') {
+    grindGroup.style.display = 'none';
+    uniformityGroup.style.display = 'none';
+    feedbackGrindType = null;
+    feedbackGrindUniformity = null;
+    return;
+  }
+  grindGroup.style.display = 'block';
+  const opts = GRIND_TYPE_OPTIONS[currentLevel] || GRIND_TYPE_OPTIONS.regular;
+  renderOptionCards('feedback-grind-options', opts, (v) => { feedbackGrindType = v; });
+
+  if (currentLevel === 'expert') {
+    uniformityGroup.style.display = 'block';
+    renderOptionCards('feedback-uniformity-options', GRIND_UNIFORMITY_OPTIONS, (v) => { feedbackGrindUniformity = v; });
+  } else {
+    uniformityGroup.style.display = 'none';
+    feedbackGrindUniformity = null;
+  }
+}
+
+function populateFeedbackScreen(order) {
+  pendingFeedbackOrder = order;
+  feedbackSatisfaction = null;
+  feedbackBrewValue = null;
+  feedbackGrindType = null;
+  feedbackGrindUniformity = null;
+  document.getElementById('feedback-bean-name').textContent = order.bean_name || '—';
+  document.getElementById('feedback-satisfaction-row').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('feedback-notes').value = '';
+  document.getElementById('feedback-error').classList.remove('visible');
+  const brewOpts = (QUESTIONS.brew.options[currentLevel] || QUESTIONS.brew.options.regular);
+  renderOptionCards('feedback-brew-options', brewOpts, (v) => { feedbackBrewValue = v; });
+  renderFeedbackGrindSection(order.grind_preference);
+}
+
+// سفارش‌های تأییدشده/ارسال‌شده‌ی حداقل ۵روزه‌ای که هنوز بازخوردی براشون ثبت نشده رو پیدا می‌کنه
+async function getPendingFeedbackOrder(userId) {
+  try {
+    const orders = await sb('GET', `orders?user_id=eq.${userId}&status=in.(confirmed,shipped)&order=created_at.asc&select=*`);
+    if (!orders || !orders.length) return null;
+    const feedbackRows = await sb('GET', `order_feedback?user_id=eq.${userId}&select=order_id`);
+    const feedbackGiven = new Set((feedbackRows || []).map(f => f.order_id));
+    const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    for (const o of orders) {
+      if (feedbackGiven.has(o.id)) continue;
+      if (now - new Date(o.created_at).getTime() >= FIVE_DAYS_MS) return o;
+    }
+    return null;
+  } catch (e) {
+    console.warn('getPendingFeedbackOrder error:', e);
+    return null;
+  }
+}
+
+async function submitOrderFeedback() {
+  const errEl = document.getElementById('feedback-error');
+  errEl.classList.remove('visible');
+  if (!pendingFeedbackOrder) { skipFeedback(); return; }
+  if (!feedbackSatisfaction) {
+    showErr(errEl, currentLang === 'en' ? 'Please rate your satisfaction' : 'لطفاً رضایتت رو مشخص کن');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit-feedback');
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  try {
+    await sb('POST', 'order_feedback', {
+      order_id: pendingFeedbackOrder.id,
+      user_id: currentUser.id,
+      bean_name: pendingFeedbackOrder.bean_name || null,
+      satisfaction: feedbackSatisfaction,
+      actual_brew: feedbackBrewValue,
+      grind_type: feedbackGrindType,
+      grind_uniformity: feedbackGrindUniformity,
+      notes: document.getElementById('feedback-notes').value.trim() || null
+    });
+
+    // اگه دم‌آوری واقعی با چیزی که تو کوییز گفته بود فرق داشت، پروفایل همون سفارش رو آپدیت کن —
+    // دقیق‌ترین سیگنالیه که از رفتار واقعی کاربر داریم
+    if (feedbackBrewValue && pendingFeedbackOrder.profile_id) {
+      try {
+        await sb('PATCH', `coffee_profiles?id=eq.${pendingFeedbackOrder.profile_id}`, { brew: feedbackBrewValue });
+      } catch (e) { console.warn('could not update profile brew from feedback:', e); }
+    }
+  } catch (e) {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="fa-only">✅ ثبت بازخورد</span><span class="en-only">✅ Submit Feedback</span>';
+    showErr(errEl, currentLang === 'en' ? 'Something went wrong. Please try again.' : 'مشکلی پیش اومد. دوباره امتحان کن.');
+    return;
+  }
+
+  const cont = pendingFeedbackContinuation;
+  pendingFeedbackContinuation = null;
+  pendingFeedbackOrder = null;
+  if (cont) cont(); else showDashboard();
+}
+
+function skipFeedback() {
+  const cont = pendingFeedbackContinuation;
+  pendingFeedbackContinuation = null;
+  pendingFeedbackOrder = null;
+  if (cont) cont(); else showDashboard();
+}
+
+// کارت پیشنهادی تو داشبورد — پروآکتیو، مستقل از مسیر ساخت پروفایل جدید
+async function checkPendingFeedbackCard() {
+  const card = document.getElementById('dash-feedback-card');
+  if (!card || !currentUser) return;
+  const pending = await getPendingFeedbackOrder(currentUser.id);
+  if (pending) {
+    card.style.display = 'flex';
+    const nameEl = document.getElementById('dash-feedback-bean-name');
+    if (nameEl) nameEl.textContent = pending.bean_name ? (pending.bean_name + ' — ') : '';
+  } else {
+    card.style.display = 'none';
+  }
+}
+
+function startFeedbackFromDashboard() {
+  if (!currentUser) return;
+  getPendingFeedbackOrder(currentUser.id).then(pending => {
+    if (!pending) { checkPendingFeedbackCard(); return; }
+    populateFeedbackScreen(pending);
+    pendingFeedbackContinuation = () => showDashboard();
+    show('screen-feedback');
+  });
+}
+
+/* ═══════════════════════════════════════════
    QUIZ
 ═══════════════════════════════════════════ */
 async function startNewProfile() {
@@ -2852,25 +3166,42 @@ async function startNewProfile() {
           return;
         }
 
-        ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
-        ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
-        ans.tastepref = last.tastepref; ans.brew = last.brew;
-        isPhase2 = true;
+        // بازخورد سفارش: اگه سفارشی هست که حداقل ۵ روز پیش تأیید/ارسال شده و هنوز بازخوردی نگرفتیم،
+        // قبل از محورهای عمیق فاز۲ ازش می‌پرسیم — این دقیق‌ترین سیگنالیه که از تجربه‌ی واقعی داریم
+        const pendingFeedback = await getPendingFeedbackOrder(currentUser.id);
+        if (pendingFeedback) {
+          populateFeedbackScreen(pendingFeedback);
+          pendingFeedbackContinuation = () => proceedToPhase2Setup(last);
+          show('screen-feedback');
+          return;
+        }
 
-        // موتور پوشش محور: کدوم محورهای عمیق هنوز پرسیده نشدن؟ (یا، تو Refresh Mode، کدومشون قدیمی‌ترینه؟)
-        const coverage = await getUncoveredAxes(currentUser.id);
-        phase2AxesToAsk = coverage.axesToAsk;
-        isRefreshMode = coverage.isRefreshMode;
-        // محورهایی که از قبل جواب داریم، همین نشست هم اعمال بشن — تا پیشنهاد دقیق‌تر بمونه
-        // حتی وقتی این نشست دوباره ازشون پرسیده نمی‌شه
-        DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
-
-        setPhase2IntroText(isRefreshMode);
+        await proceedToPhase2Setup(last);
+        return;
       }
     }
   } catch(e) { console.warn('could not check for returning user:', e); }
 
   show(isPhase2 ? 'screen-phase2-intro' : 'screen-level');
+}
+
+// ادامه‌ی راه‌اندازی فاز۲ برای کاربر برگشتی — بعد از عبور از گیت سفارش و (در صورت وجود) بازخورد سفارش
+async function proceedToPhase2Setup(last) {
+  ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
+  ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
+  ans.tastepref = last.tastepref; ans.brew = last.brew;
+  isPhase2 = true;
+
+  // موتور پوشش محور: کدوم محورهای عمیق هنوز پرسیده نشدن؟ (یا، تو Refresh Mode، کدومشون قدیمی‌ترینه؟)
+  const coverage = await getUncoveredAxes(currentUser.id);
+  phase2AxesToAsk = coverage.axesToAsk;
+  isRefreshMode = coverage.isRefreshMode;
+  // محورهایی که از قبل جواب داریم، همین نشست هم اعمال بشن — تا پیشنهاد دقیق‌تر بمونه
+  // حتی وقتی این نشست دوباره ازشون پرسیده نمی‌شه
+  DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
+
+  setPhase2IntroText(isRefreshMode);
+  show('screen-phase2-intro');
 }
 
 function updateProgressBean(category) {
@@ -3156,8 +3487,11 @@ function priceForAmount(amount) {
 
 async function goToOrderDirect() {
   selectedAmount = null;
+  selectedGrindPref = null;
   document.getElementById('amt-125').classList.remove('selected');
   document.getElementById('amt-250').classList.remove('selected');
+  document.getElementById('grind-self').classList.remove('selected');
+  document.getElementById('grind-roastery').classList.remove('selected');
   document.getElementById('order-address').value = '';
   document.getElementById('order-notes').value = '';
   document.getElementById('order-error').classList.remove('visible');
@@ -3177,6 +3511,12 @@ function selectAmount(g) {
   document.getElementById('amt-250').classList.toggle('selected', g === 250);
 }
 
+function selectGrindPref(pref) {
+  selectedGrindPref = pref;
+  document.getElementById('grind-self').classList.toggle('selected', pref === 'self_ground');
+  document.getElementById('grind-roastery').classList.toggle('selected', pref === 'roastery_ground');
+}
+
 async function submitOrder() {
   const errEl = document.getElementById('order-error');
   const sucEl = document.getElementById('order-success');
@@ -3188,6 +3528,7 @@ async function submitOrder() {
   const notes   = document.getElementById('order-notes').value.trim();
 
   if (!selectedAmount) return showErr(errEl, en ? 'Please select an amount (125g or 250g)' : 'مقدار را انتخاب کنید (۱۲۵g یا ۲۵۰g)');
+  if (!selectedGrindPref) return showErr(errEl, en ? 'Please choose how you want the beans ground' : 'روش آسیاب رو انتخاب کنید');
   if (!address) return showErr(errEl, en ? 'Please enter a delivery address' : 'آدرس تحویل را وارد کنید');
 
   const btn = document.getElementById('btn-submit-order');
@@ -3203,6 +3544,7 @@ async function submitOrder() {
       notes,
       status: 'pending',
       payment_status: 'unpaid',
+      grind_preference: selectedGrindPref,
       bean_name: orderBean ? (orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '')) : null,
       roastery_id: selectedRoastery ? selectedRoastery.id : null,
       roastery_name: selectedRoastery ? selectedRoastery.name : null
