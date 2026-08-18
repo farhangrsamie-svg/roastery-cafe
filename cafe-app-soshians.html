@@ -1313,25 +1313,6 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </div>
   </div>
   <textarea id="memory-input-1" class="textarea-field" rows="5" style="width:100%;margin-bottom:16px;"></textarea>
-  <button class="btn-primary" onclick="show('screen-memory2')"><span class="fa-only">بعدی ←</span><span class="en-only">Next →</span></button>
-  <button class="btn-back" style="position:static;margin-top:12px;width:100%;text-align:center;" onclick="show('screen-memory2')"><span class="fa-only">رد شدن</span><span class="en-only">Skip</span></button>
-  <div class="spacer"></div>
-</div>
-
-<div class="screen" id="screen-memory2">
-  <button class="btn-back" onclick="show('screen-memory1')">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
-  <div class="progress-wrap">
-    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4E3B24"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
-    <div class="progress-label" id="progress-label-memory2"></div>
-  </div>
-  <div class="q-header">
-    <div class="q-title-dynamic" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
-    <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
-      <span class="fa-only">کاملاً خصوصیه، فقط پیش خودت می‌مونه</span>
-      <span class="en-only">Completely private — stays only with you</span>
-    </div>
-  </div>
-  <textarea id="memory-input-2" class="textarea-field" rows="5" style="width:100%;margin-bottom:16px;"></textarea>
   <button class="btn-primary" onclick="finishPhase2()"><span class="fa-only">تموم شد →</span><span class="en-only">Done →</span></button>
   <button class="btn-back" style="position:static;margin-top:12px;width:100%;text-align:center;" onclick="finishPhase2()"><span class="fa-only">رد شدن</span><span class="en-only">Skip</span></button>
   <div class="spacer"></div>
@@ -1980,6 +1961,8 @@ const QUESTIONS = {
 };
 
 // سؤالات روایی Memory Identity — بدون امتیازدهی، فقط ذخیره‌ی متن خام (خصوصی، جدول جدا)
+// بانک بزرگ‌تر از یه سؤال ثابت — هر نشست فقط ۱ سؤال (که قبلاً پرسیده نشده) از این‌جا انتخاب می‌شه،
+// تا کاربر برگشتی هر بار یه سؤال تازه ببینه، نه همیشه همون خاطره/فصل تکراری
 const MEMORY_QUESTIONS = [
   {
     key: 'first_memory',
@@ -1990,6 +1973,21 @@ const MEMORY_QUESTIONS = [
     key: 'best_cup',
     title: { fa:'اگه قهوه یه فصل بود، کدوم فصل بود؟ چرا؟', en:'If coffee were a season, which one would it be? Why?' },
     placeholder: { fa:'جواب درست یا غلط نداره، هرچی به ذهنت میاد...', en:"There's no right answer, whatever comes to mind..." }
+  },
+  {
+    key: 'coffee_relationship',
+    title: { fa:'رابطه‌ت با قهوه رو چطور توصیف می‌کنی؟', en:'How would you describe your relationship with coffee?' },
+    placeholder: { fa:'یه لحظه، یه عادت، یه حس... هرچی به ذهنت میاد', en:'A moment, a habit, a feeling... whatever comes to mind' }
+  },
+  {
+    key: 'coffee_music',
+    title: { fa:'موقع قهوه خوردن معمولاً چی گوش می‌دی؟', en:'What do you usually listen to while drinking coffee?' },
+    placeholder: { fa:'یه آهنگ، یه خواننده، یه سکوت... هرچی بهش عادت داری', en:'A song, an artist, silence... whatever you\'re used to' }
+  },
+  {
+    key: 'coffee_object',
+    title: { fa:'همیشه چی کنار فنجون قهوه‌ته؟', en:"What's always next to your coffee cup?" },
+    placeholder: { fa:'یه کتاب، گوشی، دفترچه، هیچی...', en:'A book, your phone, a notebook, nothing...' }
   }
 ];
 
@@ -2031,6 +2029,28 @@ async function getUncoveredAxes(userId) {
     if (lastSeenAt[axis] < lastSeenAt[oldestAxis]) oldestAxis = axis;
   });
   return { axesToAsk: [oldestAxis], isRefreshMode: true, knownValues: known };
+}
+
+// موتور چرخش سؤال خاطره‌ای — دقیقاً همون منطق موتور پوشش محور، ولی برای MEMORY_QUESTIONS
+// هر نشست فقط ۱ سؤال (که قبلاً پرسیده نشده) انتخاب می‌شه؛ اگه همه پرسیده شده بودن، قدیمی‌ترین دوباره پرسیده می‌شه
+async function getNextMemoryQuestion(userId) {
+  let responses = [];
+  try {
+    responses = await sb('GET', `memory_identity_responses?user_id=eq.${userId}&order=created_at.asc&select=question_key,created_at`);
+  } catch (e) {
+    console.warn('getNextMemoryQuestion: خطا در گرفتن پاسخ‌های قبلی:', e);
+  }
+  const lastSeenAt = {};
+  (responses || []).forEach(r => { lastSeenAt[r.question_key] = r.created_at; });
+  const allKeys = MEMORY_QUESTIONS.map(q => q.key);
+  const unseen = allKeys.filter(k => !(k in lastSeenAt));
+  if (unseen.length > 0) {
+    return MEMORY_QUESTIONS.find(q => q.key === unseen[0]);
+  }
+  // همه‌ی سؤالات حداقل یه‌بار پرسیده شدن — قدیمی‌ترین‌شون رو دوباره می‌پرسیم
+  let oldestKey = allKeys[0];
+  allKeys.forEach(k => { if (lastSeenAt[k] < lastSeenAt[oldestKey]) oldestKey = k; });
+  return MEMORY_QUESTIONS.find(q => q.key === oldestKey);
 }
 
 // متن صفحه‌ی معرفی فاز۲ رو بسته به Refresh Mode بودن یا نبودن تنظیم می‌کنه
@@ -2338,10 +2358,11 @@ function renderAllQuestions(level) {
 }
 
 // فاز ۲ — موتور پوشش محور: رو phase2AxesToAsk (حداکثر ۳ محور) حلقه می‌زنه
-// + ۲ سؤال روایی ثابت (فقط برای مبتدی/معمولی — متخصص این سؤالات خاطره‌ای رو اصلاً نمی‌بینه)
-function renderPhase2Questions(level) {
+// + فقط ۱ سؤال روایی (از بانک بزرگ‌تر، چرخشی — هر نشست یه سؤال تازه) — فقط مبتدی/معمولی، متخصص اصلاً نمی‌بینه
+let selectedMemoryQuestion = null;
+async function renderPhase2Questions(level) {
   const isExpert = level === 'expert';
-  const total = phase2AxesToAsk.length + (isExpert ? 0 : 2);
+  const total = phase2AxesToAsk.length + (isExpert ? 0 : 1);
 
   phase2AxesToAsk.forEach((axis, i) => {
     const screenId = 'deep-' + (i + 1);
@@ -2356,6 +2377,10 @@ function renderPhase2Questions(level) {
 
   if (isExpert) return; // متخصص مستقیم بعد از آخرین محور می‌ره سراغ نتیجه، سؤالات خاطره‌ای رو نمی‌بینه
 
+  selectedMemoryQuestion = currentUser
+    ? await getNextMemoryQuestion(currentUser.id)
+    : MEMORY_QUESTIONS[0]; // fallback (کاربر واردنشده که عملاً پیش نمیاد اینجا)
+
   const memLabel1 = document.getElementById('progress-label-memory1');
   if (memLabel1) {
     const n1 = phase2AxesToAsk.length + 1;
@@ -2363,24 +2388,14 @@ function renderPhase2Questions(level) {
       '<span class="fa-only">سؤال ' + n1 + ' از ' + total + ' (خاطره‌ای، اختیاری)</span>' +
       '<span class="en-only">Question ' + n1 + ' of ' + total + ' (memory, optional)</span>';
   }
-  const memLabel2 = document.getElementById('progress-label-memory2');
-  if (memLabel2) {
-    const n2 = phase2AxesToAsk.length + 2;
-    memLabel2.innerHTML =
-      '<span class="fa-only">سؤال ' + n2 + ' از ' + total + ' (خاطره‌ای، اختیاری)</span>' +
-      '<span class="en-only">Question ' + n2 + ' of ' + total + ' (memory, optional)</span>';
-  }
 
-  MEMORY_QUESTIONS.forEach((mq, i) => {
-    const n = i + 1;
-    document.getElementById('q-title-memory' + n).innerHTML =
-      '<span class="fa-only" style="direction:rtl">' + mq.title.fa + '</span>' +
-      '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + mq.title.en + '</span>';
-    const input = document.getElementById('memory-input-' + n);
-    input.placeholder = currentLang === 'en' ? mq.placeholder.en : mq.placeholder.fa;
-    input.dir = currentLang === 'en' ? 'ltr' : 'rtl';
-    input.value = '';
-  });
+  document.getElementById('q-title-memory1').innerHTML =
+    '<span class="fa-only" style="direction:rtl">' + selectedMemoryQuestion.title.fa + '</span>' +
+    '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + selectedMemoryQuestion.title.en + '</span>';
+  const input = document.getElementById('memory-input-1');
+  input.placeholder = currentLang === 'en' ? selectedMemoryQuestion.placeholder.en : selectedMemoryQuestion.placeholder.fa;
+  input.dir = currentLang === 'en' ? 'ltr' : 'rtl';
+  input.value = '';
 }
 
 // برگشت از صفحات پویای فاز۲
@@ -2419,13 +2434,11 @@ function pickDynamic(el, axis, value, screenNum) {
 // وقتی کاربر روایت‌های Memory Identity رو تموم کرد (یا رد کرد)
 async function finishPhase2() {
   const m1 = document.getElementById('memory-input-1').value.trim();
-  const m2 = document.getElementById('memory-input-2').value.trim();
   try {
-    if (currentUser && (m1 || m2)) {
-      const rows = [];
-      if (m1) rows.push({ user_id: currentUser.id, question_key: MEMORY_QUESTIONS[0].key, answer_text: m1 });
-      if (m2) rows.push({ user_id: currentUser.id, question_key: MEMORY_QUESTIONS[1].key, answer_text: m2 });
-      await sb('POST', 'memory_identity_responses', rows);
+    if (currentUser && m1 && selectedMemoryQuestion) {
+      await sb('POST', 'memory_identity_responses', [
+        { user_id: currentUser.id, question_key: selectedMemoryQuestion.key, answer_text: m1 }
+      ]);
     }
   } catch(e) {
     console.warn('memory identity save error:', e); // خصوصیه؛ اگه ذخیره نشد، جلوی ادامه‌ی فرآیند رو نمی‌گیریم
@@ -2433,7 +2446,7 @@ async function finishPhase2() {
   showLoading();
 }
 
-function selectLevel(level) {
+async function selectLevel(level) {
   currentLevel = level;
 
   // نکته: قانون Upgrade (ارتقای خودکار مبتدی→معمولی بر اساس localStorage) عمداً
@@ -2444,7 +2457,7 @@ function selectLevel(level) {
   document.documentElement.style.setProperty('--level-color', LEVEL_META[currentLevel].color);
 
   if (isPhase2) {
-    renderPhase2Questions(currentLevel);
+    await renderPhase2Questions(currentLevel);
     show('screen-deep-1');
     return;
   }
