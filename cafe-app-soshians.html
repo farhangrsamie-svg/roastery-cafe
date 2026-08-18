@@ -2842,11 +2842,12 @@ function computeCombinedPersona(weighted) {
       totals[key] += score * weight;
     });
   });
-  let bestKey = null, bestAvg = -1;
+  let bestKey = null, bestAvg = -Infinity; // قبلاً -1 بود — همون باگی که تو determinePersonaFrom بود
   keys.forEach(key => {
     const avg = totals[key] / (weightSum || 1);
     if (avg > bestAvg) { bestAvg = avg; bestKey = key; }
   });
+  if (!bestKey) bestKey = keys[0]; // لایه‌ی محافظتی — هرگز undefined برنگردون
   return PERSONAS[bestKey];
 }
 
@@ -4166,11 +4167,15 @@ function computeAxisScore(entityS, a, weights) {
 
 function determinePersonaFrom(a) {
   const weights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
-  let bestKey = null, bestScore = -1;
+  let bestKey = null, bestScore = -Infinity; // قبلاً -1 بود — اگه همه‌ی پرسوناها امتیاز منفی‌تر از -1 می‌گرفتن،
+                                              // هیچ‌کدوم انتخاب نمی‌شد و persona undefined می‌موند (کرش «reading icon»)
   for (const key in PERSONAS) {
     const score = computeAxisScore(PERSONAS[key].s, a, weights);
     if (score > bestScore) { bestScore = score; bestKey = key; }
   }
+  // لایه‌ی محافظتی: حتی اگه به هر دلیل غیرمنتظره‌ای بازم چیزی انتخاب نشد، اولین پرسونا رو برگردون
+  // تا اپ کرش نکنه — بهتره یه پرسونای غیردقیق نشون بدیم تا این‌که کل صفحه‌ی نتیجه خراب بشه
+  if (!bestKey) bestKey = Object.keys(PERSONAS)[0];
   return PERSONAS[bestKey];
 }
 function determinePersona() {
