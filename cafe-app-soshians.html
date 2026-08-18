@@ -217,12 +217,20 @@ body {
 .flavor-wheel-center-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56%; text-align: center; pointer-events: none; }
 .flavor-wheel-center-icon { font-size: 26px; line-height: 1; margin-bottom: 2px; }
 .flavor-wheel-center-text { font-size: 11.5px; color: #fff; font-weight: 600; line-height: 1.3; font-family: 'Vazirmatn', sans-serif; }
+/* لایه‌ی برچسب‌ها — دقیقاً هم‌زمان با چرخ می‌چرخه، تا رنگ هر بخش همیشه با اسمش همراه بمونه */
+.flavor-wheel-labels-layer { position: absolute; inset: 0; transition: transform 0.05s linear; pointer-events: none; }
+.flavor-wheel-labels-layer.settling { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
 .flavor-wheel-label-pill {
   position: absolute; transform: translate(-50%, -50%);
-  font-size: 10.5px; font-weight: 600; color: #fff; text-align: center; line-height: 1.25;
-  pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,0.55); width: 78px;
-  font-family: 'Vazirmatn', sans-serif;
+  width: 78px; pointer-events: none;
 }
+.flavor-wheel-label-inner {
+  font-size: 10.5px; font-weight: 600; color: rgba(255,255,255,0.85); text-align: center; line-height: 1.25;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55); font-family: 'Vazirmatn', sans-serif;
+  transition: transform 0.05s linear, color 0.15s ease, font-weight 0.15s ease;
+}
+.flavor-wheel-labels-layer.settling .flavor-wheel-label-inner { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), color 0.15s ease; }
+.flavor-wheel-label-inner.selected { color: #fff; font-weight: 800; font-size: 11.5px; }
 .flavor-wheel-confirm-btn {
   margin-top: 18px; padding: 10px 28px; border-radius: 30px; border: none; cursor: pointer;
   background: var(--caramel); color: var(--dark-brown); font-weight: 700; font-size: 14px;
@@ -2143,6 +2151,7 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
         <g id="flavor-wheel-group-${screenNum}"></g>
         <circle class="flavor-wheel-center-circle" cx="${cx}" cy="${cy}" r="${innerR - 3}"></circle>
       </svg>
+      <div class="flavor-wheel-labels-layer" id="flavor-wheel-labels-${screenNum}"></div>
       <div class="flavor-wheel-center-label" id="flavor-wheel-center-${screenNum}">
         <div class="flavor-wheel-center-icon">☕</div>
         <div class="flavor-wheel-center-text">
@@ -2157,14 +2166,18 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
 
   const svg = container.querySelector('#flavor-wheel-svg-' + screenNum);
   const group = container.querySelector('#flavor-wheel-group-' + screenNum);
+  const labelsLayer = container.querySelector('#flavor-wheel-labels-' + screenNum);
   const centerLabel = container.querySelector('#flavor-wheel-center-' + screenNum);
   const confirmBtn = container.querySelector('#flavor-wheel-confirm-' + screenNum);
   const stage = container.querySelector('.flavor-wheel-stage');
 
   let rotation = 0;
   let pendingIndex = null; // بخشی که زیر نشانگره ولی هنوز تأیید نشده (بعد از چرخوندن دستی)
+  const labelInners = []; // برای ضدچرخش هر برچسب، تا متن همیشه صاف و خوانا بمونه
 
   // ساخت گوه‌ها + برچسب‌های دوزبانه‌ی HTML (برای پشتیبانی درست از fa-only/en-only)
+  // نکته‌ی مهم: برچسب‌ها تو یه لایه‌ی جدا هستن که دقیقاً هم‌زمان با خودِ چرخ می‌چرخه —
+  // تا رنگ هر بخش همیشه با برچسب مخصوص به خودش حرکت کنه و گم نشه
   opts.forEach((opt, i) => {
     const start = i * segAngle;
     const end = start + segAngle;
@@ -2183,17 +2196,29 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     pill.className = 'flavor-wheel-label-pill';
     pill.style.left = (pos.x / 300 * 100) + '%';
     pill.style.top = (pos.y / 300 * 100) + '%';
-    pill.innerHTML =
+    const inner = document.createElement('div');
+    inner.className = 'flavor-wheel-label-inner';
+    inner.innerHTML =
       '<span class="fa-only" style="direction:rtl">' + opt.fa + '</span>' +
       '<span class="en-only" style="direction:ltr;">' + opt.en + '</span>';
+    pill.appendChild(inner);
     pill.style.pointerEvents = 'none';
-    stage.appendChild(pill);
+    labelsLayer.appendChild(pill);
+    labelInners.push(inner);
   });
+
+  // چرخ (SVG) و لایه‌ی برچسب‌ها رو با هم می‌چرخونه؛ هر برچسب هم ضدچرخش می‌گیره تا متنش صاف بمونه
+  function applyRotation() {
+    svg.style.transform = 'rotate(' + rotation + 'deg)';
+    labelsLayer.style.transform = 'rotate(' + rotation + 'deg)';
+    labelInners.forEach(el => { el.style.transform = 'rotate(' + (-rotation) + 'deg)'; });
+  }
 
   function wedgeAt(i) { return group.children[i]; }
 
   function clearHighlight() {
     Array.from(group.children).forEach(w => w.classList.remove('selected'));
+    labelInners.forEach(el => el.classList.remove('selected'));
   }
 
   // بخشی که الان دقیقاً زیر نشانگر (بالای چرخ) قرار داره رو حساب می‌کنه
@@ -2206,6 +2231,7 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     const idx = segmentUnderPointer();
     clearHighlight();
     wedgeAt(idx).classList.add('selected');
+    labelInners[idx].classList.add('selected');
     pendingIndex = idx;
     centerLabel.innerHTML =
       '<div class="flavor-wheel-center-icon">☕</div>' +
@@ -2222,7 +2248,8 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     const mid = i * segAngle + segAngle / 2;
     rotation = -mid;
     svg.classList.add('settling');
-    svg.style.transform = 'rotate(' + rotation + 'deg)';
+    labelsLayer.classList.add('settling');
+    applyRotation();
     highlightUnderPointer();
     if (immediate) {
       setTimeout(() => confirmSelection(), 260);
@@ -2255,6 +2282,7 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     dragging = true;
     svg.classList.add('dragging');
     svg.classList.remove('settling');
+    labelsLayer.classList.remove('settling');
     const p = e.touches ? e.touches[0] : e;
     startPointerAngle = angleFromEvent(p.clientX, p.clientY);
     startRotation = rotation;
@@ -2266,7 +2294,7 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     const p = e.touches ? e.touches[0] : e;
     const currentAngle = angleFromEvent(p.clientX, p.clientY);
     rotation = startRotation + (currentAngle - startPointerAngle);
-    svg.style.transform = 'rotate(' + rotation + 'deg)';
+    applyRotation();
     highlightUnderPointer();
     e.preventDefault();
   }
@@ -2275,11 +2303,12 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
     dragging = false;
     svg.classList.remove('dragging');
     svg.classList.add('settling');
+    labelsLayer.classList.add('settling');
     if (pendingIndex !== null) {
       // چرخ رو دقیق‌تر روی وسط همون بخش تنظیم کن (چفت‌شدن نرم)
       const mid = pendingIndex * segAngle + segAngle / 2;
       rotation = -mid;
-      svg.style.transform = 'rotate(' + rotation + 'deg)';
+      applyRotation();
     }
   }
 
@@ -2290,7 +2319,7 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
   window.addEventListener('mouseup', onPointerUp);
   window.addEventListener('touchend', onPointerUp);
 
-  svg.style.transform = 'rotate(0deg)';
+  applyRotation();
 }
 
 let isPhase2 = false;
