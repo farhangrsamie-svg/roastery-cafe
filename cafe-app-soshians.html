@@ -161,6 +161,10 @@ body {
 .q-header { margin-bottom: 34px; }
 .q-text-en { font-size: 22px; color: var(--dark-brown); font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
 .q-text-fa { font-size: 19px; color: var(--dark-brown); font-weight: 700; line-height: 1.6; }
+/* برای عنوان‌های سؤال که با JS و دو زبانه (span های fa-only/en-only) پر می‌شن —
+   این کانتینر نباید خودش کلاس q-text-fa داشته باشه، وگرنه رول مخفی‌سازی زبان
+   کل کانتینر (همراه هر دو زبان داخلش) رو تو حالت انگلیسی مخفی می‌کنه */
+.q-title-dynamic { font-size: 19px; color: var(--dark-brown); font-weight: 700; line-height: 1.6; }
 
 /* ── OPTION CARDS ── */
 .options { display: grid; gap: 14px; }
@@ -347,7 +351,7 @@ body {
 body.lang-fa .en-only { display: none !important; }
 body.lang-en .fa-only { display: none !important; }
 body.lang-fa .option-en, body.lang-fa .q-text-en, body.lang-fa .loading-en { display: none !important; }
-body.lang-en .option-fa, body.lang-en .q-text-fa, body.lang-fa .loading-fa { display: none !important; }
+body.lang-en .option-fa, body.lang-en .q-text-fa, body.lang-en .loading-fa { display: none !important; }
 body.lang-fa { direction: rtl; }
 body.lang-fa .msg-card, body.lang-fa .confirm-desc, body.lang-fa .roastery-card,
 body.lang-fa .payment-step, body.lang-fa .amount-due-box, body.lang-fa .payment-timer,
@@ -1074,7 +1078,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-1"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-1" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-1" style="text-align:right;direction:rtl"></div>
   </div>
   <div class="q-edu" id="q-edu-1" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-1"></div>
@@ -1088,7 +1092,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#729839"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label" id="progress-label-2"></div>
   </div>
-  <div class="q-header"><div class="q-text-fa" id="q-title-2" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-2" style="text-align:right;direction:rtl"></div></div>
   <div class="q-edu" id="q-edu-2" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-2"></div>
   <div class="spacer"></div>
@@ -1101,7 +1105,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#687D31"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label" id="progress-label-3"></div>
   </div>
-  <div class="q-header"><div class="q-text-fa" id="q-title-3" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-3" style="text-align:right;direction:rtl"></div></div>
   <div class="q-edu" id="q-edu-3" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-3"></div>
   <div class="spacer"></div>
@@ -1114,7 +1118,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#5E6228"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label" id="progress-label-4"></div>
   </div>
-  <div class="q-header"><div class="q-text-fa" id="q-title-4" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-4" style="text-align:right;direction:rtl"></div></div>
   <div class="q-edu" id="q-edu-4" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-4"></div>
   <div class="spacer"></div>
@@ -1127,7 +1131,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#544720"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label" id="progress-label-5"></div>
   </div>
-  <div class="q-header"><div class="q-text-fa" id="q-title-5" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-5" style="text-align:right;direction:rtl"></div></div>
   <div class="q-edu" id="q-edu-5" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-5"></div>
   <div class="spacer"></div>
@@ -1140,7 +1144,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#4A2C17"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
     <div class="progress-label" id="progress-label-6"></div>
   </div>
-  <div class="q-header"><div class="q-text-fa" id="q-title-6" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-6" style="text-align:right;direction:rtl"></div></div>
   <div class="q-edu" id="q-edu-6" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-6"></div>
   <div class="spacer"></div>
@@ -1198,7 +1202,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-8"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-8" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-8" style="text-align:right;direction:rtl"></div>
     <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
       <span class="fa-only">این فقط برای راهنمای دم‌آوریته، روی انتخاب دانه اثر نمی‌ذاره</span>
     </div>
@@ -1218,7 +1222,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-deep-1"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-deep-1" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-deep-1" style="text-align:right;direction:rtl"></div>
   </div>
   <div class="q-edu" id="q-edu-deep-1" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-deep-1"></div>
@@ -1232,7 +1236,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-deep-2"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-deep-2" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-deep-2" style="text-align:right;direction:rtl"></div>
   </div>
   <div class="q-edu" id="q-edu-deep-2" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-deep-2"></div>
@@ -1246,7 +1250,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-deep-3"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-deep-3" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-deep-3" style="text-align:right;direction:rtl"></div>
   </div>
   <div class="q-edu" id="q-edu-deep-3" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
   <div class="options" id="q-options-deep-3"></div>
@@ -1261,7 +1265,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-memory1"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-memory1" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-memory1" style="text-align:right;direction:rtl"></div>
     <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
       <span class="fa-only">کاملاً خصوصیه، فقط پیش خودت می‌مونه</span>
       <span class="en-only">Completely private — stays only with you</span>
@@ -1280,7 +1284,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="progress-label" id="progress-label-memory2"></div>
   </div>
   <div class="q-header">
-    <div class="q-text-fa" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
+    <div class="q-title-dynamic" id="q-title-memory2" style="text-align:right;direction:rtl"></div>
     <div style="font-size:12px;color:var(--gray);font-family:Arial,sans-serif;margin-top:6px;">
       <span class="fa-only">کاملاً خصوصیه، فقط پیش خودت می‌مونه</span>
       <span class="en-only">Completely private — stays only with you</span>
