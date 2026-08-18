@@ -198,6 +198,39 @@ body {
 .screen.active .option-card:nth-child(5) { animation-delay: 0.22s; }
 .option-card.full-row { grid-column: span 2; }
 .option-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; display: flex; justify-content: center; }
+
+/* ═══════════════════════════════════════════
+   چرخ طعم (Flavor Wheel) — الهام‌گرفته از SCA Coffee Taster's Flavor Wheel
+   فقط برای محور «طعم» (taste) استفاده می‌شه؛ بقیه‌ی سؤالات همون دکمه‌های عادی رو دارن
+═══════════════════════════════════════════ */
+.flavor-wheel-wrap { display: flex; flex-direction: column; align-items: center; padding: 6px 0 10px; user-select: none; -webkit-user-select: none; }
+.flavor-wheel-hint { font-size: 12px; color: var(--medium-brown); text-align: center; margin-bottom: 14px; font-family: 'Vazirmatn', sans-serif; }
+.flavor-wheel-stage { position: relative; width: 300px; max-width: 88vw; aspect-ratio: 1/1; touch-action: none; }
+.flavor-wheel-pointer { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); font-size: 22px; z-index: 5; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.35)); pointer-events: none; }
+.flavor-wheel-svg { width: 100%; height: 100%; cursor: grab; transition: transform 0.05s linear; }
+.flavor-wheel-svg.dragging { cursor: grabbing; transition: none; }
+.flavor-wheel-svg.settling { transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1); }
+.flavor-wedge { stroke: var(--cream); stroke-width: 2; transition: opacity 0.15s ease, filter 0.15s ease; opacity: 0.88; }
+.flavor-wedge:hover { opacity: 1; }
+.flavor-wedge.selected { opacity: 1; filter: drop-shadow(0 0 6px rgba(255,255,255,0.5)); }
+.flavor-wheel-center-circle { fill: var(--dark-brown); stroke: var(--caramel); stroke-width: 2; }
+.flavor-wheel-center-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 56%; text-align: center; pointer-events: none; }
+.flavor-wheel-center-icon { font-size: 26px; line-height: 1; margin-bottom: 2px; }
+.flavor-wheel-center-text { font-size: 11.5px; color: #fff; font-weight: 600; line-height: 1.3; font-family: 'Vazirmatn', sans-serif; }
+.flavor-wheel-label-pill {
+  position: absolute; transform: translate(-50%, -50%);
+  font-size: 10.5px; font-weight: 600; color: #fff; text-align: center; line-height: 1.25;
+  pointer-events: none; text-shadow: 0 1px 3px rgba(0,0,0,0.55); width: 78px;
+  font-family: 'Vazirmatn', sans-serif;
+}
+.flavor-wheel-confirm-btn {
+  margin-top: 18px; padding: 10px 28px; border-radius: 30px; border: none; cursor: pointer;
+  background: var(--caramel); color: var(--dark-brown); font-weight: 700; font-size: 14px;
+  font-family: 'Vazirmatn', sans-serif; transition: transform 0.15s ease, opacity 0.15s ease;
+  opacity: 0; pointer-events: none;
+}
+.flavor-wheel-confirm-btn.visible { opacity: 1; pointer-events: auto; }
+.flavor-wheel-confirm-btn:active { transform: scale(0.96); }
 .option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
 .option-card.selected .option-icon svg { color: var(--caramel); }
 
@@ -2046,6 +2079,13 @@ function renderQuestion(screenNum, axis, level) {
 
   const optsWrap = document.getElementById('q-options-' + screenNum);
   const opts = q.options[level];
+
+  // محور «طعم» به‌جای دکمه، با چرخ طعم (الهام از SCA Flavor Wheel) نمایش داده می‌شه
+  if (axis === 'taste') {
+    renderFlavorWheel(optsWrap, opts, axis, screenNum);
+    return;
+  }
+
   optsWrap.className = 'options ' + (opts.length % 2 === 0 && opts.length <= 4 ? 'cols-2' : 'cols-1');
   optsWrap.innerHTML = '';
   opts.forEach(opt => {
@@ -2058,6 +2098,199 @@ function renderQuestion(screenNum, axis, level) {
     card.onclick = () => pickDynamic(card, axis, opt.v, screenNum);
     optsWrap.appendChild(card);
   });
+}
+
+/* ═══════════════════════════════════════════
+   چرخ طعم (Flavor Wheel) — رندر SVG + برچسب‌های HTML دوزبانه + تعامل چرخوندن/لمس
+═══════════════════════════════════════════ */
+const FLAVOR_WHEEL_COLORS = ['#B5482A', '#8E6FB5', '#7A4B28', '#C9832E', '#5C7A3A', '#A34E6E'];
+
+function polarToXY(cx, cy, r, angleDeg) {
+  const rad = (angleDeg - 90) * Math.PI / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function flavorWedgePath(cx, cy, innerR, outerR, startAngle, endAngle) {
+  const outerStart = polarToXY(cx, cy, outerR, endAngle);
+  const outerEnd = polarToXY(cx, cy, outerR, startAngle);
+  const innerStart = polarToXY(cx, cy, innerR, startAngle);
+  const innerEnd = polarToXY(cx, cy, innerR, endAngle);
+  const largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
+  return [
+    'M', innerStart.x.toFixed(2), innerStart.y.toFixed(2),
+    'L', outerEnd.x.toFixed(2), outerEnd.y.toFixed(2),
+    'A', outerR, outerR, 0, largeArc, 1, outerStart.x.toFixed(2), outerStart.y.toFixed(2),
+    'L', innerEnd.x.toFixed(2), innerEnd.y.toFixed(2),
+    'A', innerR, innerR, 0, largeArc, 0, innerStart.x.toFixed(2), innerStart.y.toFixed(2),
+    'Z'
+  ].join(' ');
+}
+
+function renderFlavorWheel(container, opts, axis, screenNum) {
+  const cx = 150, cy = 150, innerR = 55, outerR = 140, labelR = (innerR + outerR) / 2;
+  const n = opts.length;
+  const segAngle = 360 / n;
+
+  container.className = 'flavor-wheel-wrap';
+  container.innerHTML = `
+    <div class="flavor-wheel-hint">
+      <span class="fa-only">چرخ رو بچرخون یا مستقیم یه بخش رو لمس کن</span>
+      <span class="en-only">Spin the wheel, or tap a slice directly</span>
+    </div>
+    <div class="flavor-wheel-stage">
+      <div class="flavor-wheel-pointer">▼</div>
+      <svg class="flavor-wheel-svg" id="flavor-wheel-svg-${screenNum}" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+        <g id="flavor-wheel-group-${screenNum}"></g>
+        <circle class="flavor-wheel-center-circle" cx="${cx}" cy="${cy}" r="${innerR - 3}"></circle>
+      </svg>
+      <div class="flavor-wheel-center-label" id="flavor-wheel-center-${screenNum}">
+        <div class="flavor-wheel-center-icon">☕</div>
+        <div class="flavor-wheel-center-text">
+          <span class="fa-only">انتخاب کن</span><span class="en-only">Pick one</span>
+        </div>
+      </div>
+    </div>
+    <button class="flavor-wheel-confirm-btn" id="flavor-wheel-confirm-${screenNum}">
+      <span class="fa-only">تأیید ←</span><span class="en-only">Confirm →</span>
+    </button>
+  `;
+
+  const svg = container.querySelector('#flavor-wheel-svg-' + screenNum);
+  const group = container.querySelector('#flavor-wheel-group-' + screenNum);
+  const centerLabel = container.querySelector('#flavor-wheel-center-' + screenNum);
+  const confirmBtn = container.querySelector('#flavor-wheel-confirm-' + screenNum);
+  const stage = container.querySelector('.flavor-wheel-stage');
+
+  let rotation = 0;
+  let pendingIndex = null; // بخشی که زیر نشانگره ولی هنوز تأیید نشده (بعد از چرخوندن دستی)
+
+  // ساخت گوه‌ها + برچسب‌های دوزبانه‌ی HTML (برای پشتیبانی درست از fa-only/en-only)
+  opts.forEach((opt, i) => {
+    const start = i * segAngle;
+    const end = start + segAngle;
+    const mid = start + segAngle / 2;
+
+    const wedge = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    wedge.setAttribute('d', flavorWedgePath(cx, cy, innerR, outerR, start, end));
+    wedge.setAttribute('class', 'flavor-wedge');
+    wedge.setAttribute('fill', FLAVOR_WHEEL_COLORS[i % FLAVOR_WHEEL_COLORS.length]);
+    wedge.dataset.index = i;
+    wedge.addEventListener('click', () => selectWheelIndex(i, true));
+    group.appendChild(wedge);
+
+    const pos = polarToXY(cx, cy, labelR, mid);
+    const pill = document.createElement('div');
+    pill.className = 'flavor-wheel-label-pill';
+    pill.style.left = (pos.x / 300 * 100) + '%';
+    pill.style.top = (pos.y / 300 * 100) + '%';
+    pill.innerHTML =
+      '<span class="fa-only" style="direction:rtl">' + opt.fa + '</span>' +
+      '<span class="en-only" style="direction:ltr;">' + opt.en + '</span>';
+    pill.style.pointerEvents = 'none';
+    stage.appendChild(pill);
+  });
+
+  function wedgeAt(i) { return group.children[i]; }
+
+  function clearHighlight() {
+    Array.from(group.children).forEach(w => w.classList.remove('selected'));
+  }
+
+  // بخشی که الان دقیقاً زیر نشانگر (بالای چرخ) قرار داره رو حساب می‌کنه
+  function segmentUnderPointer() {
+    const effective = ((-rotation) % 360 + 360) % 360;
+    return Math.floor(effective / segAngle) % n;
+  }
+
+  function highlightUnderPointer() {
+    const idx = segmentUnderPointer();
+    clearHighlight();
+    wedgeAt(idx).classList.add('selected');
+    pendingIndex = idx;
+    centerLabel.innerHTML =
+      '<div class="flavor-wheel-center-icon">☕</div>' +
+      '<div class="flavor-wheel-center-text">' +
+      '<span class="fa-only" style="direction:rtl">' + opts[idx].fa + '</span>' +
+      '<span class="en-only" style="direction:ltr;">' + opts[idx].en + '</span>' +
+      '</div>';
+    confirmBtn.classList.add('visible');
+  }
+
+  // انتخاب مستقیم با لمس/کلیک رو یه بخش — بدون نیاز به چرخوندن، فوری تأیید می‌شه
+  function selectWheelIndex(i, immediate) {
+    // چرخ رو طوری بچرخون که این بخش زیر نشانگر بیاد (برای بازخورد بصری هماهنگ)
+    const mid = i * segAngle + segAngle / 2;
+    rotation = -mid;
+    svg.classList.add('settling');
+    svg.style.transform = 'rotate(' + rotation + 'deg)';
+    highlightUnderPointer();
+    if (immediate) {
+      setTimeout(() => confirmSelection(), 260);
+    }
+  }
+
+  function confirmSelection() {
+    if (pendingIndex === null) return;
+    const opt = opts[pendingIndex];
+    ans[axis] = opt.v;
+    updateProgressBean(axis);
+    if (screenNum === 8) { setTimeout(showLoading, 200); return; }
+    const nextScreen = { 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 }[screenNum];
+    if (nextScreen) setTimeout(() => go(nextScreen), 200);
+  }
+
+  confirmBtn.addEventListener('click', confirmSelection);
+
+  // درگ برای چرخوندن (موس و لمس)
+  let dragging = false, startPointerAngle = 0, startRotation = 0;
+
+  function angleFromEvent(clientX, clientY) {
+    const rect = stage.getBoundingClientRect();
+    const dx = clientX - (rect.left + rect.width / 2);
+    const dy = clientY - (rect.top + rect.height / 2);
+    return Math.atan2(dy, dx) * 180 / Math.PI;
+  }
+
+  function onPointerDown(e) {
+    dragging = true;
+    svg.classList.add('dragging');
+    svg.classList.remove('settling');
+    const p = e.touches ? e.touches[0] : e;
+    startPointerAngle = angleFromEvent(p.clientX, p.clientY);
+    startRotation = rotation;
+    confirmBtn.classList.remove('visible');
+    pendingIndex = null;
+  }
+  function onPointerMove(e) {
+    if (!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    const currentAngle = angleFromEvent(p.clientX, p.clientY);
+    rotation = startRotation + (currentAngle - startPointerAngle);
+    svg.style.transform = 'rotate(' + rotation + 'deg)';
+    highlightUnderPointer();
+    e.preventDefault();
+  }
+  function onPointerUp() {
+    if (!dragging) return;
+    dragging = false;
+    svg.classList.remove('dragging');
+    svg.classList.add('settling');
+    if (pendingIndex !== null) {
+      // چرخ رو دقیق‌تر روی وسط همون بخش تنظیم کن (چفت‌شدن نرم)
+      const mid = pendingIndex * segAngle + segAngle / 2;
+      rotation = -mid;
+      svg.style.transform = 'rotate(' + rotation + 'deg)';
+    }
+  }
+
+  svg.addEventListener('mousedown', onPointerDown);
+  svg.addEventListener('touchstart', onPointerDown, { passive: true });
+  window.addEventListener('mousemove', onPointerMove);
+  window.addEventListener('touchmove', onPointerMove, { passive: false });
+  window.addEventListener('mouseup', onPointerUp);
+  window.addEventListener('touchend', onPointerUp);
+
+  svg.style.transform = 'rotate(0deg)';
 }
 
 let isPhase2 = false;
