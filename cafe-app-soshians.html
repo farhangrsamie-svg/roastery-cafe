@@ -239,6 +239,26 @@ body {
 }
 .flavor-wheel-confirm-btn.visible { opacity: 1; pointer-events: auto; }
 .flavor-wheel-confirm-btn:active { transform: scale(0.96); }
+
+/* ═══════════════════════════════════════════
+   اسلایدر شدت قهوه (Intensity) — مقیاس ۱ تا ۱۲، شبیه ولوم، با کامنت لحظه‌ای
+═══════════════════════════════════════════ */
+.intensity-wrap { display: flex; flex-direction: column; align-items: center; padding: 10px 4px 6px; }
+.intensity-number { font-size: 64px; font-weight: 800; color: var(--dark-brown); line-height: 1; margin-bottom: 6px; font-variant-numeric: tabular-nums; transition: transform 0.1s ease; }
+.intensity-number.pulse { transform: scale(1.12); }
+.intensity-comment { font-size: 14px; color: var(--medium-brown); text-align: center; min-height: 40px; max-width: 280px; line-height: 1.6; font-family: 'Vazirmatn', sans-serif; margin-bottom: 22px; }
+.intensity-track-wrap { width: 100%; max-width: 320px; padding: 0 6px; }
+.intensity-track { position: relative; width: 100%; height: 44px; }
+.intensity-track-bg { position: absolute; top: 50%; left: 0; right: 0; height: 10px; transform: translateY(-50%); border-radius: 6px; background: linear-gradient(90deg, var(--light-caramel), var(--caramel) 50%, var(--dark-brown)); }
+.intensity-thumb {
+  position: absolute; top: 50%; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--white); border: 3px solid var(--caramel); box-shadow: 0 2px 8px var(--shadow-strong);
+  transform: translate(-50%, -50%); cursor: grab; touch-action: none; transition: box-shadow 0.15s ease;
+}
+.intensity-thumb.dragging { cursor: grabbing; box-shadow: 0 4px 14px var(--shadow-strong); }
+.intensity-ticks { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 2px; }
+.intensity-tick { font-size: 10px; color: var(--gray-light); font-family: Arial, sans-serif; }
+.intensity-labels-row { display: flex; justify-content: space-between; width: 100%; max-width: 320px; margin-top: 4px; font-size: 11px; color: var(--gray); font-family: 'Vazirmatn', sans-serif; }
 .option-icon svg { color: var(--medium-brown); transition: color 0.2s ease; }
 .option-card.selected .option-icon svg { color: var(--caramel); }
 
@@ -1740,7 +1760,7 @@ async function sb(method, path, body = null) {
    APP STATE
 ═══════════════════════════════════════════ */
 let currentUser = null; // { id, name, phone }
-let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null };
+let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null };
 let rec = null;
 let currentLevel = 'regular'; // beginner | regular | expert
 let currentPersona = null;
@@ -1758,9 +1778,9 @@ const LEVEL_META = {
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:10, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:13, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:13, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10 }
+  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15 },
+  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15 },
+  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15 }
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
@@ -1998,14 +2018,16 @@ const MEMORY_QUESTIONS = [
    اون‌ها (حداکثر ۳ تا) رو می‌پرسه. وقتی همه‌ی محورها حداقل یه‌بار پاسخ داده
    شدن («عمق کامل»)، حالت Refresh Mode فعال می‌شه: قدیمی‌ترین محور دوباره پرسیده می‌شه.
 ═══════════════════════════════════════════ */
-const DEEP_AXES = ['context', 'ritual', 'evolution', 'sensory_attention', 'finish_preference'];
+// نکته: moment (زمان مصرف) اینجا به‌عنوان محور روایی/فرعیه — وزنش تو LEVEL_WEIGHTS صفره،
+// یعنی هنوز پرسیده می‌شه (برای شخصی‌سازی متن) ولی دیگه رو انتخاب دونه اثر نمی‌ذاره
+const DEEP_AXES = ['context', 'ritual', 'evolution', 'sensory_attention', 'finish_preference', 'moment'];
 let phase2AxesToAsk = [];   // محورهایی که این نشست باید پرسیده بشن (حداکثر ۳ تا)
 let isRefreshMode = false;  // true یعنی «عمق کامل» — داریم قدیمی‌ترین محور رو دوباره می‌پرسیم
 
 async function getUncoveredAxes(userId) {
   let profiles = [];
   try {
-    profiles = await sb('GET', `coffee_profiles?user_id=eq.${userId}&order=created_at.asc&select=context,ritual,evolution,sensory_attention,finish_preference,created_at`);
+    profiles = await sb('GET', `coffee_profiles?user_id=eq.${userId}&order=created_at.asc&select=context,ritual,evolution,sensory_attention,finish_preference,moment,created_at`);
   } catch (e) {
     console.warn('getUncoveredAxes: خطا در گرفتن پروفایل‌های قبلی:', e);
   }
@@ -2342,6 +2364,115 @@ function renderFlavorWheel(container, opts, axis, screenNum) {
   applyRotation();
 }
 
+/* ═══════════════════════════════════════════
+   اسلایدر شدت قهوه — رندر HTML + تعامل درگ (موس و لمس) + کامنت لحظه‌ای
+═══════════════════════════════════════════ */
+function renderIntensitySlider(screenNum) {
+  const titleEl = document.getElementById('q-title-' + screenNum);
+  const eduEl = document.getElementById('q-edu-' + screenNum);
+  const optsWrap = document.getElementById('q-options-' + screenNum);
+
+  titleEl.innerHTML =
+    '<span class="fa-only" style="direction:rtl">چه شدتی از قهوه رو دوست داری؟</span>' +
+    '<span class="en-only" style="direction:ltr;text-align:left;display:block;">How intense do you like your coffee?</span>';
+  eduEl.innerHTML =
+    '<span class="fa-only" style="direction:rtl">شدت یعنی چقدر قدرت و عمق طعم رو تو هر جرعه حس می‌کنی — نه میزان کافئین. دستگیره رو بکش.</span>' +
+    '<span class="en-only" style="direction:ltr;">Intensity means how much depth and power you feel in each sip — not caffeine level. Drag the handle.</span>';
+  eduEl.style.display = 'block';
+
+  optsWrap.className = '';
+  optsWrap.innerHTML = `
+    <div class="intensity-wrap">
+      <div class="intensity-number" id="intensity-number-${screenNum}">6</div>
+      <div class="intensity-comment" id="intensity-comment-${screenNum}"></div>
+      <div class="intensity-track-wrap">
+        <div class="intensity-track" id="intensity-track-${screenNum}">
+          <div class="intensity-track-bg"></div>
+          <div class="intensity-thumb" id="intensity-thumb-${screenNum}"></div>
+        </div>
+        <div class="intensity-labels-row">
+          <span class="fa-only">ملایم</span><span class="en-only">Mild</span>
+          <span class="fa-only">قوی</span><span class="en-only">Bold</span>
+        </div>
+      </div>
+      <button class="btn-primary" id="intensity-next-${screenNum}" style="margin-top:26px;max-width:280px;">
+        <span class="fa-only">بعدی ←</span><span class="en-only">Next →</span>
+      </button>
+    </div>
+  `;
+
+  const track = document.getElementById('intensity-track-' + screenNum);
+  const thumb = document.getElementById('intensity-thumb-' + screenNum);
+  const numberEl = document.getElementById('intensity-number-' + screenNum);
+  const commentEl = document.getElementById('intensity-comment-' + screenNum);
+  const nextBtn = document.getElementById('intensity-next-' + screenNum);
+
+  let value = ans.intensity || 6; // شروع از وسط مقیاس اگه قبلاً چیزی انتخاب نشده
+
+  function updateDisplay(v) {
+    numberEl.textContent = v;
+    const c = INTENSITY_COMMENTS[v];
+    commentEl.innerHTML = c
+      ? '<span class="fa-only" style="direction:rtl">' + c.fa + '</span><span class="en-only" style="direction:ltr;">' + c.en + '</span>'
+      : '';
+    const pct = (v - 1) / 11 * 100;
+    thumb.style.left = pct + '%';
+    numberEl.classList.remove('pulse');
+    void numberEl.offsetWidth;
+    numberEl.classList.add('pulse');
+  }
+
+  function commit(v) {
+    value = Math.max(1, Math.min(12, Math.round(v)));
+    updateDisplay(value);
+  }
+
+  function valueFromClientX(clientX) {
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    return 1 + pct * 11;
+  }
+
+  let dragging = false;
+  function onDown(e) {
+    dragging = true;
+    thumb.classList.add('dragging');
+    const p = e.touches ? e.touches[0] : e;
+    commit(valueFromClientX(p.clientX));
+  }
+  function onMove(e) {
+    if (!dragging) return;
+    const p = e.touches ? e.touches[0] : e;
+    commit(valueFromClientX(p.clientX));
+    e.preventDefault();
+  }
+  function onUp() {
+    if (!dragging) return;
+    dragging = false;
+    thumb.classList.remove('dragging');
+    ans.intensity = value;
+    updateProgressBean('intensity');
+  }
+
+  thumb.addEventListener('mousedown', onDown);
+  thumb.addEventListener('touchstart', onDown, { passive: true });
+  track.addEventListener('mousedown', onDown); // کلیک رو خودِ نوار هم قابل قبوله
+  track.addEventListener('touchstart', onDown, { passive: true });
+  window.addEventListener('mousemove', onMove);
+  window.addEventListener('touchmove', onMove, { passive: false });
+  window.addEventListener('mouseup', onUp);
+  window.addEventListener('touchend', onUp);
+
+  updateDisplay(value);
+  ans.intensity = value; // مقدار پیش‌فرض هم ذخیره بشه، حتی اگه کاربر دست نزنه و مستقیم بره جلو
+
+  nextBtn.addEventListener('click', () => {
+    if (screenNum === 8) { showLoading(); return; }
+    const nextScreen = { 1:2, 2:3, 3:4, 4:5, 5:6, 6:7 }[screenNum];
+    if (nextScreen) go(nextScreen);
+  });
+}
+
 let isPhase2 = false;
 
 function renderAllQuestions(level) {
@@ -2350,7 +2481,7 @@ function renderAllQuestions(level) {
   renderQuestion(3, 'acidity', level);
   renderQuestion(4, 'bitterness', level);
   renderQuestion(5, 'mood', level);
-  renderQuestion(6, 'moment', level);
+  renderIntensitySlider(6);
   renderQuestion(8, 'brew', level);
   document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span><span class="en-only">Question 7 of 8</span>';
   const q7b = document.getElementById('q7-badge');
@@ -3063,6 +3194,7 @@ function viewProfile(p) {
   ans.moment = p.moment || null;
   ans.tastepref = p.tastepref || null;
   ans.brew = p.brew || null;
+  ans.intensity = p.intensity || null;
   currentLevel = p.experience_level || 'regular';
   currentProfileId = p.id;
   currentPersona = determinePersona();
@@ -3411,7 +3543,7 @@ function startFeedbackFromDashboard() {
    QUIZ
 ═══════════════════════════════════════════ */
 async function startNewProfile() {
-  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null };
+  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null };
   healthAns = { h1: null, h2: null };
   rec = null;
   currentPersona = null;
@@ -3472,7 +3604,7 @@ async function startNewProfile() {
 async function proceedToPhase2Setup(last) {
   ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
   ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
-  ans.tastepref = last.tastepref; ans.brew = last.brew;
+  ans.tastepref = last.tastepref; ans.brew = last.brew; ans.intensity = last.intensity;
   isPhase2 = true;
 
   // موتور پوشش محور: کدوم محورهای عمیق هنوز پرسیده نشدن؟ (یا، تو Refresh Mode، کدومشون قدیمی‌ترینه؟)
@@ -3681,6 +3813,7 @@ async function saveProfile(rec) {
       evolution: ans.evolution,
       finish_preference: ans.finish_preference,
       sensory_attention: ans.sensory_attention,
+      intensity: ans.intensity,
       is_phase2: isPhase2,
       experience_level: currentLevel,
       persona: currentPersona ? currentPersona.en : null,
@@ -4250,6 +4383,36 @@ function applyHardFilter(pool) {
   return { pool: bitternessPool, noStrongMatch: false, catalogGap: !!bitternessGap, catalogGapDetail: bitternessGap || '' };
 }
 
+/* ═══════════════════════════════════════════
+   شدت قهوه (Intensity) — مقیاس ۱ تا ۱۲، مثل چیزی که رو بسته‌بندی کپسول‌ها می‌بینیم،
+   ولی از داده‌ی واقعی کاپینگ (بدنه + تیرگی/تلخی هر دونه) محاسبه می‌شه، نه ذهنی
+═══════════════════════════════════════════ */
+function computeBeanIntensity(bean) {
+  const s = bean.s || {};
+  const bodyPart = s.body_full || 0;
+  const darkPart = ((s.medium_bt || 0) + (s.dark || 0)) / 2;
+  const raw = bodyPart * 0.5 + darkPart * 0.5; // تقریباً رو مقیاس ۰ تا ۱۰
+  const scaled = 1 + (raw / 10) * 11; // نگاشت به ۱ تا ۱۲
+  return Math.max(1, Math.min(12, Math.round(scaled)));
+}
+
+// کامنت لحظه‌ای که موقع کشیدن اسلایدر شدت نشون داده می‌شه
+const INTENSITY_COMMENTS = [
+  null, // ایندکس ۰ استفاده نمی‌شه
+  { fa: 'خیلی سبک و لطیف، تقریباً مثل چای پررنگ', en: 'Very light and delicate — almost like strong tea' },
+  { fa: 'سبک و آرام، حس ملایمی داره', en: 'Light and gentle, a soft experience' },
+  { fa: 'سبک، شروع روز بدون فشار', en: 'Light — an easy way to start the day' },
+  { fa: 'متعادل، یه‌کم رو به سبکی', en: 'Balanced, leaning slightly light' },
+  { fa: 'متعادل و روان، حس همیشگی قهوه', en: 'Balanced and smooth — classic coffee feel' },
+  { fa: 'متعادل، یه‌کم رو به قدرت', en: 'Balanced, leaning slightly strong' },
+  { fa: 'قوی و پرحضور، حسابی حس می‌شه', en: 'Strong and present — you feel every sip' },
+  { fa: 'قوی، همون حس واقعی قهوه‌ی پررنگ', en: 'Strong — the real feel of a bold cup' },
+  { fa: 'پرقدرت و تأثیرگذار', en: 'Powerful and impactful' },
+  { fa: 'خیلی قوی، برای کسایی که عاشق شدتن', en: 'Very strong — for those who love intensity' },
+  { fa: 'فوق‌العاده قوی و پرتلخی', en: 'Extremely strong and bold' },
+  { fa: 'نهایت شدت، فقط برای حرفه‌ای‌های قهوه', en: 'Maximum intensity — for the boldest palates' }
+];
+
 function recommend() {
   let pool = BEANS.filter(b => AVAILABLE.includes(b.id));
   const baseWeights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
@@ -4266,6 +4429,13 @@ function recommend() {
 
   const scored = pool.map(b => {
     let score = computeAxisScore(b.s, ans, weights);
+    // شدت (Intensity): محور عددی مستقل — نه categorical مثل بقیه، پس با فاصله محاسبه می‌شه نه lookup
+    // هرچی فاصله‌ی شدت ترجیحی کاربر با شدت واقعی این دونه کمتر باشه، امتیاز بیشتری می‌گیره
+    if (ans.intensity) {
+      const beanIntensity = computeBeanIntensity(b);
+      const distance = Math.abs(ans.intensity - beanIntensity);
+      score += -(distance) * (weights.intensity || 0) / 10;
+    }
     // Override: دانه‌های خاستگاه کلمبیا (معادل امروزیِ برزیل/کلمبیای سند اصلی) اولویت می‌گیرند
     if (isMilk && b.origin.includes('Colombia')) score *= 1.15;
     return { ...b, _score: score };
@@ -4600,32 +4770,36 @@ function buildFlavorRadar(bean, highlightKey) {
    منطق سؤالات سلامت‌محور — طبق سند v1.3
    بدون هیچ واژهٔ بالینی در متن قابل‌مشاهده کاربر
 ═══════════════════════════════════════════ */
-function getHealthCautionText() {
+function getHealthCautionText(rec) {
   const h1 = healthAns.h1, h2 = healthAns.h2;
   if (!h1 && !h2) return null; // رد شده یا مسیر متخصص (سؤالات سلامت رو ندیده)
   const sensitiveCount = [h1, h2].filter(v => v === 'sensitive').length;
   const anyElevated = [h1, h2].some(v => v === 'sensitive' || v === 'mild');
   const en = currentLang === 'en';
+  const intensity = rec ? computeBeanIntensity(rec) : null;
+  const intensityNote = intensity != null
+    ? (en ? ` (this bean's intensity: ${intensity}/12)` : ` (شدت این دونه: ${intensity} از ۱۲)`)
+    : '';
 
   if (sensitiveCount === 2) {
-    return en
+    return (en
       ? "Since you mentioned evening coffee disrupts your sleep and you're sensitive to jitters, it's best to try this coffee before noon and with medium-to-low caffeine."
-      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه و به بی‌قراری هم حساسی، بهتره این قهوه رو تا قبل ظهر و با کافئین متوسط‌به‌پایین امتحان کنی.';
+      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه و به بی‌قراری هم حساسی، بهتره این قهوه رو تا قبل ظهر و با کافئین متوسط‌به‌پایین امتحان کنی.') + intensityNote;
   }
   if (h2 === 'sensitive') {
-    return en
+    return (en
       ? 'Since evening coffee disrupts your sleep, try this one before noon.'
-      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه، این قهوه رو تا قبل ظهر امتحان کن.';
+      : 'چون گفتی عصرها خوابت به‌هم می‌ریزه، این قهوه رو تا قبل ظهر امتحان کن.') + intensityNote;
   }
   if (h1 === 'sensitive') {
-    return en
+    return (en
       ? 'Suggested coffee: medium-to-low caffeine — good for anyone sensitive to jitters.'
-      : 'قهوهٔ پیشنهادی: کافئین متوسط‌به‌پایین — مناسب کسی که به بی‌قراری حساسه.';
+      : 'قهوهٔ پیشنهادی: کافئین متوسط‌به‌پایین — مناسب کسی که به بی‌قراری حساسه.') + intensityNote;
   }
   if (anyElevated) {
-    return en
+    return (en
       ? "If you're sensitive to caffeine, it's best to try this coffee in the morning or early in the day."
-      : 'اگه به کافئین حساسی، بهتره این قهوه رو صبح یا اوایل روز امتحان کنی.';
+      : 'اگه به کافئین حساسی، بهتره این قهوه رو صبح یا اوایل روز امتحان کنی.') + intensityNote;
   }
   return null;
 }
@@ -4691,7 +4865,7 @@ function render(r) {
 
   // نکتهٔ مراقبتی ملایم (سؤالات سلامت‌محور) — بدون واژهٔ بالینی
   const healthNoteEl = document.getElementById('r-health-note');
-  const cautionText = getHealthCautionText();
+  const cautionText = getHealthCautionText(r);
   if (cautionText) { healthNoteEl.textContent = '☕ ' + cautionText; healthNoteEl.style.display = 'block'; }
   else { healthNoteEl.style.display = 'none'; }
 
@@ -5091,83 +5265,23 @@ async function confirmPayment() {
    AI EXPLANATION
 ═══════════════════════════════════════════ */
 /* ── FALLBACK EXPLANATIONS ── */
-const FALLBACK_FA = {
-  yirgacheffe: {
-    floral:      'ذائقه‌ات دقیقاً با روح این دانه هم‌خوانی داره. Ethiopia Yirgacheffe با نت‌های یاسمن و هلو، معطرترین قهوه دنیاست و برای کسی که طعم‌های گلی رو دوست داره انتخاب بی‌نظیریه. هر فنجان یه تجربه ظریف و به‌یادماندنیه.',
-    sweet:       'شیرینی طبیعی Ethiopia Yirgacheffe بدون هیچ تلخی اضافه‌ای، دقیقاً چیزیه که دنبالش بودی. نت‌های هلو و چای سبز با هم یه هارمونی شیرین و لطیف می‌سازن. این دانه برای کسی مثل تو که سبکی و شیرینی رو دوست داره ایده‌آله.',
-    chocolatey:  'شاید تعجب کنی ولی Ethiopia Yirgacheffe با وجود سبکی، یه پیچیدگی منحصربه‌فرد داره که عاشقان قهوه رو شگفت‌زده می‌کنه. پروفایل طعمیت نشون میده که آماده‌ای تجربه جدیدی داشته باشی. این دانه دنیای قهوه رو از زاویه‌ای متفاوت نشونت میده.',
-    bold:        'این دانه به‌عنوان یه تجربه متفاوت برات جالبه. Yirgacheffe سبک و گلی، یه کنتراست جذاب با سلیقه‌ی معمولت ایجاد می‌کنه و ممکنه افق‌های جدیدی از دنیای قهوه رو برات باز کنه.',
-  },
-  kenya: {
-    floral:      'Kenya AA با اسیدیته درخشان و نت‌های میوه‌ای قرمز، برای کسی که طعم‌های زنده و پُرانرژی رو دوست داره عالیه. تمشک و انگور قرمز در هر قطره این قهوه حس میشه. یه انتخاب هیجان‌انگیز برای ذائقه‌ای مثل تو.',
-    sweet:       'شیرینی خاص Kenya AA از نوع قند قهوه‌ایه — عمیق‌تر و پیچیده‌تر از شیرینی معمولی. پروفایل طعمیت با این دانه جذاب به‌خوبی جور در میاد. یه فنجان Kenya خوب، تعریف شیرینی رو برات عوض می‌کنه.',
-    chocolatey:  'Kenya AA یه ترکیب جالب از شکلات تلخ و میوه‌های قرمز داره که برای ذائقه‌ات عالیه. اسیدیته پُرانرژیش یه بُعد جدید به تجربه‌ات اضافه می‌کنه. این دانه برای کسی که عمق طعمی می‌خواد بی‌نظیره.',
-    bold:        'Kenya AA با اسیدیته جسور و طعم‌های میوه‌ای شدید، برای ذائقه‌ی پُرانرژی تو انتخاب درستیه. قدرت این دانه از جای دیگه‌ای میاد — نه از تلخی بلکه از شدت طعم. یه تجربه قوی و به‌یادماندنی.',
-  },
-  rwanda: {
-    floral:      'Rwanda Bourbon با طراوت هلو و زردآلو، یه تجربه گلی و میوه‌ای دلنشین داره. این دانه برای کسی که ظرافت و شیرینی طبیعی رو دوست داره ایده‌آله. هر فنجان مثل یه صبح بهاری شاداب و طراواته.',
-    sweet:       'Rwanda Bourbon شیرین‌ترین دانه‌ای هست که می‌تونی پیدا کنی. کاراملو میوه‌های قرمز با هم یه شیرینی طبیعی و دلنشین می‌سازن که نیازی به قند نداره. این دانه دقیقاً برای ذائقه‌ی شیرین‌دوست تو ساخته شده.',
-    chocolatey:  'Rwanda Bourbon یه تعادل زیبا بین شیرینی میوه‌ای و عمق طعمی داره. برای کسی که از شکلات شیری لذت می‌بره، این دانه یه جایگزین قهوه‌ای عالیه. ملایم، شیرین، و کاملاً دلنشین.',
-    bold:        'Rwanda Bourbon یه آرامش لذت‌بخش داره که می‌تونه تعادل خوبی با سلیقه‌ات ایجاد کنه. این دانه نشون میده که قهوه قوی همیشه لازم نیست تلخ باشه. یه تجربه متفاوت و شاید کشف یه ذائقه جدید.',
-  },
-  sidama: {
-    floral:      'Ethiopia Sidama Natural با فرآوری طبیعی، توت‌فرنگی و زغال‌اخته رو توی فنجانت میاره. برای کسی که طعم‌های میوه‌ای شدید رو دوست داره، این دانه یه کشف جذابه. پُرشدت، شیرین، و کاملاً استثنایی.',
-    sweet:       'Sidama Natural یکی از شیرین‌ترین قهوه‌های دنیاست. فرآوری طبیعیش باعث میشه شیرینی میوه مستقیماً وارد فنجانت بشه. برای ذائقه‌ای مثل تو که شیرینی اصیل رو دوست داره، این دانه یه هدیه‌ست.',
-    chocolatey:  'Sidama Natural ترکیب جادویی شکلات تلخ و میوه‌های قرمز رو داره. مثل یه شکلات تلخ با مغز توت‌فرنگی — عمق شکلاتی که عاشقشی با یه پیچش میوه‌ای سورپرایزکننده. کاملاً برای ذائقه‌ی تو.',
-    bold:        'Sidama Natural با شدت طعمی بالاش برای ذائقه‌ی جسور تو ایده‌آله. این دانه قوی‌ترین طعم‌های میوه‌ای رو داره — انگور قرمز و توت‌فرنگی در یه فنجان پُرانرژی. یه تجربه غنی و فراموش‌نشدنی.',
-  },
-  colombia: {
-    floral:      'Colombia Huila متعادل‌ترین قهوه دنیاست و برای هر ذائقه‌ای کار می‌کنه. شکلات تیره و پرتقال با هم یه هارمونی زیبا می‌سازن. برای کسی که تازه با specialty coffee آشنا میشه، یه نقطه شروع ایده‌آله.',
-    sweet:       'Colombia Huila با کاراملو گیلاس، شیرینی متعادل و دلنشینی داره. نه خیلی شیرین، نه خیلی تلخ — دقیقاً اون تعادلی که دنبالش بودی. این دانه برای هر موقعیتی مناسبه.',
-    chocolatey:  'Colombia Huila با نت‌های شکلات تیره و کاراملو گیلاس، دقیقاً برای ذائقه‌ی تو ساخته شده. عمق شکلاتی این دانه با یه شیرینی طبیعی همراهه که هر فنجان رو کامل می‌کنه. یه انتخاب کلاسیک و بی‌نقص.',
-    bold:        'Colombia Huila با وجود قدرتش، یه تعادل زیبا بین قوّت و شیرینی داره. این دانه نشون میده که قهوه جسور می‌تونه هم قوی باشه هم دلنشین. برای ذائقه‌ات یه انتخاب بی‌نقصه.',
-  },
-  brazil: {
-    floral:      'Brazil Natural با شکلات شیری و کاراملو وانیل، یه آرامش دلنشین داره. این دانه برای کسی که می‌خواد یه تجربه راحت و بدون دردسر داشته باشه عالیه. ساده، خوشایند، و همیشه قابل اعتماد.',
-    sweet:       'Brazil Natural با وانیل و کاراملو فندق، شیرین‌ترین و راحت‌ترین قهوه‌ای هست که می‌تونی پیدا کنی. برای ذائقه‌ی شیرین‌دوست تو، این دانه مثل یه لاته بدون شیر عمل می‌کنه. کاملاً برای تو.',
-    chocolatey:  'Brazil Natural بهترین دانه برای عاشقان شکلات شیریه. فندق، بادام، و شکلات شیری در هر قطره این قهوه وجود داره. اگه عاشق شکلات هستی، این دانه رویاهات رو به واقعیت تبدیل می‌کنه.',
-    bold:        'Brazil Natural با وجود بدنه‌ی غنی، یه ملایمت دلنشین داره. برای کسی که قهوه قوی دوست داره ولی می‌خواد از تلخی خبری نباشه، این دانه انتخاب هوشمندانه‌ایه. قوی، غنی، و راحت.',
-  },
-  guatemala: {
-    floral:      'Guatemala Antigua با آلو و دارچین، یه پیچیدگی جذاب داره که ذائقه‌ی کنجکاوت رو راضی می‌کنه. خاک آتشفشانیش یه طعم مینرال خاص بهش میده. یه کشف جذاب برای عاشق تنوع طعمی.',
-    sweet:       'Guatemala Antigua با آلو شیرین و کاراملو گردو، یه شیرینی عمیق و پیچیده داره. این شیرینی از جنس متفاوتیه — تیره‌تر و غنی‌تر از شیرینی‌های معمول. برای ذائقه‌ای که می‌خواد عمق داشته باشه.',
-    chocolatey:  'Guatemala Antigua بهترین گزینه برای عاشقان شکلات تلخه. آلو و دارچین با شکلات تیره ترکیب می‌شن و یه عمق طعمی استثنایی می‌سازن. اگه شکلات تلخ ۷۵٪ دوست داری، این قهوه برای توئه.',
-    bold:        'Guatemala Antigua با قوّت و پیچیدگیش، دقیقاً برای ذائقه‌ی جسور تو ایده‌آله. خاک آتشفشانی گواتمالا یه قدرت خاص به این دانه میده. یه تجربه‌ی عمیق، قوی، و فراموش‌نشدنی.',
-  },
-  sumatra: {
-    floral:      'Sumatra Mandheling یه تجربه کاملاً متفاوت از قهوه‌ست. خاکی، سدر، و تنباکو در یه فنجان سنگین و تأملی. برای کسی که می‌خواد از منطقه راحتش خارج بشه و چیز جدیدی کشف کنه.',
-    sweet:       'Sumatra Mandheling قهوه‌ای برای لحظات تأملی و عمیقه. سنگین، خاکی، و با شخصیت قوی. این دانه طرف‌داران وفادار خودش رو داره — کسایی که از پیچیدگی لذت می‌برن.',
-    chocolatey:  'Sumatra Mandheling با شکلات تیره و عطر سدر، یه عمق طعمی بی‌مثال داره. برای عاشقان شکلات تلخ که می‌خوان یه بُعد خاکی هم به تجربه‌شون اضافه بشه. قوی، عمیق، و اثرگذار.',
-    bold:        'Sumatra Mandheling دقیقاً همون قهوه‌ایه که دنبالش بودی. سنگین‌ترین، خاکی‌ترین، و قوی‌ترین قهوه دنیا. برای کسی که می‌خواد قهوه واقعی بخوره — بدون هیچ سازش و تعارفی.',
-  },
-};
-
-const FALLBACK_EN = {
-  yirgacheffe: "Ethiopia Yirgacheffe is the world's most aromatic coffee — jasmine, peach, and bergamot in every sip. Its light body and delicate complexity make it a perfect match for your flavor preferences. Brew it with care and it will reward you with an unforgettable experience.",
-  kenya: "Kenya AA's sparkling acidity and red fruit intensity match your bold preferences perfectly. Blackcurrant and pomegranate dance in every cup, leaving a long satisfying finish. This is coffee that demands your full attention — in the best possible way.",
-  rwanda: "Rwanda Bourbon is the sweetest and most approachable specialty coffee in the world. Peach, apricot and caramel create a naturally sweet cup that needs nothing added. It is the perfect companion for your relaxed moments.",
-  sidama: "Ethiopia Sidama Natural brings intense fruit sweetness through its natural processing method. Strawberries and blueberries leap from the cup in a way no other origin can replicate. A bold fruit-forward experience that matches your adventurous palate.",
-  colombia: "Colombia Huila is the world's most balanced coffee — dark chocolate, caramel and cherry in perfect harmony. It works beautifully with any brew method making it endlessly versatile. A reliable elegant choice for any moment of your day.",
-  brazil: "Brazil Natural is the foundation of great coffee comfort. Milk chocolate, hazelnut and vanilla create a smooth low-acid cup that is easy to love. Perfect for your relaxed moments and those long unhurried afternoons.",
-  guatemala: "Guatemala Antigua's volcanic soil gives it a distinctive mineral richness that sets it apart. Dark chocolate, plum and cinnamon create a complex satisfying cup. For those who appreciate depth and character in their coffee.",
-  sumatra: "Sumatra Mandheling is the boldest most earthy coffee on the planet. Cedar, tobacco and dark chocolate in a syrupy full-bodied cup — built for contemplation and depth. This is coffee for those who want nothing held back."
-};
-
+// نکته‌ی مهم: قبلاً اینجا دو دیکشنری ثابت FALLBACK_FA/FALLBACK_EN بودن که با شناسه‌های
+// قدیمی و منسوخ دونه‌ها (yirgacheffe, kenya, colombia, ...) نوشته شده بودن — نه شناسه‌های
+// واقعی کاتالوگ فعلی (colombia_tolima, peru_huancayo, ...). نتیجه: هر وقت AI جواب نمی‌داد،
+// fallback هیچ دونه‌ی واقعی رو پیدا نمی‌کرد و متن خالی می‌موند.
+// الان fallback مستقیم از توضیحات خودِ هر دونه (descFA/storyFA) ساخته می‌شه — همیشه با
+// کاتالوگ واقعی هماهنگه، حتی اگه بعداً دونه‌ی جدید اضافه بشه.
 function getFallbackExplanation(rec) {
   const lang = currentLang;
-  const name = currentUser?.name ? currentUser.name + ' عزیز، ' : '';
-  const nameEN = currentUser?.name ? currentUser.name + ', ' : '';
   if (lang === 'fa') {
-    const beanFallbacks = FALLBACK_FA[rec.id];
-    if (beanFallbacks) {
-      const text = beanFallbacks[ans.taste] || beanFallbacks['floral'] || '';
-      return name + text;
-    }
+    const name = currentUser?.name ? currentUser.name + ' عزیز، ' : '';
+    const combined = [rec.descFA, rec.storyFA].filter(Boolean).join(' ');
+    return combined ? name + combined : '';
   } else {
-    const text = FALLBACK_EN[rec.id] || '';
-    return nameEN + text;
+    const name = currentUser?.name ? currentUser.name + ', ' : '';
+    const combined = [rec.desc, rec.story].filter(Boolean).join(' ');
+    return combined ? name + combined : '';
   }
-  return '';
 }
 
 async function getAIExplanation(rec) {
