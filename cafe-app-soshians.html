@@ -1442,6 +1442,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <div class="flavor-tags" id="r-flavors"></div>
     <div class="result-desc" id="r-desc" style="margin-top:16px;"></div>
     <div id="r-health-note" style="display:none;margin-top:14px;padding:12px 14px;background:var(--tint);border-radius:10px;font-size:12.5px;color:var(--medium-brown);line-height:1.8;direction:rtl;text-align:right;font-family:'Vazirmatn',sans-serif;"></div>
+    <div id="r-mokapot-note" style="display:none;margin-top:10px;padding:12px 14px;background:var(--tint);border-radius:10px;font-size:12.5px;color:var(--medium-brown);line-height:1.8;direction:rtl;text-align:right;font-family:'Vazirmatn',sans-serif;"></div>
     <div id="r-phase2-note" style="display:none;margin-top:10px;padding:8px 14px;background:#EFE6DC;border-radius:20px;font-size:11.5px;color:var(--medium-brown);text-align:center;font-family:'Vazirmatn',sans-serif;">
       <span class="fa-only">🔍 این نتیجه بر اساس شناخت عمیق‌تری از توئه — چون قبلاً هم باهام آشنا شده بودی</span>
       <span class="en-only">🔍 This result is based on a deeper understanding of you — since we've met before</span>
@@ -1892,9 +1893,9 @@ const QUESTIONS = {
       regular:  { fa:'روش دم‌آوری مستقیماً روی نحوه استخراج طعم اثر می‌ذاره.', en:'Brew method directly affects flavor extraction; it does not affect your bean match.' }
     },
     options: {
-      beginner: [ {v:'espressohome', fa:'دستگاه اسپرسوساز خانگی', en:'Home espresso machine'}, {v:'frenchpress', fa:'فرنچ‌پرس یا موکاپات', en:'French press or moka pot'}, {v:'other', fa:'قهوه فوری یا کپسولی', en:'Instant or capsule coffee'} ],
-      regular:  [ {v:'espressohome', fa:'اسپرسو / موکاپات', en:'Espresso / Moka pot'}, {v:'v60', fa:'پوراور (وی۶۰ یا کمکس)', en:'Pour-over (V60 / Chemex)'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'aeropress', fa:'ایروپرس', en:'AeroPress'} ],
-      expert:   [ {v:'espressohome', fa:'اسپرسو', en:'Espresso'}, {v:'v60', fa:'پوراور (وی۶۰ یا کالیتا)', en:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', fa:'غوطه‌وری (فرنچ‌پرس یا ایروپرس)', en:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', fa:'کولد برو', en:'Cold Brew'}, {v:'other', fa:'سایفون', en:'Siphon'} ]
+      beginner: [ {v:'espressohome', fa:'دستگاه اسپرسوساز خانگی', en:'Home espresso machine'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'other', fa:'قهوه فوری یا کپسولی', en:'Instant or capsule coffee'} ],
+      regular:  [ {v:'espressohome', fa:'اسپرسو', en:'Espresso'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'v60', fa:'پوراور (وی۶۰ یا کمکس)', en:'Pour-over (V60 / Chemex)'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'aeropress', fa:'ایروپرس', en:'AeroPress'} ],
+      expert:   [ {v:'espressohome', fa:'اسپرسو', en:'Espresso'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'v60', fa:'پوراور (وی۶۰ یا کالیتا)', en:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', fa:'غوطه‌وری (فرنچ‌پرس یا ایروپرس)', en:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', fa:'کولد برو', en:'Cold Brew'}, {v:'other', fa:'سایفون', en:'Siphon'} ]
     }
   },
   // ═══ فاز ۲ — محورهای جدید (فقط برای کاربرهای برگشتی) ═══
@@ -4804,6 +4805,18 @@ function getHealthCautionText(rec) {
   return null;
 }
 
+// هشدار سازگاری موکاپات: طبق دانش تخصصی، موکاپات (فشار بخار + آب داغ) دونه‌های گلی/ظریف/پراسید رو
+// بیش‌ازحد استخراج می‌کنه و باعث تلخی/ترشی می‌شه — این نکته فقط وقتی نشون داده می‌شه که واقعاً لازمه
+function getMokaPotCautionText(rec) {
+  if (!rec || ans.brew !== 'mokapot' || !rec.brewFit) return null;
+  const compat = rec.brewFit.mokapot;
+  if (compat == null || compat > 4) return null; // سازگاری قابل‌قبوله، نیازی به هشدار نیست
+  const en = currentLang === 'en';
+  return en
+    ? "This bean is delicate and floral — moka pot's high heat and pressure can pull out bitterness or sourness. If you're not trying the suggested alternative, brew with lower heat and a shorter time on the stove."
+    : 'این دونه ظریف و گلیه؛ موکاپات با گرما و فشار بالاش ممکنه تلخی یا ترشیش رو زیاد کنه. اگه دونه‌ی جایگزین رو امتحان نمی‌کنی، حداقل با گرمای پایین‌تر و مدت کوتاه‌تری رو اجاق امتحانش کن.';
+}
+
 // نمایش بصری سطح رست — مثل رو بسته‌بندی واقعی قهوه: هرچی دونه‌ها تیره‌تر، رست عمیق‌تر
 const ROAST_SCALE = {
   'light': 1, 'light–medium': 2, 'light-medium': 2,
@@ -4868,6 +4881,12 @@ function render(r) {
   const cautionText = getHealthCautionText(r);
   if (cautionText) { healthNoteEl.textContent = '☕ ' + cautionText; healthNoteEl.style.display = 'block'; }
   else { healthNoteEl.style.display = 'none'; }
+
+  // هشدار سازگاری موکاپات — فقط وقتی کاربر موکاپات‌دار باشه و دونه‌ی پیشنهادی گلی/ظریف باشه
+  const mokapotNoteEl = document.getElementById('r-mokapot-note');
+  const mokapotNote = getMokaPotCautionText(r);
+  if (mokapotNote) { mokapotNoteEl.textContent = '⚠️ ' + mokapotNote; mokapotNoteEl.style.display = 'block'; }
+  else { mokapotNoteEl.style.display = 'none'; }
 
   // Roast guide
   if (r.roastInfo) {
