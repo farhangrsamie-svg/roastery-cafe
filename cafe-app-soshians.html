@@ -3914,6 +3914,13 @@ async function goToOrderDirect() {
     document.getElementById('order-notes').value = '';
     document.getElementById('order-error')?.classList.remove('visible');
     document.getElementById('order-success')?.classList.remove('visible');
+    // نکته‌ی مهم: قبلاً این دکمه بعد از یه سفارش موفق برای همیشه غیرفعال و رو «ثبت شد» می‌موند —
+    // چون هیچ‌جا ریست نمی‌شد. الان هر بار که صفحه‌ی سفارش باز می‌شه، دکمه به حالت اولیه برمی‌گرده.
+    const submitBtn = document.getElementById('btn-submit-order');
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = '<span class="en-only">✅ Submit Order</span><span class="fa-only">✅ ثبت سفارش</span>';
+    }
     document.getElementById('order-bean-name').textContent = orderBean ? orderBean.name + (orderBean.detail ? ' (' + orderBean.detail + ')' : '') : '—';
     document.getElementById('order-bean-origin').textContent = orderBean ? orderBean.origin : '—';
     if (orderBean) await fetchBeanPricing(orderBean.id); // قیمت واقعی این دونه رو از دیتابیس بگیر
@@ -4012,6 +4019,7 @@ function showErr(el, msg) {
 ═══════════════════════════════════════════ */
 const BEANS = [
   { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Espresso', temp:'91 °C', ratio:'1g : 2g', roastInfo:{charge:'187.6°C',drop:'197.8°C',dtr:'20.2%',time:'12:30'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.', story:"From the Tolima region, deep in Colombia's mountains; traditional Washed processing keeps this bean's clarity and balance.",
+    music: { track: 'Wave', artist: 'Antonio Carlos Jobim' },
     s:{
       fruity:6, choc_nutty:7, floral:2, spicy:1,
       low:1, medium:4, bright:9,
@@ -4029,6 +4037,7 @@ const BEANS = [
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
   { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Medium', brew:'Espresso', temp:'90 °C', ratio:'1g : 2g', roastInfo:{charge:'202°C',drop:'201°C',dtr:'17%',time:'13:11'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.', story:"From the Guji zone, one of Ethiopia's emerging regions; Natural processing intensifies the bean's fruity sweetness.",
+    music: { track: 'Pink Moon', artist: 'Nick Drake' },
     s:{
       fruity:9, choc_nutty:3, floral:5, spicy:1,
       low:3, medium:8, bright:5,
@@ -4046,6 +4055,7 @@ const BEANS = [
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
   { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Espresso', temp:'91.5 °C', ratio:'1g : 2g', roastInfo:{charge:'182°C',drop:'195.5°C',dtr:'19.18%',time:'13:12'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.', story:'From Huancayo, deep in the Andes; smallholder farming at altitude produces a balanced, unpretentious bean.',
+    music: { track: 'Peace Piece', artist: 'Bill Evans' },
     s:{
       fruity:2, choc_nutty:9, floral:1, spicy:1,
       low:5, medium:7, bright:3,
@@ -4063,6 +4073,7 @@ const BEANS = [
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
   { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Medium–Dark', brew:'V60 (Pour Over)', temp:'89 °C', ratio:'1g : 14g', roastInfo:{charge:'189.7°C',drop:'197.7°C',dtr:'19%',time:'13:24'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.', story:"Extended aerobic fermentation pushes this lot's sweetness and fruit complexity way up — a very different experience from typical Colombian coffee.",
+    music: { track: 'Wave', artist: 'João Gilberto' },
     s:{
       fruity:9, choc_nutty:3, floral:4, spicy:1,
       low:2, medium:6, bright:8,
@@ -4080,6 +4091,7 @@ const BEANS = [
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
   { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'190.5°C',drop:'204.1°C',dtr:'14%',time:'11:06'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.', story:"The same aerobic fermentation, but a completely different profile — showing how much processing can transform an origin's identity.",
+    music: { track: "What's Going On", artist: 'Marvin Gaye' },
     s:{
       fruity:3, choc_nutty:9, floral:2, spicy:2,
       low:3, medium:8, bright:5,
@@ -4097,6 +4109,7 @@ const BEANS = [
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
   { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', flavors:['Lavender','Lemon Candy','Mint'], roast:'Medium', brew:'Pour Over', temp:'88 °C', ratio:'1g : 14g', roastInfo:{charge:'189°C',drop:'198°C',dtr:'15%',time:'12:21'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.', story:"Geisha is the world's most expensive commercial coffee variety; this Colombian take, with anaerobic processing, creates a flavor unlike any other coffee.",
+    music: { track: 'Gymnopédie No. 1', artist: 'Erik Satie' },
     s:{
       fruity:6, choc_nutty:0, floral:10, spicy:1,
       low:2, medium:6, bright:8,
@@ -4114,6 +4127,7 @@ const BEANS = [
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
   { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (both)', ratio:'1g : 1.8g (espresso) / 1g : 12g (pour over)', roastInfo:{charge:'186°C',drop:'197.4°C',dtr:'16.9%',time:'14:45'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.', story:"Ethiopia's Heirloom variety carries thousands of wild genotypes; aerobic fermentation pushes this lot toward deep, honeyed sweetness.",
+    music: { track: 'Friday Morning', artist: 'Khruangbin' },
     s:{
       fruity:5, choc_nutty:4, floral:3, spicy:1,
       low:5, medium:7, bright:3,
@@ -4131,6 +4145,7 @@ const BEANS = [
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
   { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Jasmine','Rose Petal','Lily'], roast:'Medium', brew:'Immersion / Cold Brew', temp:'Room temperature', ratio:'1g : 14g', roastInfo:{charge:'178.5°C',drop:'195.2°C',dtr:'21%',time:'14:15'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.', story:'Same region, closely related variety — but different processing this time highlights the floral side instead of the honeyed one.',
+    music: { track: 'Arabesque No. 1', artist: 'Claude Debussy' },
     s:{
       fruity:3, choc_nutty:0, floral:10, spicy:1,
       low:3, medium:8, bright:5,
@@ -4598,6 +4613,12 @@ function shareResultCard(style, birthDay, birthMonth) {
   ctx.font = '600 32px Arial';
   ctx.fillText(currentLang === 'fa' ? 'هویت قهوه' : 'COFFEE IDENTITY', W / 2, 130);
 
+  if (currentUser && currentUser.name) {
+    ctx.fillStyle = 'rgba(254,254,254,0.85)';
+    ctx.font = '500 30px Arial';
+    ctx.fillText(currentUser.name, W / 2, 175);
+  }
+
   ctx.font = '150px Arial';
   ctx.fillText(persona.icon, W / 2, 350);
 
@@ -4618,7 +4639,7 @@ function shareResultCard(style, birthDay, birthMonth) {
   ctx.fillText(`${Math.round(rec._matchPct || 0)}% ${currentLang === 'fa' ? 'تطابق' : 'match'}`, W / 2, 615);
 
   // کارت دانه
-  const cardY = 680, cardH = 760;
+  const cardY = 680, cardH = 880;
   ctx.fillStyle = 'rgba(254,254,254,0.96)';
   roundRect(ctx, 80, cardY, W - 160, cardH, 32);
   ctx.fill();
@@ -4638,6 +4659,25 @@ function shareResultCard(style, birthDay, birthMonth) {
   }
 
   drawCanvasRadar(ctx, rec, ans.taste, W / 2, cardY + 420, 130);
+
+  // پیشنهاد شنیداری (Sonic Seasoning) — همراه حسیِ این دونه، نه ادعای تغییر طعم
+  if (rec.music) {
+    ctx.strokeStyle = 'rgba(107,63,42,0.15)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(W / 2 - 140, cardY + 640); ctx.lineTo(W / 2 + 140, cardY + 640); ctx.stroke();
+
+    ctx.fillStyle = '#C4956A';
+    ctx.font = '500 22px Arial';
+    ctx.fillText(currentLang === 'fa' ? '🎵 همراه شنیداری این دونه' : '🎵 Suggested pairing', W / 2, cardY + 690);
+
+    ctx.fillStyle = '#2C1A0E';
+    ctx.font = 'bold 30px Arial';
+    ctx.fillText(rec.music.track, W / 2, cardY + 730);
+
+    ctx.fillStyle = '#6B3F2A';
+    ctx.font = '26px Arial';
+    ctx.fillText(rec.music.artist, W / 2, cardY + 765);
+  }
 
   ctx.fillStyle = 'rgba(254,254,254,0.55)';
   ctx.font = '24px Arial';
@@ -5406,15 +5446,15 @@ function populateShareBirthSelects() {
   const yearPlaceholder = document.createElement('option');
   yearPlaceholder.value = ''; yearPlaceholder.textContent = en ? 'Year' : 'سال';
   yearEl.appendChild(yearPlaceholder);
-  // فارسی: سال شمسی ۱۳۳۵ تا ۱۴۱۰ — انگلیسی: سال میلادی معادل، نه همون اعداد شمسی
+  // فارسی: سال شمسی ۱۳۰۰ تا ۱۴۰۵ — انگلیسی: سال میلادی معادل، نه همون اعداد شمسی
   if (en) {
-    for (let y = 2026; y >= 1945; y--) {
+    for (let y = 2026; y >= 1921; y--) {
       const opt = document.createElement('option');
       opt.value = y; opt.textContent = y;
       yearEl.appendChild(opt);
     }
   } else {
-    for (let y = 1410; y >= 1335; y--) {
+    for (let y = 1405; y >= 1300; y--) {
       const opt = document.createElement('option');
       opt.value = y; opt.textContent = y;
       yearEl.appendChild(opt);
