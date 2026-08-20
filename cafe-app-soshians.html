@@ -977,7 +977,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen" id="screen-phase2-intro">
   <div style="text-align:center;padding-top:50px;">
     <div style="font-size:56px;margin-bottom:18px;">🔍</div>
-    <div id="phase2-intro-greeting" style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
+    <div id="phase2-intro-greeting" style="font-size:19px;font-weight:800;color:var(--caramel);font-family:'Vazirmatn',sans-serif;margin-bottom:10px;line-height:1.6;">
       <span class="fa-only">دوباره خوش اومدی</span><span class="en-only">Welcome back</span>
     </div>
     <div id="phase2-intro-title" style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
@@ -1768,7 +1768,7 @@ async function sb(method, path, body = null) {
    APP STATE
 ═══════════════════════════════════════════ */
 let currentUser = null; // { id, name, phone }
-let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null };
+let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
 let rec = null;
 let currentLevel = 'regular'; // beginner | regular | expert
 let currentPersona = null;
@@ -1786,9 +1786,9 @@ const LEVEL_META = {
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:14 }
+  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0, dtr:0 },
+  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0, dtr:0 },
+  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:14, dtr:12 }
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
@@ -2000,6 +2000,20 @@ const QUESTIONS = {
         { v:'aerobic_ferment', fa:'تخمیر هوازی کنترل‌شده — شیرین و لایه‌لایه، شبیه دسر', en:'Controlled aerobic fermentation — sweet and layered, dessert-like' }
       ]
     }
+  },
+  // محور تخصصی دوم — نسبت توسعه‌ی رست (DTR)؛ داده‌ی واقعی از فرم رست هر دونه
+  dtr: {
+    title: {
+      expert: { fa:'چه نسبت توسعه‌ی رستی (DTR) رو ترجیح می‌دی؟', en:'What development time ratio (DTR) do you prefer?' }
+    },
+    edu: {},
+    options: {
+      expert: [
+        { v:'short', fa:'کوتاه (زیر ۱۶٪) — روشن‌تر، اسیدیته بیشتر، خام‌تر', en:'Short (under 16%) — brighter, more acidity, less developed' },
+        { v:'medium', fa:'متوسط (۱۶ تا ۱۹.۵٪) — متعادل بین طراوت و شیرینی', en:'Medium (16–19.5%) — balanced between brightness and sweetness' },
+        { v:'long', fa:'بلند (بالای ۱۹.۵٪) — شیرین‌تر، توسعه‌یافته‌تر، عمیق‌تر', en:'Long (over 19.5%) — sweeter, more developed, deeper' }
+      ]
+    }
   }
 };
 
@@ -2078,6 +2092,28 @@ async function getUncoveredAxes(userId) {
 
 // موتور چرخش سؤال خاطره‌ای — دقیقاً همون منطق موتور پوشش محور، ولی برای MEMORY_QUESTIONS
 // هر نشست فقط ۱ سؤال (که قبلاً پرسیده نشده) انتخاب می‌شه؛ اگه همه پرسیده شده بودن، قدیمی‌ترین دوباره پرسیده می‌شه
+// چرخش بین سؤالات تخصصی متخصص (فرآوری، DTR) تو Refresh Mode — همون منطق چرخشی
+// سؤالات خاطره‌ای، فقط این‌بار برای پرسش‌های فنی تک‌بار-هر-نشست
+async function getNextExpertTechnicalAxis(userId) {
+  const pool = ['processing', 'dtr'];
+  let rows = [];
+  try {
+    rows = await sb('GET', `coffee_profiles?user_id=eq.${userId}&order=created_at.asc&select=processing,dtr,created_at`);
+  } catch (e) {
+    console.warn('getNextExpertTechnicalAxis: خطا در گرفتن پاسخ‌های قبلی:', e);
+  }
+  const lastSeenAt = {};
+  (rows || []).forEach(r => {
+    if (r.processing) lastSeenAt['processing'] = r.created_at;
+    if (r.dtr) lastSeenAt['dtr'] = r.created_at;
+  });
+  const unseen = pool.filter(k => !(k in lastSeenAt));
+  if (unseen.length > 0) return unseen[0];
+  let oldest = pool[0];
+  pool.forEach(k => { if (lastSeenAt[k] < lastSeenAt[oldest]) oldest = k; });
+  return oldest;
+}
+
 async function getNextMemoryQuestion(userId, allowedKeys) {
   let responses = [];
   try {
@@ -2546,10 +2582,11 @@ async function renderPhase2Questions(level) {
   const isExpert = level === 'expert';
 
   // برای متخصص، وقتی به Refresh Mode می‌رسه (یعنی هر ۶ محور رفتاری حداقل یه‌بار پرسیده شده)،
-  // به‌جای تکرار محور رفتاری قدیمی، یه سؤال تخصصی‌تر (روش فرآوری) می‌پرسیم —
-  // تجربه‌ی متفاوت و مرتبط‌تری برای کاربر حرفه‌ای، به‌جای حس تکراری
+  // به‌جای تکرار محور رفتاری قدیمی، یه سؤال تخصصی می‌پرسیم — بین «روش فرآوری» و «DTR» می‌چرخه
+  // تا حتی تو Refresh Mode هم همیشه یه سؤال تکراری نباشه
   if (isExpert && isRefreshMode) {
-    phase2AxesToAsk = ['processing'];
+    const nextTechAxis = currentUser ? await getNextExpertTechnicalAxis(currentUser.id) : 'processing';
+    phase2AxesToAsk = [nextTechAxis];
   }
 
   const total = phase2AxesToAsk.length + 1; // متخصص هم الان ۱ سؤال (فقط موسیقی) می‌بینه
@@ -3256,6 +3293,7 @@ function viewProfile(p) {
   ans.brew = p.brew || null;
   ans.intensity = p.intensity || null;
   ans.processing = p.processing || null;
+  ans.dtr = p.dtr || null;
   currentLevel = p.experience_level || 'regular';
   currentProfileId = p.id;
   currentPersona = determinePersona();
@@ -3604,7 +3642,7 @@ function startFeedbackFromDashboard() {
    QUIZ
 ═══════════════════════════════════════════ */
 async function startNewProfile() {
-  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null };
+  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
   healthAns = { h1: null, h2: null };
   rec = null;
   currentPersona = null;
@@ -3667,6 +3705,7 @@ async function proceedToPhase2Setup(last) {
   ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
   ans.tastepref = last.tastepref; ans.brew = last.brew; ans.intensity = last.intensity;
   ans.processing = last.processing;
+  ans.dtr = last.dtr;
   isPhase2 = true;
 
   // سطح کاربر برگشتی از قبل مشخصه (تغییر نمی‌کنه) — دیگه دوباره نمی‌پرسیم
@@ -3888,6 +3927,7 @@ async function saveProfile(rec) {
       sensory_attention: ans.sensory_attention,
       intensity: ans.intensity,
       processing: ans.processing,
+      dtr: ans.dtr,
       is_phase2: isPhase2,
       experience_level: currentLevel,
       persona: currentPersona ? currentPersona.en : null,
@@ -4103,7 +4143,8 @@ const BEANS = [
       guided:7, self_taught:5, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:5, texture:7, aftertaste:8, balance:7,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3
+      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3,
+      dtr_short:2, dtr_medium:5, dtr_long:9
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
@@ -4121,7 +4162,8 @@ const BEANS = [
       guided:5, self_taught:7, analytical:6,
       finish_short:4, finish_medium:9, finish_long:3,
       aroma:9, texture:4, aftertaste:4, balance:5,
-      processing_washed:3, processing_natural:9, processing_anaerobic:4, processing_aerobic_ferment:5
+      processing_washed:3, processing_natural:9, processing_anaerobic:4, processing_aerobic_ferment:5,
+      dtr_short:5, dtr_medium:9, dtr_long:5
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
@@ -4139,7 +4181,8 @@ const BEANS = [
       guided:7, self_taught:4, analytical:4,
       finish_short:4, finish_medium:9, finish_long:3,
       aroma:4, texture:5, aftertaste:5, balance:8,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3
+      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3,
+      dtr_short:3, dtr_medium:8, dtr_long:6
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
@@ -4157,7 +4200,8 @@ const BEANS = [
       guided:4, self_taught:8, analytical:6,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:8, texture:7, aftertaste:8, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
+      dtr_short:5, dtr_medium:9, dtr_long:5
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -4175,7 +4219,8 @@ const BEANS = [
       guided:6, self_taught:6, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:6, texture:7, aftertaste:8, balance:7,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
+      dtr_short:9, dtr_medium:5, dtr_long:2
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
@@ -4193,7 +4238,8 @@ const BEANS = [
       guided:3, self_taught:6, analytical:9,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:10, texture:5, aftertaste:7, balance:4,
-      processing_washed:1, processing_natural:4, processing_anaerobic:9, processing_aerobic_ferment:5
+      processing_washed:1, processing_natural:4, processing_anaerobic:9, processing_aerobic_ferment:5,
+      dtr_short:8, dtr_medium:6, dtr_long:3
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
@@ -4211,7 +4257,8 @@ const BEANS = [
       guided:6, self_taught:6, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:7, texture:6, aftertaste:8, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
+      dtr_short:5, dtr_medium:9, dtr_long:5
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -4229,7 +4276,8 @@ const BEANS = [
       guided:4, self_taught:7, analytical:7,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:9, texture:4, aftertaste:7, balance:5,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
+      dtr_short:2, dtr_medium:5, dtr_long:9
     },
     brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
   },
@@ -4385,6 +4433,9 @@ function computeAxisScore(entityS, a, weights) {
   // فرآوری: فقط سطح متخصص (وزنش تو بقیه‌ی سطوح صفره) — پیشوند برای جلوگیری از تداخل احتمالی کلید
   const processingKey = a.processing ? 'processing_' + a.processing : null;
   score += rel(processingKey) * (weights.processing / 10);
+  // نسبت توسعه‌ی رست (DTR): فقط سطح متخصص
+  const dtrKey = a.dtr ? 'dtr_' + a.dtr : null;
+  score += rel(dtrKey) * (weights.dtr / 10);
   return score;
 }
 
