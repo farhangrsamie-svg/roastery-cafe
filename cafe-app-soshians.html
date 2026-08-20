@@ -1993,6 +1993,11 @@ const QUESTIONS = {
 // تا کاربر برگشتی هر بار یه سؤال تازه ببینه، نه همیشه همون خاطره/فصل تکراری
 const MEMORY_QUESTIONS = [
   {
+    key: 'coffee_music',
+    title: { fa:'موقع قهوه خوردن معمولاً چی گوش می‌دی؟', en:'What do you usually listen to while drinking coffee?' },
+    placeholder: { fa:'یه آهنگ، یه خواننده، یه سکوت... هرچی بهش عادت داری', en:'A song, an artist, silence... whatever you\'re used to' }
+  },
+  {
     key: 'first_memory',
     title: { fa:'اولین قهوه‌ای که یادت مونده رو کجا خوردی؟', en:'Where did you drink the first coffee you remember?' },
     placeholder: { fa:'هر چیزی که یادت میاد بنویس...', en:'Write whatever you remember...' }
@@ -2006,11 +2011,6 @@ const MEMORY_QUESTIONS = [
     key: 'coffee_relationship',
     title: { fa:'رابطه‌ت با قهوه رو چطور توصیف می‌کنی؟', en:'How would you describe your relationship with coffee?' },
     placeholder: { fa:'یه لحظه، یه عادت، یه حس... هرچی به ذهنت میاد', en:'A moment, a habit, a feeling... whatever comes to mind' }
-  },
-  {
-    key: 'coffee_music',
-    title: { fa:'موقع قهوه خوردن معمولاً چی گوش می‌دی؟', en:'What do you usually listen to while drinking coffee?' },
-    placeholder: { fa:'یه آهنگ، یه خواننده، یه سکوت... هرچی بهش عادت داری', en:'A song, an artist, silence... whatever you\'re used to' }
   },
   {
     key: 'coffee_object',
@@ -2499,6 +2499,7 @@ function renderAllQuestions(level) {
 // فاز ۲ — موتور پوشش محور: رو phase2AxesToAsk (حداکثر ۳ محور) حلقه می‌زنه
 // + فقط ۱ سؤال روایی (از بانک بزرگ‌تر، چرخشی — هر نشست یه سؤال تازه) — فقط مبتدی/معمولی، متخصص اصلاً نمی‌بینه
 let selectedMemoryQuestion = null;
+let lastMusicAnswerText = null; // اگه کاربر تو همین نشست به سؤال «چی گوش می‌دی» جواب داده باشه، اینجا نگه می‌داریم
 async function renderPhase2Questions(level) {
   const isExpert = level === 'expert';
   const total = phase2AxesToAsk.length + (isExpert ? 0 : 1);
@@ -2573,6 +2574,9 @@ function pickDynamic(el, axis, value, screenNum) {
 // وقتی کاربر روایت‌های Memory Identity رو تموم کرد (یا رد کرد)
 async function finishPhase2() {
   const m1 = document.getElementById('memory-input-1').value.trim();
+  if (m1 && selectedMemoryQuestion && selectedMemoryQuestion.key === 'coffee_music') {
+    lastMusicAnswerText = m1; // برای انتخاب موسیقی همین نشست نگهش می‌داریم
+  }
   try {
     if (currentUser && m1 && selectedMemoryQuestion) {
       await sb('POST', 'memory_identity_responses', [
@@ -3624,6 +3628,13 @@ async function proceedToPhase2Setup(last) {
   DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
 
   setPhase2IntroText(isRefreshMode);
+
+  // اگه قبلاً (نه لزوماً همین نشست) به سؤال «چی گوش می‌دی» جواب داده بود، برای انتخاب موسیقی از همون استفاده کن
+  try {
+    const musicRows = await sb('GET', `memory_identity_responses?user_id=eq.${currentUser.id}&question_key=eq.coffee_music&order=created_at.desc&limit=1&select=answer_text`);
+    if (musicRows && musicRows.length > 0) lastMusicAnswerText = musicRows[0].answer_text;
+  } catch (e) { console.warn('could not fetch previous music answer:', e); }
+
   show('screen-phase2-intro');
 }
 
@@ -3892,10 +3903,8 @@ async function goToOrder(bean) {
     console.warn('could not fetch default roastery:', e);
     selectedRoastery = null;
   }
-  goToOrderDirect();
-}
-
-async function fetchBeanPricing(beanId) {
+  await goToOrderDirect();
+}async function fetchBeanPricing(beanId) {
   try {
     const rows = await sb('GET', `bean_pricing?bean_id=eq.${beanId}&select=price_per_gram`);
     currentPricePerGram = (rows && rows.length && rows[0].price_per_gram) ? Number(rows[0].price_per_gram) : 680;
@@ -4424,7 +4433,7 @@ const BEAN_ALBUMS = {
     { track: 'Cinema Paradiso (Love Theme)', artist: 'Ennio Morricone', energy: 4, mood: { relax: 7, sensory: 8, focus: 4, social: 5 }, persona: { comfort: 7, creative: 7, bold: 3, explorer: 5, weekend: 6 } },
     { track: 'Watermelon Man', artist: 'Herbie Hancock', energy: 7, mood: { relax: 3, sensory: 5, focus: 7, social: 6 }, persona: { bold: 7, explorer: 7, creative: 6, comfort: 3, weekend: 5 } },
     { track: 'Cavatina', artist: 'John Williams (guitar)', energy: 3, mood: { relax: 8, sensory: 7, focus: 5, social: 3 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } }
+    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, keywords: ['persian','iranian','sonati'],  mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } }
   ],
   // زردآلوی خشک، کارامل، سیب سبز؛ متعادل و مخملی — گرم و متوازن
   ethiopia_guji: [
@@ -4433,7 +4442,7 @@ const BEAN_ALBUMS = {
     { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
     { track: 'The Godfather Waltz', artist: 'Nino Rota', energy: 4, mood: { relax: 6, sensory: 8, focus: 5, social: 4 }, persona: { comfort: 6, creative: 7, bold: 5, explorer: 5, weekend: 5 } },
     { track: 'Albatross', artist: 'Fleetwood Mac', energy: 3, mood: { relax: 9, sensory: 7, focus: 4, social: 2 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Chakad (چکاد)', artist: 'پرویز مشکاتیان (سنتور)', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { comfort: 6, creative: 8, bold: 2, explorer: 5, weekend: 6 } }
+    { track: 'Chakad (چکاد)', artist: 'پرویز مشکاتیان (سنتور)', energy: 3, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { comfort: 6, creative: 8, bold: 2, explorer: 5, weekend: 6 } }
   ],
   // بادام، فندق، کارامل؛ چای‌مانند و کم‌اسید — آرام و تأملی
   peru_huancayo: [
@@ -4442,7 +4451,7 @@ const BEAN_ALBUMS = {
     { track: "Gabriel's Oboe (The Mission)", artist: 'Ennio Morricone', energy: 2, mood: { relax: 9, sensory: 8, focus: 5, social: 1 }, persona: { comfort: 7, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
     { track: "One Summer's Day", artist: 'Joe Hisaishi', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 7, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
     { track: 'Take Five', artist: 'Dave Brubeck', energy: 6, mood: { relax: 4, sensory: 5, focus: 8, social: 5 }, persona: { explorer: 7, bold: 5, creative: 6, comfort: 4, weekend: 5 } },
-    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } }
+    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati','ney'],  mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } }
   ],
   // هلو، انبه، گیلاس، کولا؛ شیرینی بالا و میوه‌ای — زنده، رنگارنگ، جشن‌گونه
   narino_peach: [
@@ -4451,7 +4460,7 @@ const BEAN_ALBUMS = {
     { track: "Europa (Earth's Cry Heaven's Smile)", artist: 'Santana', energy: 5, mood: { relax: 6, sensory: 8, focus: 4, social: 5 }, persona: { creative: 7, explorer: 6, bold: 5, comfort: 5, weekend: 5 } },
     { track: 'Sing, Sing, Sing', artist: 'Benny Goodman', energy: 9, mood: { relax: 1, sensory: 5, focus: 4, social: 9 }, persona: { bold: 8, explorer: 6, weekend: 6, comfort: 2, creative: 4 } },
     { track: 'Watermelon Man', artist: 'Herbie Hancock', energy: 7, mood: { relax: 3, sensory: 5, focus: 7, social: 6 }, persona: { bold: 7, explorer: 7, creative: 6, comfort: 3, weekend: 5 } },
-    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } }
+    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, keywords: ['persian','iranian','sonati'],  mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } }
   ],
   // کاکائو، تافی، وانیل، کوکی؛ گرم و مخملی — شیرین و صمیمی
   narino_cacao: [
@@ -4460,7 +4469,7 @@ const BEAN_ALBUMS = {
     { track: 'Cinema Paradiso (Love Theme)', artist: 'Ennio Morricone', energy: 4, mood: { relax: 7, sensory: 8, focus: 4, social: 5 }, persona: { comfort: 7, creative: 7, bold: 3, explorer: 5, weekend: 6 } },
     { track: 'Albatross', artist: 'Fleetwood Mac', energy: 3, mood: { relax: 9, sensory: 7, focus: 4, social: 2 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 7 } },
     { track: 'Friday Morning', artist: 'Khruangbin', energy: 5, mood: { relax: 6, sensory: 6, focus: 4, social: 7 }, persona: { weekend: 9, explorer: 6, comfort: 6, creative: 6, bold: 4 } },
-    { track: 'قطعه‌ی امان', artist: 'فرامرز پایور (سنتور)', energy: 4, mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 8, creative: 6, bold: 2, explorer: 4, weekend: 6 } }
+    { track: 'قطعه‌ی امان', artist: 'فرامرز پایور (سنتور)', energy: 4, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 8, creative: 6, bold: 2, explorer: 4, weekend: 6 } }
   ],
   // اسطوخودوس، آب‌نبات لیمویی، نعناع؛ ظریف و عطری — مینیمال، شفاف، سبک
   colombia_geisha: [
@@ -4468,7 +4477,7 @@ const BEAN_ALBUMS = {
     { track: 'Clair de Lune', artist: 'Claude Debussy', energy: 2, mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 9, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
     { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', energy: 1, mood: { relax: 10, sensory: 7, focus: 7, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 8 } },
     { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
+    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati','ney'],  mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
     { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', energy: 3, mood: { relax: 8, sensory: 8, focus: 6, social: 2 }, persona: { comfort: 8, creative: 7, bold: 2, explorer: 4, weekend: 7 } }
   ],
   // عسل، انگور سیاه، هانی‌کامب؛ شیرینی بالا و پس‌مزه‌ی طولانی — شیرین، شناور، گرم
@@ -4477,7 +4486,7 @@ const BEAN_ALBUMS = {
     { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', energy: 3, mood: { relax: 8, sensory: 8, focus: 6, social: 2 }, persona: { comfort: 8, creative: 7, bold: 2, explorer: 4, weekend: 7 } },
     { track: 'Desafinado', artist: 'Stan Getz & Charlie Byrd', energy: 5, mood: { relax: 5, sensory: 6, focus: 4, social: 8 }, persona: { explorer: 6, weekend: 7, comfort: 5, creative: 5, bold: 4 } },
     { track: "Gabriel's Oboe (The Mission)", artist: 'Ennio Morricone', energy: 2, mood: { relax: 9, sensory: 8, focus: 5, social: 1 }, persona: { comfort: 7, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'چهارمضراب دلکش', artist: 'موسیقی سنتی ایرانی (سنتور)', energy: 4, mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 7, creative: 6, bold: 3, explorer: 4, weekend: 6 } },
+    { track: 'چهارمضراب دلکش', artist: 'موسیقی سنتی ایرانی (سنتور)', energy: 4, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 7, creative: 6, bold: 3, explorer: 4, weekend: 6 } },
     { track: 'Wave', artist: 'Antonio Carlos Jobim', energy: 4, mood: { relax: 6, sensory: 7, focus: 4, social: 6 }, persona: { comfort: 6, explorer: 5, creative: 6, bold: 3, weekend: 6 } }
   ],
   // یاس، گل رز، زنبق؛ گل‌دار و چای‌مانند — ظریف، شفاف، هوایی
@@ -4486,23 +4495,45 @@ const BEAN_ALBUMS = {
     { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
     { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', energy: 1, mood: { relax: 10, sensory: 7, focus: 7, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 8 } },
     { track: "One Summer's Day", artist: 'Joe Hisaishi', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 7, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'Bayat-e Esfahan (بیات اصفهان)', artist: 'دستگاه موسیقی سنتی ایرانی', energy: 2, mood: { relax: 8, sensory: 8, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 5, weekend: 6 } },
+    { track: 'Bayat-e Esfahan (بیات اصفهان)', artist: 'دستگاه موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati'],  mood: { relax: 8, sensory: 8, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 5, weekend: 6 } },
     { track: 'Clair de Lune', artist: 'Claude Debussy', energy: 2, mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 9, comfort: 6, bold: 1, explorer: 4, weekend: 6 } }
   ]
 };
 
+// اگه کاربر تو سؤال آزاد «چی گوش می‌دی» به یه سبک خاص اشاره کرده باشه (مثلاً سنتی ایرانی)،
+// امتیاز اثرهایی که همون کلیدواژه رو دارن به‌شدت بالا می‌ره — تا جواب مستقیم کاربر واقعاً اثر بذاره
+const MUSIC_KEYWORD_MAP = {
+  persian: ['سنتی', 'ایرانی', 'سنتور', 'کمانچه', 'تار', 'سه‌تار', 'سه تار', 'نی ', 'دف', 'ردیف', 'دستگاه'],
+  jazz: ['جاز', 'jazz'],
+  classical: ['کلاسیک', 'classical', 'پیانو'],
+  rock: ['راک', 'rock', 'گیتار'],
+  latin: ['بوسانوا', 'لاتین', 'بوسا']
+};
+function matchedKeywordCategories(text) {
+  if (!text) return [];
+  const found = [];
+  for (const cat in MUSIC_KEYWORD_MAP) {
+    if (MUSIC_KEYWORD_MAP[cat].some(kw => text.includes(kw))) found.push(cat);
+  }
+  return found;
+}
+
 // اول آلبومی که به ذات همون دونه وفاداره رو پیدا می‌کنه، بعد داخل همون آلبوم بر اساس
-// حس‌وحال (mood)، پرسونای قهوه‌ای، و شدت ترجیحی کاربر، بهترین اثر رو انتخاب می‌کنه
+// حس‌وحال (mood)، پرسونای قهوه‌ای، شدت ترجیحی، و — اگه کاربر مستقیم گفته باشه چی گوش می‌ده —
+// همون سبک، بهترین اثر رو انتخاب می‌کنه
 function pickMusicForUser(rec) {
   const album = (rec && BEAN_ALBUMS[rec.id]) || BEAN_ALBUMS.colombia_tolima;
   const persona = currentPersona || determinePersona();
   const personaKey = persona.key;
+  const preferredCats = matchedKeywordCategories(lastMusicAnswerText);
   let best = null, bestScore = -Infinity;
   album.forEach(m => {
     let score = 0;
     if (ans.mood && m.mood[ans.mood] !== undefined) score += m.mood[ans.mood] * 1.5;
     if (personaKey && m.persona[personaKey] !== undefined) score += m.persona[personaKey] * 1.5;
     if (ans.intensity) score += -(Math.abs(ans.intensity - m.energy)) * 1.0;
+    // جواب مستقیم کاربر به سؤال «چی گوش می‌دی» — وزن بالا، چون این صریح‌ترین سیگنالیه که داریم
+    if (preferredCats.length && m.keywords && m.keywords.some(k => preferredCats.includes(k))) score += 20;
     if (score > bestScore) { bestScore = score; best = m; }
   });
   return best || album[0]; // لایه‌ی محافظتی — هرگز undefined برنگردون
