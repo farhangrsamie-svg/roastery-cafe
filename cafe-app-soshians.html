@@ -977,7 +977,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <div class="screen" id="screen-phase2-intro">
   <div style="text-align:center;padding-top:50px;">
     <div style="font-size:56px;margin-bottom:18px;">🔍</div>
-    <div style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
+    <div id="phase2-intro-greeting" style="font-size:13px;letter-spacing:2px;color:var(--caramel);text-transform:uppercase;font-family:Arial,sans-serif;margin-bottom:10px;">
       <span class="fa-only">دوباره خوش اومدی</span><span class="en-only">Welcome back</span>
     </div>
     <div id="phase2-intro-title" style="font-size:21px;font-weight:bold;color:var(--dark-brown);margin-bottom:16px;line-height:1.6;">
@@ -987,7 +987,7 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">این‌بار سؤالات جدید و متفاوتی داریم — دربارهٔ زمینهٔ مصرف، روحیهٔ کاوشگری، و حتی یکی‌دو خاطره — تا هویت قهوه‌ت هر بار دقیق‌تر بشه.</span>
       <span class="en-only">This time we have new, different questions — about context, exploration style, and even a memory or two — so your coffee identity gets more precise each time.</span>
     </div>
-    <button class="btn-primary" onclick="show('screen-level')" style="max-width:280px;margin:0 auto;">
+    <button class="btn-primary" onclick="continueReturningUserFlow()" style="max-width:280px;margin:0 auto;">
       <span class="fa-only">بریم! →</span><span class="en-only">Let's go! →</span>
     </button>
   </div>
@@ -2078,7 +2078,7 @@ async function getUncoveredAxes(userId) {
 
 // موتور چرخش سؤال خاطره‌ای — دقیقاً همون منطق موتور پوشش محور، ولی برای MEMORY_QUESTIONS
 // هر نشست فقط ۱ سؤال (که قبلاً پرسیده نشده) انتخاب می‌شه؛ اگه همه پرسیده شده بودن، قدیمی‌ترین دوباره پرسیده می‌شه
-async function getNextMemoryQuestion(userId) {
+async function getNextMemoryQuestion(userId, allowedKeys) {
   let responses = [];
   try {
     responses = await sb('GET', `memory_identity_responses?user_id=eq.${userId}&order=created_at.asc&select=question_key,created_at`);
@@ -2087,12 +2087,16 @@ async function getNextMemoryQuestion(userId) {
   }
   const lastSeenAt = {};
   (responses || []).forEach(r => { lastSeenAt[r.question_key] = r.created_at; });
-  const allKeys = MEMORY_QUESTIONS.map(q => q.key);
+  // اگه یه لیست محدود (allowedKeys) داده شده بود، فقط از همون‌ها انتخاب کن — مثلاً برای متخصص که فقط
+  // سؤال موسیقی رو می‌بینه، نه بقیه‌ی سؤالات روایی/نوستالژیک
+  const allKeys = allowedKeys && allowedKeys.length
+    ? MEMORY_QUESTIONS.filter(q => allowedKeys.includes(q.key)).map(q => q.key)
+    : MEMORY_QUESTIONS.map(q => q.key);
   const unseen = allKeys.filter(k => !(k in lastSeenAt));
   if (unseen.length > 0) {
     return MEMORY_QUESTIONS.find(q => q.key === unseen[0]);
   }
-  // همه‌ی سؤالات حداقل یه‌بار پرسیده شدن — قدیمی‌ترین‌شون رو دوباره می‌پرسیم
+  // همه‌ی سؤالات (تو همون محدوده‌ی مجاز) حداقل یه‌بار پرسیده شدن — قدیمی‌ترین‌شون رو دوباره می‌پرسیم
   let oldestKey = allKeys[0];
   allKeys.forEach(k => { if (lastSeenAt[k] < lastSeenAt[oldestKey]) oldestKey = k; });
   return MEMORY_QUESTIONS.find(q => q.key === oldestKey);
@@ -2116,6 +2120,29 @@ function setPhase2IntroText(isRefresh) {
       '<span class="fa-only">این‌بار سؤالات جدید و متفاوتی داریم — دربارهٔ زمینهٔ مصرف، روحیهٔ کاوشگری، و حتی یکی‌دو خاطره — تا هویت قهوه‌ت هر بار دقیق‌تر بشه.</span>' +
       '<span class="en-only">This time we have new, different questions — about context, exploration style, and even a memory or two — so your coffee identity gets more precise each time.</span>';
   }
+}
+
+// خوش‌آمدگویی شخصی‌سازی‌شده با اسم و متناسب با سطح — دیگه سطح رو دوباره نمی‌پرسیم چون کاربر برگشتیه
+// و سطحش (که تغییر نمی‌کنه) رو از پروفایل قبلی می‌شناسیم
+function setPhase2Greeting() {
+  const el = document.getElementById('phase2-intro-greeting');
+  if (!el) return;
+  const name = (currentUser && currentUser.name) ? currentUser.name : '';
+  if (currentLevel === 'expert') {
+    el.innerHTML = name
+      ? '<span class="fa-only">سلام همکار گرامی، ' + name + ' عزیز</span><span class="en-only">Hi, ' + name + '</span>'
+      : '<span class="fa-only">سلام همکار گرامی</span><span class="en-only">Hi there</span>';
+  } else {
+    el.innerHTML = name
+      ? '<span class="fa-only">دوباره خوش اومدی، ' + name + ' عزیز</span><span class="en-only">Welcome back, ' + name + '</span>'
+      : '<span class="fa-only">دوباره خوش اومدی</span><span class="en-only">Welcome back</span>';
+  }
+}
+
+// کاربر برگشتی سطحش از قبل مشخصه — به‌جای رفتن به صفحه‌ی انتخاب سطح، مستقیم می‌ره سراغ سؤالات فاز۲
+async function continueReturningUserFlow() {
+  await renderPhase2Questions(currentLevel);
+  show('screen-deep-1');
 }
 
 function renderQuestion(screenNum, axis, level) {
@@ -2525,7 +2552,7 @@ async function renderPhase2Questions(level) {
     phase2AxesToAsk = ['processing'];
   }
 
-  const total = phase2AxesToAsk.length + (isExpert ? 0 : 1);
+  const total = phase2AxesToAsk.length + 1; // متخصص هم الان ۱ سؤال (فقط موسیقی) می‌بینه
 
   phase2AxesToAsk.forEach((axis, i) => {
     const screenId = 'deep-' + (i + 1);
@@ -2538,10 +2565,10 @@ async function renderPhase2Questions(level) {
     }
   });
 
-  if (isExpert) return; // متخصص مستقیم بعد از آخرین محور می‌ره سراغ نتیجه، سؤالات خاطره‌ای رو نمی‌بینه
-
+  // متخصص فقط سؤال موسیقی رو می‌بینه (چون واقعاً می‌تونه تو کارش کاربرد داشته باشه)،
+  // نه بقیه‌ی سؤالات روایی/نوستالژیک (اولین خاطره، فصل، و غیره)
   selectedMemoryQuestion = currentUser
-    ? await getNextMemoryQuestion(currentUser.id)
+    ? await getNextMemoryQuestion(currentUser.id, isExpert ? ['coffee_music'] : null)
     : MEMORY_QUESTIONS[0]; // fallback (کاربر واردنشده که عملاً پیش نمیاد اینجا)
 
   const memLabel1 = document.getElementById('progress-label-memory1');
@@ -2563,7 +2590,7 @@ async function renderPhase2Questions(level) {
 
 // برگشت از صفحات پویای فاز۲
 function goBackDeep(n) {
-  if (n === 1) { show('screen-level'); return; }
+  if (n === 1) { show('screen-phase2-intro'); return; }
   show('screen-deep-' + (n - 1));
 }
 // برگشت از اولین سؤال خاطره‌ای، به آخرین صفحه‌ی محور عمیق که این نشست پرسیده شد
@@ -2582,10 +2609,8 @@ function pickDynamic(el, axis, value, screenNum) {
     const idx = parseInt(screenNum.split('-')[1], 10); // شماره‌ی ۱-پایه‌ی این صفحه
     if (idx < phase2AxesToAsk.length) {
       setTimeout(() => show('screen-deep-' + (idx + 1)), 280);
-    } else if (currentLevel === 'expert') {
-      // متخصص (باریستا/رستر) سؤالات خاطره‌ای/نوستالژیک رو نمی‌بینه — این سطح از سؤال براش مناسب نیست
-      setTimeout(showLoading, 280);
     } else {
+      // متخصص هم الان اینجا میاد — چون سؤال موسیقی (بر خلاف بقیه‌ی سؤالات روایی) براش نگه داشته شده
       setTimeout(() => show('screen-memory1'), 280);
     }
     return;
@@ -3644,6 +3669,9 @@ async function proceedToPhase2Setup(last) {
   ans.processing = last.processing;
   isPhase2 = true;
 
+  // سطح کاربر برگشتی از قبل مشخصه (تغییر نمی‌کنه) — دیگه دوباره نمی‌پرسیم
+  currentLevel = last.experience_level || currentLevel || 'regular';
+
   // موتور پوشش محور: کدوم محورهای عمیق هنوز پرسیده نشدن؟ (یا، تو Refresh Mode، کدومشون قدیمی‌ترینه؟)
   const coverage = await getUncoveredAxes(currentUser.id);
   phase2AxesToAsk = coverage.axesToAsk;
@@ -3653,6 +3681,7 @@ async function proceedToPhase2Setup(last) {
   DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
 
   setPhase2IntroText(isRefreshMode);
+  setPhase2Greeting();
 
   // اگه قبلاً (نه لزوماً همین نشست) به سؤال «چی گوش می‌دی» جواب داده بود، برای انتخاب موسیقی از همون استفاده کن
   try {
