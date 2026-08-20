@@ -1,6 +1,7 @@
-const CACHE_NAME = 'ghahvato-shell-v1';
+const CACHE_NAME = 'ghahvato-shell-v2'; // نسخه بالا رفت تا کش قدیمی همه‌ی کاربرها پاک بشه
 const ASSETS_TO_CACHE = [
   './cafe-app-fa-final.html',
+  './cafe-app-soshians.html',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -36,18 +37,18 @@ self.addEventListener('fetch', (event) => {
   // فقط GET قابل کش‌شدنه
   if (event.request.method !== 'GET') return;
 
+  // نکته‌ی مهم: قبلاً این "Cache First" بود (اول کش، حتی اگه قدیمی بود) — یعنی کاربر همیشه
+  // یه نسخه عقب‌تر از آخرین آپدیت رو می‌دید، حتی با ریفرش سخت (Ctrl+Shift+R). الان "Network First"ه:
+  // همیشه اول سعی می‌کنه از شبکه بگیره (یعنی همیشه آخرین نسخه)، فقط وقتی واقعاً آفلاینه سراغ کش می‌ره.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      const networkFetch = fetch(event.request)
-        .then((response) => {
-          if (response && response.ok && url.origin === location.origin) {
-            const clone = response.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-          }
-          return response;
-        })
-        .catch(() => cached); // آفلاین: برگرد به نسخه‌ی کش‌شده
-      return cached || networkFetch;
-    })
+    fetch(event.request)
+      .then((response) => {
+        if (response && response.ok && url.origin === location.origin) {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(event.request)) // فقط وقتی شبکه قطعه (آفلاین)، برو سراغ کش
   );
 });
