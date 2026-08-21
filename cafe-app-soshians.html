@@ -1383,7 +1383,8 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 <!-- ══════ SCREEN: RESULT ══════ -->
 <div class="screen" id="screen-result">
   <div class="result-identity-header">
-    <div class="result-identity-label">هویت قهوه شما</div>
+    <div class="result-identity-label"><span class="fa-only">هویت قهوه‌ت داره شکل می‌گیره</span><span class="en-only">Your coffee identity is taking shape</span></div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.75);margin-bottom:4px;"><span class="fa-only">این پروفایل بیشتر به این سمت می‌کشه:</span><span class="en-only">This profile leans toward:</span></div>
     <div class="result-identity-name" id="r-identity-name">—</div>
     <div class="persona-tagline" id="r-persona-tagline"></div>
     <div class="persona-desc" id="r-persona-desc"></div>
@@ -1495,35 +1496,34 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="en-only">Flavor Radar</span>
       <span class="fa-only">نمودار طعم</span>
     </div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;" id="result-radar-tabs">
+      <button class="option-card radar-tab-btn selected" data-tab="taste" onclick="switchResultRadarTab('taste')" style="flex:1;padding:8px;text-align:center;font-size:13px;"><span class="fa-only">طعم</span><span class="en-only">Taste</span></button>
+      <button class="option-card radar-tab-btn" data-tab="sensory" onclick="switchResultRadarTab('sensory')" style="flex:1;padding:8px;text-align:center;font-size:13px;"><span class="fa-only">پروفایل حسی</span><span class="en-only">Sensory Profile</span></button>
+    </div>
     <div id="r-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
   </div>
 
   <div class="card">
-    <div class="card-title">
-      <span class="en-only">How to Brew</span>
-      <span class="fa-only">روش دم‌آوری</span>
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleRoastGuide()">
+      <span>🔧 <span class="fa-only">جزئیات فنی</span><span class="en-only">Technical Details</span></span>
+      <span id="roast-card-arrow" style="transition:transform 0.2s;font-size:13px;color:var(--caramel);">▼</span>
     </div>
-    <div class="info-row">
-      <span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span>
-      <span style="display:flex;align-items:center;gap:8px;">
-        <span class="info-value" id="r-roast"></span>
-        <span id="r-roast-dots" style="display:inline-flex;gap:3px;" title=""></span>
-      </span>
+    <div id="roast-card" style="display:none;margin-top:10px;">
+      <div class="info-row">
+        <span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span>
+        <span style="display:flex;align-items:center;gap:8px;">
+          <span class="info-value" id="r-roast"></span>
+          <span id="r-roast-dots" style="display:inline-flex;gap:3px;" title=""></span>
+        </span>
+      </div>
+      <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
+      <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
+      <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
+      <div class="info-row"><span class="info-label">⬆️ <span class="en-only">Charge Temp</span><span class="fa-only">دمای شارژ</span></span><span class="info-value" id="r-charge"></span></div>
+      <div class="info-row"><span class="info-label">⬇️ <span class="en-only">Drop Temp</span><span class="fa-only">دمای خروج</span></span><span class="info-value" id="r-drop"></span></div>
+      <div class="info-row"><span class="info-label">⏱️ <span class="en-only">Total Time</span><span class="fa-only">زمان کل</span></span><span class="info-value" id="r-time"></span></div>
+      <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
     </div>
-    <div class="info-row"><span class="info-label">☕ <span class="en-only">Best Brew Method</span><span class="fa-only">بهترین روش دم‌آوری برای این دانه</span></span><span class="info-value" id="r-brew"></span></div>
-    <div class="info-row" id="r-your-brew-row" style="display:none;"><span class="info-label">🫵 <span class="en-only">Your Method</span><span class="fa-only">روش دم‌آوری شما</span></span><span class="info-value" id="r-your-brew"></span></div>
-    <div class="info-row" id="r-brew-note-row" style="display:none;"><span class="info-label">💡 <span class="en-only">Note</span><span class="fa-only">توضیح</span></span><span class="info-value" id="r-brew-note" style="font-size:12px;font-weight:normal;color:var(--medium-brown);"></span></div>
-  </div>
-
-  <button class="staff-toggle" onclick="toggleRoastGuide()">🔧 <span class="fa-only">جزئیات فنی ▼</span><span class="en-only">Technical Details ▼</span></button>
-  <div class="card" id="roast-card" style="display:none;">
-    <div class="card-title">🔧 <span class="fa-only">جزئیات فنی</span><span class="en-only">Technical Details</span></div>
-    <div class="info-row"><span class="info-label">💧 <span class="en-only">Temp</span><span class="fa-only">دما</span></span><span class="info-value" id="r-temp"></span></div>
-    <div class="info-row"><span class="info-label">⚖️ <span class="en-only">Ratio</span><span class="fa-only">نسبت</span></span><span class="info-value" id="r-ratio"></span></div>
-    <div class="info-row"><span class="info-label">⬆️ Charge Temp</span><span class="info-value" id="r-charge"></span></div>
-    <div class="info-row"><span class="info-label">⬇️ Drop Temp</span><span class="info-value" id="r-drop"></span></div>
-    <div class="info-row"><span class="info-label">⏱️ Total Time</span><span class="info-value" id="r-time"></span></div>
-    <div class="info-row"><span class="info-label">📊 DTR</span><span class="info-value" id="r-dtr"></span></div>
   </div>
 
   <div style="background:var(--tint);border:1px solid var(--light-caramel);border-radius:16px;padding:18px 20px;margin-bottom:14px;">
@@ -5622,7 +5622,14 @@ function render(r) {
   fl.innerHTML = r.flavors.map(f => `<span class="flavor-tag">${trFlavor(f)}</span>`).join('');
 
   // Flavor Radar
-  document.getElementById('r-radar-chart').innerHTML = buildFlavorRadar(r, ans.taste);
+  currentResultRadarBean = r;
+  currentResultRadarHighlight = ans.taste;
+  document.getElementById('r-radar-chart').innerHTML = buildRadarChart(r, RADAR_TABS.taste.axes, ans.taste);
+  // هر بار نتیجه‌ی جدید رندر می‌شه، تب رو برگردون به «طعم» (پیش‌فرض)
+  const tastTabBtn = document.querySelector('#result-radar-tabs [data-tab="taste"]');
+  const sensTabBtn = document.querySelector('#result-radar-tabs [data-tab="sensory"]');
+  if (tastTabBtn) tastTabBtn.classList.add('selected');
+  if (sensTabBtn) sensTabBtn.classList.remove('selected');
 
   // Alternative Bean Suggestion (نمایش فوری، مستقل از تحلیل AI)
   const altCard = document.getElementById('alt-bean-card');
@@ -5668,16 +5675,28 @@ function render(r) {
 
 function toggleRoastGuide() {
   const card = document.getElementById('roast-card');
-  const btn  = document.querySelector('.staff-toggle');
+  const arrow = document.getElementById('roast-card-arrow');
   const visible = card.style.display !== 'none';
   card.style.display = visible ? 'none' : 'block';
-  const arrow = visible ? '▼' : '▲';
-  btn.innerHTML = '🔧 <span class="fa-only">جزئیات فنی ' + arrow + '</span><span class="en-only">Technical Details ' + arrow + '</span>';
+  if (arrow) arrow.style.transform = visible ? 'rotate(0deg)' : 'rotate(180deg)';
 
   // قانون Upgrade: کاربر مبتدی که خودش سراغ جزئیات فنی/خاستگاه می‌ره، آشنایی نشون داده
   if (!visible && currentLevel === 'beginner') {
     localStorage.setItem('coffee_identity_upgrade_eligible', 'true');
   }
+}
+
+let currentResultRadarBean = null;
+let currentResultRadarHighlight = null;
+// جابه‌جایی بین نمای «طعم» و «پروفایل حسی» رو نمودار راداری صفحه‌ی نتیجه — دقیقاً هم‌خانواده‌ی نسخه‌ی صفحه‌ی پروفایل
+function switchResultRadarTab(tabKey) {
+  const tab = RADAR_TABS[tabKey];
+  if (!tab || !currentResultRadarBean) return;
+  document.querySelectorAll('#result-radar-tabs .radar-tab-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.tab === tabKey);
+  });
+  const highlight = tabKey === 'taste' ? currentResultRadarHighlight : null;
+  document.getElementById('r-radar-chart').innerHTML = buildRadarChart(currentResultRadarBean, tab.axes, highlight);
 }
 
 /* ═══════════════════════════════════════════
@@ -5708,7 +5727,13 @@ function setLang(lang) {
 
   if (rec) {
     const radarEl = document.getElementById('r-radar-chart');
-    if (radarEl) radarEl.innerHTML = buildFlavorRadar(rec, ans.taste);
+    if (radarEl && currentResultRadarBean) {
+      const activeTabBtn = document.querySelector('#result-radar-tabs .radar-tab-btn.selected');
+      const activeTabKey = activeTabBtn ? activeTabBtn.dataset.tab : 'taste';
+      const tab = RADAR_TABS[activeTabKey] || RADAR_TABS.taste;
+      const highlight = activeTabKey === 'taste' ? currentResultRadarHighlight : null;
+      radarEl.innerHTML = buildRadarChart(currentResultRadarBean, tab.axes, highlight);
+    }
     renderRoastDots(rec.roast);
   }
 }
