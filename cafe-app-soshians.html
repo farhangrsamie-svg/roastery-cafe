@@ -3358,6 +3358,66 @@ function viewProfile(p) {
   const personaTagline = currentPersona ? (currentLang === 'en' ? currentPersona.tagEn : currentPersona.tagFa) : '';
   const personaDesc = currentPersona ? (currentLang === 'en' ? currentPersona.descEn : currentPersona.descFa) : '';
 
+  // «چرا این دونه» — همون منطق استدلالی صفحه‌ی نتیجه، بازسازی‌شده از جواب‌های ذخیره‌شده
+  const enW = currentLang === 'en';
+  const whyMapProfile = enW ? {
+    fruity: 'The fruity, tart character of this bean matches your taste',
+    choc_nutty: 'The rich chocolate and nutty notes of this coffee are ideal for you',
+    floral: 'The floral, fragrant character of this bean is exactly what you were after',
+    spicy: 'The spicy depth of this bean matches your coffee personality'
+  } : {
+    fruity: 'میوه‌ای و ترش بودن این دانه با ذائقه شما هماهنگ است',
+    choc_nutty: 'نت‌های شکلاتی و آجیلی غنی این قهوه برای شما ایده‌آل است',
+    floral: 'گلی و معطر بودن این دانه دقیقاً چیزی است که دنبالش هستید',
+    spicy: 'عمق ادویه‌ای این دانه با شخصیت قهوه‌ای شما می‌خواند'
+  };
+  const whyReasonsProfile = [
+    whyMapProfile[p.flavor] || '',
+    p.body === 'light' ? (enW ? "This coffee's light body matches your preference" : 'بدنه سبک این قهوه با سلیقه شما مطابقت دارد') :
+    p.body === 'full'  ? (enW ? "This coffee's strength and richness matches what you wanted" : 'قدرت و غنای این قهوه با خواسته شما هماهنگ است') : '',
+    p.acidity === 'bright' ? (enW ? 'This bean\u2019s brightness is exactly what you were after' : 'طراوت و شادابی این دانه دقیقاً همونیه که دنبالش بودید') : ''
+  ].filter(Boolean);
+
+  const roastGuideHtml = rec.roastInfo ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--light-caramel);">
+      <div style="font-size:12.5px;font-weight:700;color:var(--caramel);margin-bottom:8px;">راهنمای رست</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--medium-brown);">
+        <div>دمای شارژ: <b>${rec.roastInfo.charge}</b></div>
+        <div>دمای خروج: <b>${rec.roastInfo.drop}</b></div>
+        <div>زمان رست: <b>${rec.roastInfo.time}</b></div>
+        <div>DTR: <b>${rec.roastInfo.dtr}</b></div>
+      </div>
+    </div>` : '';
+
+  const brewGuideHtml = (rec.temp || rec.ratio) ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--light-caramel);">
+      <div style="font-size:12.5px;font-weight:700;color:var(--caramel);margin-bottom:8px;">راهنمای دم‌آوری پیشنهادی</div>
+      <div style="font-size:13px;color:var(--medium-brown);">
+        ${rec.temp ? `دما: <b>${rec.temp}</b>` : ''} ${rec.ratio ? `— نسبت: <b>${rec.ratio}</b>` : ''}
+      </div>
+    </div>` : '';
+
+  const storyText = (currentLang === 'en' ? rec.story : rec.storyFA) || rec.storyFA || '';
+  const storyHtml = storyText ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--light-caramel);">
+      <div style="font-size:12.5px;font-weight:700;color:var(--caramel);margin-bottom:8px;">داستان مبدأ</div>
+      <div style="font-size:13px;color:var(--medium-brown);line-height:1.8;">${storyText}</div>
+    </div>` : '';
+
+  const whyHtml = whyReasonsProfile.length ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--light-caramel);">
+      <div style="font-size:12.5px;font-weight:700;color:var(--caramel);margin-bottom:8px;">چرا این دونه</div>
+      ${whyReasonsProfile.map(r => `<div style="font-size:13px;color:var(--medium-brown);margin-bottom:4px;">✓ ${r}</div>`).join('')}
+    </div>` : '';
+
+  const healthCaution = getHealthCautionText(rec);
+  const mokaCaution = getMokaPotCautionText(rec);
+  const cautionsHtml = (healthCaution || mokaCaution) ? `
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--light-caramel);">
+      ${healthCaution ? `<div style="font-size:12.5px;color:var(--medium-brown);margin-bottom:6px;">☕ ${healthCaution}</div>` : ''}
+      ${mokaCaution ? `<div style="font-size:12.5px;color:var(--medium-brown);">⚠️ ${mokaCaution}</div>` : ''}
+    </div>` : '';
+
   document.getElementById('detail-content').innerHTML = `
     <div class="card" style="direction:rtl;text-align:center;">
       <div class="card-title">هویت قهوهٔ شما</div>
@@ -3372,6 +3432,11 @@ function viewProfile(p) {
       </div>
       <div id="profile-details-body" style="display:none;margin-top:10px;">
         <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+        ${whyHtml}
+        ${roastGuideHtml}
+        ${brewGuideHtml}
+        ${storyHtml}
+        ${cautionsHtml}
       </div>
     </div>
     <div class="card" style="direction:rtl;">
