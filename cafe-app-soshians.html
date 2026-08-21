@@ -3456,16 +3456,16 @@ function viewProfile(p) {
 
   document.getElementById('detail-content').innerHTML = `
     <div class="card" style="direction:rtl;text-align:center;">
-      <div class="card-title">هویت قهوه‌ت داره شکل می‌گیره</div>
+      <div class="card-title"><span class="fa-only">هویت قهوه‌ت داره شکل می‌گیره</span><span class="en-only">Your coffee identity is taking shape</span></div>
       <div style="font-size:11.5px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:10px;">${dateFA}</div>
-      <div style="font-size:12px;color:var(--medium-brown);margin-bottom:6px;">این پروفایل بیشتر به این سمت می‌کشه:</div>
+      <div style="font-size:12px;color:var(--medium-brown);margin-bottom:6px;"><span class="fa-only">این پروفایل بیشتر به این سمت می‌کشه:</span><span class="en-only">This profile leans toward:</span></div>
       <div style="font-size:19px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${personaFa}</div>
       <div style="font-size:13px;color:var(--caramel);font-weight:600;margin-bottom:6px;">${personaTagline}</div>
       <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;">${personaDesc}</div>
     </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleProfileDetails()">
-        <span>📖 ماجرای این قهوه</span>
+        <span>📖 <span class="fa-only">ماجرای این قهوه</span><span class="en-only">The Story of This Coffee</span></span>
         <span id="profile-details-arrow" style="transition:transform 0.2s;font-size:13px;color:var(--caramel);">▼</span>
       </div>
       <div id="profile-details-body" style="display:none;margin-top:10px;">
@@ -3479,8 +3479,8 @@ function viewProfile(p) {
     </div>
     <div class="card" style="direction:rtl;">
       <div style="display:flex;gap:8px;margin-bottom:10px;" id="detail-radar-tabs">
-        <button class="option-card radar-tab-btn selected" data-tab="taste" onclick="switchDetailRadarTab('taste')" style="flex:1;padding:8px;text-align:center;font-size:13px;">طعم</button>
-        <button class="option-card radar-tab-btn" data-tab="sensory" onclick="switchDetailRadarTab('sensory')" style="flex:1;padding:8px;text-align:center;font-size:13px;">پروفایل حسی</button>
+        <button class="option-card radar-tab-btn selected" data-tab="taste" onclick="switchDetailRadarTab('taste')" style="flex:1;padding:8px;text-align:center;font-size:13px;"><span class="fa-only">طعم</span><span class="en-only">Taste</span></button>
+        <button class="option-card radar-tab-btn" data-tab="sensory" onclick="switchDetailRadarTab('sensory')" style="flex:1;padding:8px;text-align:center;font-size:13px;"><span class="fa-only">پروفایل حسی</span><span class="en-only">Sensory Profile</span></button>
       </div>
       <div id="detail-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
     </div>
