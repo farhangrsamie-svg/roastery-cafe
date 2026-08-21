@@ -3457,25 +3457,34 @@ function viewProfile(p) {
       <button class="alt-bean-order-btn" onclick="goToOrder(rec._runnerBean)">🛒 سفارش همین دونه</button>
     </div>
     ` : ''}
-    <div class="card" style="direction:rtl;">
+    <div class="card" style="direction:rtl;" id="review-card-${pid}">
       <div class="card-title">نظر و پیشنهاد شما</div>
-      <textarea class="textarea-field" id="review-text-${pid}"
-        placeholder="تجربه‌ات از این قهوه رو بنویس..."
-        style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
-        <span style="font-size:13px;color:var(--gray);font-family:Arial,sans-serif;">امتیاز:</span>
-        <div style="display:flex;gap:4px;" id="stars-${pid}">
-          <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
-          <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
-          <span onclick="setRating('${pid}',3)" style="font-size:26px;cursor:pointer;" id="star-${pid}-3">☆</span>
-          <span onclick="setRating('${pid}',4)" style="font-size:26px;cursor:pointer;" id="star-${pid}-4">☆</span>
-          <span onclick="setRating('${pid}',5)" style="font-size:26px;cursor:pointer;" id="star-${pid}-5">☆</span>
+      <div id="review-form-view-${pid}">
+        <textarea class="textarea-field" id="review-text-${pid}"
+          placeholder="تجربه‌ات از این قهوه رو بنویس..."
+          style="min-height:90px;margin-bottom:10px;font-size:14px;"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;">
+          <span style="font-size:13px;color:var(--gray);font-family:Arial,sans-serif;">امتیاز:</span>
+          <div style="display:flex;gap:4px;" id="stars-${pid}">
+            <span onclick="setRating('${pid}',1)" style="font-size:26px;cursor:pointer;" id="star-${pid}-1">☆</span>
+            <span onclick="setRating('${pid}',2)" style="font-size:26px;cursor:pointer;" id="star-${pid}-2">☆</span>
+            <span onclick="setRating('${pid}',3)" style="font-size:26px;cursor:pointer;" id="star-${pid}-3">☆</span>
+            <span onclick="setRating('${pid}',4)" style="font-size:26px;cursor:pointer;" id="star-${pid}-4">☆</span>
+            <span onclick="setRating('${pid}',5)" style="font-size:26px;cursor:pointer;" id="star-${pid}-5">☆</span>
+          </div>
         </div>
+        <div class="success-msg" id="review-success-${pid}"></div>
+        <button class="btn-primary" onclick="submitReview('${pid}')" style="margin-top:4px;">
+          💬 <span class="fa-only">ثبت نظر</span><span class="en-only">Submit Review</span>
+        </button>
       </div>
-      <div class="success-msg" id="review-success-${pid}"></div>
-      <button class="btn-primary" onclick="submitReview('${pid}')" style="margin-top:4px;">
-        💬 <span class="fa-only">ثبت نظر</span><span class="en-only">Submit Review</span>
-      </button>
+      <div id="review-thanks-view-${pid}" style="display:none;text-align:center;padding:10px 0;">
+        <div style="font-size:32px;margin-bottom:8px;">✅</div>
+        <div style="font-size:14px;color:var(--dark-brown);font-weight:600;margin-bottom:16px;">نظرت ثبت شد. ممنون که وقت گذاشتی!</div>
+        <button class="btn-primary btn-ghost" onclick="editReview('${pid}')">
+          ✏️ <span class="fa-only">ویرایش نظر</span><span class="en-only">Edit review</span>
+        </button>
+      </div>
     </div>
     <button class="btn-primary" onclick="reorderProfile()" style="margin-top:4px;">
       🛒 <span class="fa-only">سفارش این دانه</span><span class="en-only">Order This Bean</span>
@@ -3535,11 +3544,26 @@ async function submitReview(profileId) {
       review_text: text || null,
       review_rating: currentRating || null
     });
-    sucEl.textContent = '✅ نظر شما ثبت شد. ممنون!';
-    sucEl.classList.add('visible');
+    // فرم رو با پیام تشکر جایگزین می‌کنیم — به‌جای این‌که فرم پر همون‌جا بمونه
+    const formView = document.getElementById('review-form-view-' + profileId);
+    const thanksView = document.getElementById('review-thanks-view-' + profileId);
+    if (formView && thanksView) {
+      formView.style.display = 'none';
+      thanksView.style.display = 'block';
+    }
   } catch(e) {
     sucEl.textContent = 'خطا در ثبت نظر';
     sucEl.classList.add('visible');
+  }
+}
+
+// کاربر اگه بخواد نظرش رو عوض کنه، برمی‌گردیم به فرم (خودِ متن/امتیاز قبلی همچنان تو فرم باقی می‌مونه)
+function editReview(profileId) {
+  const formView = document.getElementById('review-form-view-' + profileId);
+  const thanksView = document.getElementById('review-thanks-view-' + profileId);
+  if (formView && thanksView) {
+    thanksView.style.display = 'none';
+    formView.style.display = 'block';
   }
 }
 
