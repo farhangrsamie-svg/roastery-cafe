@@ -1305,6 +1305,34 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
   <div class="spacer"></div>
 </div>
 
+<!-- ══════ SCREEN 9: معمولی یا خاص (محور rarity) — آخرین سؤال اصلی، از قدم اول برای هر ۳ سطح ══════ -->
+<div class="screen" id="screen-9">
+  <div class="q-bg-icon" id="q-bg-icon-9"></div>
+  <button class="btn-back" onclick="goBack(9)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#8E6FB5"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label" id="progress-label-9"></div>
+  </div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-9" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-edu" id="q-edu-9" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-9"></div>
+  <div class="spacer"></div>
+</div>
+
+<!-- ══════ SCREEN 10: فرآوری، ساده‌شده برای همه‌ی سطوح — قبلاً فقط Expert/Refresh Mode می‌دید ══════ -->
+<div class="screen" id="screen-10">
+  <div class="q-bg-icon" id="q-bg-icon-10"></div>
+  <button class="btn-back" onclick="goBack(10)">← <span class="en-only">Back</span><span class="fa-only">بازگشت</span></button>
+  <div class="progress-wrap">
+    <div class="progress-bean"><svg viewBox="0 0 60 40" width="52" height="36" xmlns="http://www.w3.org/2000/svg"><ellipse cx="30" cy="20" rx="26" ry="17" fill="#5C7A3A"/><path d="M30 4 C22 10, 22 30, 30 36" stroke="rgba(0,0,0,0.28)" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="progress-label" id="progress-label-10"></div>
+  </div>
+  <div class="q-header"><div class="q-title-dynamic" id="q-title-10" style="text-align:right;direction:rtl"></div></div>
+  <div class="q-edu" id="q-edu-10" style="direction:rtl;text-align:right;font-size:12.5px;color:var(--medium-brown);line-height:1.8;font-family:'Vazirmatn',sans-serif;background:var(--tint);border-radius:10px;padding:10px 14px;margin:-8px 0 14px;"></div>
+  <div class="options" id="q-options-10"></div>
+  <div class="spacer"></div>
+</div>
+
 <!-- ══════ فاز ۲ — کشف تدریجی هویت (فقط کاربر برگشتی) ══════
      موتور پوشش محور: این ۳ صفحه عمومی‌ان — هرکدوم می‌تونه هر محوری از DEEP_AXES رو نشون بده،
      بسته به این‌که کدوم محورها برای این کاربر هنوز پرسیده نشدن (یا کدوم قدیمی‌ترینه، تو Refresh Mode) -->
@@ -1818,7 +1846,7 @@ function containsInappropriateContent(text) {
   return BLOCKED_TERMS.some(term => normalized.includes(term.replace(/[\u200c\s]+/g, '')));
 }
 
-let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
+let ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, rarity: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
 let rec = null;
 let currentLevel = 'regular'; // beginner | regular | expert
 let currentPersona = null;
@@ -1836,9 +1864,9 @@ const LEVEL_META = {
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0, dtr:0 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:0, dtr:0 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:14, dtr:12 }
+  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, rarity:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:8, dtr:0 },
+  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, rarity:12, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:9, dtr:0 },
+  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, rarity:12, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:14, dtr:12 }
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
@@ -1902,9 +1930,9 @@ const QUESTIONS = {
       regular:  { fa:'تلخی معمولاً با درجه‌ی رست رابطه‌ی مستقیم داره؛ رست تیره‌تر یعنی تلخی بیشتر.', en:'Bitterness is usually tied to roast level — the darker the roast, the more bitterness.' }
     },
     options: {
-      beginner: [ {v:'light', fa:'اصلاً تلخ نباشه', en:'Not bitter at all'}, {v:'medium', fa:'یک‌کم تلخی خوبه', en:'A little bitterness is nice'}, {v:'dark', fa:'هرچی تلخ‌تر بهتر', en:'The more bitter, the better'} ],
-      regular:  [ {v:'light', fa:'رست روشن، کم‌تلخ', en:'Light Roast, low bitterness'}, {v:'medium', fa:'رست متوسط', en:'Medium Roast'}, {v:'dark', fa:'رست تیره، پرتلخی', en:'Dark Roast, high bitterness'} ],
-      expert:   [ {v:'light', fa:'روشن / سیتی', en:'Light / City'}, {v:'medium', fa:'متوسط / فول‌سیتی', en:'Medium / Full City'}, {v:'dark', fa:'تیره / فرنچ - ایتالیایی', en:'Dark / French–Italian'} ]
+      beginner: [ {v:'light', fa:'اصلاً تلخ نباشه', en:'Not bitter at all'}, {v:'medium', fa:'پررنگ‌تر با یه‌کم تلخی خوبه', en:'Bolder, with a bit of bitterness is nice'} ],
+      regular:  [ {v:'light', fa:'رست روشن، کم‌تلخ', en:'Light Roast, low bitterness'}, {v:'medium', fa:'رست متوسط تا پررنگ', en:'Medium to Bold Roast'} ],
+      expert:   [ {v:'light', fa:'روشن / سیتی', en:'Light / City'}, {v:'medium', fa:'متوسط / فول‌سیتی', en:'Medium / Full City'}, {v:'dark', fa:'متوسط رو به تیره / پرتوسعه‌ترین', en:'Medium-Dark / Most Developed'} ]
     }
   },
   mood: {
@@ -1953,6 +1981,24 @@ const QUESTIONS = {
       beginner: [ {v:'espressohome', fa:'دستگاه اسپرسوساز خانگی', en:'Home espresso machine'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'other', fa:'قهوه فوری یا کپسولی', en:'Instant or capsule coffee'} ],
       regular:  [ {v:'espressohome', fa:'اسپرسو', en:'Espresso'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'v60', fa:'پوراور (وی۶۰ یا کمکس)', en:'Pour-over (V60 / Chemex)'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press'}, {v:'aeropress', fa:'ایروپرس', en:'AeroPress'} ],
       expert:   [ {v:'espressohome', fa:'اسپرسو', en:'Espresso'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot'}, {v:'v60', fa:'پوراور (وی۶۰ یا کالیتا)', en:'Pour-over (V60 / Kalita)'}, {v:'frenchpress', fa:'غوطه‌وری (فرنچ‌پرس یا ایروپرس)', en:'Immersion (French Press / AeroPress)'}, {v:'coldbrew', fa:'کولد برو', en:'Cold Brew'}, {v:'other', fa:'سایفون', en:'Siphon'} ]
+    }
+  },
+  // محور جدید — «معمولی یا خاص»؛ محور اصلیه (نه فاز۲)، از قدم اول برای هر ۳ سطح پرسیده می‌شه
+  // چون بدون این سیگنال، دونه‌های کمیاب/گران (مثل گیشا) فقط از رو محورهای فرعی طعم رقابت می‌کردن
+  rarity: {
+    title: {
+      beginner: { fa:'امروز دنبال چی هستی؟', en:'What are you in the mood for today?' },
+      regular:  { fa:'این‌بار دنبال چه‌جور تجربه‌ای هستی؟', en:'What kind of experience are you looking for this time?' },
+      expert:   { fa:'ترجیح بین آشنایی و اکتشاف؟', en:'Familiar vs. exploratory preference?' }
+    },
+    edu: {
+      beginner: { fa:'بعضی روزها دلمون یه چیز مطمئنه می‌خواد، بعضی روزها دلمون یه تجربه‌ی تازه می‌خواد.', en:'Some days you want something reliable, other days you want something new.' },
+      regular:  { fa:'این محور کمک می‌کنه بفهمیم دنبال یه دونه‌ی همیشگی و مطمئن هستی یا یه تجربه‌ی کمیاب و خاص.', en:'This helps us know whether you want an everyday reliable bean or a rare, special experience.' }
+    },
+    options: {
+      beginner: [ {v:'everyday', fa:'یه قهوه‌ی خوب و مطمئن، مثل همیشه', en:'A good, reliable coffee, like always'}, {v:'curious', fa:'یه چیز متفاوت، ولی نه خیلی عجیب', en:'Something different, but not too weird'}, {v:'rare', fa:'یه تجربه‌ی کاملاً خاص و کمیاب، حتی اگه گرون‌تر باشه', en:'A completely special, rare experience, even if pricier'} ],
+      regular:  [ {v:'everyday', fa:'یه قهوه‌ی خوب و مطمئن، مثل همیشه', en:'A good, reliable coffee, like always'}, {v:'curious', fa:'یه چیز متفاوت، ولی نه خیلی عجیب', en:'Something different, but not too weird'}, {v:'rare', fa:'یه تجربه‌ی کاملاً خاص و کمیاب، حتی اگه گرون‌تر باشه', en:'A completely special, rare experience, even if pricier'} ],
+      expert:   [ {v:'everyday', fa:'یه قهوه‌ی خوب و مطمئن، مثل همیشه', en:'A good, reliable coffee, like always'}, {v:'curious', fa:'یه چیز متفاوت، ولی نه خیلی عجیب', en:'Something different, but not too weird'}, {v:'rare', fa:'یه تجربه‌ی کاملاً خاص و کمیاب، حتی اگه گرون‌تر باشه', en:'A completely special, rare experience, even if pricier'} ]
     }
   },
   // ═══ فاز ۲ — محورهای جدید (فقط برای کاربرهای برگشتی) ═══
@@ -2036,13 +2082,29 @@ const QUESTIONS = {
       expert:   [ {v:'aroma', fa:'عطر و رایحه', en:'Aroma'}, {v:'texture', fa:'بافت دهانی', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'پس‌مزه', en:'Aftertaste'}, {v:'balance', fa:'تعادل کلی', en:'Overall Balance'} ]
     }
   },
-  // محور تخصصی جدید — فقط برای سطح متخصص، فقط تو Refresh Mode پرسیده می‌شه (نه تو چرخش عادی)
+  // محور فرآوری — قبلاً فقط سطح Expert (و فقط تو Refresh Mode) می‌دیدش؛ حالا برای هر ۳ سطح
+  // از قدم اول هم پرسیده می‌شه، چون یکی از واقعی‌ترین خط‌های تفکیک بین دونه‌هاست
   processing: {
     title: {
-      expert: { fa:'کدوم روش فرآوری رو بیشتر می‌پسندی؟', en:'Which processing method do you prefer most?' }
+      beginner: { fa:'دوست داری طعم قهوه ساده و آشنا باشه یا پیچیده و غافلگیرکننده؟', en:'Do you want the flavor simple and familiar, or complex and surprising?' },
+      regular:  { fa:'ترجیح طعمی‌ت بین ساده/تمیز و پیچیده/آزمایشیه؟', en:'Do you prefer simple/clean flavors or complex/experimental ones?' },
+      expert:   { fa:'کدوم روش فرآوری رو بیشتر می‌پسندی؟', en:'Which processing method do you prefer most?' }
     },
-    edu: {},
+    edu: {
+      beginner: { fa:'روش فرآوری دونه (چطور از میوه جدا و خشک می‌شه) روی طعم نهایی خیلی اثر می‌ذاره.', en:'How the bean is processed (separated and dried from the fruit) strongly affects the final flavor.' },
+      regular:  { fa:'فرآوری Washed طعم تمیز و دقیق می‌ده؛ فرآوری‌های Natural و تخمیر هوازی/بی‌هوازی طعم‌های پیچیده‌تر و غیرمنتظره‌تری می‌سازن.', en:'Washed processing gives a clean, precise flavor; Natural and fermented processes create more complex, unexpected flavors.' }
+    },
     options: {
+      beginner: [
+        { v:'washed', fa:'ساده و تمیز', en:'Simple and clean' },
+        { v:'natural', fa:'میوه‌ای و پرحس', en:'Fruity and intense' },
+        { v:'experimental', fa:'کاملاً غیرمنتظره و آزمایشی', en:'Completely unexpected and experimental' }
+      ],
+      regular: [
+        { v:'washed', fa:'ساده و تمیز (Washed)', en:'Simple and clean (Washed)' },
+        { v:'natural', fa:'میوه‌ای و پرحس (Natural)', en:'Fruity and intense (Natural)' },
+        { v:'experimental', fa:'کاملاً غیرمنتظره و آزمایشی (Anaerobic/تخمیر هوازی)', en:'Completely unexpected and experimental (Anaerobic/fermented)' }
+      ],
       expert: [
         { v:'washed', fa:'شسته (Washed) — شفاف و تمیز، اسیدیته دقیق', en:'Washed — clean and transparent, precise acidity' },
         { v:'natural', fa:'خشک (Natural) — میوه‌ای و وحشی، بدنه سنگین‌تر', en:'Natural — fruity and wild, heavier body' },
@@ -2239,7 +2301,7 @@ function renderQuestion(screenNum, axis, level) {
   const progressLabelEl = document.getElementById('progress-label-' + screenNum);
   if (progressLabelEl && typeof screenNum === 'number') {
     progressLabelEl.innerHTML =
-      '<span class="fa-only">سؤال ' + screenNum + ' از ۸</span><span class="en-only">Question ' + screenNum + ' of 8</span>';
+      '<span class="fa-only">سؤال ' + screenNum + ' از ۱۰</span><span class="en-only">Question ' + screenNum + ' of 10</span>';
   }
 
   // نشان رنگی سطح (سبز/آبی/بنفش) — بالای عنوان سؤال
@@ -2619,7 +2681,9 @@ function renderAllQuestions(level) {
   renderQuestion(5, 'mood', level);
   renderIntensitySlider(6);
   renderQuestion(8, 'brew', level);
-  document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۸</span><span class="en-only">Question 7 of 8</span>';
+  renderQuestion(9, 'rarity', level);
+  renderQuestion(10, 'processing', level);
+  document.getElementById('progress-label-7').innerHTML = '<span class="fa-only">سؤال ۷ از ۱۰</span><span class="en-only">Question 7 of 10</span>';
   const q7b = document.getElementById('q7-badge');
   if (q7b) q7b.textContent = LEVEL_META[level].emoji;
 }
@@ -2691,7 +2755,9 @@ function pickDynamic(el, axis, value, screenNum) {
   el.classList.add('selected');
   ans[axis] = value;
   updateProgressBean(axis);
-  if (screenNum === 8) { setTimeout(showLoading, 280); return; }
+  if (screenNum === 10) { setTimeout(showLoading, 280); return; }
+  if (screenNum === 9) { setTimeout(() => go(10), 280); return; }
+  if (screenNum === 8) { setTimeout(() => go(9), 280); return; }
   if (typeof screenNum === 'string' && screenNum.indexOf('deep-') === 0) {
     const idx = parseInt(screenNum.split('-')[1], 10); // شماره‌ی ۱-پایه‌ی این صفحه
     if (idx < phase2AxesToAsk.length) {
@@ -3952,7 +4018,7 @@ function startFeedbackFromDashboard() {
    QUIZ
 ═══════════════════════════════════════════ */
 async function startNewProfile() {
-  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
+  ans = { taste: null, body: null, acidity: null, bitterness: null, mood: null, moment: null, tastepref: null, brew: null, rarity: null, context: null, ritual: null, evolution: null, finish_preference: null, sensory_attention: null, intensity: null, processing: null, dtr: null };
   healthAns = { h1: null, h2: null };
   rec = null;
   currentPersona = null;
@@ -4047,6 +4113,7 @@ async function proceedToPhase2Setup(last) {
   ans.taste = last.flavor; ans.body = last.body; ans.acidity = last.acidity;
   ans.bitterness = last.bitterness; ans.mood = last.mood; ans.moment = last.moment;
   ans.tastepref = last.tastepref; ans.brew = last.brew; ans.intensity = last.intensity;
+  ans.rarity = last.rarity; // ممکنه تو دیتابیس فعلی این ستون نباشه (نیاز به migration) — در اون صورت null می‌مونه، مشکلی نداره
   ans.processing = last.processing;
   ans.dtr = last.dtr;
   isPhase2 = true;
@@ -4263,6 +4330,7 @@ async function saveProfile(rec) {
       acidity: ans.acidity,
       bitterness: ans.bitterness,
       moment: ans.moment,
+      rarity: ans.rarity,
       context: ans.context,
       ritual: ans.ritual,
       evolution: ans.evolution,
@@ -4486,8 +4554,9 @@ const BEANS = [
       guided:7, self_taught:5, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:5, texture:7, aftertaste:8, balance:7,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3,
-      dtr_short:2, dtr_medium:5, dtr_long:9
+      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3, processing_experimental:3,
+      dtr_short:2, dtr_medium:5, dtr_long:9,
+      rarity_everyday:8, rarity_curious:5, rarity_rare:2
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
@@ -4505,8 +4574,9 @@ const BEANS = [
       guided:5, self_taught:7, analytical:6,
       finish_short:2, finish_medium:4, finish_long:8,
       aroma:9, texture:4, aftertaste:4, balance:5,
-      processing_washed:3, processing_natural:9, processing_anaerobic:4, processing_aerobic_ferment:5,
-      dtr_short:5, dtr_medium:9, dtr_long:5
+      processing_washed:3, processing_natural:9, processing_anaerobic:4, processing_aerobic_ferment:5, processing_experimental:5,
+      dtr_short:5, dtr_medium:9, dtr_long:5,
+      rarity_everyday:5, rarity_curious:8, rarity_rare:4
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
@@ -4524,8 +4594,9 @@ const BEANS = [
       guided:7, self_taught:4, analytical:4,
       finish_short:4, finish_medium:9, finish_long:3,
       aroma:4, texture:5, aftertaste:5, balance:8,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3,
-      dtr_short:3, dtr_medium:8, dtr_long:6
+      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3, processing_experimental:3,
+      dtr_short:3, dtr_medium:8, dtr_long:6,
+      rarity_everyday:9, rarity_curious:4, rarity_rare:1
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
@@ -4543,8 +4614,9 @@ const BEANS = [
       guided:4, self_taught:8, analytical:6,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:8, texture:4, aftertaste:6, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
-      dtr_short:5, dtr_medium:9, dtr_long:5
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
+      dtr_short:5, dtr_medium:9, dtr_long:5,
+      rarity_everyday:3, rarity_curious:7, rarity_rare:6
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -4562,8 +4634,9 @@ const BEANS = [
       guided:6, self_taught:6, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:6, texture:4, aftertaste:8, balance:4,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
-      dtr_short:9, dtr_medium:5, dtr_long:2
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
+      dtr_short:9, dtr_medium:5, dtr_long:2,
+      rarity_everyday:3, rarity_curious:7, rarity_rare:6
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
@@ -4581,8 +4654,9 @@ const BEANS = [
       guided:3, self_taught:6, analytical:9,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:10, texture:5, aftertaste:7, balance:4,
-      processing_washed:1, processing_natural:4, processing_anaerobic:9, processing_aerobic_ferment:5,
-      dtr_short:8, dtr_medium:6, dtr_long:3
+      processing_washed:1, processing_natural:4, processing_anaerobic:9, processing_aerobic_ferment:5, processing_experimental:9,
+      dtr_short:8, dtr_medium:6, dtr_long:3,
+      rarity_everyday:1, rarity_curious:4, rarity_rare:9
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
@@ -4600,8 +4674,9 @@ const BEANS = [
       guided:6, self_taught:6, analytical:5,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:7, texture:6, aftertaste:8, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
-      dtr_short:5, dtr_medium:9, dtr_long:5
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
+      dtr_short:5, dtr_medium:9, dtr_long:5,
+      rarity_everyday:3, rarity_curious:7, rarity_rare:6
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
@@ -4619,8 +4694,9 @@ const BEANS = [
       guided:4, self_taught:5, analytical:7,
       finish_short:2, finish_medium:4, finish_long:9,
       aroma:7, texture:4, aftertaste:7, balance:5,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9,
-      dtr_short:2, dtr_medium:5, dtr_long:9
+      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
+      dtr_short:2, dtr_medium:5, dtr_long:9,
+      rarity_everyday:3, rarity_curious:7, rarity_rare:6
     },
     brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
   },
@@ -4764,6 +4840,9 @@ function computeAxisScore(entityS, a, weights) {
   score += rel(a.moment) * (weights.moment / 10);
   // ترکیب شیر/شکلات: خارج از جدول رسمی ۷بُعدی سند، فقط برای ظرافت اضافه نگه داشته می‌شه
   score += rel(a.tastepref) * 1.0;
+  // محور «معمولی یا خاص» — پیشوند 'rarity_' چون مقادیرش (everyday/curious/rare) با کلید محورهای دیگه تداخل نداره
+  const rarityKey = a.rarity ? 'rarity_' + a.rarity : null;
+  score += rel(rarityKey) * (weights.rarity / 10);
   // فاز ۲ — محورهای عمیق‌تر (فقط وقتی کاربر برگشتی این‌ها رو پاسخ داده باشه مقدار دارن)
   score += rel(a.context) * (weights.context / 10);
   score += rel(a.ritual) * (weights.ritual / 10);
@@ -4774,6 +4853,8 @@ function computeAxisScore(entityS, a, weights) {
   // توجه حسی: مقادیرش (aroma/texture/aftertaste/balance) با هیچ کلید دیگه‌ای تداخل ندارن
   score += rel(a.sensory_attention) * (weights.sensory_attention / 10);
   // فرآوری: فقط سطح متخصص (وزنش تو بقیه‌ی سطوح صفره) — پیشوند برای جلوگیری از تداخل احتمالی کلید
+  // 'experimental' مقدار ساده‌شده‌ی beginner/regular برای هر دوی anaerobic و aerobic_ferment هست
+  // (چون این تفکیک ظریف برای غیرمتخصص معنا نداره)؛ رو کلید مشتق‌شده‌ی processing_experimental امتیاز می‌گیره
   const processingKey = a.processing ? 'processing_' + a.processing : null;
   score += rel(processingKey) * (weights.processing / 10);
   // نسبت توسعه‌ی رست (DTR): فقط سطح متخصص
