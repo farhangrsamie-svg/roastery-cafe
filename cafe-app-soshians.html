@@ -901,6 +901,24 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       </div>
     </div>
 
+    <div class="new-profile-btn" id="dash-followup-card" style="display:none;background:var(--tint);">
+      <div class="new-profile-icon">🔄</div>
+      <div class="new-profile-text">
+        <div class="new-profile-title">
+          <span class="en-only">Did the tip help?</span>
+          <span class="fa-only">راهنمایی‌ای که دادیم کمک کرد؟</span>
+        </div>
+        <div class="new-profile-sub" style="display:flex;gap:8px;margin-top:8px;">
+          <button class="btn-primary" style="flex:1;padding:8px;font-size:12.5px;" onclick="event.stopPropagation(); resolveFollowup('resolved')">
+            <span class="fa-only">بهتر شد ✅</span><span class="en-only">Better now ✅</span>
+          </button>
+          <button class="btn-back" style="flex:1;position:static;text-align:center;padding:8px;font-size:12.5px;" onclick="event.stopPropagation(); resolveFollowup('still_unhappy')">
+            <span class="fa-only">هنوز راضی نیستم</span><span class="en-only">Still not happy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- New Profile Button -->
     <button class="new-profile-btn" onclick="startNewProfile()">
       <div class="new-profile-icon">✨</div>
@@ -1011,6 +1029,12 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     <button class="btn-primary" onclick="goOrderFromGate()" style="max-width:280px;margin:0 auto;">
       <span class="fa-only">سفارش بدم →</span><span class="en-only">Order now →</span>
     </button>
+    <button class="btn-back" id="gate-later-btn" style="display:none;position:static;margin-top:12px;width:100%;text-align:center;" onclick="deferGateOrder()">
+      <span class="fa-only">بعداً سفارش می‌دم</span><span class="en-only">I'll order later</span>
+    </button>
+    <button class="btn-back" id="gate-cancel-btn" style="display:none;position:static;margin-top:12px;width:100%;text-align:center;color:var(--gray);" onclick="cancelGateProfile()">
+      <span class="fa-only">این پروفایل رو لغو کن</span><span class="en-only">Cancel this profile</span>
+    </button>
     <button class="btn-back" style="position:static;margin-top:14px;width:100%;text-align:center;" onclick="showDashboard()">
       <span class="fa-only">بازگشت به داشبورد</span><span class="en-only">Back to dashboard</span>
     </button>
@@ -1061,6 +1085,14 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <span class="fa-only">یکنواختی آسیاب</span><span class="en-only">Grind uniformity</span>
     </label>
     <div class="options" id="feedback-uniformity-options"></div>
+  </div>
+
+  <div class="input-group" id="feedback-issue-group" style="display:none;background:var(--tint);border-radius:12px;padding:14px 16px;">
+    <label class="input-label">
+      <span class="fa-only">دقیقاً چی مشکل داشت؟</span><span class="en-only">What exactly was the issue?</span>
+    </label>
+    <div class="options" id="feedback-issue-options"></div>
+    <div id="feedback-tip" style="display:none;margin-top:12px;padding:12px 14px;background:var(--white);border-radius:10px;font-size:13px;color:var(--dark-brown);line-height:1.8;"></div>
   </div>
 
   <div class="input-group">
@@ -2863,6 +2895,7 @@ async function showDashboard() {
   loadOrders();
   loadUserMessages();
   checkPendingFeedbackCard();
+  checkFollowupCard();
 }
 
 async function loadUserMessages() {
@@ -3439,6 +3472,23 @@ function goOrderFromGate() {
   goToOrder(rec);
 }
 
+// کاربر گفته «بعداً سفارش می‌دم» — بدون سفارش دادن، اجازه‌ی ساخت پروفایل جدید بهش می‌دیم؛
+// پروفایل قدیمی همچنان بدون‌سفارش می‌مونه (نه حذف می‌شه، نه اجباری می‌مونه)
+async function deferGateOrder() {
+  if (!pendingGateProfile) { showDashboard(); return; }
+  await proceedToPhase2Setup(pendingGateProfile);
+}
+
+// کاربر تصمیم گرفته دیگه اون پروفایل قدیمی رو سفارش نده — لغوش می‌کنیم (پروفایل تو تاریخچه می‌مونه،
+// فقط دیگه گیت رو مسدود نمی‌کنه) و می‌ذاریم پروفایل جدید بسازه
+async function cancelGateProfile() {
+  if (!pendingGateProfile) { showDashboard(); return; }
+  try {
+    await sb('PATCH', `coffee_profiles?id=eq.${pendingGateProfile.id}`, { abandoned: true });
+  } catch (e) { console.warn('could not mark profile as abandoned:', e); }
+  await proceedToPhase2Setup(pendingGateProfile);
+}
+
 /* ═══════════════════════════════════════════
    بازخورد سفارش (Order Feedback)
    بعد از حداقل ۵ روز از تأیید/ارسال سفارش، اگه هنوز بازخوردی نگرفتیم، ازش می‌پرسیم —
@@ -3496,10 +3546,51 @@ function renderOptionCards(containerId, options, onPick) {
   });
 }
 
+// وقتی رضایت پایینه (۱ یا ۲ از ۵)، می‌پرسیم دقیقاً چی مشکل داشته و فوراً یه نکته‌ی
+// مرتبط نشون می‌دیم — نه چت‌بات کامل، بلکه یه راهنمای فوری و قابل‌اعتماد
+const FEEDBACK_ISSUE_OPTIONS = [
+  { v:'too_bitter', fa:'خیلی تلخ', en:'Too bitter' },
+  { v:'too_sour', fa:'خیلی ترش', en:'Too sour' },
+  { v:'too_weak', fa:'خیلی رقیق', en:'Too weak' },
+  { v:'too_strong', fa:'خیلی غلیظ', en:'Too strong' },
+  { v:'off_flavor', fa:'طعم یا بوی عجیب', en:'Off flavor or smell' },
+  { v:'other', fa:'چیز دیگه', en:'Something else' }
+];
+const FEEDBACK_TIPS = {
+  too_bitter: { fa:'معمولاً یعنی استخراج بیش از حد — دفعه‌ی بعد آسیاب رو کمی درشت‌تر کن یا زمان دم‌آوری رو کوتاه‌تر کن.', en:'Usually means over-extraction — try a coarser grind or shorter brew time next time.' },
+  too_sour: { fa:'معمولاً یعنی استخراج ناکافی — آسیاب رو ریزتر کن یا زمان دم‌آوری رو کمی بیشتر کن.', en:'Usually means under-extraction — try a finer grind or a slightly longer brew time.' },
+  too_weak: { fa:'نسبت قهوه به آب رو افزایش بده — قهوه‌ی بیشتر یا آب کمتر تو دم‌آوری بعدی.', en:'Increase the coffee-to-water ratio — more coffee or less water next time.' },
+  too_strong: { fa:'نسبت آب به قهوه رو افزایش بده — آب بیشتر یا قهوه‌ی کمتر تو دم‌آوری بعدی.', en:'Increase the water-to-coffee ratio — more water or less coffee next time.' },
+  off_flavor: { fa:'ممکنه دستگاه یا فیلتر دم‌آوری کاملاً تمیز نبوده، یا دونه درست نگهداری نشده باشه — این‌ها رو چک کن.', en:"Your equipment or filter might not have been fully clean, or the beans weren't stored properly — worth checking." },
+  other: { fa:'تو بخش توضیحات برامون بنویس دقیقاً چی شده — می‌خوایم بهتر کمکت کنیم.', en:"Please tell us more in the notes — we want to help you get it right." }
+};
+let feedbackIssueValue = null;
+
+function showFeedbackTip(issueValue) {
+  const tipEl = document.getElementById('feedback-tip');
+  const tip = FEEDBACK_TIPS[issueValue];
+  if (!tip) { tipEl.style.display = 'none'; return; }
+  tipEl.innerHTML = '<span class="fa-only">💡 ' + tip.fa + '</span><span class="en-only">💡 ' + tip.en + '</span>';
+  tipEl.style.display = 'block';
+}
+
 function pickFeedbackSatisfaction(n, el) {
   feedbackSatisfaction = n;
   el.parentElement.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
+
+  const issueGroup = document.getElementById('feedback-issue-group');
+  if (n <= 2) {
+    issueGroup.style.display = 'block';
+    renderOptionCards('feedback-issue-options', FEEDBACK_ISSUE_OPTIONS, (v) => {
+      feedbackIssueValue = v;
+      showFeedbackTip(v);
+    });
+  } else {
+    issueGroup.style.display = 'none';
+    feedbackIssueValue = null;
+    document.getElementById('feedback-tip').style.display = 'none';
+  }
 }
 
 // آسیاب فقط وقتی می‌پرسیم که کاربر موقع سفارش گفته بود خودش آسیاب می‌کنه —
@@ -3527,18 +3618,32 @@ function renderFeedbackGrindSection(grindPreference) {
   }
 }
 
+// گزینه‌های روش دم‌آوری مخصوص فرم بازخورد — کاربر تا این‌جا دونه‌ی کامل خریده، پس
+// «قهوه فوری/کپسولی» که تو کوییز اصلی برای مبتدی هست، اینجا اصلاً معنی نداره
+const FEEDBACK_BREW_OPTIONS = [
+  { v:'espressohome', fa:'اسپرسو', en:'Espresso' },
+  { v:'mokapot', fa:'موکاپات', en:'Moka pot' },
+  { v:'v60', fa:'پوراور (وی۶۰، کمکس، کالیتا و مشابه)', en:'Pour-over (V60, Chemex, Kalita, etc.)' },
+  { v:'frenchpress', fa:'فرنچ‌پرس', en:'French press' },
+  { v:'aeropress', fa:'ایروپرس', en:'AeroPress' },
+  { v:'coldbrew', fa:'کولد برو', en:'Cold Brew' },
+  { v:'other', fa:'روش دیگه', en:'Other method' }
+];
+
 function populateFeedbackScreen(order) {
   pendingFeedbackOrder = order;
   feedbackSatisfaction = null;
   feedbackBrewValue = null;
   feedbackGrindType = null;
   feedbackGrindUniformity = null;
+  feedbackIssueValue = null;
   document.getElementById('feedback-bean-name').textContent = order.bean_name || '—';
   document.getElementById('feedback-satisfaction-row').querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('feedback-issue-group').style.display = 'none';
+  document.getElementById('feedback-tip').style.display = 'none';
   document.getElementById('feedback-notes').value = '';
   document.getElementById('feedback-error').classList.remove('visible');
-  const brewOpts = (QUESTIONS.brew.options[currentLevel] || QUESTIONS.brew.options.regular);
-  renderOptionCards('feedback-brew-options', brewOpts, (v) => { feedbackBrewValue = v; });
+  renderOptionCards('feedback-brew-options', FEEDBACK_BREW_OPTIONS, (v) => { feedbackBrewValue = v; });
   renderFeedbackGrindSection(order.grind_preference);
 }
 
@@ -3579,11 +3684,14 @@ async function submitOrderFeedback() {
     await sb('POST', 'order_feedback', {
       order_id: pendingFeedbackOrder.id,
       user_id: currentUser.id,
+      profile_id: pendingFeedbackOrder.profile_id || null,
       bean_name: pendingFeedbackOrder.bean_name || null,
       satisfaction: feedbackSatisfaction,
       actual_brew: feedbackBrewValue,
       grind_type: feedbackGrindType,
       grind_uniformity: feedbackGrindUniformity,
+      issue_reason: feedbackIssueValue,
+      followup_status: feedbackSatisfaction <= 2 ? 'pending' : null,
       notes: document.getElementById('feedback-notes').value.trim() || null
     });
 
@@ -3628,6 +3736,51 @@ async function checkPendingFeedbackCard() {
   }
 }
 
+let pendingFollowupFeedback = null;
+// وقتی کاربر رضایت پایین ثبت کرده بود و یه نکته‌ی راهنمایی گرفت، چند روز بعد ازش می‌پرسیم
+// نتیجه چی شد — تا بفهمیم مشکل واقعاً حل شد یا نه (نه فقط یه نکته بدیم و فراموش کنیم)
+async function checkFollowupCard() {
+  const card = document.getElementById('dash-followup-card');
+  if (!card || !currentUser) return;
+  try {
+    const rows = await sb('GET', `order_feedback?user_id=eq.${currentUser.id}&followup_status=eq.pending&order=created_at.asc&limit=1&select=*`);
+    const row = rows && rows[0];
+    const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+    if (row && (Date.now() - new Date(row.created_at).getTime() >= TWO_DAYS_MS)) {
+      pendingFollowupFeedback = row;
+      card.style.display = 'flex';
+    } else {
+      pendingFollowupFeedback = null;
+      card.style.display = 'none';
+    }
+  } catch (e) {
+    console.warn('checkFollowupCard error:', e);
+    card.style.display = 'none';
+  }
+}
+
+async function resolveFollowup(status) {
+  if (!pendingFollowupFeedback) return;
+  try {
+    await sb('PATCH', `order_feedback?id=eq.${pendingFollowupFeedback.id}`, { followup_status: status });
+    if (status === 'still_unhappy') {
+      // هنوز راضی نیست — قول هدیه‌ی سفارش بعدی رو می‌دیم و برای پیگیری انسانی به پنل ادمین علامت می‌زنیم
+      if (pendingFollowupFeedback.profile_id) {
+        try {
+          await sb('PATCH', `coffee_profiles?id=eq.${pendingFollowupFeedback.profile_id}`, { needs_followup: true, gift_pending: true });
+        } catch (e) { console.warn('could not flag profile for followup:', e); }
+      }
+      alert(currentLang === 'en'
+        ? "We hear you, and we're sorry it didn't work out. You'll definitely get a gift with your next order — and we'll personally follow up with you until you're happy."
+        : 'متوجه‌ایم و واقعاً متأسفیم که درست نشد. تو سفارش بعدیت حتماً یه هدیه از طرفمون داری — و تا وقتی راضی بشی، شخصاً پیگیرت هستیم.');
+    }
+  } catch (e) {
+    console.warn('resolveFollowup error:', e);
+  }
+  pendingFollowupFeedback = null;
+  document.getElementById('dash-followup-card').style.display = 'none';
+}
+
 function startFeedbackFromDashboard() {
   if (!currentUser) return;
   getPendingFeedbackOrder(currentUser.id).then(pending => {
@@ -3659,15 +3812,44 @@ async function startNewProfile() {
   // بررسی کاربر برگشتی — طبق سند معماری: فاز ۲ (کشف تدریجی) به‌جای تکرار فاز ۱
   try {
     if (currentUser) {
-      const existing = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&limit=1&select=*`);
+      const existing = await sb('GET', `coffee_profiles?user_id=eq.${currentUser.id}&order=created_at.desc&limit=3&select=*`);
       if (existing && existing.length > 0) {
         const last = existing[0];
 
-        // گیت سفارش: تا وقتی کاربر واقعاً پروفایل قبلیش رو سفارش نداده، اجازه‌ی ساخت پروفایل جدید نداره
-        // (cancelled یعنی سفارش شروع شده ولی به دلیل عدم پرداخت خودکار کنسل شده — قبول نیست)
+        // اگه این پروفایل قبلاً «لغو» شده (کاربر گفته دیگه نمی‌خواد سفارشش بده)، گیت روش اعمال نمی‌شه
+        if (last.abandoned) {
+          await proceedToPhase2Setup(last);
+          return;
+        }
+
+        // گیت سفارش: تا وقتی کاربر واقعاً پروفایل قبلیش رو سفارش نداده، اجازه‌ی ساخت پروفایل جدید نداره —
+        // مگراینکه (الف) قبلاً اعلام کرده هنوز از سفارش قبلی راضی نیست (دیگه مجبورش نمی‌کنیم دوباره همون رو بخره)
         const lastOrders = await sb('GET', `orders?profile_id=eq.${last.id}&select=status`);
         const hasRealOrder = (lastOrders || []).some(o => o.status !== 'cancelled');
         if (!hasRealOrder) {
+          let bypassForDissatisfaction = false;
+          try {
+            const fbRows = await sb('GET', `order_feedback?profile_id=eq.${last.id}&followup_status=eq.still_unhappy&select=id&limit=1`);
+            bypassForDissatisfaction = !!(fbRows && fbRows.length > 0);
+          } catch (e) { console.warn('could not check dissatisfaction bypass:', e); }
+
+          if (bypassForDissatisfaction) {
+            await proceedToPhase2Setup(last);
+            return;
+          }
+
+          // آیا پروفایل قبل از این هم بدون سفارش بوده؟ (برای محدودیت گزینه‌ی «بعداً سفارش می‌دم»
+          // — یک‌بار مجانی، نه بی‌نهایت)
+          let consecutiveUnordered = 1;
+          const prev = existing[1];
+          if (prev && !prev.abandoned) {
+            try {
+              const prevOrders = await sb('GET', `orders?profile_id=eq.${prev.id}&select=status`);
+              const prevHasOrder = (prevOrders || []).some(o => o.status !== 'cancelled');
+              if (!prevHasOrder) consecutiveUnordered = 2;
+            } catch (e) { console.warn('could not check previous order status:', e); }
+          }
+
           pendingGateProfile = last;
           const beanFull = last.recommended_bean || '—';
           const nameEl = document.getElementById('order-required-bean-name');
@@ -3676,6 +3858,10 @@ async function startNewProfile() {
               '<span class="fa-only">آخرین پیشنهاد: <b>' + beanFull + '</b></span>' +
               '<span class="en-only">Last recommendation: <b>' + beanFull + '</b></span>';
           }
+          const laterBtn = document.getElementById('gate-later-btn');
+          const cancelBtn = document.getElementById('gate-cancel-btn');
+          if (laterBtn) laterBtn.style.display = consecutiveUnordered >= 2 ? 'none' : 'block';
+          if (cancelBtn) cancelBtn.style.display = consecutiveUnordered >= 2 ? 'block' : 'none';
           show('screen-order-required');
           return;
         }

@@ -315,6 +315,10 @@ textarea.input-field { resize: vertical; min-height: 100px; }
           <span class="nav-icon">💬</span> بازخورد سفارش‌ها
           <span class="nav-badge" id="nav-badge-feedback" style="display:none;">0</span>
         </div>
+        <div class="nav-item" onclick="showPage('followup')">
+          <span class="nav-icon">🔄</span> پیگیری مشتریان ناراضی
+          <span class="nav-badge" id="nav-badge-followup" style="display:none;">0</span>
+        </div>
         <div class="nav-item" onclick="showPage('pricing')">
           <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
         </div>
@@ -613,6 +617,21 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         </div>
       </div>
 
+      <!-- ══════ صفحه: پیگیری مشتریان ناراضی ══════ -->
+      <div class="page" id="page-followup">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">🔄 پیگیری مشتریان ناراضی</div>
+            <div class="page-sub">مشتریانی که بعد از راهنمایی هنوز راضی نبودن — این‌ها نیاز به تماس واقعی و پیگیری انسانی دارن، نه پاسخ خودکار</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div id="followup-list">
+            <div style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- ══════ صفحه: قیمت‌گذاری دونه‌ها ══════ -->
       <div class="page" id="page-pricing">
         <div class="top-bar">
@@ -778,6 +797,7 @@ function showPage(name) {
   if (name === 'customers') loadCustomers();
   if (name === 'gaps') loadGapsReport();
   if (name === 'feedback') loadFeedbackReport();
+  if (name === 'followup') loadFollowupQueue();
   if (name === 'pricing') loadPricingForm();
 }
 
@@ -1171,6 +1191,77 @@ async function loadGapsReport() {
 /* ═══════════════════════════════════════════
    بازخورد سفارش‌ها — تجربه‌ی واقعی مشتری بعد از مصرف دونه
 ═══════════════════════════════════════════ */
+// صف مشتریانی که بعد از راهنمایی هنوز راضی نبودن — نیاز به تماس واقعی و پیگیری انسانی
+async function loadFollowupQueue() {
+  const listEl = document.getElementById('followup-list');
+  if (!listEl) return;
+  listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</div>';
+
+  const ISSUE_FA = { too_bitter:'خیلی تلخ', too_sour:'خیلی ترش', too_weak:'خیلی رقیق', too_strong:'خیلی غلیظ', off_flavor:'طعم/بوی عجیب', other:'چیز دیگه' };
+
+  try {
+    const rows = await sb('GET', `order_feedback?followup_status=eq.still_unhappy&order=created_at.desc&select=*`);
+    const list = rows || [];
+
+    const badge = document.getElementById('nav-badge-followup');
+    if (badge) {
+      if (list.length > 0) { badge.style.display = 'inline-block'; badge.textContent = list.length; }
+      else { badge.style.display = 'none'; }
+    }
+
+    if (list.length === 0) {
+      listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">فعلاً کسی نیاز به پیگیری نداره 🎉</div>';
+      return;
+    }
+
+    // اسم و شماره‌ی مشتری‌ها رو جدا می‌گیریم چون تو order_feedback فقط user_id هست
+    const userIds = [...new Set(list.map(f => f.user_id).filter(Boolean))];
+    let usersMap = {};
+    if (userIds.length) {
+      try {
+        const users = await sb('GET', `users?id=in.(${userIds.join(',')})&select=id,name,phone`);
+        (users || []).forEach(u => { usersMap[u.id] = u; });
+      } catch (e) { console.warn('could not load user info for followup queue:', e); }
+    }
+
+    listEl.innerHTML = list.map(f => {
+      const u = usersMap[f.user_id] || {};
+      const dateStr = new Date(f.created_at).toLocaleDateString('fa-IR', { year:'numeric', month:'long', day:'numeric' });
+      const issueLabel = f.issue_reason ? (ISSUE_FA[f.issue_reason] || f.issue_reason) : '—';
+      return `
+        <div class="section-card" style="margin-bottom:14px;border-right:4px solid #E85D5D;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+            <div>
+              <div style="font-weight:700;font-size:15px;">${u.name || 'نامشخص'} <span style="color:#999;font-weight:400;font-size:12.5px;">— ${u.phone || '—'}</span></div>
+              <div style="font-size:12.5px;color:#999;margin-top:4px;">${dateStr}</div>
+            </div>
+            <div style="background:#FFF3F3;color:#E85D5D;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">نیاز به تماس</div>
+          </div>
+          <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;">
+            <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">دونه: ${f.bean_name || '—'}</span>
+            <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">مشکل: ${issueLabel}</span>
+          </div>
+          ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${f.notes}</div>` : ''}
+          <div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 قول هدیه‌ی سفارش بعدی داده شده — یادت باشه موقع سفارش بعدیش اعمالش کنی</div>
+          <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" onclick="markFollowupResolved('${f.id}')">✅ پیگیری شد و حل شد</button>
+        </div>
+      `;
+    }).join('');
+  } catch (e) {
+    console.warn('loadFollowupQueue error:', e);
+    listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">خطا در بارگذاری</div>';
+  }
+}
+
+async function markFollowupResolved(feedbackId) {
+  try {
+    await sb('PATCH', `order_feedback?id=eq.${feedbackId}`, { followup_status: 'resolved' });
+    loadFollowupQueue();
+  } catch (e) {
+    alert('خطا در ثبت — دوباره امتحان کن');
+  }
+}
+
 async function loadFeedbackReport() {
   const tbody = document.getElementById('feedback-tbody');
   const byBeanEl = document.getElementById('feedback-by-bean');
