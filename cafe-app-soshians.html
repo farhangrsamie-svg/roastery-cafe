@@ -3420,7 +3420,9 @@ function viewProfile(p) {
 
   document.getElementById('detail-content').innerHTML = `
     <div class="card" style="direction:rtl;text-align:center;">
-      <div class="card-title">هویت قهوهٔ شما</div>
+      <div class="card-title">هویت قهوه‌ت داره شکل می‌گیره</div>
+      <div style="font-size:11.5px;color:var(--gray);font-family:Arial,sans-serif;margin-bottom:10px;">${dateFA}</div>
+      <div style="font-size:12px;color:var(--medium-brown);margin-bottom:6px;">این پروفایل بیشتر به این سمت می‌کشه:</div>
       <div style="font-size:19px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${personaFa}</div>
       <div style="font-size:13px;color:var(--caramel);font-weight:600;margin-bottom:6px;">${personaTagline}</div>
       <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;">${personaDesc}</div>
@@ -3440,7 +3442,10 @@ function viewProfile(p) {
       </div>
     </div>
     <div class="card" style="direction:rtl;">
-      <div class="card-title">نمودار طعم</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px;" id="detail-radar-tabs">
+        <button class="option-card radar-tab-btn selected" data-tab="taste" onclick="switchDetailRadarTab('taste')" style="flex:1;padding:8px;text-align:center;font-size:13px;">طعم</button>
+        <button class="option-card radar-tab-btn" data-tab="sensory" onclick="switchDetailRadarTab('sensory')" style="flex:1;padding:8px;text-align:center;font-size:13px;">پروفایل حسی</button>
+      </div>
       <div id="detail-radar-chart" style="display:flex;justify-content:center;padding:8px 0;"></div>
     </div>
     ${rec._runnerBean ? `
@@ -3452,10 +3457,6 @@ function viewProfile(p) {
       <button class="alt-bean-order-btn" onclick="goToOrder(rec._runnerBean)">🛒 سفارش همین دونه</button>
     </div>
     ` : ''}
-    <div class="card" style="direction:rtl;">
-      <div class="card-title">تاریخ ثبت</div>
-      <div style="font-size:14px;color:var(--medium-brown);font-family:Arial,sans-serif;">${dateFA}</div>
-    </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title">نظر و پیشنهاد شما</div>
       <textarea class="textarea-field" id="review-text-${pid}"
@@ -3483,9 +3484,24 @@ function viewProfile(p) {
       📤 <span class="fa-only">اشتراک‌گذاری هویت قهوه‌ام</span><span class="en-only">Share My Coffee Identity</span>
     </button>
   `;
-  document.getElementById('detail-radar-chart').innerHTML = buildFlavorRadar(rec, ans.taste);
+  document.getElementById('detail-radar-chart').innerHTML = buildRadarChart(rec, RADAR_TABS.taste.axes, ans.taste);
+  currentDetailRadarBean = rec;
+  currentDetailRadarHighlight = ans.taste;
   setLang(currentLang);
   show('screen-profile-detail');
+}
+
+let currentDetailRadarBean = null;
+let currentDetailRadarHighlight = null;
+// جابه‌جایی بین نمای «طعم» و «پروفایل حسی» رو نمودار راداری صفحه‌ی پروفایل
+function switchDetailRadarTab(tabKey) {
+  const tab = RADAR_TABS[tabKey];
+  if (!tab || !currentDetailRadarBean) return;
+  document.querySelectorAll('#detail-radar-tabs .radar-tab-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.tab === tabKey);
+  });
+  const highlight = tabKey === 'taste' ? currentDetailRadarHighlight : null;
+  document.getElementById('detail-radar-chart').innerHTML = buildRadarChart(currentDetailRadarBean, tab.axes, highlight);
 }
 
 function toggleProfileDetails() {
@@ -5249,13 +5265,8 @@ function buildFlavorRadarMini(bean) {
   </svg>`;
 }
 
-function buildFlavorRadar(bean, highlightKey) {
-  const axes = [
-    { key: 'fruity',     fa: 'میوه‌ای',  en: 'Fruity' },
-    { key: 'floral',     fa: 'گلی',     en: 'Floral' },
-    { key: 'choc_nutty', fa: 'شکلاتی/آجیلی', en: 'Chocolate/Nutty' },
-    { key: 'spicy',      fa: 'ادویه‌ای', en: 'Spicy' }
-  ];
+// نسخه‌ی عمومی‌شده — هر مجموعه محوری (نه فقط طعم) رو می‌تونه رسم کنه
+function buildRadarChart(bean, axes, highlightKey) {
   const cx = 140, cy = 140, maxR = 62;
   const angleStep = (2 * Math.PI) / axes.length;
 
@@ -5311,6 +5322,32 @@ function buildFlavorRadar(bean, highlightKey) {
     ${dots}
     ${labels}
   </svg>`;
+}
+
+// دو دسته‌محور آماده — طعم (مثل قبل) و پروفایل حسی (بدنه/اسیدیته/تلخی/پس‌مزه) — هر دو از داده‌ی واقعی هر دونه
+const RADAR_TABS = {
+  taste: {
+    labelFa: 'طعم', labelEn: 'Taste',
+    axes: [
+      { key: 'fruity',     fa: 'میوه‌ای',  en: 'Fruity' },
+      { key: 'floral',     fa: 'گلی',     en: 'Floral' },
+      { key: 'choc_nutty', fa: 'شکلاتی/آجیلی', en: 'Chocolate/Nutty' },
+      { key: 'spicy',      fa: 'ادویه‌ای', en: 'Spicy' }
+    ]
+  },
+  sensory: {
+    labelFa: 'پروفایل حسی', labelEn: 'Sensory Profile',
+    axes: [
+      { key: 'body_full',   fa: 'بدنه',    en: 'Body' },
+      { key: 'bright',      fa: 'اسیدیته', en: 'Acidity' },
+      { key: 'dark',        fa: 'تلخی',    en: 'Bitterness' },
+      { key: 'finish_long', fa: 'پس‌مزه',  en: 'Finish' }
+    ]
+  }
+};
+
+function buildFlavorRadar(bean, highlightKey) {
+  return buildRadarChart(bean, RADAR_TABS.taste.axes, highlightKey);
 }
 
 /* ═══════════════════════════════════════════
