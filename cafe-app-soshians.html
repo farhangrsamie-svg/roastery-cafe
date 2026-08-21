@@ -4240,12 +4240,17 @@ function setQuestionBackground(qNum) {
 
 function findBrewAlternative(winner) {
   if (!ans.brew || !winner.brewFit) return null;
+  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+  // آستانه‌ی «خوب کافیه» نسبت به بهترین دونه‌ی کاتالوگ رو همین روش دم‌آوری محاسبه می‌شه، نه یه عدد ثابت —
+  // چون بعضی روش‌ها (coldbrew, other) کلاً تو کاتالوگ سقف پایینی دارن (هیچ دونه‌ای فوق‌العاده نیست)
+  // و بعضی (v60) سقف بالایی دارن؛ یه آستانه‌ی مطلق ثابت (قبلاً ۶ و ۷) برای هر دو کار نمی‌کرد و
+  // باعث می‌شد جایگزین برای ۴ از ۷ روش دم‌آوری هیچ‌وقت نشون داده نشه
+  const maxForMethod = Math.max(...pool.map(b => (b.brewFit ? b.brewFit[ans.brew] : 0) || 0));
   const compat = winner.brewFit[ans.brew] ?? 5;
-  if (compat >= 6) return null; // سازگاره، جایگزین لازم نیست
+  if (compat >= maxForMethod - 1) return null; // به بهترین گزینه‌ی موجود کاتالوگ به‌اندازه‌ی کافی نزدیکه
 
-  // دنبال بهترین دونهٔ جایگزین: هم به ذائقه نزدیک، هم با دستگاه مشتری سازگار
-  const pool = BEANS.filter(b => AVAILABLE.includes(b.id) && b.id !== winner.id);
-  const candidates = pool.map(b => {
+  // دنبال بهترین دونهٔ جایگزین: هم به ذائقه نزدیک، هم با دستگاه مشتری سازگارتر از winner فعلی
+  const candidates = pool.filter(b => b.id !== winner.id).map(b => {
     let tasteScore = 0;
     tasteScore += (b.s[ans.taste]     || 0) * 3.0;
     tasteScore += (b.s['body_' + ans.body] || 0) * 2.5;
@@ -4254,7 +4259,7 @@ function findBrewAlternative(winner) {
     tasteScore += (b.s[ans.tastepref] || 0) * 1.5;
     const brewCompat = b.brewFit ? (b.brewFit[ans.brew] || 0) : 0;
     return { bean: b, tasteScore, brewCompat };
-  }).filter(c => c.brewCompat >= 7);
+  }).filter(c => c.brewCompat >= maxForMethod - 1 && c.brewCompat > compat);
 
   if (candidates.length === 0) return null;
   candidates.sort((a, b) => b.tasteScore - a.tasteScore);
