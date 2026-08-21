@@ -3366,13 +3366,13 @@ function viewProfile(p) {
       <div style="font-size:13px;color:var(--medium-brown);line-height:1.7;">${personaDesc}</div>
     </div>
     <div class="card" style="direction:rtl;">
-      <div class="card-title">دانه پیشنهادی</div>
-      <div style="font-size:17px;font-weight:bold;color:var(--dark-brown);margin-bottom:4px;">${beanName}</div>
-      ${beanDetail ? `<div style="font-size:13px;color:var(--caramel);">${beanDetail}</div>` : ''}
-    </div>
-    <div class="card" style="direction:rtl;">
-      <div class="card-title">طعم‌شناسی</div>
-      <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+      <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleProfileDetails()">
+        <span>جزئیات فنی</span>
+        <span id="profile-details-arrow" style="transition:transform 0.2s;font-size:13px;color:var(--caramel);">▼</span>
+      </div>
+      <div id="profile-details-body" style="display:none;margin-top:10px;">
+        <div class="profile-card-tags-new" style="margin-bottom:0;">${tags}</div>
+      </div>
     </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title">نمودار طعم</div>
@@ -3419,12 +3419,16 @@ function viewProfile(p) {
     </button>
   `;
   document.getElementById('detail-radar-chart').innerHTML = buildFlavorRadar(rec, ans.taste);
-  // اگه rec معتبره، result رو هم render کن
-  if (rec && rec.name) {
-    try { render(rec); } catch(e) {}
-  }
   setLang(currentLang);
   show('screen-profile-detail');
+}
+
+function toggleProfileDetails() {
+  const body = document.getElementById('profile-details-body');
+  const arrow = document.getElementById('profile-details-arrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
 }
 
 let currentRating = 0;
