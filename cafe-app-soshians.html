@@ -1463,11 +1463,6 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
     </div>
   </div>
 
-  <div class="card" id="why-card">
-    <div class="card-title"><span class="fa-only">چرا این قهوه؟</span><span class="en-only">Why This Coffee?</span></div>
-    <div id="why-list"></div>
-  </div>
-
   <div class="card">
     <div class="card-title">
       <span class="en-only">Flavor Notes</span>
@@ -1505,10 +1500,11 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
 
   <div class="card">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleRoastGuide()">
-      <span>🔧 <span class="fa-only">جزئیات فنی</span><span class="en-only">Technical Details</span></span>
+      <span>📖 <span class="fa-only">ماجرای این قهوه</span><span class="en-only">The Story of This Coffee</span></span>
       <span id="roast-card-arrow" style="transition:transform 0.2s;font-size:13px;color:var(--caramel);">▼</span>
     </div>
     <div id="roast-card" style="display:none;margin-top:10px;">
+      <div id="why-list" style="margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--light-caramel);"></div>
       <div class="info-row">
         <span class="info-label">🌡️ <span class="en-only">Roast</span><span class="fa-only">رست</span></span>
         <span style="display:flex;align-items:center;gap:8px;">
@@ -3469,7 +3465,7 @@ function viewProfile(p) {
     </div>
     <div class="card" style="direction:rtl;">
       <div class="card-title" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;" onclick="toggleProfileDetails()">
-        <span>جزئیات فنی</span>
+        <span>📖 ماجرای این قهوه</span>
         <span id="profile-details-arrow" style="transition:transform 0.2s;font-size:13px;color:var(--caramel);">▼</span>
       </div>
       <div id="profile-details-body" style="display:none;margin-top:10px;">
