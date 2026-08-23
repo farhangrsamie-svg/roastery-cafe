@@ -266,7 +266,7 @@ textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
       <div class="section-title">هویت قهوه و پیشنهاد</div>
 
       <div class="q">
-        <div class="q-label">پرسونا و پیشنهادی که اپ برات ساخت، چقدر احساس کردی واقعاً «خودتی»؟</div>
+        <div class="q-label">توضیحی که اپ درباره‌ی شخصیت قهوه‌ت نوشت، چقدر حس کردی درسته؟</div>
         <div class="scale" data-field="persona_accuracy">
           <button type="button" class="scale-btn" data-val="1">۱</button>
           <button type="button" class="scale-btn" data-val="2">۲</button>
@@ -277,7 +277,27 @@ textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
       </div>
 
       <div class="q">
-        <div class="q-label">چرا این امتیاز رو دادی؟ <span class="q-optional">(اختیاری)</span></div>
+        <div class="q-label">دونه‌ای که پیشنهاد شد، چقدر با ذائقه‌ی واقعی‌ت جور بود؟</div>
+        <div class="scale" data-field="bean_match_accuracy">
+          <button type="button" class="scale-btn" data-val="1">۱</button>
+          <button type="button" class="scale-btn" data-val="2">۲</button>
+          <button type="button" class="scale-btn" data-val="3">۳</button>
+          <button type="button" class="scale-btn" data-val="4">۴</button>
+          <button type="button" class="scale-btn" data-val="5">۵</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">دونه‌ی پیشنهادی از نظر خاص/معمولی‌بودن با انتظارت جور بود؟</div>
+        <div class="pills" data-field="rarity_fit">
+          <button type="button" class="pill" data-val="too_ordinary">معمولی‌تر از چیزی که می‌خواستم</button>
+          <button type="button" class="pill" data-val="just_right">دقیقاً همون‌قدر</button>
+          <button type="button" class="pill" data-val="too_special">خاص‌تر از چیزی که می‌خواستم</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">چرا این امتیازها رو دادی؟ <span class="q-optional">(اختیاری)</span></div>
         <textarea id="f-persona-feedback" placeholder="مثلاً: دقیقاً همون طعمی بود که دنبالش بودم..."></textarea>
       </div>
 
@@ -287,6 +307,15 @@ textarea { min-height: 80px; resize: vertical; line-height: 1.6; }
           <button type="button" class="pill" data-val="yes">بله، حتماً</button>
           <button type="button" class="pill" data-val="maybe">شاید</button>
           <button type="button" class="pill" data-val="no">نه، جذبم نکرد</button>
+        </div>
+      </div>
+
+      <div class="q">
+        <div class="q-label">می‌دونستی اگه موقع قهوه خوردن به موسیقی‌های خاصی گوش بدی، طعم‌ها رو بهتر حس می‌کنی؟</div>
+        <div class="pills" data-field="music_pairing_reaction">
+          <button type="button" class="pill" data-val="yes">آره</button>
+          <button type="button" class="pill" data-val="no">نه</button>
+          <button type="button" class="pill" data-val="cool">چه باحال</button>
         </div>
       </div>
     </div>
