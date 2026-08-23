@@ -626,7 +626,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <div class="top-bar">
           <div>
             <div class="page-title">🔄 پیگیری مشتریان ناراضی</div>
-            <div class="page-sub">مشتریانی که بعد از راهنمایی هنوز راضی نبودن — این‌ها نیاز به تماس واقعی و پیگیری انسانی دارن، نه پاسخ خودکار</div>
+            <div class="page-sub">مشتریانی که بازخورد ⭐۱-۲ ثبت کردن و هنوز حل‌شده اعلام نشده — بدون تأخیر، همون لحظه اینجا دیده می‌شن</div>
           </div>
         </div>
         <div class="content-area">
@@ -1295,7 +1295,10 @@ async function loadFollowupQueue() {
   const ISSUE_FA = { too_bitter:'خیلی تلخ', too_sour:'خیلی ترش', too_weak:'خیلی رقیق', too_strong:'خیلی غلیظ', off_flavor:'طعم/بوی عجیب', other:'چیز دیگه' };
 
   try {
-    const rows = await sb('GET', `order_feedback?followup_status=eq.still_unhappy&order=created_at.desc&select=*`);
+    // هر بازخورد ⭐۱-۲ که هنوز حل‌شده اعلام نشده، بلافاصله دیده می‌شه — بدون هیچ تأخیری.
+    // نمایش زودهنگام به ادمین هیچ هزینه‌ای نداره؛ فقط شفافیته. وضعیت (تازه/تأیید ناراضی) رو
+    // به‌صورت برچسب نشون می‌دیم تا ادمین خودش تصمیم بگیره کِی تماس بگیره، نه اینکه سیستم دیرتر نشونش بده
+    const rows = await sb('GET', `order_feedback?followup_status=neq.resolved&order=created_at.desc&select=*`);
     const list = rows || [];
 
     const badge = document.getElementById('nav-badge-followup');
@@ -1319,22 +1322,29 @@ async function loadFollowupQueue() {
       } catch (e) { console.warn('could not load user info for followup queue:', e); }
     }
 
+    const STATUS_META = {
+      still_unhappy: { border:'#E85D5D', bg:'#FFF3F3', color:'#E85D5D', label:'تأیید کرده هنوز راضی نیست — نیاز به تماس' },
+      pending: { border:'#D9A441', bg:'#FFF8E8', color:'#B8860B', label:'تازه ثبت شده — منتظر واکنش مشتریه' }
+    };
+
     listEl.innerHTML = list.map(f => {
       const u = usersMap[f.user_id] || {};
       const dateStr = new Date(f.created_at).toLocaleDateString('fa-IR', { year:'numeric', month:'long', day:'numeric' });
       const issueLabel = f.issue_reason ? (ISSUE_FA[f.issue_reason] || f.issue_reason) : '—';
+      const meta = STATUS_META[f.followup_status] || STATUS_META.pending;
       return `
-        <div class="section-card" style="margin-bottom:14px;border-right:4px solid #E85D5D;">
+        <div class="section-card" style="margin-bottom:14px;border-right:4px solid ${meta.border};">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
             <div>
               <div style="font-weight:700;font-size:15px;">${u.name || 'نامشخص'} <span style="color:#999;font-weight:400;font-size:12.5px;">— ${u.phone || '—'}</span></div>
               <div style="font-size:12.5px;color:#999;margin-top:4px;">${dateStr}</div>
             </div>
-            <div style="background:#FFF3F3;color:#E85D5D;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">نیاز به تماس</div>
+            <div style="background:${meta.bg};color:${meta.color};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">${meta.label}</div>
           </div>
           <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;">
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">دونه: ${f.bean_name || '—'}</span>
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">مشکل: ${issueLabel}</span>
+            <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">رضایت: ⭐${f.satisfaction != null ? f.satisfaction : '—'}</span>
           </div>
           ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${f.notes}</div>` : ''}
           <div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 قول هدیه‌ی سفارش بعدی داده شده — یادت باشه موقع سفارش بعدیش اعمالش کنی</div>
