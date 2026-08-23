@@ -47,13 +47,13 @@ body {
 .admin-layout { display: flex; min-height: 100vh; }
 .sidebar {
   width: 240px; background: var(--dark-brown); flex-shrink: 0;
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; overflow: hidden;
 }
 .sidebar-logo { padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
 .sidebar-logo-icon { font-size: 32px; }
 .sidebar-logo-title { font-size: 16px; font-weight: bold; color: var(--white); margin-top: 6px; }
 .sidebar-logo-sub { font-size: 11px; color: var(--caramel); margin-top: 2px; }
-.sidebar-nav { flex: 1; padding: 12px 0; }
+.sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
 .nav-item {
   display: flex; align-items: center; gap: 12px; padding: 12px 20px;
   color: rgba(255,255,255,0.65); font-size: 14px; cursor: pointer;
