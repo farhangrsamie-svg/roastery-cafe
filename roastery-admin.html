@@ -322,6 +322,10 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <div class="nav-item" onclick="showPage('pricing')">
           <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
         </div>
+        <div class="nav-item" onclick="showPage('survey')">
+          <span class="nav-icon">📝</span> نظرسنجی پایلوت
+          <span class="nav-badge" id="nav-badge-survey" style="display:none;">0</span>
+        </div>
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-admin" id="admin-name-display">ادمین</div>
@@ -648,6 +652,96 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         </div>
       </div>
 
+      <!-- ══════ صفحه: نظرسنجی پایلوت ══════ -->
+      <div class="page" id="page-survey">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">📝 نظرسنجی پایلوت</div>
+            <div class="page-sub">بازخورد تسترهای پایلوت درباره‌ی ظاهر، مسیر کوئیز، دقت پیشنهاد، و تجربه‌ی کلی</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="stats-grid" style="margin-bottom:20px;">
+            <div class="stat-card">
+              <div class="stat-icon">📝</div>
+              <div class="stat-num" id="survey-total-count">0</div>
+              <div class="stat-label">کل نظرسنجی‌های ثبت‌شده</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-num" id="survey-avg-bean-match">—</div>
+              <div class="stat-label">میانگین تناسب دونه (از ۵)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">👤</div>
+              <div class="stat-num" id="survey-avg-persona">—</div>
+              <div class="stat-label">میانگین دقت پرسونا (از ۵)</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📣</div>
+              <div class="stat-num" id="survey-avg-nps">—</div>
+              <div class="stat-label">میانگین NPS (از ۱۰)</div>
+            </div>
+          </div>
+
+          <div class="section-card">
+            <div style="font-weight:700;margin-bottom:14px;">میانگین امتیازها (مقیاس ۱ تا ۵)</div>
+            <div id="survey-scale-averages">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">طول کوئیز — نظر تسترها</div>
+            <div id="survey-quiz-length">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">تناسب خاص/معمولی‌بودن دونه (محور rarity)</div>
+            <div id="survey-rarity-fit">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">آیا دونه‌ی پیشنهادی رو امتحان می‌کنن؟</div>
+            <div id="survey-would-try">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">🎵 واکنش به فکت موسیقی</div>
+            <div id="survey-music-reaction">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">لیست کامل پاسخ‌ها</div>
+            <table class="orders-table">
+              <thead>
+                <tr>
+                  <th>تاریخ</th>
+                  <th>نام</th>
+                  <th>تناسب دونه</th>
+                  <th>دقت پرسونا</th>
+                  <th>NPS</th>
+                  <th>نقطه‌ی قوت</th>
+                  <th>نقطه‌ی ضعف</th>
+                  <th>نظر آزاد</th>
+                </tr>
+              </thead>
+              <tbody id="survey-tbody">
+                <tr><td colspan="8" style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /main-content -->
   </div><!-- /admin-layout -->
 </div><!-- /admin-screen -->
@@ -799,6 +893,7 @@ function showPage(name) {
   if (name === 'feedback') loadFeedbackReport();
   if (name === 'followup') loadFollowupQueue();
   if (name === 'pricing') loadPricingForm();
+  if (name === 'survey') loadSurveyReport();
 }
 
 /* ═══════════════════════════════════════════
@@ -1369,6 +1464,110 @@ async function loadFeedbackReport() {
   } catch(e) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
     byBeanEl.innerHTML = byBrewEl.innerHTML = byGrindEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   نظرسنجی پایلوت — بازخورد UX و دقت پیشنهاد از pilot_survey_responses
+═══════════════════════════════════════════ */
+async function loadSurveyReport() {
+  const tbody = document.getElementById('survey-tbody');
+  const scaleAvgEl = document.getElementById('survey-scale-averages');
+  const quizLenEl = document.getElementById('survey-quiz-length');
+  const rarityFitEl = document.getElementById('survey-rarity-fit');
+  const wouldTryEl = document.getElementById('survey-would-try');
+  const musicEl = document.getElementById('survey-music-reaction');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
+  scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML =
+    '<div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>';
+
+  const SCALE_FIELDS = [
+    { key: 'visual_overall', fa: 'حس کلی ظاهر' },
+    { key: 'visual_colors', fa: 'رنگ‌بندی و حس‌وحال بصری' },
+    { key: 'visual_readability', fa: 'خوانایی متن‌ها' },
+    { key: 'ease_navigation', fa: 'راحتی ناوبری' },
+    { key: 'ease_registration', fa: 'راحتی ثبت‌نام' },
+    { key: 'quiz_clarity', fa: 'وضوح سؤالات کوئیز' },
+    { key: 'ease_ordering', fa: 'راحتی ثبت سفارش' },
+    { key: 'ease_payment', fa: 'راحتی پرداخت' },
+    { key: 'app_speed', fa: 'سرعت و روانی اپ' },
+    { key: 'persona_accuracy', fa: 'دقت توضیح پرسونا' },
+    { key: 'bean_match_accuracy', fa: 'تناسب دونه با ذائقه‌ی واقعی' }
+  ];
+  const QUIZ_LEN_FA = { too_short: 'خیلی کوتاه بود', just_right: 'اندازه‌ش خوب بود', too_long: 'خیلی طولانی بود' };
+  const RARITY_FIT_FA = { too_ordinary: 'معمولی‌تر از چیزی که می‌خواستم', just_right: 'دقیقاً همون‌قدر', too_special: 'خاص‌تر از چیزی که می‌خواستم' };
+  const WOULD_TRY_FA = { yes: 'بله، حتماً', maybe: 'شاید', no: 'نه، جذبم نکرد' };
+  const MUSIC_FA = { yes: 'آره', no: 'نه', cool: 'چه باحال' };
+
+  function renderBreakdown(el, list, field, labelMap) {
+    const counts = {};
+    list.forEach(r => { if (r[field]) counts[r[field]] = (counts[r[field]] || 0) + 1; });
+    const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    el.innerHTML = entries.length
+      ? entries.map(([val, count]) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${labelMap[val] || val}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} نفر</span>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست</div>';
+  }
+
+  try {
+    const rows = await sb('GET', 'pilot_survey_responses?select=*&order=created_at.desc');
+    const list = rows || [];
+    const total = list.length;
+
+    document.getElementById('survey-total-count').textContent = total.toLocaleString('fa-IR');
+    const badge = document.getElementById('nav-badge-survey');
+    if (badge) {
+      if (total > 0) { badge.style.display = 'inline-block'; badge.textContent = total; }
+      else { badge.style.display = 'none'; }
+    }
+
+    function avgOf(field) {
+      const vals = list.map(r => r[field]).filter(v => v != null);
+      return vals.length ? (vals.reduce((s, v) => s + v, 0) / vals.length) : null;
+    }
+    const avgBeanMatch = avgOf('bean_match_accuracy');
+    const avgPersona = avgOf('persona_accuracy');
+    const avgNps = avgOf('nps_score');
+    document.getElementById('survey-avg-bean-match').textContent = avgBeanMatch != null ? avgBeanMatch.toFixed(1) : '—';
+    document.getElementById('survey-avg-persona').textContent = avgPersona != null ? avgPersona.toFixed(1) : '—';
+    document.getElementById('survey-avg-nps').textContent = avgNps != null ? avgNps.toFixed(1) : '—';
+
+    scaleAvgEl.innerHTML = SCALE_FIELDS.map(f => {
+      const avg = avgOf(f.key);
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
+          <span>${f.fa}</span>
+          <span style="font-weight:700;color:var(--medium-brown);">${avg != null ? '⭐ ' + avg.toFixed(1) : '—'}</span>
+        </div>`;
+    }).join('');
+
+    renderBreakdown(quizLenEl, list, 'quiz_length', QUIZ_LEN_FA);
+    renderBreakdown(rarityFitEl, list, 'rarity_fit', RARITY_FIT_FA);
+    renderBreakdown(wouldTryEl, list, 'would_try_recommended_bean', WOULD_TRY_FA);
+    renderBreakdown(musicEl, list, 'music_pairing_reaction', MUSIC_FA);
+
+    tbody.innerHTML = list.length
+      ? list.map(r => `
+        <tr>
+          <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('fa-IR') : '—'}</td>
+          <td>${r.name || 'ناشناس'}</td>
+          <td>${r.bean_match_accuracy != null ? '⭐ ' + r.bean_match_accuracy : '—'}</td>
+          <td>${r.persona_accuracy != null ? '⭐ ' + r.persona_accuracy : '—'}</td>
+          <td>${r.nps_score != null ? r.nps_score : '—'}</td>
+          <td style="max-width:180px;white-space:normal;">${r.biggest_strength || '—'}</td>
+          <td style="max-width:180px;white-space:normal;">${r.biggest_weakness || '—'}</td>
+          <td style="max-width:200px;white-space:normal;">${r.additional_comments || r.persona_feedback || '—'}</td>
+        </tr>`).join('')
+      : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ نظرسنجی‌ای ثبت نشده</td></tr>';
+
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML =
+      `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
 
