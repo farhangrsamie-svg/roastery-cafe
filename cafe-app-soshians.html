@@ -5012,105 +5012,58 @@ function applyHardFilter(pool) {
       یه اثر مشخص انتخاب می‌شه — تا با وفاداری به ذات دونه، هر نشست هم متفاوت باشه.
    همه‌ی آثار بی‌کلامن (طبق تصمیم قبلی برای نسخه‌ی ایران).
 ═══════════════════════════════════════════ */
-const BEAN_ALBUMS = {
-  // نارنگی، مغز، زردآلو؛ اسیدیته بالا، بدنه‌ی متوسط‌روبه‌سنگین — روشن، مرکباتی، گرم
-  colombia_tolima: [
-    { track: 'Desafinado', artist: 'Stan Getz & Charlie Byrd', energy: 5, mood: { relax: 5, sensory: 6, focus: 4, social: 8 }, persona: { explorer: 6, weekend: 7, comfort: 5, creative: 5, bold: 4 } },
-    { track: 'So What', artist: 'Miles Davis', energy: 5, mood: { relax: 6, sensory: 7, focus: 7, social: 4 }, persona: { explorer: 7, creative: 7, bold: 5, comfort: 5, weekend: 5 } },
-    { track: 'Cinema Paradiso (Love Theme)', artist: 'Ennio Morricone', energy: 4, mood: { relax: 7, sensory: 8, focus: 4, social: 5 }, persona: { comfort: 7, creative: 7, bold: 3, explorer: 5, weekend: 6 } },
-    { track: 'Watermelon Man', artist: 'Herbie Hancock', energy: 7, mood: { relax: 3, sensory: 5, focus: 7, social: 6 }, persona: { bold: 7, explorer: 7, creative: 6, comfort: 3, weekend: 5 } },
-    { track: 'Cavatina', artist: 'John Williams (guitar)', energy: 3, mood: { relax: 8, sensory: 7, focus: 5, social: 3 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, keywords: ['persian','iranian','sonati'],  mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } },
-    { track: 'Time: The Donut of the Heart', artist: 'J Dilla', energy: 5, keywords: ['hiphop'], mood: { relax: 5, sensory: 6, focus: 5, social: 6 }, persona: { bold: 5, explorer: 6, creative: 6, comfort: 4, weekend: 5 } },
-    { track: 'Everything Has an End, Even Sadness', artist: 'Kaki King', energy: 4, keywords: ['rock'], mood: { relax: 7, sensory: 7, focus: 4, social: 3 }, persona: { creative: 7, comfort: 6, bold: 3, explorer: 5, weekend: 5 } },
-    { track: 'Blade Runner Blues', artist: 'Vangelis', energy: 3, keywords: ['electronic'], mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 3, explorer: 5, weekend: 6 } },
-  ],
-  // زردآلوی خشک، کارامل، سیب سبز؛ متعادل و مخملی — گرم و متوازن
-  ethiopia_guji: [
-    { track: 'Blue in Green', artist: 'Miles Davis', energy: 3, mood: { relax: 7, sensory: 8, focus: 6, social: 3 }, persona: { comfort: 7, creative: 7, bold: 4, explorer: 5, weekend: 6 } },
-    { track: 'Clair de Lune', artist: 'Claude Debussy', energy: 2, mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 9, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'The Godfather Waltz', artist: 'Nino Rota', energy: 4, mood: { relax: 6, sensory: 8, focus: 5, social: 4 }, persona: { comfort: 6, creative: 7, bold: 5, explorer: 5, weekend: 5 } },
-    { track: 'Albatross', artist: 'Fleetwood Mac', energy: 3, mood: { relax: 9, sensory: 7, focus: 4, social: 2 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Chakad (چکاد)', artist: 'پرویز مشکاتیان (سنتور)', energy: 3, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { comfort: 6, creative: 8, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'Everything Has an End, Even Sadness', artist: 'Kaki King', energy: 4, keywords: ['rock'], mood: { relax: 7, sensory: 7, focus: 4, social: 3 }, persona: { creative: 7, comfort: 6, bold: 3, explorer: 5, weekend: 5 } },
-    { track: 'On the Nature of Daylight', artist: 'Max Richter', energy: 2, keywords: ['classical'], mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'Time', artist: 'Hans Zimmer', energy: 5, mood: { relax: 6, sensory: 8, focus: 6, social: 4 }, persona: { comfort: 6, creative: 7, bold: 5, explorer: 5, weekend: 5 } },
-  ],
-  // بادام، فندق، کارامل؛ چای‌مانند و کم‌اسید — آرام و تأملی
-  peru_huancayo: [
-    { track: 'Peace Piece', artist: 'Bill Evans', energy: 2, mood: { relax: 9, sensory: 8, focus: 5, social: 2 }, persona: { comfort: 8, creative: 6, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', energy: 1, mood: { relax: 10, sensory: 7, focus: 7, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 8 } },
-    { track: "Gabriel's Oboe (The Mission)", artist: 'Ennio Morricone', energy: 2, mood: { relax: 9, sensory: 8, focus: 5, social: 1 }, persona: { comfort: 7, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
-    { track: "One Summer's Day", artist: 'Joe Hisaishi', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 7, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'Take Five', artist: 'Dave Brubeck', energy: 6, mood: { relax: 4, sensory: 5, focus: 8, social: 5 }, persona: { explorer: 7, bold: 5, creative: 6, comfort: 4, weekend: 5 } },
-    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati','ney'],  mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'Feather', artist: 'Nujabes', energy: 3, keywords: ['hiphop','jazz'], mood: { relax: 8, sensory: 7, focus: 6, social: 3 }, persona: { creative: 7, comfort: 7, explorer: 4, weekend: 6, bold: 2 } },
-    { track: 'An Ending (Ascent)', artist: 'Brian Eno', energy: 1, keywords: ['electronic'], mood: { relax: 10, sensory: 7, focus: 8, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'On the Nature of Daylight', artist: 'Max Richter', energy: 2, keywords: ['classical'], mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-  ],
-  // هلو، انبه، گیلاس، کولا؛ شیرینی بالا و میوه‌ای — زنده، رنگارنگ، جشن‌گونه
-  narino_peach: [
-    { track: 'Wave', artist: 'Antonio Carlos Jobim', energy: 4, mood: { relax: 6, sensory: 7, focus: 4, social: 6 }, persona: { comfort: 6, explorer: 5, creative: 6, bold: 3, weekend: 6 } },
-    { track: 'Tico-Tico no Fubá', artist: 'Zequinha de Abreu', energy: 8, mood: { relax: 2, sensory: 6, focus: 4, social: 9 }, persona: { bold: 6, explorer: 7, weekend: 7, comfort: 3, creative: 5 } },
-    { track: "Europa (Earth's Cry Heaven's Smile)", artist: 'Santana', energy: 5, mood: { relax: 6, sensory: 8, focus: 4, social: 5 }, persona: { creative: 7, explorer: 6, bold: 5, comfort: 5, weekend: 5 } },
-    { track: 'Sing, Sing, Sing', artist: 'Benny Goodman', energy: 9, mood: { relax: 1, sensory: 5, focus: 4, social: 9 }, persona: { bold: 8, explorer: 6, weekend: 6, comfort: 2, creative: 4 } },
-    { track: 'Watermelon Man', artist: 'Herbie Hancock', energy: 7, mood: { relax: 3, sensory: 5, focus: 7, social: 6 }, persona: { bold: 7, explorer: 7, creative: 6, comfort: 3, weekend: 5 } },
-    { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', energy: 6, keywords: ['persian','iranian','sonati'],  mood: { relax: 4, sensory: 6, focus: 4, social: 7 }, persona: { explorer: 6, weekend: 6, comfort: 4, creative: 6, bold: 5 } },
-    { track: 'Building Steam with a Grain of Salt', artist: 'DJ Shadow', energy: 6, keywords: ['hiphop','electronic'], mood: { relax: 4, sensory: 6, focus: 6, social: 5 }, persona: { explorer: 7, bold: 6, creative: 6, comfort: 3, weekend: 4 } },
-    { track: 'Time: The Donut of the Heart', artist: 'J Dilla', energy: 5, keywords: ['hiphop'], mood: { relax: 5, sensory: 6, focus: 5, social: 6 }, persona: { bold: 5, explorer: 6, creative: 6, comfort: 4, weekend: 5 } },
-  ],
-  // کاکائو، تافی، وانیل، کوکی؛ گرم و مخملی — شیرین و صمیمی
-  narino_cacao: [
-    { track: 'Mercy, Mercy, Mercy', artist: 'Cannonball Adderley', energy: 6, mood: { relax: 5, sensory: 6, focus: 4, social: 8 }, persona: { comfort: 7, creative: 5, bold: 6, explorer: 5, weekend: 7 } },
-    { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', energy: 3, mood: { relax: 8, sensory: 8, focus: 6, social: 2 }, persona: { comfort: 8, creative: 7, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Cinema Paradiso (Love Theme)', artist: 'Ennio Morricone', energy: 4, mood: { relax: 7, sensory: 8, focus: 4, social: 5 }, persona: { comfort: 7, creative: 7, bold: 3, explorer: 5, weekend: 6 } },
-    { track: 'Albatross', artist: 'Fleetwood Mac', energy: 3, mood: { relax: 9, sensory: 7, focus: 4, social: 2 }, persona: { comfort: 7, creative: 6, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Friday Morning', artist: 'Khruangbin', energy: 5, mood: { relax: 6, sensory: 6, focus: 4, social: 7 }, persona: { weekend: 9, explorer: 6, comfort: 6, creative: 6, bold: 4 } },
-    { track: 'قطعه‌ی امان', artist: 'فرامرز پایور (سنتور)', energy: 4, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 8, creative: 6, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'Aruarian Dance', artist: 'Nujabes', energy: 4, keywords: ['hiphop','jazz'], mood: { relax: 7, sensory: 7, focus: 5, social: 4 }, persona: { creative: 7, comfort: 6, explorer: 5, weekend: 6, bold: 3 } },
-    { track: 'Blade Runner Blues', artist: 'Vangelis', energy: 3, keywords: ['electronic'], mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 3, explorer: 5, weekend: 6 } },
-    { track: 'Time', artist: 'Hans Zimmer', energy: 5, mood: { relax: 6, sensory: 8, focus: 6, social: 4 }, persona: { comfort: 6, creative: 7, bold: 5, explorer: 5, weekend: 5 } },
-  ],
-  // اسطوخودوس، آب‌نبات لیمویی، نعناع؛ ظریف و عطری — مینیمال، شفاف، سبک
-  colombia_geisha: [
-    { track: 'Gymnopédie No. 1', artist: 'Erik Satie', energy: 1, mood: { relax: 9, sensory: 9, focus: 6, social: 1 }, persona: { creative: 9, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'Clair de Lune', artist: 'Claude Debussy', energy: 2, mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 9, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', energy: 1, mood: { relax: 10, sensory: 7, focus: 7, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 8 } },
-    { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati','ney'],  mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 6, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', energy: 3, mood: { relax: 8, sensory: 8, focus: 6, social: 2 }, persona: { comfort: 8, creative: 7, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'An Ending (Ascent)', artist: 'Brian Eno', energy: 1, keywords: ['electronic'], mood: { relax: 10, sensory: 7, focus: 8, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'On the Nature of Daylight', artist: 'Max Richter', energy: 2, keywords: ['classical'], mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'Feather', artist: 'Nujabes', energy: 3, keywords: ['hiphop','jazz'], mood: { relax: 8, sensory: 7, focus: 6, social: 3 }, persona: { creative: 7, comfort: 7, explorer: 4, weekend: 6, bold: 2 } },
-  ],
-  // عسل، انگور سیاه، هانی‌کامب؛ شیرینی بالا و پس‌مزه‌ی طولانی — شیرین، شناور، گرم
-  sidamo_honey: [
-    { track: 'Friday Morning', artist: 'Khruangbin', energy: 5, mood: { relax: 6, sensory: 6, focus: 4, social: 7 }, persona: { weekend: 9, explorer: 6, comfort: 6, creative: 6, bold: 4 } },
-    { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', energy: 3, mood: { relax: 8, sensory: 8, focus: 6, social: 2 }, persona: { comfort: 8, creative: 7, bold: 2, explorer: 4, weekend: 7 } },
-    { track: 'Desafinado', artist: 'Stan Getz & Charlie Byrd', energy: 5, mood: { relax: 5, sensory: 6, focus: 4, social: 8 }, persona: { explorer: 6, weekend: 7, comfort: 5, creative: 5, bold: 4 } },
-    { track: "Gabriel's Oboe (The Mission)", artist: 'Ennio Morricone', energy: 2, mood: { relax: 9, sensory: 8, focus: 5, social: 1 }, persona: { comfort: 7, creative: 7, bold: 2, explorer: 4, weekend: 6 } },
-    { track: 'چهارمضراب دلکش', artist: 'موسیقی سنتی ایرانی (سنتور)', energy: 4, keywords: ['persian','iranian','sonati','santur'],  mood: { relax: 7, sensory: 7, focus: 4, social: 4 }, persona: { comfort: 7, creative: 6, bold: 3, explorer: 4, weekend: 6 } },
-    { track: 'Wave', artist: 'Antonio Carlos Jobim', energy: 4, mood: { relax: 6, sensory: 7, focus: 4, social: 6 }, persona: { comfort: 6, explorer: 5, creative: 6, bold: 3, weekend: 6 } },
-    { track: 'Aruarian Dance', artist: 'Nujabes', energy: 4, keywords: ['hiphop','jazz'], mood: { relax: 7, sensory: 7, focus: 5, social: 4 }, persona: { creative: 7, comfort: 6, explorer: 5, weekend: 6, bold: 3 } },
-    { track: 'Roygbiv', artist: 'Boards of Canada', energy: 3, keywords: ['electronic'], mood: { relax: 7, sensory: 7, focus: 6, social: 3 }, persona: { creative: 7, explorer: 6, comfort: 5, weekend: 6, bold: 3 } },
-  ],
-  // یاس، گل رز، زنبق؛ گل‌دار و چای‌مانند — ظریف، شفاف، هوایی
-  sidamo_floral: [
-    { track: 'Arabesque No. 1', artist: 'Claude Debussy', energy: 2, mood: { relax: 8, sensory: 9, focus: 5, social: 2 }, persona: { creative: 9, comfort: 5, bold: 2, explorer: 6, weekend: 5 } },
-    { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', energy: 3, mood: { relax: 8, sensory: 8, focus: 5, social: 2 }, persona: { creative: 8, comfort: 6, bold: 2, explorer: 5, weekend: 6 } },
-    { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', energy: 1, mood: { relax: 10, sensory: 7, focus: 7, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 8 } },
-    { track: "One Summer's Day", artist: 'Joe Hisaishi', energy: 2, mood: { relax: 9, sensory: 8, focus: 6, social: 1 }, persona: { comfort: 7, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'Bayat-e Esfahan (بیات اصفهان)', artist: 'دستگاه موسیقی سنتی ایرانی', energy: 2, keywords: ['persian','iranian','sonati'],  mood: { relax: 8, sensory: 8, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 5, weekend: 6 } },
-    { track: 'Clair de Lune', artist: 'Claude Debussy', energy: 2, mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 9, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'On the Nature of Daylight', artist: 'Max Richter', energy: 2, keywords: ['classical'], mood: { relax: 9, sensory: 9, focus: 5, social: 1 }, persona: { creative: 8, comfort: 6, bold: 1, explorer: 4, weekend: 6 } },
-    { track: 'An Ending (Ascent)', artist: 'Brian Eno', energy: 1, keywords: ['electronic'], mood: { relax: 10, sensory: 7, focus: 8, social: 1 }, persona: { comfort: 6, creative: 8, bold: 1, explorer: 4, weekend: 7 } },
-    { track: 'Roygbiv', artist: 'Boards of Canada', energy: 3, keywords: ['electronic'], mood: { relax: 7, sensory: 7, focus: 6, social: 3 }, persona: { creative: 7, explorer: 6, comfort: 5, weekend: 6, bold: 3 } },
-  ]
-};
+const MUSIC_CATALOG = [
+  // ══════ پیوند صوت-طعم — چارچوب مبتنی بر مقاله‌های علمی حوزه‌ی «Sonic Seasoning» ══════
+  // (Crisinel & Spence 2010، Reinoso Carvalho، آزمایش‌های تجاری مثل Beck's Frequency)
+  // هر اثر رو ۴ محور واقعی صوتی برچسب خورده (نه mood انتزاعی):
+  //   pitch      : زیر/بم بودن غالب (۰=بم، ۱۰=زیر) — یافته: تلخی↔بم، شیرینی↔زیر
+  //   consonance : سازگاری هارمونیک (۰=ناسازگار/کشیده، ۱۰=کاملاً سازگار/ساده) — شیرینی↔سازگار
+  //   tempo      : سرعت ریتمیک (۰=بسیار آرام، ۱۰=بسیار تند) — ترشی/تیزی↔تمپوی سریع
+  //   richness   : غنای بافت صوتی (۰=تک‌ساز/تُنُک، ۱۰=ارکسترال/لایه‌لایه) — با بدنه‌ی قهوه هم‌راستا
+  { track: 'Desafinado', artist: 'Stan Getz & Charlie Byrd', pitch:6, consonance:7, tempo:4, richness:4 },
+  { track: 'So What', artist: 'Miles Davis', pitch:5, consonance:6, tempo:4, richness:5 },
+  { track: 'Cinema Paradiso (Love Theme)', artist: 'Ennio Morricone', pitch:6, consonance:8, tempo:3, richness:7 },
+  { track: 'Watermelon Man', artist: 'Herbie Hancock', pitch:5, consonance:6, tempo:6, richness:6 },
+  { track: 'Cavatina', artist: 'John Williams (guitar)', pitch:7, consonance:8, tempo:2, richness:3 },
+  { track: 'Chaharmezrab-e Afshari (رقص پروانه)', artist: 'موسیقی سنتی ایرانی', keywords:['persian'], pitch:7, consonance:6, tempo:7, richness:4 },
+  { track: 'Time: The Donut of the Heart', artist: 'J Dilla', keywords:['hiphop'], pitch:5, consonance:7, tempo:5, richness:5 },
+  { track: 'Everything Has an End, Even Sadness', artist: 'Kaki King', keywords:['rock'], pitch:6, consonance:6, tempo:3, richness:4 },
+  { track: 'Blade Runner Blues', artist: 'Vangelis', keywords:['electronic'], pitch:3, consonance:6, tempo:1, richness:5 },
+  { track: 'Blue in Green', artist: 'Miles Davis', pitch:5, consonance:6, tempo:2, richness:5 },
+  { track: 'Clair de Lune', artist: 'Claude Debussy', keywords:['classical'], pitch:8, consonance:9, tempo:1, richness:3 },
+  { track: 'Merry Christmas, Mr. Lawrence', artist: 'Ryuichi Sakamoto', pitch:7, consonance:6, tempo:2, richness:3 },
+  { track: 'The Godfather Waltz', artist: 'Nino Rota', pitch:6, consonance:7, tempo:4, richness:6 },
+  { track: 'Albatross', artist: 'Fleetwood Mac', keywords:['rock'], pitch:6, consonance:8, tempo:2, richness:4 },
+  { track: 'Chakad (چکاد)', artist: 'پرویز مشکاتیان (سنتور)', keywords:['persian'], pitch:8, consonance:6, tempo:6, richness:3 },
+  { track: 'On the Nature of Daylight', artist: 'Max Richter', keywords:['classical'], pitch:5, consonance:6, tempo:1, richness:6 },
+  { track: 'Time', artist: 'Hans Zimmer', pitch:4, consonance:5, tempo:3, richness:7 },
+  { track: 'Peace Piece', artist: 'Bill Evans', pitch:6, consonance:6, tempo:1, richness:2 },
+  { track: 'Spiegel im Spiegel', artist: 'Arvo Pärt', keywords:['classical'], pitch:7, consonance:10, tempo:1, richness:2 },
+  { track: "Gabriel's Oboe (The Mission)", artist: 'Ennio Morricone', pitch:6, consonance:8, tempo:2, richness:5 },
+  { track: "One Summer's Day", artist: 'Joe Hisaishi', keywords:['classical'], pitch:7, consonance:8, tempo:2, richness:4 },
+  { track: 'Take Five', artist: 'Dave Brubeck', keywords:['jazz'], pitch:5, consonance:6, tempo:6, richness:5 },
+  { track: 'تکنوازی نی', artist: 'موسیقی سنتی ایرانی', keywords:['persian'], pitch:6, consonance:6, tempo:1, richness:2 },
+  { track: 'Feather', artist: 'Nujabes', keywords:['hiphop','jazz'], pitch:6, consonance:7, tempo:4, richness:5 },
+  { track: 'An Ending (Ascent)', artist: 'Brian Eno', keywords:['electronic'], pitch:6, consonance:7, tempo:1, richness:5 },
+  { track: 'Wave', artist: 'Antonio Carlos Jobim', keywords:['latin'], pitch:6, consonance:7, tempo:4, richness:4 },
+  { track: 'Tico-Tico no Fubá', artist: 'Zequinha de Abreu', keywords:['latin'], pitch:8, consonance:8, tempo:9, richness:5 },
+  { track: "Europa (Earth's Cry Heaven's Smile)", artist: 'Santana', keywords:['rock'], pitch:5, consonance:6, tempo:5, richness:6 },
+  { track: 'Sing, Sing, Sing', artist: 'Benny Goodman', keywords:['jazz'], pitch:4, consonance:6, tempo:9, richness:8 },
+  { track: 'Building Steam with a Grain of Salt', artist: 'DJ Shadow', keywords:['hiphop','electronic'], pitch:4, consonance:5, tempo:5, richness:6 },
+  { track: 'Mercy, Mercy, Mercy', artist: 'Cannonball Adderley', keywords:['jazz'], pitch:5, consonance:6, tempo:6, richness:6 },
+  { track: 'Nuvole Bianche', artist: 'Ludovico Einaudi', keywords:['classical'], pitch:7, consonance:8, tempo:3, richness:3 },
+  { track: 'Friday Morning', artist: 'Khruangbin', pitch:5, consonance:7, tempo:5, richness:5 },
+  { track: 'قطعه‌ی امان', artist: 'فرامرز پایور (سنتور)', keywords:['persian'], pitch:7, consonance:6, tempo:3, richness:3 },
+  { track: 'Aruarian Dance', artist: 'Nujabes', keywords:['hiphop','jazz'], pitch:6, consonance:7, tempo:4, richness:5 },
+  { track: 'Gymnopédie No. 1', artist: 'Erik Satie', keywords:['classical'], pitch:7, consonance:7, tempo:1, richness:2 },
+  { track: 'Arabesque No. 1', artist: 'Claude Debussy', keywords:['classical'], pitch:8, consonance:8, tempo:4, richness:4 },
+  { track: 'Bayat-e Esfahan (بیات اصفهان)', artist: 'دستگاه موسیقی سنتی ایرانی', keywords:['persian'], pitch:6, consonance:5, tempo:2, richness:3 },
+  { track: 'Roygbiv', artist: 'Boards of Canada', keywords:['electronic'], pitch:6, consonance:7, tempo:3, richness:5 },
+  { track: 'چهارمضراب دلکش', artist: 'موسیقی سنتی ایرانی (سنتور)', keywords:['persian'], pitch:7, consonance:6, tempo:6, richness:4 },
+];
 
 // اگه کاربر تو سؤال آزاد «چی گوش می‌دی» به یه سبک خاص اشاره کرده باشه (مثلاً سنتی ایرانی)،
-// امتیاز اثرهایی که همون کلیدواژه رو دارن به‌شدت بالا می‌ره — تا جواب مستقیم کاربر واقعاً اثر بذاره
+// تو تطابق نهایی وزن اضافه می‌گیره — ولی override کامل نمی‌کنه، چون هدف اصلی تطابق شیمیایی‌صوتیه
 const MUSIC_KEYWORD_MAP = {
   persian: ['سنتی', 'ایرانی', 'سنتور', 'کمانچه', 'تار', 'سه‌تار', 'سه تار', 'نی ', 'دف', 'ردیف', 'دستگاه'],
   jazz: ['جاز', 'jazz'],
@@ -5129,9 +5082,6 @@ function matchedKeywordCategories(text) {
   return found;
 }
 
-// اول آلبومی که به ذات همون دونه وفاداره رو پیدا می‌کنه، بعد داخل همون آلبوم بر اساس
-// حس‌وحال (mood)، پرسونای قهوه‌ای، شدت ترجیحی، و — اگه کاربر مستقیم گفته باشه چی گوش می‌ده —
-// همون سبک، بهترین اثر رو انتخاب می‌کنه
 const GENRE_LABELS = {
   persian:   { fa: 'موسیقی سنتی ایرانی', en: 'Persian traditional music' },
   jazz:      { fa: 'جاز', en: 'jazz' },
@@ -5142,8 +5092,8 @@ const GENRE_LABELS = {
   electronic:{ fa: 'الکترونیک', en: 'electronic' }
 };
 
-// اگه کاربر صراحتاً یه سبک خاص رو گفته بود (مثلاً رپ) ولی چیزی که واقعاً پیشنهاد دادیم اون سبک نبود
-// (چون این دونه بیشتر با یه حس دیگه می‌سازه)، این رو محترمانه و صادقانه بهش می‌گیم — نه نادیده‌گرفتن سلیقه‌ش
+// اگه کاربر صراحتاً یه سبک خاص رو گفته بود ولی چیزی که واقعاً پیشنهاد دادیم اون سبک نبود
+// (چون از نظر صوتی-شیمیایی با این دونه‌ی خاص نمی‌سازه)، این رو محترمانه و صادقانه بهش می‌گیم
 function getMusicRespectNote(rec, pick) {
   const preferredCats = matchedKeywordCategories(lastMusicAnswerText);
   if (!preferredCats.length || !pick) return null;
@@ -5152,26 +5102,53 @@ function getMusicRespectNote(rec, pick) {
   const genre = GENRE_LABELS[preferredCats[0]];
   if (!genre) return null;
   return currentLang === 'en'
-    ? `You like ${genre.en} — that's great! But this one pairs better with the character of this bean:`
-    : `دوست داری ${genre.fa} گوش بدی — عالیه! ولی این یکی با ذات این دونه بیشتر می‌سازه:`;
+    ? `You like ${genre.en} — that's great! But based on this bean's actual flavor chemistry, this pairs better:`
+    : `دوست داری ${genre.fa} گوش بدی — عالیه! ولی بر اساس شیمی طعمی این دونه، این یکی بهتر می‌سازه:`;
+}
+
+// پروفایل صوتی هدف رو مستقیم از شیمی واقعی دونه مشتق می‌کنه (نه از حدس یا mood انتزاعی) —
+// از همون داده‌ی اسیدیته/تلخی/بدنه که قبلاً تو s{} هر دونه هست
+function computeBeanSonicTarget(bean) {
+  const s = (bean && bean.s) || {};
+  function weightedPos(low, mid, high) {
+    const sum = (low||0) + (mid||0) + (high||0);
+    if (!sum) return 5; // خنثی اگه داده‌ای نبود
+    return (((low||0)*1 + (mid||0)*2 + (high||0)*3) / sum - 1) / 2 * 10; // نرمال به ۰-۱۰
+  }
+  const bitternessLevel = weightedPos(s.light, s.medium_bt, s.dark);
+  const acidityLevel = weightedPos(s.low, s.medium, s.bright);
+  const bodyLevel = weightedPos(s.body_light, s.body_medium, s.body_full);
+  return {
+    pitch: 10 - bitternessLevel,      // تلخی بالا → زیر پایین‌تر (Crisinel & Spence 2010)
+    consonance: 10 - bitternessLevel, // تلخی بالا → ناسازگاری هارمونیک بیشتر
+    tempo: acidityLevel,              // اسیدیته/روشنی بالا → تمپوی سریع‌تر
+    richness: bodyLevel               // بدنه‌ی سنگین‌تر → تیمبر غنی‌تر
+  };
 }
 
 function pickMusicForUser(rec) {
-  const album = (rec && BEAN_ALBUMS[rec.id]) || BEAN_ALBUMS.colombia_tolima;
-  const persona = currentPersona || determinePersona();
-  const personaKey = persona.key;
+  const bean = rec || BEANS.find(b => b.id === 'colombia_tolima');
+  const target = computeBeanSonicTarget(bean);
   const preferredCats = matchedKeywordCategories(lastMusicAnswerText);
-  let best = null, bestScore = -Infinity;
-  album.forEach(m => {
-    let score = 0;
-    if (ans.mood && m.mood[ans.mood] !== undefined) score += m.mood[ans.mood] * 1.5;
-    if (personaKey && m.persona[personaKey] !== undefined) score += m.persona[personaKey] * 1.5;
-    if (ans.intensity) score += -(Math.abs(ans.intensity - m.energy)) * 1.0;
-    // جواب مستقیم کاربر به سؤال «چی گوش می‌دی» — وزن بالا، چون این صریح‌ترین سیگنالیه که داریم
-    if (preferredCats.length && m.keywords && m.keywords.some(k => preferredCats.includes(k))) score += 20;
-    if (score > bestScore) { bestScore = score; best = m; }
+
+  const scored = MUSIC_CATALOG.map(m => {
+    const dist = Math.sqrt(
+      Math.pow(m.pitch - target.pitch, 2) +
+      Math.pow(m.consonance - target.consonance, 2) +
+      Math.pow(m.tempo - target.tempo, 2) +
+      Math.pow(m.richness - target.richness, 2)
+    );
+    const keywordMatch = preferredCats.length && m.keywords && m.keywords.some(k => preferredCats.includes(k));
+    // تطابق با سبک موردعلاقه‌ی صریح کاربر فاصله رو کمی کم می‌کنه (نه override کامل) —
+    // چون تطابق شیمیایی-صوتی اولویت اصلیه؛ سلیقه‌ی کاربر فقط تای شکن نزدیکه
+    return { track: m, distance: dist - (keywordMatch ? 2.5 : 0) };
   });
-  return best || album[0]; // لایه‌ی محافظتی — هرگز undefined برنگردون
+
+  scored.sort((a, b) => a.distance - b.distance);
+  // برای تنوع واقعی (نه همیشه دقیقاً یه آهنگ ثابت برای هر دونه)، از بین ۵ تای نزدیک‌تر تصادفی انتخاب می‌کنیم
+  const topN = scored.slice(0, 5);
+  const chosen = topN[Math.floor(Math.random() * topN.length)];
+  return chosen ? chosen.track : MUSIC_CATALOG[0]; // لایه‌ی محافظتی — هرگز undefined برنگردون
 }
 
 function computeBeanIntensity(bean) {
