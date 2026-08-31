@@ -720,6 +720,13 @@ textarea.input-field { resize: vertical; min-height: 100px; }
           </div>
 
           <div class="section-card" style="margin-top:16px;">
+            <div style="font-weight:700;margin-bottom:14px;">🎨🎵 دیدن موسیقی و نقاشیِ همراه دونه</div>
+            <div id="survey-music-art-engagement">
+              <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
+            </div>
+          </div>
+
+          <div class="section-card" style="margin-top:16px;">
             <div style="font-weight:700;margin-bottom:14px;">لیست کامل پاسخ‌ها</div>
             <table class="orders-table">
               <thead>
@@ -1487,9 +1494,10 @@ async function loadSurveyReport() {
   const rarityFitEl = document.getElementById('survey-rarity-fit');
   const wouldTryEl = document.getElementById('survey-would-try');
   const musicEl = document.getElementById('survey-music-reaction');
+  const musicArtEngagementEl = document.getElementById('survey-music-art-engagement');
   if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
-  scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML =
+  scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML = musicArtEngagementEl.innerHTML =
     '<div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>';
 
   const SCALE_FIELDS = [
@@ -1503,12 +1511,14 @@ async function loadSurveyReport() {
     { key: 'ease_payment', fa: 'راحتی پرداخت' },
     { key: 'app_speed', fa: 'سرعت و روانی اپ' },
     { key: 'persona_accuracy', fa: 'دقت توضیح پرسونا' },
-    { key: 'bean_match_accuracy', fa: 'تناسب دونه با ذائقه‌ی واقعی' }
+    { key: 'bean_match_accuracy', fa: 'تناسب دونه با ذائقه‌ی واقعی' },
+    { key: 'music_art_value', fa: 'ارزش‌افزوده‌ی موسیقی و نقاشی' }
   ];
   const QUIZ_LEN_FA = { too_short: 'خیلی کوتاه بود', just_right: 'اندازه‌ش خوب بود', too_long: 'خیلی طولانی بود' };
   const RARITY_FIT_FA = { too_ordinary: 'معمولی‌تر از چیزی که می‌خواستم', just_right: 'دقیقاً همون‌قدر', too_special: 'خاص‌تر از چیزی که می‌خواستم' };
   const WOULD_TRY_FA = { yes: 'بله، حتماً', maybe: 'شاید', no: 'نه، جذبم نکرد' };
   const MUSIC_FA = { yes: 'آره', no: 'نه', cool: 'چه باحال' };
+  const MUSIC_ART_ENGAGEMENT_FA = { both: 'بله، هر دو رو', one: 'فقط یکیش رو', none: 'نه، متوجه نشدم' };
 
   function renderBreakdown(el, list, field, labelMap) {
     const counts = {};
@@ -1559,6 +1569,7 @@ async function loadSurveyReport() {
     renderBreakdown(rarityFitEl, list, 'rarity_fit', RARITY_FIT_FA);
     renderBreakdown(wouldTryEl, list, 'would_try_recommended_bean', WOULD_TRY_FA);
     renderBreakdown(musicEl, list, 'music_pairing_reaction', MUSIC_FA);
+    renderBreakdown(musicArtEngagementEl, list, 'music_art_engagement', MUSIC_ART_ENGAGEMENT_FA);
 
     tbody.innerHTML = list.length
       ? list.map(r => `
@@ -1576,7 +1587,7 @@ async function loadSurveyReport() {
 
   } catch (e) {
     tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
-    scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML =
+    scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML = musicArtEngagementEl.innerHTML =
       `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
