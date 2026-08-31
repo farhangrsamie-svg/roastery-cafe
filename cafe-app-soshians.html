@@ -1535,6 +1535,19 @@ body.lang-fa .result-desc, body.lang-fa .card-title { text-align: right; }
       <div id="r-music-respect-note" style="display:none;font-size:11.5px;color:var(--medium-brown);margin-bottom:6px;line-height:1.7;"></div>
       <div id="r-music-track" style="font-size:15px;font-weight:700;color:var(--dark-brown);"></div>
       <div id="r-music-artist" style="font-size:12.5px;color:var(--medium-brown);margin-top:2px;"></div>
+      <a id="r-music-play-btn" href="#" target="_blank" rel="noopener" style="display:none;margin-top:10px;padding:8px 18px;background:var(--medium-brown);color:var(--white);border-radius:20px;font-size:12.5px;font-weight:700;text-decoration:none;">
+        <span class="fa-only">▶️ پخش</span><span class="en-only">▶️ Play</span>
+      </a>
+    </div>
+    <div id="r-art-note" style="display:none;margin-top:14px;background:var(--tint);border-radius:12px;overflow:hidden;font-family:'Vazirmatn',sans-serif;text-align:center;">
+      <div style="font-size:11.5px;color:var(--caramel);padding:12px 16px 0;">
+        <span class="fa-only">🎨 همراه دیداری این دونه</span><span class="en-only">🎨 Suggested artwork</span>
+      </div>
+      <img id="r-art-image" src="" alt="" style="width:100%;display:block;margin-top:10px;" loading="lazy">
+      <div style="padding:10px 16px 14px;">
+        <div id="r-art-title" style="font-size:14px;font-weight:700;color:var(--dark-brown);"></div>
+        <div id="r-art-artist" style="font-size:12px;color:var(--medium-brown);margin-top:2px;"></div>
+      </div>
     </div>
     <div id="r-phase2-note" style="display:none;margin-top:10px;padding:8px 14px;background:#EFE6DC;border-radius:20px;font-size:11.5px;color:var(--medium-brown);text-align:center;font-family:'Vazirmatn',sans-serif;">
       <span class="fa-only">🔍 این نتیجه بر اساس شناخت عمیق‌تری از توئه — چون قبلاً هم باهام آشنا شده بودی</span>
@@ -4586,7 +4599,7 @@ function showErr(el, msg) {
    BEAN DATABASE
 ═══════════════════════════════════════════ */
 const BEANS = [
-  { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Espresso', temp:'91 °C', ratio:'1g : 2g', roastInfo:{charge:'187.6°C',drop:'197.8°C',dtr:'20.2%',time:'12:30'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.', story:"From the Tolima region, deep in Colombia's mountains; traditional Washed processing keeps this bean's clarity and balance.",
+  { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Espresso', temp:'91 °C', ratio:'1g : 2g', roastInfo:{charge:'187.6°C',drop:'197.8°C',dtr:'20.2%',time:'12:30'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.', story:"From the Tolima region, deep in Colombia's mountains; traditional Washed processing keeps this bean's clarity and balance.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/colombia_tolima.webp', artTitle:'Flower Clouds', artArtistFA:'اودیلون رودون', musicTrack:'Freudiana', musicArtist:'Alan Parsons Project', musicUrl:'https://open.spotify.com/search/Freudiana%20Alan%20Parsons%20Project',
     s:{
       fruity:6, choc_nutty:7, floral:2, spicy:1,
       low:1, medium:4, bright:9,
@@ -4606,7 +4619,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
   },
-  { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Medium', brew:'Espresso', temp:'90 °C', ratio:'1g : 2g', roastInfo:{charge:'202°C',drop:'201°C',dtr:'17%',time:'13:11'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.', story:"From the Guji zone, one of Ethiopia's emerging regions; Natural processing intensifies the bean's fruity sweetness.",
+  { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Medium', brew:'Espresso', temp:'90 °C', ratio:'1g : 2g', roastInfo:{charge:'202°C',drop:'201°C',dtr:'17%',time:'13:11'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.', story:"From the Guji zone, one of Ethiopia's emerging regions; Natural processing intensifies the bean's fruity sweetness.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/ethiopia_guji.webp', artTitle:'The Hay Wain', artArtistFA:'جان کنستبل', musicTrack:'Coming of Age', musicArtist:'Camel', musicUrl:'https://open.spotify.com/search/Coming%20of%20Age%20Camel',
     s:{
       fruity:9, choc_nutty:3, floral:5, spicy:1,
       low:3, medium:6, bright:5,
@@ -4626,7 +4639,7 @@ const BEANS = [
     },
     brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
   },
-  { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Espresso', temp:'91.5 °C', ratio:'1g : 2g', roastInfo:{charge:'182°C',drop:'195.5°C',dtr:'19.18%',time:'13:12'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.', story:'From Huancayo, deep in the Andes; smallholder farming at altitude produces a balanced, unpretentious bean.',
+  { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Espresso', temp:'91.5 °C', ratio:'1g : 2g', roastInfo:{charge:'182°C',drop:'195.5°C',dtr:'19.18%',time:'13:12'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.', story:'From Huancayo, deep in the Andes; smallholder farming at altitude produces a balanced, unpretentious bean.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/peru_huancayo.webp', artTitle:'Wanderer above the Sea of Fog', artArtistFA:'کاسپار داوید فریدریش', musicTrack:'Soldier of Fortune', musicArtist:'Deep Purple', musicUrl:'https://open.spotify.com/search/Soldier%20of%20Fortune%20Deep%20Purple',
     s:{
       fruity:2, choc_nutty:9, floral:1, spicy:1,
       low:5, medium:6, bright:2,
@@ -4646,7 +4659,7 @@ const BEANS = [
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
   },
-  { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Medium–Dark', brew:'V60 (Pour Over)', temp:'89 °C', ratio:'1g : 14g', roastInfo:{charge:'189.7°C',drop:'197.7°C',dtr:'19%',time:'13:24'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.', story:"Extended aerobic fermentation pushes this lot's sweetness and fruit complexity way up — a very different experience from typical Colombian coffee.",
+  { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Medium–Dark', brew:'V60 (Pour Over)', temp:'89 °C', ratio:'1g : 14g', roastInfo:{charge:'189.7°C',drop:'197.7°C',dtr:'19%',time:'13:24'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.', story:"Extended aerobic fermentation pushes this lot's sweetness and fruit complexity way up — a very different experience from typical Colombian coffee.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_peach.webp', artTitle:'Impression, Sunrise', artArtistFA:'کلود مونه', musicTrack:'Dawn Chorus', musicArtist:'Thom Yorke', musicUrl:'https://open.spotify.com/search/Dawn%20Chorus%20Thom%20Yorke',
     s:{
       fruity:9, choc_nutty:3, floral:4, spicy:1,
       low:2, medium:6, bright:8,
@@ -4666,7 +4679,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
-  { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'190.5°C',drop:'204.1°C',dtr:'14%',time:'11:06'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.', story:"The same aerobic fermentation, but a completely different profile — showing how much processing can transform an origin's identity.",
+  { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'190.5°C',drop:'204.1°C',dtr:'14%',time:'11:06'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.', story:"The same aerobic fermentation, but a completely different profile — showing how much processing can transform an origin's identity.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_cacao.webp', artTitle:'Self-Portrait', artArtistFA:'رامبراند', musicTrack:'The Thrill Is Gone', musicArtist:'B.B. King', musicUrl:'https://open.spotify.com/search/The%20Thrill%20Is%20Gone%20B.B.%20King',
     s:{
       fruity:3, choc_nutty:9, floral:2, spicy:2,
       low:3, medium:8, bright:5,
@@ -4686,7 +4699,7 @@ const BEANS = [
     },
     brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
   },
-  { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', flavors:['Lavender','Lemon Candy','Mint'], roast:'Medium', brew:'Pour Over', temp:'88 °C', ratio:'1g : 14g', roastInfo:{charge:'189°C',drop:'198°C',dtr:'15%',time:'12:21'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.', story:"Geisha is the world's most expensive commercial coffee variety; this Colombian take, with anaerobic processing, creates a flavor unlike any other coffee.",
+  { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', flavors:['Lavender','Lemon Candy','Mint'], roast:'Medium', brew:'Pour Over', temp:'88 °C', ratio:'1g : 14g', roastInfo:{charge:'189°C',drop:'198°C',dtr:'15%',time:'12:21'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.', story:"Geisha is the world's most expensive commercial coffee variety; this Colombian take, with anaerobic processing, creates a flavor unlike any other coffee.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/colombia_geisha.webp', artTitle:'Almond Blossoms', artArtistFA:'ون‌گوگ', musicTrack:'Cherry Blossoms', musicArtist:'Suri X', musicUrl:'https://open.spotify.com/search/Cherry%20Blossoms%20Suri%20X',
     s:{
       fruity:6, choc_nutty:0, floral:10, spicy:1,
       low:2, medium:6, bright:8,
@@ -4706,7 +4719,7 @@ const BEANS = [
     },
     brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
   },
-  { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (both)', ratio:'1g : 1.8g (espresso) / 1g : 12g (pour over)', roastInfo:{charge:'186°C',drop:'197.4°C',dtr:'16.9%',time:'14:45'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.', story:"Ethiopia's Heirloom variety carries thousands of wild genotypes; aerobic fermentation pushes this lot toward deep, honeyed sweetness.",
+  { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (both)', ratio:'1g : 1.8g (espresso) / 1g : 12g (pour over)', roastInfo:{charge:'186°C',drop:'197.4°C',dtr:'16.9%',time:'14:45'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.', story:"Ethiopia's Heirloom variety carries thousands of wild genotypes; aerobic fermentation pushes this lot toward deep, honeyed sweetness.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/sidamo_honey.webp', artTitle:'Wheatfield with Crows', artArtistFA:'ون‌گوگ', musicTrack:'Solace', musicArtist:'Estas Tonne', musicUrl:'https://open.spotify.com/search/Solace%20Estas%20Tonne',
     s:{
       fruity:8, choc_nutty:4, floral:5, spicy:1,
       low:5, medium:7, bright:3,
@@ -4726,7 +4739,7 @@ const BEANS = [
     },
     brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
   },
-  { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Jasmine','Rose Petal','Lily'], roast:'Medium', brew:'Immersion / Cold Brew', temp:'Room temperature', ratio:'1g : 14g', roastInfo:{charge:'178.5°C',drop:'195.2°C',dtr:'21%',time:'14:15'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.', story:'Same region, closely related variety — but different processing this time highlights the floral side instead of the honeyed one.',
+  { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', flavors:['Jasmine','Rose Petal','Lily'], roast:'Medium', brew:'Immersion / Cold Brew', temp:'Room temperature', ratio:'1g : 14g', roastInfo:{charge:'178.5°C',drop:'195.2°C',dtr:'21%',time:'14:15'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.', story:'Same region, closely related variety — but different processing this time highlights the floral side instead of the honeyed one.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/sidamo_floral.webp', artTitle:'Still Life of White Roses', artArtistFA:'هانری فانتن-لاتور', musicTrack:'Taa Bikaraan Doordast VII', musicArtist:'کیهان کلهر', musicUrl:'https://open.spotify.com/search/Taa%20Bikaraan%20Doordast%20VII%20Kayhan%20Kalhor',
     s:{
       fruity:3, choc_nutty:0, floral:10, spicy:1,
       low:3, medium:8, bright:5,
@@ -4746,7 +4759,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
   },
-  { id:'yemen_heirloom', name:'Yemen Heirloom — Berry', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Yemen · 1940 m', flavors:['Berry','Dried Berry','Dried Fig','Sour Cherry'], roast:'Medium', brew:'V60 (Pour Over) / Espresso', temp:'91 °C (pour over) / 90 °C (espresso)', ratio:'1g : 14g (pour over) / 1g : 2g (espresso)', roastInfo:{charge:'190°C',drop:'202°C',dtr:'18%',time:'13:31'}, desc:'A rare Yemeni heirloom lot — berry, dried fig and sour cherry in a juicy, long-finishing cup.', descFA:'یک لات کمیاب و اصیل از یمن — بری، انجیر خشک و کیلاس آلبالو در فنجانی آبمیوه‌ای با پس‌مزه‌ی طولانی.', storyFA:'واریته‌ی بومی یمن (Heirloom) با فرآوری تخمیر هوازی — پیچیدگی و اسیدیته‌ی بالایی داره که بیشتر به مذاق قهوه‌دوست‌های حرفه‌ای می‌شینه.', story:'A native Yemeni heirloom variety with aerobic fermentation — its complexity and high acidity make it a favorite among coffee professionals.',
+  { id:'yemen_heirloom', name:'Yemen Heirloom — Berry', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Yemen · 1940 m', flavors:['Berry','Dried Berry','Dried Fig','Sour Cherry'], roast:'Medium', brew:'V60 (Pour Over) / Espresso', temp:'91 °C (pour over) / 90 °C (espresso)', ratio:'1g : 14g (pour over) / 1g : 2g (espresso)', roastInfo:{charge:'190°C',drop:'202°C',dtr:'18%',time:'13:31'}, desc:'A rare Yemeni heirloom lot — berry, dried fig and sour cherry in a juicy, long-finishing cup.', descFA:'یک لات کمیاب و اصیل از یمن — بری، انجیر خشک و کیلاس آلبالو در فنجانی آبمیوه‌ای با پس‌مزه‌ی طولانی.', storyFA:'واریته‌ی بومی یمن (Heirloom) با فرآوری تخمیر هوازی — پیچیدگی و اسیدیته‌ی بالایی داره که بیشتر به مذاق قهوه‌دوست‌های حرفه‌ای می‌شینه.', story:'A native Yemeni heirloom variety with aerobic fermentation — its complexity and high acidity make it a favorite among coffee professionals.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/yemen_heirloom.webp', artTitle:'Basket of Fruit', artArtistFA:'کاراواجو', musicTrack:'Ishraq', musicArtist:'نصیر شمه', musicUrl:'https://open.spotify.com/search/Ishraq%20Naseer%20Shamma',
     s:{
       fruity:9, choc_nutty:1, floral:2, spicy:2,
       low:1, medium:4, bright:9,
@@ -4766,7 +4779,7 @@ const BEANS = [
     },
     brewFit:{ v60:9, frenchpress:4, mokapot:4, espressohome:7, aeropress:7, coldbrew:5, other:6 }
   },
-  { id:'narino_gum', name:'Colombia Nariño — Gum', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Gum','Sweet Peach','Coconut'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'191°C',drop:'204°C',dtr:'15%',time:'12:01'}, desc:'A playful, novel micro-lot — bubblegum, sweet summer peach and coconut in a tea-like cup.', descFA:'یک لات بازیگوش و غیرمنتظره — آدامس، هلوی شیرین تابستانی و نارگیل در فنجانی چای‌مانند.', storyFA:'همون فرآوری تخمیر هوازی نارینیو، ولی با یه پروفایل کاملاً فانتزی — برای کسایی که دنبال یه تجربه‌ی متفاوت و بازیگوشن.', story:'The same Nariño aerobic fermentation, but with a completely fantastical profile — for those seeking something playful and different.',
+  { id:'narino_gum', name:'Colombia Nariño — Gum', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', flavors:['Gum','Sweet Peach','Coconut'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'191°C',drop:'204°C',dtr:'15%',time:'12:01'}, desc:'A playful, novel micro-lot — bubblegum, sweet summer peach and coconut in a tea-like cup.', descFA:'یک لات بازیگوش و غیرمنتظره — آدامس، هلوی شیرین تابستانی و نارگیل در فنجانی چای‌مانند.', storyFA:'همون فرآوری تخمیر هوازی نارینیو، ولی با یه پروفایل کاملاً فانتزی — برای کسایی که دنبال یه تجربه‌ی متفاوت و بازیگوشن.', story:'The same Nariño aerobic fermentation, but with a completely fantastical profile — for those seeking something playful and different.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_gum.webp', artTitle:'Tiger in a Tropical Storm (Surprised!)', artArtistFA:'آنری روسو', musicTrack:'Imminence', musicArtist:'Sleep Dealer', musicUrl:'https://open.spotify.com/search/Imminence%20Sleep%20Dealer',
     s:{
       fruity:8, choc_nutty:2, floral:3, spicy:1,
       low:3, medium:7, bright:4,
@@ -5738,15 +5751,35 @@ function render(r) {
   if (mokapotNote) { mokapotNoteEl.textContent = '⚠️ ' + mokapotNote; mokapotNoteEl.style.display = 'block'; }
   else { mokapotNoteEl.style.display = 'none'; }
 
-  // پیشنهاد شنیداری (Sonic Seasoning) — همینجا تو صفحه‌ی نتیجه، نه فقط رو کارت اشتراک‌گذاری
-  const suggestedMusic = pickMusicForUser(r);
-  if (suggestedMusic) {
-    document.getElementById('r-music-track').textContent = suggestedMusic.track;
-    document.getElementById('r-music-artist').textContent = suggestedMusic.artist;
-    const respectEl = document.getElementById('r-music-respect-note');
-    const respectNote = getMusicRespectNote(r, suggestedMusic);
-    if (respectNote) { respectEl.textContent = respectNote; respectEl.style.display = 'block'; }
-    else { respectEl.style.display = 'none'; }
+  // پیشنهاد شنیداری و دیداری — انتخاب مشخص و ثابت تیم رستری برای هر دونه (نه الگوریتم عمومی)
+  if (r.musicTrack) {
+    document.getElementById('r-music-track').textContent = r.musicTrack;
+    document.getElementById('r-music-artist').textContent = r.musicArtist || '';
+    const playBtn = document.getElementById('r-music-play-btn');
+    if (r.musicUrl) { playBtn.href = r.musicUrl; playBtn.style.display = 'inline-block'; }
+    else { playBtn.style.display = 'none'; }
+    document.getElementById('r-music-respect-note').style.display = 'none';
+  } else {
+    // لایه‌ی محافظتی: اگه یه دونه هنوز انتخاب ثابت نداشت، از موتور تطبیق صوتی-شیمیایی استفاده کن
+    const suggestedMusic = pickMusicForUser(r);
+    if (suggestedMusic) {
+      document.getElementById('r-music-track').textContent = suggestedMusic.track;
+      document.getElementById('r-music-artist').textContent = suggestedMusic.artist;
+      document.getElementById('r-music-play-btn').style.display = 'none';
+      const respectEl = document.getElementById('r-music-respect-note');
+      const respectNote = getMusicRespectNote(r, suggestedMusic);
+      if (respectNote) { respectEl.textContent = respectNote; respectEl.style.display = 'block'; }
+      else { respectEl.style.display = 'none'; }
+    }
+  }
+  if (r.artUrl) {
+    document.getElementById('r-art-image').src = r.artUrl;
+    document.getElementById('r-art-image').alt = r.artTitle || '';
+    document.getElementById('r-art-title').textContent = r.artTitle || '';
+    document.getElementById('r-art-artist').textContent = r.artArtistFA || '';
+    document.getElementById('r-art-note').style.display = 'block';
+  } else {
+    document.getElementById('r-art-note').style.display = 'none';
   }
 
   // Roast guide
