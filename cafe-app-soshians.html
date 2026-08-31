@@ -5232,6 +5232,15 @@ const INTENSITY_COMMENTS = [
 
 function recommend() {
   let pool = BEANS.filter(b => AVAILABLE.includes(b.id));
+
+  // دونه‌های «فقط حرفه‌ای» — بر اساس توصیف صریح خودِ رستری (پیچیدگی/اسیدیته‌ی بالا که نیاز به ذائقه‌ی
+  // کالیبره‌شده داره)، برای کاربر مبتدی از استخر رقابت حذف می‌شن. این یه فیلتر قطعیه، نه وزنی —
+  // چون سیگنال rarity به‌تنهایی (یه کلیک رو «خاص») نشونه‌ی واقعی آماده‌بودن ذائقه نیست، فقط یه آرزوست
+  const BEGINNER_EXCLUDED = ['yemen_heirloom', 'colombia_geisha'];
+  if (currentLevel === 'beginner') {
+    pool = pool.filter(b => !BEGINNER_EXCLUDED.includes(b.id));
+  }
+
   const baseWeights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
 
   const { pool: filteredPool, noStrongMatch, catalogGap, catalogGapDetail } = applyHardFilter(pool);
