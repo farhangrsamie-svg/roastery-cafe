@@ -1913,6 +1913,13 @@ const LEVEL_META = {
   expert:   { color: '#7B4FA8', label: 'متخصص', emoji: '🏆' }
 };
 
+// آرکی‌تایپ فرهنگی — فقط برای لحن سؤالات فاز۲ در Refresh Mode، ربطی به سطح تجربه یا امتیازدهی نداره
+const ARCHETYPE_META = {
+  cyber:    { emoji: '🌐', label: 'سایبر-سیمرغ' },
+  harmony:  { emoji: '🎐', label: 'هارمونی معاصر' },
+  damavand: { emoji: '⛰️', label: 'استواری دماوند' }
+};
+
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
 const LEVEL_WEIGHTS = {
   beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, rarity:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:8, dtr:0 },
@@ -2057,80 +2064,130 @@ const QUESTIONS = {
     title: {
       beginner: { fa:'معمولاً کجا این قهوه رو می‌خوری؟', en:'Where do you usually drink this coffee?' },
       regular:  { fa:'زمینهٔ اصلی مصرف این قهوه چیه؟', en:"What's the main context you drink this coffee in?" },
-      expert:   { fa:'زمینه‌ی اصلی مصرف؟', en:'Primary consumption context?' }
+      expert:   { fa:'زمینه‌ی اصلی مصرف؟', en:'Primary consumption context?' },
+      // ✅ نسخه‌ی نهایی — تأییدشده توسط کارشناس فرهنگی
+      cyber:    { fa:'قهوه‌ت قراره ویایبِ چه فضایی باشه؟', en:'What vibe is your coffee about to match?' },
+      harmony:  { fa:'این قهوه قراره همراهِ چه لحظه‌ای از روزت باشه؟', en:'Which moment of your day is this coffee meant to accompany?' },
+      damavand: { fa:'این قهوه قراره کجای زندگیت جا بگیره؟', en:'Where in your life is this coffee meant to fit?' }
     },
     edu: {
       beginner: { fa:'مکان و همراهی که قهوه می‌خوری، روی چیزی که ازش می‌خوای اثر می‌ذاره.', en:'Where and with whom you drink coffee affects what you want from it.' },
-      regular:  { fa:'زمینهٔ مصرف (خانه، کار، دورهمی) روی انتخاب دونه و روش دم‌آوری هم اثر داره.', en:'Consumption context (home, work, social) also influences bean and brew choice.' }
+      regular:  { fa:'زمینهٔ مصرف (خانه، کار، دورهمی) روی انتخاب دونه و روش دم‌آوری هم اثر داره.', en:'Consumption context (home, work, social) also influences bean and brew choice.' },
+      cyber:    { fa:'فضایی که توش قهوه می‌خوری، رو حس‌وحالی که ازش می‌خوای اثر مستقیم می‌ذاره.', en:'The scene you drink coffee in has a direct effect on what you want from it.' },
+      harmony:  { fa:'فضایی که توش قهوه می‌خوری، بخشی از همون آیینیه که برای خودت می‌سازی.', en:'The space you drink coffee in is part of the ritual you build for yourself.' },
+      damavand: { fa:'زمینه‌ای که قهوه توش می‌شینه، بخشی از همون ثباتیه که برای خودت ساختی.', en:'The context coffee sits in is part of the stability you\'ve built for yourself.' }
     },
     options: {
       beginner: [ {v:'home_alone', fa:'تنها، تو خونه', en:'Alone, at home'}, {v:'work_focus', fa:'سر کار یا حین انجام کار', en:'At work or while working'}, {v:'social', fa:'با دوستام یا خانواده', en:'With friends or family'}, {v:'on_the_go', fa:'بیرون از خونه، در حال رفت‌وآمد', en:'Out and about'} ],
       regular:  [ {v:'home_alone', fa:'خانه، تنها', en:'Home, alone'}, {v:'work_focus', fa:'محل کار', en:'Workplace'}, {v:'social', fa:'دورهمی با دوستان/خانواده', en:'Social gathering'}, {v:'on_the_go', fa:'کافه یا در مسیر', en:'Café or on the move'} ],
-      expert:   [ {v:'home_alone', fa:'تنها / خانه', en:'Solo / Home'}, {v:'work_focus', fa:'محل کار / تمرکز', en:'Workplace / Focus'}, {v:'social', fa:'جمع دوستانه', en:'Social Gathering'}, {v:'on_the_go', fa:'کافه / در حال حرکت', en:'Café / On-the-go'} ]
+      expert:   [ {v:'home_alone', fa:'تنها / خانه', en:'Solo / Home'}, {v:'work_focus', fa:'محل کار / تمرکز', en:'Workplace / Focus'}, {v:'social', fa:'جمع دوستانه', en:'Social Gathering'}, {v:'on_the_go', fa:'کافه / در حال حرکت', en:'Café / On-the-go'} ],
+      cyber:    [ {v:'home_alone', fa:'تنها، با هدفون و پلی‌لیست شخصی‌ام', en:'Alone, headphones on, my own playlist'}, {v:'work_focus', fa:'وسط یه دیپ‌ورک سشن، گوشی سایلنت', en:'Mid deep-work session, phone on silent'}, {v:'social', fa:'با اکیپ، حتی برای یه استوری/ثبت فریم', en:'With the crew, even just for a story/photo'}, {v:'on_the_go', fa:'بین رفت‌وآمدها، کافه به کافه روی حرکت', en:'Between errands, café-hopping on the move'} ],
+      harmony:  [ {v:'home_alone', fa:'تنها، تو یه گوشه‌ی آروم خودم', en:'Alone, in my own quiet corner'}, {v:'work_focus', fa:'وسط کار، برای حفظ تمرکز و ریتم', en:'Mid-work, to keep my focus and rhythm'}, {v:'social', fa:'با آدم‌های نزدیک، تو یه دورهمی ساده و صمیمی', en:'With close people, in a simple, intimate gathering'}, {v:'on_the_go', fa:'بین مسیرها، یه مکث کوتاه و آگاهانه', en:'Between errands, a short mindful pause'} ],
+      damavand: [ {v:'home_alone', fa:'تنها، تو خلوت و سکوت خودم', en:'Alone, in my own solitude and silence'}, {v:'work_focus', fa:'سر کار، برای استواری و ثبات در مسیر', en:'At work, for steadiness on my path'}, {v:'social', fa:'دور یک سفره، با آدم‌های اصیل و قدیمی زندگیم', en:'Around one table, with the genuine, longtime people in my life'}, {v:'on_the_go', fa:'تو دل مسیر، با وقار و بدون عجله', en:'In the midst of the road, with dignity and no rush'} ]
     }
   },
   ritual: {
     title: {
       beginner: { fa:'وقتی یه قهوه‌ی جدید می‌بینی چیکار می‌کنی؟', en:'What do you do when you see a new coffee?' },
       regular:  { fa:'رابطه‌ت با روتین و کشف قهوه‌ی جدید چطوره؟', en:'How do you relate to routine vs. discovering new coffee?' },
-      expert:   { fa:'گرایش به آیین‌مندی یا کاوشگری؟', en:'Ritual vs exploration tendency?' }
+      expert:   { fa:'گرایش به آیین‌مندی یا کاوشگری؟', en:'Ritual vs exploration tendency?' },
+      // ✅ نسخه‌ی نهایی — تأییدشده توسط کارشناس فرهنگی
+      cyber:    { fa:'الگوریتم ذائقه‌ت چجوریه؟', en:'What does your taste algorithm look like?' },
+      harmony:  { fa:'رابطه‌ت با تازگی و ثبات چیه؟', en:'What is your relationship with novelty and stability?' },
+      damavand: { fa:'رابطه‌ت با ریشه و تغییر چیه؟', en:'What is your relationship with roots and change?' }
     },
     edu: {
       beginner: { fa:'بعضی‌ها عاشق قهوه‌ی همیشگی‌ان، بعضی‌ها دنبال کشف مداوم.', en:'Some love their usual coffee, others always seek discovery.' },
-      regular:  { fa:'این محور نشون می‌ده چقدر به تنوع در انتخاب دونه نیاز داری.', en:'This axis shows how much variety you need in bean selection.' }
+      regular:  { fa:'این محور نشون می‌ده چقدر به تنوع در انتخاب دونه نیاز داری.', en:'This axis shows how much variety you need in bean selection.' },
+      cyber:    { fa:'بعضی‌ها همیشه روی یه فلو می‌مونن، بعضی‌ها دائم دنبال کشف جدیدن.', en:'Some always stay on one flow, others are always chasing a new discovery.' },
+      harmony:  { fa:'بعضی‌ها آرامش رو تو تکرار پیدا می‌کنن، بعضی‌ها تو یه تعادل تازه.', en:'Some find calm in repetition, others in a fresh balance.' },
+      damavand: { fa:'بعضی‌ها به چیزی که سال‌هاست می‌شناسن وفادار می‌مونن، بعضی‌ها حتی تو کاوش هم دنبال یه عمق آشنان.', en:'Some stay loyal to what they\'ve known for years, others seek a familiar depth even while exploring.' }
     },
     options: {
       beginner: [ {v:'routine', fa:'همون قهوه‌ی همیشگی رو می‌خوام', en:'I want my usual coffee'}, {v:'mixed', fa:'گاهی امتحان می‌کنم، ولی برمی‌گردم به قبلی', en:'I try sometimes, but return to my usual'}, {v:'explorer', fa:'همیشه دنبال یه چیز تازه‌ام', en:"I'm always looking for something new"} ],
       regular:  [ {v:'routine', fa:'ثابت و قابل‌پیش‌بینی', en:'Consistent & predictable (Routine)'}, {v:'mixed', fa:'ترکیبی — گاهی امتحان، گاهی تکرار', en:'Mixed — sometimes new, sometimes repeat'}, {v:'explorer', fa:'کاوشگر — همیشه چیز تازه', en:'Explorer — always something new'} ],
-      expert:   [ {v:'routine', fa:'آیین‌مند / به‌دنبال ثبات', en:'Ritual / Consistency-seeking'}, {v:'mixed', fa:'متعادل / گاهی به‌دنبال تازگی', en:'Balanced Novelty-seeking'}, {v:'explorer', fa:'به‌شدت به‌دنبال تازگی', en:'High Novelty-seeking'} ]
+      expert:   [ {v:'routine', fa:'آیین‌مند / به‌دنبال ثبات', en:'Ritual / Consistency-seeking'}, {v:'mixed', fa:'متعادل / گاهی به‌دنبال تازگی', en:'Balanced Novelty-seeking'}, {v:'explorer', fa:'به‌شدت به‌دنبال تازگی', en:'High Novelty-seeking'} ],
+      cyber:    [ {v:'routine', fa:'یه چیزی که امتحانش رو پس داده — بدون ریسک', en:'Something that\'s already proven itself — zero risk'}, {v:'mixed', fa:'گاهی از فید رد می‌شم، گاهی روش کلیک می‌کنم', en:'Sometimes I scroll past the feed, sometimes I click'}, {v:'explorer', fa:'دنبال یه کشف ناب‌ام؛ چیزی که تو هیچ فیدی ندیدمش', en:"I'm after a pure discovery — something I haven't seen in any feed"} ],
+      harmony:  [ {v:'routine', fa:'همون طعم آشنایی که باهاش آروم می‌شم', en:'The familiar taste that brings me calm'}, {v:'mixed', fa:'گاهی تجربه‌ی تازگی، گاهی بازگشت به طعم‌های آشنا', en:'Sometimes a taste of something new, sometimes a return to the familiar'}, {v:'explorer', fa:'دنبال یه تعادل و حس تازه‌ام، نه لزوماً چیز عجیب', en:'Looking for a fresh balance and feeling, not necessarily something strange'} ],
+      damavand: [ {v:'routine', fa:'همون طعم اصیلی که سال‌هاست بهش وفادارم', en:'The one authentic taste I\'ve stayed loyal to for years'}, {v:'mixed', fa:'گاهی تجارب تازه، اما همواره بازگشت به ریشه‌ها', en:'Sometimes new experiences, but always a return to my roots'}, {v:'explorer', fa:'حتی تو کاوش هم دنبال یک عمق ماندگار و آشنام', en:'Even while exploring, I seek a lasting, familiar depth'} ]
     }
   },
   evolution: {
     title: {
       beginner: { fa:'دوست داری قهوه‌ی جدید رو چطوری پیدا کنی؟', en:'How do you like to discover new coffee?' },
       regular:  { fa:'روش یادگیری و کشف سلیقه‌ت تو قهوه چیه؟', en:'How do you learn about and discover your coffee taste?' },
-      expert:   { fa:'سبک یادگیری سلیقه؟', en:'Preference learning style?' }
+      expert:   { fa:'سبک یادگیری سلیقه؟', en:'Preference learning style?' },
+      // ✅ نسخه‌ی نهایی — تأییدشده توسط کارشناس فرهنگی
+      cyber:    { fa:'منبع کشفت کجاست؟', en:'Where does your discovery come from?' },
+      harmony:  { fa:'چطور می‌خوای بیشتر بشناسیش؟', en:'How do you want to get to know it better?' },
+      damavand: { fa:'شناخت واقعی از کجا میاد؟', en:'Where does real understanding come from?' }
     },
     edu: {
       beginner: { fa:'بعضی‌ها دوست دارن کسی راهنماییشون کنه، بعضی‌ها دوست دارن خودشون کشف کنن.', en:'Some like guidance, others prefer to discover on their own.' },
-      regular:  { fa:'این محور کمک می‌کنه بفهمیم چقدر توضیح فنی یا صرفاً پیشنهاد ساده بهت بدیم.', en:'This helps us know whether to give technical detail or simple suggestions.' }
+      regular:  { fa:'این محور کمک می‌کنه بفهمیم چقدر توضیح فنی یا صرفاً پیشنهاد ساده بهت بدیم.', en:'This helps us know whether to give technical detail or simple suggestions.' },
+      cyber:    { fa:'بعضی‌ها می‌ذارن الگوریتم پیدا کنه، بعضی‌ها خودشون عمیق کندوکاو می‌کنن.', en:'Some let the algorithm find it, others dig in deep themselves.' },
+      harmony:  { fa:'بعضی‌ها به یه راهنمای مطمئن اعتماد می‌کنن، بعضی‌ها با آرامش خودشون کشف می‌کنن.', en:'Some trust a reliable guide, others calmly discover it themselves.' },
+      damavand: { fa:'بعضی‌ها به تجربه‌ی رفته‌ها اعتماد می‌کنن، بعضی‌ها با صبر خودشون به عمق می‌رسن.', en:'Some trust the experience of those who came before, others patiently reach depth themselves.' }
     },
     options: {
       beginner: [ {v:'guided', fa:'دوست دارم یکی بهم پیشنهاد بده', en:'I like someone to recommend it to me'}, {v:'self_taught', fa:'دوست دارم خودم امتحان و کشف کنم', en:'I like to try and discover myself'}, {v:'analytical', fa:'دوست دارم بدونم چرا این طعم اینه', en:'I like to understand why it tastes this way'} ],
       regular:  [ {v:'guided', fa:'راهنمایی‌شده (پیشنهاد دیگران)', en:'Guided (recommendations from others)'}, {v:'self_taught', fa:'اکتشافی (امتحان شخصی)', en:'Exploratory (personal trial)'}, {v:'analytical', fa:'تحلیلی (فهم علت و اصول)', en:'Analytical (understanding the reasoning)'} ],
-      expert:   [ {v:'guided', fa:'کشف با راهنمایی دیگران', en:'Guided Discovery'}, {v:'self_taught', fa:'یادگیری تجربی', en:'Experiential Learning'}, {v:'analytical', fa:'یادگیری تحلیلی / فنی', en:'Analytical / Technical Learning'} ]
+      expert:   [ {v:'guided', fa:'کشف با راهنمایی دیگران', en:'Guided Discovery'}, {v:'self_taught', fa:'یادگیری تجربی', en:'Experiential Learning'}, {v:'analytical', fa:'یادگیری تحلیلی / فنی', en:'Analytical / Technical Learning'} ],
+      cyber:    [ {v:'guided', fa:'می‌ذارم الگوریتم یا ریکامندِ دوستام مسیر رو بهم نشون بده', en:'I let the algorithm or my friends\' recommendation show me the way'}, {v:'self_taught', fa:'بدون ریسرچ قبلی، می‌زنم به دل تجربه و خودم امتحان می‌کنم', en:'No research first — I dive straight into the experience myself'}, {v:'analytical', fa:'اول تمام دیتا و ریوویوها رو بالا-پایین می‌کنم، بعد انتخاب می‌کنم', en:'I go through all the data and reviews first, then choose'} ],
+      harmony:  [ {v:'guided', fa:'دوست دارم یک راهنمای مطمئن مسیر رو بهم پیشنهاد بده', en:'I like a trusted guide to suggest the path to me'}, {v:'self_taught', fa:'با آرامش و شهود خودم امتحان و کشف می‌کنم', en:'I calmly and intuitively try and discover it myself'}, {v:'analytical', fa:'دوست دارم جزئیاتش رو بفهمم، اما بدون عجله و پیچیدگی', en:'I like to understand the details, but without rushing or complexity'} ],
+      damavand: [ {v:'guided', fa:'از تکیه بر تجربه و حکمت کسانی که این راه رو رفتن', en:'By relying on the experience and wisdom of those who\'ve walked this path'}, {v:'self_taught', fa:'با صبوری و قدم‌به‌قدم، از دل تجربه‌ی شخصیم', en:'Patiently, step by step, from my own personal experience'}, {v:'analytical', fa:'می‌خوام ریشه، اصالت و شناسنامه‌ش رو بشناسم', en:'I want to know its roots, authenticity, and full identity'} ]
     }
   },
   finish_preference: {
     title: {
       beginner: { fa:'بعد از قورت دادن قهوه، دوست داری طعمش چقدر تو دهنت بمونه؟', en:'After swallowing, how long do you want the taste to linger?' },
       regular:  { fa:'پس‌مزه‌ی قهوه رو چطور دوست داری؟', en:'How do you like your coffee finish?' },
-      expert:   { fa:'ترجیح پس‌مزه؟', en:'Finish preference?' }
+      expert:   { fa:'ترجیح پس‌مزه؟', en:'Finish preference?' },
+      // ✅ نسخه‌ی نهایی — تأییدشده توسط کارشناس فرهنگی
+      cyber:    { fa:'پس‌مزه‌ت چقدر باید بمونه؟', en:'How long should the aftertaste stay?' },
+      harmony:  { fa:'پس‌مزه‌ت باید چه حسی بده؟', en:'What feeling should the aftertaste give?' },
+      damavand: { fa:'پس‌مزه‌ت باید چقدر رسوخ کنه؟', en:'How deep should the aftertaste settle in?' }
     },
     edu: {
       beginner: { fa:'پس‌مزه یعنی طعمی که بعد از قورت دادن قهوه تو دهنت باقی می‌مونه.', en:'Finish is the taste that lingers after you swallow.' },
-      regular:  { fa:'قهوه‌های پردانسیته و شیرین معمولاً پس‌مزه‌ی طولانی‌تری دارن؛ قهوه‌های سبک و اسیددار معمولاً کوتاه و تمیزن.', en:'Sweet, dense coffees usually have a longer finish; light, acidic coffees tend to be short and clean.' }
+      regular:  { fa:'قهوه‌های پردانسیته و شیرین معمولاً پس‌مزه‌ی طولانی‌تری دارن؛ قهوه‌های سبک و اسیددار معمولاً کوتاه و تمیزن.', en:'Sweet, dense coffees usually have a longer finish; light, acidic coffees tend to be short and clean.' },
+      cyber:    { fa:'بعضی طعم‌ها زود می‌رن، بعضیا تا مدت‌ها ذهنت درگیرشونه — مثل یه ترک که تو پلی‌لیستت گیر می‌کنه.', en:"Some tastes fade fast, others stick with you — like a track stuck on repeat." },
+      harmony:  { fa:'بعضی پس‌مزه‌ها سبک و رهان، بعضی‌ها مثل یه خاطره‌ی خوب آروم آروم می‌مونن.', en:'Some finishes are light and free, others linger softly like a good memory.' },
+      damavand: { fa:'بعضی طعم‌ها مثل نسیم می‌گذرن، بعضی‌ها مثل یه کوه، پابرجا و عمیق می‌مونن.', en:'Some tastes pass like a breeze, others stay like a mountain — steady and deep.' }
     },
     options: {
       beginner: [ {v:'short', fa:'زود تموم بشه', en:'Fades quickly'}, {v:'medium', fa:'یه‌کم بمونه', en:'Lingers a bit'}, {v:'long', fa:'تا مدت‌ها بمونه', en:'Stays for a while'} ],
       regular:  [ {v:'short', fa:'کوتاه و تمیز', en:'Short & Clean'}, {v:'medium', fa:'متوسط', en:'Medium'}, {v:'long', fa:'طولانی و ماندگار', en:'Long & Lingering'} ],
-      expert:   [ {v:'short', fa:'تمیز / کوتاه', en:'Clean / Short'}, {v:'medium', fa:'متوسط', en:'Medium'}, {v:'long', fa:'طولانی و ماندگار', en:'Long / Lingering'} ]
+      expert:   [ {v:'short', fa:'تمیز / کوتاه', en:'Clean / Short'}, {v:'medium', fa:'متوسط', en:'Medium'}, {v:'long', fa:'طولانی و ماندگار', en:'Long / Lingering'} ],
+      cyber:    [ {v:'short', fa:'کوتاه و تمیز؛ بره تا جا برای تجربه بعدی باز شه', en:'Short and clean — gone, so there\'s room for the next experience'}, {v:'medium', fa:'متوازن؛ یه‌کم ردّش بمونه کافیه', en:"Balanced — a bit of a trace is enough"}, {v:'long', fa:'عمیق و متمادی؛ مثل ترکی که تا ساعت‌ها تو ذهنم پلی می‌شه', en:"Deep and lasting — like a track that stays on repeat in my head for hours"} ],
+      harmony:  [ {v:'short', fa:'سبک و رها، بدون هیچ سنگینی ماندگار', en:'Light and free, with no lasting heaviness'}, {v:'medium', fa:'یه‌کم بمونه، مثل یک یادآوری ملایم', en:'Lingers a little, like a gentle reminder'}, {v:'long', fa:'عمیق و ماندگار، مثل اثر یک خاطره‌ی خوب', en:'Deep and lasting, like the imprint of a good memory'} ],
+      damavand: [ {v:'short', fa:'سبک و گذرا، مثل یک نسیم', en:'Light and fleeting, like a breeze'}, {v:'medium', fa:'ماندگاری متوازن، مثل یک ردپای روشن', en:'A balanced lasting, like a clear footprint'}, {v:'long', fa:'عمیق، استوار و ماندگار؛ مثل سنگینی کوه', en:'Deep, steadfast, and lasting — like the weight of a mountain'} ]
     }
   },
   sensory_attention: {
     title: {
       beginner: { fa:'وقتی قهوه می‌خوری بیشتر به چی توجه می‌کنی؟', en:'What do you notice most when drinking coffee?' },
       regular:  { fa:'تمرکز حسی‌ت بیشتر رو کدوم جنبه‌ست؟', en:'Which sensory aspect do you focus on most?' },
-      expert:   { fa:'تمرکز حسی اصلی؟', en:'Primary sensory focus?' }
+      expert:   { fa:'تمرکز حسی اصلی؟', en:'Primary sensory focus?' },
+      // ✅ نسخه‌ی نهایی — تأییدشده توسط کارشناس فرهنگی
+      cyber:    { fa:'چی بیشتر جلب توجهت می‌کنه؟', en:'What grabs your attention most?' },
+      harmony:  { fa:'چی بیشتر باهات حرف می‌زنه؟', en:'What speaks to you the most?' },
+      damavand: { fa:'چی بیشتر تو وجودت می‌شینه؟', en:'What settles most deeply within you?' }
     },
     edu: {
       beginner: { fa:'بعضی‌ها بیشتر بو رو حس می‌کنن، بعضی‌ها بافت یا طعم باقی‌مونده رو.', en:'Some people notice smell most, others texture or the taste that lingers.' },
-      regular:  { fa:'این محور کمک می‌کنه بفهمیم توضیح دونه رو بیشتر رو کدوم جنبه‌ی حسی متمرکز کنیم.', en:'This helps us know which sensory aspect to emphasize when describing a bean to you.' }
+      regular:  { fa:'این محور کمک می‌کنه بفهمیم توضیح دونه رو بیشتر رو کدوم جنبه‌ی حسی متمرکز کنیم.', en:'This helps us know which sensory aspect to emphasize when describing a bean to you.' },
+      cyber:    { fa:'بعضیا رو یه حس خاص فوکوس می‌کنن، بعضیا کل ویایب رو با هم می‌گیرن.', en:'Some focus on one specific sense, others take in the whole vibe.' },
+      harmony:  { fa:'بعضی‌ها رو یه حس خاص تمرکز می‌کنن، بعضی‌ها هماهنگی کل تجربه رو می‌بینن.', en:'Some focus on one specific sense, others see the harmony of the whole experience.' },
+      damavand: { fa:'بعضی‌ها یه حس خاص رو دنبال می‌کنن، بعضی‌ها استحکام کل تجربه رو می‌خوان.', en:'Some chase one specific sense, others want the solidity of the whole experience.' }
     },
     options: {
       beginner: [ {v:'aroma', fa:'بوش', en:'The smell'}, {v:'texture', fa:'حسی که تو دهنم داره', en:'How it feels in my mouth'}, {v:'aftertaste', fa:'طعمی که بعدش می‌مونه', en:'The taste that lingers after'}, {v:'balance', fa:'کل حسش با هم', en:'The whole experience together'} ],
       regular:  [ {v:'aroma', fa:'عطر و رایحه', en:'Aroma'}, {v:'texture', fa:'بافت و بدنه', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'پس‌مزه', en:'Aftertaste'}, {v:'balance', fa:'تعادل کلی', en:'Overall Balance'} ],
-      expert:   [ {v:'aroma', fa:'عطر و رایحه', en:'Aroma'}, {v:'texture', fa:'بافت دهانی', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'پس‌مزه', en:'Aftertaste'}, {v:'balance', fa:'تعادل کلی', en:'Overall Balance'} ]
+      expert:   [ {v:'aroma', fa:'عطر و رایحه', en:'Aroma'}, {v:'texture', fa:'بافت دهانی', en:'Mouthfeel / Texture'}, {v:'aftertaste', fa:'پس‌مزه', en:'Aftertaste'}, {v:'balance', fa:'تعادل کلی', en:'Overall Balance'} ],
+      cyber:    [ {v:'aroma', fa:'اولین موجِ عطرش، همون لحظه‌ی اول', en:'That first wave of aroma, right at the start'}, {v:'texture', fa:'تکستچر و حسی که تو دهن می‌سازه', en:'The texture and mouthfeel it creates'}, {v:'aftertaste', fa:'افترتیست و ردّی که بعدش تو ذهنم می‌مونه', en:'The aftertaste and the trace it leaves in my mind'}, {v:'balance', fa:'اورال ویایب (Overall Vibe)؛ ترکیب همه‌چی با هم', en:'The overall vibe — everything combined'} ],
+      harmony:  [ {v:'aroma', fa:'رایحه‌ای که فضا رو پر می‌کنه', en:'The aroma that fills the space'}, {v:'texture', fa:'بافت مخملی که تو دهن آرومم می‌کنه', en:'The velvety texture that calms me in the mouth'}, {v:'aftertaste', fa:'ردّی که آروم‌آروم ماندگار می‌شه', en:'The trace that slowly settles and lasts'}, {v:'balance', fa:'هماهنگی و هارمونی کل تجربه', en:'The harmony of the whole experience'} ],
+      damavand: [ {v:'aroma', fa:'عطری اصیل که یادآور خاطرات ریشه‌داره', en:'An authentic aroma that recalls rooted memories'}, {v:'texture', fa:'بافتی سنگین‌وزن که حس وقار و پایداری داره', en:'A weighty texture that feels dignified and steady'}, {v:'aftertaste', fa:'طعم ماندگاری که تا مدت‌ها همراهم می‌مونه', en:'A lasting taste that stays with me for a long time'}, {v:'balance', fa:'استحکام، یکپارچگی و اصالت کل تجربه', en:'The solidity, unity, and authenticity of the whole experience'} ]
     }
   },
   // محور فرآوری — قبلاً فقط سطح Expert (و فقط تو Refresh Mode) می‌دیدش؛ حالا برای هر ۳ سطح
@@ -2223,6 +2280,27 @@ const MEMORY_QUESTIONS = [
 const DEEP_AXES = ['context', 'ritual', 'evolution', 'sensory_attention', 'finish_preference', 'moment'];
 let phase2AxesToAsk = [];   // محورهایی که این نشست باید پرسیده بشن (حداکثر ۳ تا)
 let isRefreshMode = false;  // true یعنی «عمق کامل» — داریم قدیمی‌ترین محور رو دوباره می‌پرسیم
+
+// ══════ لایه‌ی آرکی‌تایپ فرهنگی — فقط زبان/لحن سؤالات فاز۲ رو تو Refresh Mode عوض می‌کنه ══════
+// هیچ محور امتیازدهی جدیدی نمی‌سازه؛ فقط از داده‌ی موجود (mood/rarity/processing) مشتق می‌شه
+// و کدوم نسخه‌ی متنی (title/edu/options) از QUESTIONS نمایش داده بشه رو تعیین می‌کنه.
+// تصمیم‌شده: این لایه هرگز جایگزین سؤالات اصلی (صفحات ۱-۱۰) یا اولین دور فاز۲ نمی‌شه —
+// فقط وقتی isRefreshMode=true (یعنی کاربر همه‌ی محورها رو حداقل یه‌بار جواب داده) فعال می‌شه.
+let currentArchetype = null;
+function computeArchetype() {
+  const scores = { cyber: 0, harmony: 0, damavand: 0 };
+  if (ans.mood === 'sensory') scores.cyber += 2;
+  if (ans.rarity === 'curious' || ans.rarity === 'rare') scores.cyber += 1;
+  if (ans.processing === 'experimental') scores.cyber += 2;
+  if (ans.mood === 'relax') scores.harmony += 2;
+  if (ans.rarity === 'curious') scores.harmony += 1;
+  if (ans.processing === 'natural') scores.harmony += 2;
+  if (ans.mood === 'focus') scores.damavand += 2;
+  if (ans.rarity === 'everyday') scores.damavand += 2;
+  if (ans.processing === 'washed') scores.damavand += 2;
+  const top = Object.entries(scores).sort((a, b) => b[1] - a[1])[0];
+  return top[1] > 0 ? top[0] : 'harmony'; // خنثی‌ترین حالت وقتی سیگنال کافی نیست
+}
 
 async function getUncoveredAxes(userId) {
   let profiles = [];
@@ -2346,9 +2424,14 @@ async function continueReturningUserFlow() {
 
 function renderQuestion(screenNum, axis, level) {
   const q = QUESTIONS[axis];
+  // اگه تو Refresh Mode هستیم و این محور جزو محورهای عمیق فاز۲ هست و نسخه‌ی آرکی‌تایپی داریم،
+  // به‌جای زبان خنثیِ سطح تجربه، زبان آرکی‌تایپ فرهنگی نمایش داده می‌شه — فقط لحن عوض می‌شه،
+  // خودِ محور امتیازدهی (v-values) دقیقاً همونیه که همیشه بوده
+  const useArchetype = isRefreshMode && currentArchetype && DEEP_AXES.includes(axis) && q.title[currentArchetype];
+  const textKey = useArchetype ? currentArchetype : level;
   document.getElementById('q-title-' + screenNum).innerHTML =
-    '<span class="fa-only" style="direction:rtl">' + q.title[level].fa + '</span>' +
-    '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + q.title[level].en + '</span>';
+    '<span class="fa-only" style="direction:rtl">' + q.title[textKey].fa + '</span>' +
+    '<span class="en-only" style="direction:ltr;text-align:left;display:block;">' + q.title[textKey].en + '</span>';
   const progressLabelEl = document.getElementById('progress-label-' + screenNum);
   if (progressLabelEl && typeof screenNum === 'number') {
     progressLabelEl.innerHTML =
@@ -2365,10 +2448,10 @@ function renderQuestion(screenNum, axis, level) {
     badge.id = badgeId;
     header.insertBefore(badge, header.firstChild);
   }
-  badge.textContent = LEVEL_META[level].emoji;
+  badge.textContent = useArchetype ? ARCHETYPE_META[currentArchetype].emoji : LEVEL_META[level].emoji;
 
   const eduEl = document.getElementById('q-edu-' + screenNum);
-  const eduText = q.edu[level]; // فقط beginner/regular مقدار دارن؛ متخصص عمداً خالیه
+  const eduText = q.edu[textKey]; // فقط beginner/regular مقدار دارن؛ متخصص عمداً خالیه
   if (eduText) {
     eduEl.innerHTML =
       '<span class="fa-only" style="direction:rtl">💡 ' + eduText.fa + '</span>' +
@@ -2377,7 +2460,7 @@ function renderQuestion(screenNum, axis, level) {
   } else { eduEl.style.display = 'none'; }
 
   const optsWrap = document.getElementById('q-options-' + screenNum);
-  const opts = q.options[level];
+  const opts = q.options[textKey];
 
   // محور «طعم» به‌جای دکمه، با چرخ طعم (الهام از SCA Flavor Wheel) نمایش داده می‌شه
   if (axis === 'taste') {
@@ -4189,6 +4272,7 @@ async function proceedToPhase2Setup(last) {
   const coverage = await getUncoveredAxes(currentUser.id);
   phase2AxesToAsk = coverage.axesToAsk;
   isRefreshMode = coverage.isRefreshMode;
+  currentArchetype = isRefreshMode ? computeArchetype() : null;
   // محورهایی که از قبل جواب داریم، همین نشست هم اعمال بشن — تا پیشنهاد دقیق‌تر بمونه
   // حتی وقتی این نشست دوباره ازشون پرسیده نمی‌شه
   DEEP_AXES.forEach(axis => { if (coverage.knownValues[axis] !== undefined) ans[axis] = coverage.knownValues[axis]; });
