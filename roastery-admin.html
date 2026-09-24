@@ -783,6 +783,23 @@ const SUPABASE_URL = 'https://qoxmkuivwpbdzmajplus.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_7hyhxDcQFTGjgNwufRx7og_GaBYogpX';
 const ADMIN_EMAIL_DOMAIN = '@app.local'; // ایمیل مصنوعی پشت‌صحنه؛ در دیتابیس فقط admin@app.local فعاله
 
+/* ═══════════════════════════════════════════
+   SECURITY — جلوگیری از اجرای کد داخل متن مشتری (اسم، آدرس، یادداشت، پیام، نظر)
+   قبلاً این‌ها مستقیم و بدون هیچ پاک‌سازی‌ای در innerHTML گذاشته می‌شدند — یعنی هر مشتری‌ای
+   با یک اسم مثل <img onerror=...> می‌توانست کد دلخواه در مرورگر ادمین اجرا کند.
+═══════════════════════════════════════════ */
+function escapeHtml(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+// برای رد کردن اسم/متن کاربر به‌عنوان پارامتر یک onclick، به‌جای گذاشتن مستقیم داخل رشته‌ی
+// تک‌کوتیشن (که با یک ' داخل اسم کاربر می‌شکند)، اینجا امن‌اش می‌کنیم — طرف مقابل با
+// decodeURIComponent برش می‌گرداند
+function encAttr(v) {
+  return encodeURIComponent(v == null ? '' : v);
+}
+
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { storageKey: 'roastery-admin-auth' }
 });
@@ -1017,12 +1034,13 @@ function orderRow(o) {
   const beanName = (o.bean_name || '').split('(')[0].trim() || '—';
   return `<tr>
     <td>
-      <div class="customer-name">${user.name || '—'}</div>
-      <div class="customer-phone">${user.phone || '—'}</div>
+      <div class="customer-name">${escapeHtml(user.name) || '—'}</div>
+      <div class="customer-phone">${escapeHtml(user.phone) || '—'}</div>
     </td>
     <td>
-      <div class="bean-name">${beanName}</div>
+      <div class="bean-name">${escapeHtml(beanName)}</div>
       <div class="bean-detail">${o.amount}g</div>
+      ${o.discount_pct_applied ? `<div style="margin-top:4px;"><span class="badge" style="background:#FFF3D6;color:#8A6D1D;">🎁 ${o.discount_pct_applied}٪ تخفیف</span></div>` : ''}
     </td>
     <td>${o.amount}g</td>
     <td>${statusBadge(o.status)}</td>
@@ -1037,7 +1055,7 @@ function orderRow(o) {
         ${o.status === 'confirmed' ? `
           <button class="btn btn-ship" onclick="updateOrderStatus('${o.id}','shipped')">🚚 ارسال شد</button>
         ` : ''}
-        <button class="btn btn-view" onclick="openMsgModal('${o.users?.id || ''}','${user.name || ''}','${o.id}')">💬</button>
+        <button class="btn btn-view" onclick="openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')">💬</button>
       </div>
     </td>
   </tr>`;
@@ -1108,20 +1126,21 @@ async function viewOrder(orderId) {
     <div class="notif-bar" id="modal-notif"></div>
 
     <div class="profile-detail">
-      <div class="profile-row"><span class="profile-key">مشتری</span><span class="profile-val">${user.name || '—'}</span></div>
-      <div class="profile-row"><span class="profile-key">موبایل</span><span class="profile-val" style="direction:ltr;">${user.phone || '—'}</span></div>
-      <div class="profile-row"><span class="profile-key">دانه سفارشی</span><span class="profile-val">${order.bean_name || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">مشتری</span><span class="profile-val">${escapeHtml(user.name) || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">موبایل</span><span class="profile-val" style="direction:ltr;">${escapeHtml(user.phone) || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">دانه سفارشی</span><span class="profile-val">${escapeHtml(order.bean_name) || '—'}</span></div>
       <div class="profile-row"><span class="profile-key">مقدار</span><span class="profile-val">${order.amount}g</span></div>
       <div class="profile-row"><span class="profile-key">وضعیت</span><span class="profile-val">${statusBadge(order.status)}</span></div>
-      <div class="profile-row"><span class="profile-key">کد پیگیری</span><span class="profile-val">${order.transaction_id || '—'}</span></div>
-      <div class="profile-row"><span class="profile-key">آدرس</span><span class="profile-val">${order.address || '—'}</span></div>
-      ${order.notes ? `<div class="profile-row"><span class="profile-key">یادداشت</span><span class="profile-val">${order.notes}</span></div>` : ''}
+      <div class="profile-row"><span class="profile-key">کد پیگیری</span><span class="profile-val">${escapeHtml(order.transaction_id) || '—'}</span></div>
+      <div class="profile-row"><span class="profile-key">آدرس</span><span class="profile-val">${escapeHtml(order.address) || '—'}</span></div>
+      ${order.discount_pct_applied ? `<div class="profile-row" style="background:#FFF3D6;border-radius:8px;padding:8px 10px;"><span class="profile-key">🎁 تخفیف اعمال‌شده</span><span class="profile-val" style="font-weight:700;color:#8A6D1D;">${order.discount_pct_applied}٪ (از جعبه‌شانس بین‌کردیت)</span></div>` : ''}
+      ${order.notes ? `<div class="profile-row"><span class="profile-key">یادداشت</span><span class="profile-val">${escapeHtml(order.notes)}</span></div>` : ''}
     </div>
 
     ${order.receipt_url ? `
       <div style="margin-bottom:16px;">
         <div class="input-label" style="margin-bottom:8px;">تصویر رسید پرداخت</div>
-        <a href="${order.receipt_url}" target="_blank" class="receipt-link">🔗 مشاهده رسید در Google Drive</a>
+        <a href="${escapeHtml(order.receipt_url)}" target="_blank" class="receipt-link">🔗 مشاهده رسید در Google Drive</a>
       </div>
     ` : '<div style="color:#BBB;font-size:13px;margin-bottom:16px;">رسیدی آپلود نشده</div>'}
 
@@ -1129,12 +1148,12 @@ async function viewOrder(orderId) {
       <div style="margin-bottom:16px;">
         <div class="input-label" style="margin-bottom:8px;">پروفایل قهوه مشتری</div>
         <div class="profile-detail">
-          <div class="profile-row"><span class="profile-key">پرسونا</span><span class="profile-val">${personaFA[profile.persona] || profile.persona || '—'}</span></div>
-          <div class="profile-row"><span class="profile-key">طعم</span><span class="profile-val">${tasteFA[profile.flavor] || profile.flavor || '—'}</span></div>
-          <div class="profile-row"><span class="profile-key">بدنه</span><span class="profile-val">${bodyFA[profile.body] || profile.body || '—'}</span></div>
-          <div class="profile-row"><span class="profile-key">روش دم‌آوری</span><span class="profile-val">${brewFA[profile.brew_method] || profile.brew_method || '—'}</span></div>
-          <div class="profile-row"><span class="profile-key">اسیدیته</span><span class="profile-val">${acidityFA[profile.acidity] || profile.acidity || '—'}</span></div>
-          ${profile.review_text ? `<div class="profile-row"><span class="profile-key">نظر مشتری</span><span class="profile-val">${profile.review_text}</span></div>` : ''}
+          <div class="profile-row"><span class="profile-key">پرسونا</span><span class="profile-val">${escapeHtml(personaFA[profile.persona] || profile.persona) || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">طعم</span><span class="profile-val">${escapeHtml(tasteFA[profile.flavor] || profile.flavor) || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">بدنه</span><span class="profile-val">${escapeHtml(bodyFA[profile.body] || profile.body) || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">روش دم‌آوری</span><span class="profile-val">${escapeHtml(brewFA[profile.brew_method] || profile.brew_method) || '—'}</span></div>
+          <div class="profile-row"><span class="profile-key">اسیدیته</span><span class="profile-val">${escapeHtml(acidityFA[profile.acidity] || profile.acidity) || '—'}</span></div>
+          ${profile.review_text ? `<div class="profile-row"><span class="profile-key">نظر مشتری</span><span class="profile-val">${escapeHtml(profile.review_text)}</span></div>` : ''}
           ${profile.review_rating ? `<div class="profile-row"><span class="profile-key">امتیاز</span><span class="profile-val">${'⭐'.repeat(profile.review_rating)}</span></div>` : ''}
         </div>
       </div>
@@ -1148,7 +1167,7 @@ async function viewOrder(orderId) {
       ${order.status === 'confirmed' ? `
         <button class="btn btn-ship" onclick="updateOrderStatus('${order.id}','shipped')">🚚 ثبت ارسال</button>
       ` : ''}
-      <button class="btn btn-view" onclick="openMsgModal('${user.id || ''}','${user.name || ''}','${order.id}')">💬 ارسال پیام به مشتری</button>
+      <button class="btn btn-view" onclick="openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')">💬 ارسال پیام به مشتری</button>
     </div>
   `;
   document.getElementById('order-modal').style.display = 'flex';
@@ -1183,8 +1202,8 @@ async function loadProfiles() {
       const beanName = (p.recommended_bean || '').split('(')[0].trim() || '—';
       return `<tr>
         <td>
-          <div class="customer-name">${user.name || '—'}</div>
-          <div class="customer-phone">${user.phone || '—'}</div>
+          <div class="customer-name">${escapeHtml(user.name) || '—'}</div>
+          <div class="customer-phone">${escapeHtml(user.phone) || '—'}</div>
         </td>
         <td>${personaFA[p.persona] || p.persona || '—'}</td>
         <td><div class="bean-name">${beanName}</div></td>
@@ -1218,13 +1237,13 @@ async function loadCustomers() {
     tbody.innerHTML = (users || []).map(u => {
       const dateFA = new Date(u.created_at).toLocaleDateString('fa-IR', {year:'numeric', month:'short', day:'numeric'});
       return `<tr>
-        <td><div class="customer-name">${u.name || '—'}</div></td>
-        <td><div class="customer-phone">${u.phone || '—'}</div></td>
+        <td><div class="customer-name">${escapeHtml(u.name) || '—'}</div></td>
+        <td><div class="customer-phone">${escapeHtml(u.phone) || '—'}</div></td>
         <td style="text-align:center;">${profileCount[u.id] || 0}</td>
         <td style="text-align:center;">${orderCount[u.id] || 0}</td>
         <td>${dateFA}</td>
         <td>
-          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${u.name || ''}',null)">💬 پیام</button>
+          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${encAttr(u.name)}',null)">💬 پیام</button>
         </td>
       </tr>`;
     }).join('');
@@ -1343,7 +1362,7 @@ async function loadFollowupQueue() {
         <div class="section-card" style="margin-bottom:14px;border-right:4px solid ${meta.border};">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
             <div>
-              <div style="font-weight:700;font-size:15px;">${u.name || 'نامشخص'} <span style="color:#999;font-weight:400;font-size:12.5px;">— ${u.phone || '—'}</span></div>
+              <div style="font-weight:700;font-size:15px;">${escapeHtml(u.name) || 'نامشخص'} <span style="color:#999;font-weight:400;font-size:12.5px;">— ${escapeHtml(u.phone) || '—'}</span></div>
               <div style="font-size:12.5px;color:#999;margin-top:4px;">${dateStr}</div>
             </div>
             <div style="background:${meta.bg};color:${meta.color};padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">${meta.label}</div>
@@ -1353,7 +1372,7 @@ async function loadFollowupQueue() {
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">مشکل: ${issueLabel}</span>
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">رضایت: ⭐${f.satisfaction != null ? f.satisfaction : '—'}</span>
           </div>
-          ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${f.notes}</div>` : ''}
+          ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${escapeHtml(f.notes)}</div>` : ''}
           <div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 قول هدیه‌ی سفارش بعدی داده شده — یادت باشه موقع سفارش بعدیش اعمالش کنی</div>
           <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" onclick="markFollowupResolved('${f.id}')">✅ پیگیری شد و حل شد</button>
         </div>
@@ -1475,7 +1494,7 @@ async function loadFeedbackReport() {
         <td>${satStr}</td>
         <td>${brewStr}</td>
         <td>${grindStr}</td>
-        <td style="color:var(--medium-brown);max-width:280px;">${f.notes || '—'}</td>
+        <td style="color:var(--medium-brown);max-width:280px;">${escapeHtml(f.notes) || '—'}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ بازخوردی ثبت نشده</td></tr>';
   } catch(e) {
@@ -1691,12 +1710,12 @@ async function loadMessages() {
       return;
     }
     list.innerHTML = users.map(u => `
-      <div class="msg-user-item ${selectedMsgUserId === u.id ? 'selected' : ''}" onclick="selectMsgUser('${u.id}','${u.name}')">
+      <div class="msg-user-item ${selectedMsgUserId === u.id ? 'selected' : ''}" onclick="selectMsgUser('${u.id}','${encAttr(u.name)}')">
         <div style="font-size:28px;">👤</div>
         <div style="flex:1;">
-          <div class="msg-user-name">${u.name || '—'} ${unreadCount[u.id] ? `<span class="unread-dot"></span>` : ''}</div>
-          <div class="msg-user-phone">${u.phone || '—'}</div>
-          <div class="msg-user-preview">${lastMsg[u.id] ? lastMsg[u.id].text.substring(0, 40) + '...' : 'هنوز پیامی نیست'}</div>
+          <div class="msg-user-name">${escapeHtml(u.name) || '—'} ${unreadCount[u.id] ? `<span class="unread-dot"></span>` : ''}</div>
+          <div class="msg-user-phone">${escapeHtml(u.phone) || '—'}</div>
+          <div class="msg-user-preview">${lastMsg[u.id] ? escapeHtml(lastMsg[u.id].text.substring(0, 40)) + '...' : 'هنوز پیامی نیست'}</div>
         </div>
       </div>
     `).join('');
@@ -1711,6 +1730,7 @@ async function loadMessages() {
 
 async function selectMsgUser(userId, userName) {
   selectedMsgUserId = userId;
+  userName = decodeURIComponent(userName || '');
   document.querySelectorAll('.msg-user-item').forEach(i => i.classList.remove('selected'));
   event.currentTarget.classList.add('selected');
 
@@ -1726,14 +1746,14 @@ function renderMsgChat(userId, msgs, userName = '') {
   const area = document.getElementById('msg-chat-area');
   area.innerHTML = `
     <div style="padding:12px 16px;border-bottom:1px solid #F0EAE0;font-weight:bold;font-size:14px;color:var(--dark-brown);">
-      ${userName || 'مشتری'}
+      ${escapeHtml(userName) || 'مشتری'}
     </div>
     <div class="msg-chat-messages" id="chat-messages">
       ${!msgs.length ? '<div style="text-align:center;color:#BBB;font-size:13px;margin:auto;">هنوز پیامی ردوبدل نشده</div>' :
         msgs.map(m => `
           <div>
             <div class="msg-bubble ${m.from_admin ? 'admin' : 'customer'}">
-              ${m.text}
+              ${escapeHtml(m.text)}
               <div class="msg-bubble-time">${new Date(m.created_at).toLocaleTimeString('fa-IR', {hour:'2-digit', minute:'2-digit'})}</div>
             </div>
           </div>
@@ -1778,18 +1798,19 @@ async function sendMessage(userId) {
 async function openMsgModal(userId, userName, orderId) {
   if (!userId) return;
   selectedMsgUserId = userId;
+  userName = decodeURIComponent(userName || '');
   const msgs = await sb('GET', `messages?user_id=eq.${userId}&order=created_at.asc`).catch(() => []);
 
   document.getElementById('msg-modal-content').innerHTML = `
-    <div style="margin-bottom:12px;font-size:13px;color:#888;">پیام به: <strong>${userName}</strong></div>
+    <div style="margin-bottom:12px;font-size:13px;color:#888;">پیام به: <strong>${escapeHtml(userName)}</strong></div>
     <div class="msg-thread" style="max-height:250px;overflow-y:auto;margin-bottom:16px;">
       ${!msgs.length ? '<div class="empty-msgs">هنوز پیامی ردوبدل نشده</div>' :
         msgs.map(m => `
           <div class="msg-item ${m.from_admin ? 'admin' : 'customer'}">
             <div class="msg-avatar ${m.from_admin ? 'admin-av' : 'customer-av'}">${m.from_admin ? '👨‍💼' : '👤'}</div>
             <div class="msg-content">
-              <div class="msg-sender">${m.from_admin ? 'رستری' : userName}</div>
-              <div class="msg-text">${m.text}</div>
+              <div class="msg-sender">${m.from_admin ? 'رستری' : escapeHtml(userName)}</div>
+              <div class="msg-text">${escapeHtml(m.text)}</div>
               <div class="msg-time">${new Date(m.created_at).toLocaleString('fa-IR')}</div>
             </div>
           </div>
