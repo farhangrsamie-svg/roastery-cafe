@@ -1,8 +1,8 @@
 {
-  "name": "قهوتو | Coffee Identity",
-  "short_name": "قهوتو",
+  "name": "Coffee Identity | هویت قهوه",
+  "short_name": "Coffee Identity",
   "description": "پلتفرم شخصی‌سازی و رست قهوه — پروفایل قهوه‌ی شخصی خودت رو بساز",
-  "start_url": "./cafe-app-fa-final.html",
+  "start_url": "./cafe-app-soshians.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -29,5 +29,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "id": "./cafe-app-soshians.html"
 }
