@@ -253,7 +253,17 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 .page { display: none; }
 .page.active { display: block; }
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<!-- کتابخانه‌ی Supabase از خود سایت بارگذاری می‌شود، با نسخه‌ی ثابت — نه از CDN بیرونی با «آخرین نسخه‌ی ۲».
+     قبلاً هر تغییر یا دست‌کاری در آن CDN مستقیم در اپ و پنل ادمین اجرا می‌شد. برای به‌روزرسانی: فایل تازه + تغییر همین خط -->
+<script src="./supabase-js-2.117.1.js"></script>
+<script>
+  // اگر فایل محلی کتابخانه در دسترس نبود (مثلاً پیش‌نمایش فایل تکی، یا باز کردن فایل روی کامپیوتر بدون فایل کتابخانه کنارش)،
+  // همان نسخه‌ی دقیق از CDN بارگذاری می‌شود — با integrity، یعنی مرورگر فقط در صورتی اجرایش می‌کند که
+  // بایت‌به‌بایت با همین نسخه‌ی تأییدشده یکی باشد. هر دست‌کاری در CDN = اجرا نمی‌شود.
+  if (!window.supabase) {
+    document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js" integrity="sha384-K1nraABOP/zFehpLIUksXebbs7jMpB8gYMlb+uhVKZcWT/9Vkq1+qhv6ndC+1Yuz" crossorigin="anonymous"><\/script>');
+  }
+</script>
 </head>
 <body>
 
@@ -811,6 +821,28 @@ function adminUsernameToEmail(username) {
 /* ═══════════════════════════════════════════
    SUPABASE HELPER (REST — با توکن نشست واقعی ادمین)
 ═══════════════════════════════════════════ */
+// رسیدها در Storage خصوصی Supabase هستن؛ ادمین فقط یه لینک موقت ۵ دقیقه‌ای می‌گیره.
+// رسیدهای قدیمیِ تستی که لینک Google Drive دارن فقط اگه واقعاً آدرس https گوگل باشن به‌صورت لینک نشون داده می‌شن
+// (قبلاً هر مقداری، حتی javascript:، مستقیم داخل href می‌رفت).
+async function renderReceiptSlot(value) {
+  const slot = document.getElementById('receipt-slot');
+  if (!slot) return;
+  if (/^https:\/\/drive\.google\.com\//.test(value)) {
+    slot.innerHTML = `<a href="${escapeHtml(value)}" target="_blank" rel="noopener noreferrer" class="receipt-link">🔗 رسید قدیمی (Google Drive)</a>`;
+    return;
+  }
+  if (/^[a-z]+:/i.test(value)) { slot.textContent = 'آدرس رسید نامعتبر است'; return; }
+  const { data, error } = await supabaseClient.storage.from('receipts').createSignedUrl(value, 300);
+  if (error || !data?.signedUrl) { slot.textContent = 'رسید پیدا نشد یا دسترسی ندارید'; return; }
+  slot.innerHTML = '';
+  const a = document.createElement('a');
+  a.href = data.signedUrl; a.target = '_blank'; a.rel = 'noopener noreferrer';
+  const img = document.createElement('img');
+  img.src = data.signedUrl; img.className = 'receipt-img'; img.alt = 'رسید پرداخت';
+  a.appendChild(img);
+  slot.appendChild(a);
+}
+
 async function sb(method, path, body = null) {
   const { data: { session } } = await supabaseClient.auth.getSession();
   const token = session ? session.access_token : SUPABASE_KEY;
@@ -1025,7 +1057,7 @@ function statusBadge(status) {
     shipped: '<span class="badge badge-shipped">🚚 ارسال شد</span>',
     cancelled: '<span class="badge badge-cancelled">❌ کنسل شد</span>',
   };
-  return map[status] || `<span class="badge">${status}</span>`;
+  return map[status] || `<span class="badge">${escapeHtml(status)}</span>`;
 }
 
 function orderRow(o) {
@@ -1076,7 +1108,7 @@ async function loadOrders(filter) {
     }
     tbody.innerHTML = orders.map(o => orderRow(o)).join('');
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
   }
 }
 
@@ -1093,7 +1125,10 @@ async function updateOrderStatus(orderId, status) {
     closeModal('order-modal');
     showNotif(status === 'confirmed' ? '✅ سفارش تأیید شد' : status === 'shipped' ? '🚚 وضعیت ارسال ثبت شد' : '❌ سفارش رد شد', status === 'cancelled' ? 'error' : 'success');
   } catch(e) {
-    showNotif('خطا: ' + e.message, 'error');
+    const m = String(e.message || '');
+    showNotif(/invalid_status_transition/.test(m) ? 'این تغییر وضعیت مجاز نیست (مثلاً سفارش لغوشده یا ارسال‌شده قابل برگشت نیست) — صفحه را تازه کنید'
+            : /order_fields_locked/.test(m) ? 'این بخش از سفارش قابل ویرایش نیست'
+            : 'خطا: ' + m, 'error');
   }
 }
 
@@ -1140,7 +1175,7 @@ async function viewOrder(orderId) {
     ${order.receipt_url ? `
       <div style="margin-bottom:16px;">
         <div class="input-label" style="margin-bottom:8px;">تصویر رسید پرداخت</div>
-        <a href="${escapeHtml(order.receipt_url)}" target="_blank" class="receipt-link">🔗 مشاهده رسید در Google Drive</a>
+        <div id="receipt-slot" style="color:#999;font-size:13px;">در حال بارگذاری رسید...</div>
       </div>
     ` : '<div style="color:#BBB;font-size:13px;margin-bottom:16px;">رسیدی آپلود نشده</div>'}
 
@@ -1170,6 +1205,7 @@ async function viewOrder(orderId) {
       <button class="btn btn-view" onclick="openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')">💬 ارسال پیام به مشتری</button>
     </div>
   `;
+  if (order.receipt_url) renderReceiptSlot(order.receipt_url);
   document.getElementById('order-modal').style.display = 'flex';
 }
 
@@ -1205,16 +1241,16 @@ async function loadProfiles() {
           <div class="customer-name">${escapeHtml(user.name) || '—'}</div>
           <div class="customer-phone">${escapeHtml(user.phone) || '—'}</div>
         </td>
-        <td>${personaFA[p.persona] || p.persona || '—'}</td>
-        <td><div class="bean-name">${beanName}</div></td>
-        <td>${tasteFA[p.flavor] || p.flavor || '—'} / ${bodyFA[p.body] || p.body || '—'}</td>
-        <td>${brewFA[p.brew_method] || p.brew_method || '—'}</td>
+        <td>${escapeHtml(personaFA[p.persona] || p.persona || '—')}</td>
+        <td><div class="bean-name">${escapeHtml(beanName)}</div></td>
+        <td>${escapeHtml(tasteFA[p.flavor] || p.flavor || '—')} / ${escapeHtml(bodyFA[p.body] || p.body || '—')}</td>
+        <td>${escapeHtml(brewFA[p.brew_method] || p.brew_method || '—')}</td>
         <td>${p.review_rating ? '⭐'.repeat(p.review_rating) : '—'}</td>
         <td>${dateFA}</td>
       </tr>`;
     }).join('');
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
   }
 }
 
@@ -1248,7 +1284,7 @@ async function loadCustomers() {
       </tr>`;
     }).join('');
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
   }
 }
 
@@ -1288,7 +1324,7 @@ async function loadGapsReport() {
     breakdownEl.innerHTML = breakdownEntries.length
       ? breakdownEntries.map(([key, count]) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
-          <span>${key}</span>
+          <span>${escapeHtml(key)}</span>
           <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
         </div>`).join('')
       : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز هیچ شکافی ثبت نشده — عالیه!</div>';
@@ -1298,13 +1334,13 @@ async function loadGapsReport() {
       const levelFA = { beginner:'🌱 مبتدی', regular:'☕ معمولی', expert:'🏆 متخصص' }[g.experience_level] || g.experience_level || '—';
       return `<tr>
         <td>${dateFA}</td>
-        <td>${levelFA}</td>
-        <td style="color:var(--medium-brown);">${g.catalog_gap_detail || '—'}</td>
-        <td>${(g.recommended_bean || '—').split('(')[0].trim()}</td>
+        <td>${escapeHtml(levelFA)}</td>
+        <td style="color:var(--medium-brown);">${escapeHtml(g.catalog_gap_detail || '—')}</td>
+        <td>${escapeHtml((g.recommended_bean || '—').split('(')[0].trim())}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="4" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ شکافی ثبت نشده</td></tr>';
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
     breakdownEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
@@ -1446,7 +1482,7 @@ async function loadFeedbackReport() {
     byBeanEl.innerHTML = beanEntries.length
       ? beanEntries.map(([name, d]) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
-          <span>${name}</span>
+          <span>${escapeHtml(name)}</span>
           <span style="font-weight:700;color:var(--medium-brown);">⭐ ${(d.sum / d.count).toFixed(1)} (${d.count.toLocaleString('fa-IR')} بازخورد)</span>
         </div>`).join('')
       : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز هیچ بازخوردی ثبت نشده</div>';
@@ -1462,7 +1498,7 @@ async function loadFeedbackReport() {
     byBrewEl.innerHTML = brewEntries.length
       ? brewEntries.map(([key, count]) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
-          <span>${key}</span>
+          <span>${escapeHtml(key)}</span>
           <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
         </div>`).join('')
       : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست</div>';
@@ -1478,7 +1514,7 @@ async function loadFeedbackReport() {
     byGrindEl.innerHTML = grindEntries.length
       ? grindEntries.map(([key, count]) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
-          <span>${key}</span>
+          <span>${escapeHtml(key)}</span>
           <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} مورد</span>
         </div>`).join('')
       : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست (یا همه roastery_ground بودن)</div>';
@@ -1490,15 +1526,15 @@ async function loadFeedbackReport() {
       const grindStr = grindFA[f.grind_type] || f.grind_type || '—';
       return `<tr>
         <td>${dateFA}</td>
-        <td>${(f.bean_name || '—').split('(')[0].trim()}</td>
+        <td>${escapeHtml((f.bean_name || '—').split('(')[0].trim())}</td>
         <td>${satStr}</td>
-        <td>${brewStr}</td>
-        <td>${grindStr}</td>
+        <td>${escapeHtml(brewStr)}</td>
+        <td>${escapeHtml(grindStr)}</td>
         <td style="color:var(--medium-brown);max-width:280px;">${escapeHtml(f.notes) || '—'}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="6" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ بازخوردی ثبت نشده</td></tr>';
   } catch(e) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
     byBeanEl.innerHTML = byBrewEl.innerHTML = byGrindEl.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
 }
@@ -1546,7 +1582,7 @@ async function loadSurveyReport() {
     el.innerHTML = entries.length
       ? entries.map(([val, count]) => `
         <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #F0EAE0;">
-          <span>${labelMap[val] || val}</span>
+          <span>${escapeHtml(labelMap[val] || val)}</span>
           <span style="font-weight:700;color:var(--medium-brown);">${count.toLocaleString('fa-IR')} نفر</span>
         </div>`).join('')
       : '<div style="text-align:center;padding:30px;color:#BBB;">هنوز داده‌ای نیست</div>';
@@ -1594,18 +1630,18 @@ async function loadSurveyReport() {
       ? list.map(r => `
         <tr>
           <td>${r.created_at ? new Date(r.created_at).toLocaleDateString('fa-IR') : '—'}</td>
-          <td>${r.name || 'ناشناس'}</td>
+          <td>${escapeHtml(r.name || 'ناشناس')}</td>
           <td>${r.bean_match_accuracy != null ? '⭐ ' + r.bean_match_accuracy : '—'}</td>
           <td>${r.persona_accuracy != null ? '⭐ ' + r.persona_accuracy : '—'}</td>
-          <td>${r.nps_score != null ? r.nps_score : '—'}</td>
-          <td style="max-width:180px;white-space:normal;">${r.biggest_strength || '—'}</td>
-          <td style="max-width:180px;white-space:normal;">${r.biggest_weakness || '—'}</td>
-          <td style="max-width:200px;white-space:normal;">${r.additional_comments || r.persona_feedback || '—'}</td>
+          <td>${escapeHtml(r.nps_score != null ? r.nps_score : '—')}</td>
+          <td style="max-width:180px;white-space:normal;">${escapeHtml(r.biggest_strength || '—')}</td>
+          <td style="max-width:180px;white-space:normal;">${escapeHtml(r.biggest_weakness || '—')}</td>
+          <td style="max-width:200px;white-space:normal;">${escapeHtml(r.additional_comments || r.persona_feedback || '—')}</td>
         </tr>`).join('')
       : '<tr><td colspan="8" style="text-align:center;padding:40px;color:#BBB;">هنوز هیچ نظرسنجی‌ای ثبت نشده</td></tr>';
 
   } catch (e) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</td></tr>`;
     scaleAvgEl.innerHTML = quizLenEl.innerHTML = rarityFitEl.innerHTML = wouldTryEl.innerHTML = musicEl.innerHTML = musicArtEngagementEl.innerHTML =
       `<div style="text-align:center;color:red;padding:24px;">خطا در بارگذاری</div>`;
   }
@@ -1630,7 +1666,7 @@ async function loadPricingForm() {
       <div class="section-card" style="margin-bottom:14px;" id="pricing-card-${r.bean_id}">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div style="min-width:200px;">
-            <div style="font-weight:700;font-size:15px;">${r.bean_name || r.bean_id}</div>
+            <div style="font-weight:700;font-size:15px;">${escapeHtml(r.bean_name || r.bean_id)}</div>
             <div style="font-size:12px;color:#999;margin-top:2px;" id="pricing-preview-${r.bean_id}">
               ۱۲۵g: ${p125.toLocaleString('fa-IR')} تومان &nbsp;·&nbsp; ۲۵۰g: ${p250.toLocaleString('fa-IR')} تومان
             </div>
@@ -1644,7 +1680,7 @@ async function loadPricingForm() {
       </div>`;
     }).join('');
   } catch(e) {
-    container.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا: ${e.message}</div>`;
+    container.innerHTML = `<div style="text-align:center;color:red;padding:24px;">خطا: ${escapeHtml(e.message)}</div>`;
   }
 }
 
