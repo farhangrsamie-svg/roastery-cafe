@@ -2,6 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-zw3OBkGyJ1GVYeLRa/c7hVf933Q+pf8iO7y0Bet0YmI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>پنل مدیریت رستری — Coffee Identity</title>
 <style>
@@ -283,7 +284,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <input class="input-field" id="admin-password" type="password" placeholder="••••••••" />
       </div>
       <div class="notif-bar error" id="login-error">نام کاربری یا رمز اشتباه است</div>
-      <button class="btn btn-primary" style="width:100%;margin-top:8px;" onclick="doAdminLogin()">ورود به پنل →</button>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;" data-on-click="s1">ورود به پنل →</button>
     </div>
   </div>
 </div>
@@ -300,46 +301,46 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <div class="sidebar-logo-sub">Roastery Admin Panel</div>
       </div>
       <div class="sidebar-nav">
-        <div class="nav-item active" onclick="showPage('dashboard')">
+        <div class="nav-item active" data-on-click="s2">
           <span class="nav-icon">📊</span> داشبورد
         </div>
-        <div class="nav-item" onclick="showPage('orders')">
+        <div class="nav-item" data-on-click="s3">
           <span class="nav-icon">📦</span> سفارش‌ها
           <span class="nav-badge" id="nav-badge-orders">0</span>
         </div>
-        <div class="nav-item" onclick="showPage('profiles')">
+        <div class="nav-item" data-on-click="s4">
           <span class="nav-icon">☕</span> پروفایل‌های قهوه
         </div>
-        <div class="nav-item" onclick="showPage('messages')">
+        <div class="nav-item" data-on-click="s5">
           <span class="nav-icon">💬</span> پیام‌ها
           <span class="nav-badge" id="nav-badge-msgs" style="display:none;">0</span>
         </div>
-        <div class="nav-item" onclick="showPage('customers')">
+        <div class="nav-item" data-on-click="s6">
           <span class="nav-icon">👥</span> مشتریان
         </div>
-        <div class="nav-item" onclick="showPage('gaps')">
+        <div class="nav-item" data-on-click="s7">
           <span class="nav-icon">🔍</span> شکاف‌های کاتالوگ
           <span class="nav-badge" id="nav-badge-gaps" style="display:none;">0</span>
         </div>
-        <div class="nav-item" onclick="showPage('feedback')">
+        <div class="nav-item" data-on-click="s8">
           <span class="nav-icon">💬</span> بازخورد سفارش‌ها
           <span class="nav-badge" id="nav-badge-feedback" style="display:none;">0</span>
         </div>
-        <div class="nav-item" onclick="showPage('followup')">
+        <div class="nav-item" data-on-click="s9">
           <span class="nav-icon">🔄</span> پیگیری مشتریان ناراضی
           <span class="nav-badge" id="nav-badge-followup" style="display:none;">0</span>
         </div>
-        <div class="nav-item" onclick="showPage('pricing')">
+        <div class="nav-item" data-on-click="s10">
           <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
         </div>
-        <div class="nav-item" onclick="showPage('survey')">
+        <div class="nav-item" data-on-click="s11">
           <span class="nav-icon">📝</span> نظرسنجی پایلوت
           <span class="nav-badge" id="nav-badge-survey" style="display:none;">0</span>
         </div>
       </div>
       <div class="sidebar-footer">
         <div class="sidebar-admin" id="admin-name-display">ادمین</div>
-        <button class="btn-logout" onclick="doAdminLogout()">خروج ↗</button>
+        <button class="btn-logout" data-on-click="s12">خروج ↗</button>
       </div>
     </div>
 
@@ -353,7 +354,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             <div class="page-title">داشبورد</div>
             <div class="page-sub" id="dashboard-date"></div>
           </div>
-          <button class="btn btn-primary" id="btn-refresh-dashboard" onclick="refreshAllWithFeedback()">🔄 بروزرسانی</button>
+          <button class="btn btn-primary" id="btn-refresh-dashboard" data-on-click="s13">🔄 بروزرسانی</button>
         </div>
         <div class="content-area">
           <div class="stats-grid">
@@ -404,11 +405,11 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             <div class="page-sub">مدیریت و تأیید سفارش‌های مشتریان</div>
           </div>
           <div class="filter-tabs">
-            <button class="filter-tab active" onclick="filterOrders('all', this)">همه</button>
-            <button class="filter-tab" onclick="filterOrders('receipt_submitted', this)">رسید دارد</button>
-            <button class="filter-tab" onclick="filterOrders('pending', this)">در انتظار</button>
-            <button class="filter-tab" onclick="filterOrders('confirmed', this)">تأیید شده</button>
-            <button class="filter-tab" onclick="filterOrders('shipped', this)">ارسال شده</button>
+            <button class="filter-tab active" data-on-click="s14">همه</button>
+            <button class="filter-tab" data-on-click="s15">رسید دارد</button>
+            <button class="filter-tab" data-on-click="s16">در انتظار</button>
+            <button class="filter-tab" data-on-click="s17">تأیید شده</button>
+            <button class="filter-tab" data-on-click="s18">ارسال شده</button>
           </div>
         </div>
         <div class="content-area">
@@ -768,7 +769,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div class="modal-title">جزئیات سفارش</div>
-      <button class="modal-close" onclick="closeModal('order-modal')">✕</button>
+      <button class="modal-close" data-on-click="s19">✕</button>
     </div>
     <div id="order-modal-content"></div>
   </div>
@@ -779,13 +780,84 @@ textarea.input-field { resize: vertical; min-height: 100px; }
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
       <div class="modal-title">ارسال پیام به مشتری</div>
-      <button class="modal-close" onclick="closeModal('msg-modal')">✕</button>
+      <button class="modal-close" data-on-click="s20">✕</button>
     </div>
     <div id="msg-modal-content"></div>
   </div>
 </div>
 
 <script>
+/* ── نسخه‌ی ۴۰: سیاست امنیت محتوا (CSP) ──
+   هیچ کد درون‌خطی (onclick="…") در صفحه نمانده؛ همه‌ی کلیک‌ها از این جدول و یک شنونده‌ی مرکزی اجرا می‌شوند.
+   عنصرها فقط یک کلید دارند: data-on-click="s12". مقدارهای متغیر (مثل شناسه‌ی سفارش) در data-a0، data-a1 … .
+   ⚠️ هر تغییری در این اسکریپت‌ها هش CSP بالای صفحه را عوض می‌کند — بعد از ویرایش حتماً csp_rehash اجرا شود،
+   وگرنه مرورگر هیچ اسکریپتی را اجرا نمی‌کند و اپ کاملاً از کار می‌افتد. */
+const __H = {
+  s1: function (event) { doAdminLogin() },
+  s2: function (event) { showPage('dashboard') },
+  s3: function (event) { showPage('orders') },
+  s4: function (event) { showPage('profiles') },
+  s5: function (event) { showPage('messages') },
+  s6: function (event) { showPage('customers') },
+  s7: function (event) { showPage('gaps') },
+  s8: function (event) { showPage('feedback') },
+  s9: function (event) { showPage('followup') },
+  s10: function (event) { showPage('pricing') },
+  s11: function (event) { showPage('survey') },
+  s12: function (event) { doAdminLogout() },
+  s13: function (event) { refreshAllWithFeedback() },
+  s14: function (event) { filterOrders('all', this) },
+  s15: function (event) { filterOrders('receipt_submitted', this) },
+  s16: function (event) { filterOrders('pending', this) },
+  s17: function (event) { filterOrders('confirmed', this) },
+  s18: function (event) { filterOrders('shipped', this) },
+  s19: function (event) { closeModal('order-modal') },
+  s20: function (event) { closeModal('msg-modal') },
+  d1: function (event) { viewOrder(this.dataset.a0) },
+  d2: function (event) { updateOrderStatus(this.dataset.a0,'confirmed') },
+  d3: function (event) { updateOrderStatus(this.dataset.a0,'cancelled') },
+  d4: function (event) { updateOrderStatus(this.dataset.a0,'shipped') },
+  d5: function (event) { openMsgModal(this.dataset.a0,this.dataset.a1,this.dataset.a2) },
+  d6: function (event) { updateOrderStatus(this.dataset.a0,'confirmed') },
+  d7: function (event) { updateOrderStatus(this.dataset.a0,'cancelled') },
+  d8: function (event) { updateOrderStatus(this.dataset.a0,'shipped') },
+  d9: function (event) { openMsgModal(this.dataset.a0,this.dataset.a1,this.dataset.a2) },
+  d10: function (event) { openMsgModal(this.dataset.a0,this.dataset.a1,null) },
+  d11: function (event) { markFollowupResolved(this.dataset.a0) },
+  d12: function (event) { updatePricingPreview(this.dataset.a0) },
+  d13: function (event) { saveBeanPrice(this.dataset.a0) },
+  d14: function (event) { selectMsgUser(this.dataset.a0,this.dataset.a1) },
+  d15: function (event) { sendMessage(this.dataset.a0) },
+  d16: function (event) { sendMsgFromModal(this.dataset.a0,this.dataset.a1) }
+};
+const __HSRC = {"s1": "doAdminLogin()", "s2": "showPage('dashboard')", "s3": "showPage('orders')", "s4": "showPage('profiles')", "s5": "showPage('messages')", "s6": "showPage('customers')", "s7": "showPage('gaps')", "s8": "showPage('feedback')", "s9": "showPage('followup')", "s10": "showPage('pricing')", "s11": "showPage('survey')", "s12": "doAdminLogout()", "s13": "refreshAllWithFeedback()", "s14": "filterOrders('all', this)", "s15": "filterOrders('receipt_submitted', this)", "s16": "filterOrders('pending', this)", "s17": "filterOrders('confirmed', this)", "s18": "filterOrders('shipped', this)", "s19": "closeModal('order-modal')", "s20": "closeModal('msg-modal')", "d1": "viewOrder('${o.id}')", "d2": "updateOrderStatus('${o.id}','confirmed')", "d3": "updateOrderStatus('${o.id}','cancelled')", "d4": "updateOrderStatus('${o.id}','shipped')", "d5": "openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')", "d6": "updateOrderStatus('${order.id}','confirmed')", "d7": "updateOrderStatus('${order.id}','cancelled')", "d8": "updateOrderStatus('${order.id}','shipped')", "d9": "openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')", "d10": "openMsgModal('${u.id}','${encAttr(u.name)}',null)", "d11": "markFollowupResolved('${f.id}')", "d12": "updatePricingPreview('${r.bean_id}')", "d13": "saveBeanPrice('${r.bean_id}')", "d14": "selectMsgUser('${u.id}','${encAttr(u.name)}')", "d15": "sendMessage('${userId}')", "d16": "sendMsgFromModal('${userId}','${orderId}')"};
+function __ha(v) {
+  return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+(function () {
+  function run(ev, type) {
+    const attr = 'data-on-' + type;
+    let el = ev.target;
+    while (el && el !== document) {
+      if (el.nodeType === 1 && el.hasAttribute(attr)) {
+        const fn = __H[el.getAttribute(attr)];
+        if (fn) {
+          window.__hEl = el; // جایگزین event.currentTarget برای کدهای قدیمی
+          let r; try { r = fn.call(el, ev); } finally { window.__hEl = null; }
+          if (r === false) ev.preventDefault();
+        }
+        if (ev.cancelBubble) break;
+      }
+      el = el.parentNode;
+    }
+  }
+  ['click', 'change', 'input'].forEach(t => document.addEventListener(t, e => run(e, t)));
+  function runError(el, ev) { const fn = __H[el.getAttribute('data-on-error')]; if (fn) fn.call(el, ev); }
+  document.addEventListener('error', e => { const el = e.target; if (el && el.nodeType === 1 && el.hasAttribute('data-on-error')) runError(el, e); }, true);
+  // تصویرهایی که قبل از این اسکریپت خطا داده‌اند
+  document.querySelectorAll('img[data-on-error]').forEach(img => { if (img.complete && img.naturalWidth === 0 && img.getAttribute('src')) runError(img, { type: 'error', target: img }); });
+})();
+
 /* ═══════════════════════════════════════════
    CONFIG
 ═══════════════════════════════════════════ */
@@ -940,7 +1012,7 @@ function showPage(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  (window.__hEl || event.currentTarget).classList.add('active');
   if (name === 'orders') loadOrders('all');
   if (name === 'profiles') loadProfiles();
   if (name === 'messages') loadMessages();
@@ -1079,15 +1151,15 @@ function orderRow(o) {
     <td>${dateFA}</td>
     <td>
       <div class="action-btns">
-        <button class="btn btn-view" onclick="viewOrder('${o.id}')">🔍 جزئیات</button>
+        <button class="btn btn-view" data-on-click="d1" data-a0="${__ha(o.id)}">🔍 جزئیات</button>
         ${o.status === 'receipt_submitted' ? `
-          <button class="btn btn-confirm" onclick="updateOrderStatus('${o.id}','confirmed')">✅ تأیید</button>
-          <button class="btn btn-reject" onclick="updateOrderStatus('${o.id}','cancelled')">❌ رد</button>
+          <button class="btn btn-confirm" data-on-click="d2" data-a0="${__ha(o.id)}">✅ تأیید</button>
+          <button class="btn btn-reject" data-on-click="d3" data-a0="${__ha(o.id)}">❌ رد</button>
         ` : ''}
         ${o.status === 'confirmed' ? `
-          <button class="btn btn-ship" onclick="updateOrderStatus('${o.id}','shipped')">🚚 ارسال شد</button>
+          <button class="btn btn-ship" data-on-click="d4" data-a0="${__ha(o.id)}">🚚 ارسال شد</button>
         ` : ''}
-        <button class="btn btn-view" onclick="openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')">💬</button>
+        <button class="btn btn-view" data-on-click="d5" data-a0="${__ha(o.users?.id || '')}" data-a1="${__ha(encAttr(user.name))}" data-a2="${__ha(o.id)}">💬</button>
       </div>
     </td>
   </tr>`;
@@ -1196,13 +1268,13 @@ async function viewOrder(orderId) {
 
     <div class="action-btns" style="margin-top:16px;">
       ${order.status === 'receipt_submitted' ? `
-        <button class="btn btn-confirm" onclick="updateOrderStatus('${order.id}','confirmed')">✅ تأیید سفارش</button>
-        <button class="btn btn-reject" onclick="updateOrderStatus('${order.id}','cancelled')">❌ رد سفارش</button>
+        <button class="btn btn-confirm" data-on-click="d6" data-a0="${__ha(order.id)}">✅ تأیید سفارش</button>
+        <button class="btn btn-reject" data-on-click="d7" data-a0="${__ha(order.id)}">❌ رد سفارش</button>
       ` : ''}
       ${order.status === 'confirmed' ? `
-        <button class="btn btn-ship" onclick="updateOrderStatus('${order.id}','shipped')">🚚 ثبت ارسال</button>
+        <button class="btn btn-ship" data-on-click="d8" data-a0="${__ha(order.id)}">🚚 ثبت ارسال</button>
       ` : ''}
-      <button class="btn btn-view" onclick="openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')">💬 ارسال پیام به مشتری</button>
+      <button class="btn btn-view" data-on-click="d9" data-a0="${__ha(user.id || '')}" data-a1="${__ha(encAttr(user.name))}" data-a2="${__ha(order.id)}">💬 ارسال پیام به مشتری</button>
     </div>
   `;
   if (order.receipt_url) renderReceiptSlot(order.receipt_url);
@@ -1279,7 +1351,7 @@ async function loadCustomers() {
         <td style="text-align:center;">${orderCount[u.id] || 0}</td>
         <td>${dateFA}</td>
         <td>
-          <button class="btn btn-view" onclick="openMsgModal('${u.id}','${encAttr(u.name)}',null)">💬 پیام</button>
+          <button class="btn btn-view" data-on-click="d10" data-a0="${__ha(u.id)}" data-a1="${__ha(encAttr(u.name))}">💬 پیام</button>
         </td>
       </tr>`;
     }).join('');
@@ -1410,7 +1482,7 @@ async function loadFollowupQueue() {
           </div>
           ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${escapeHtml(f.notes)}</div>` : ''}
           <div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 قول هدیه‌ی سفارش بعدی داده شده — یادت باشه موقع سفارش بعدیش اعمالش کنی</div>
-          <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" onclick="markFollowupResolved('${f.id}')">✅ پیگیری شد و حل شد</button>
+          <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" data-on-click="d11" data-a0="${__ha(f.id)}">✅ پیگیری شد و حل شد</button>
         </div>
       `;
     }).join('');
@@ -1672,9 +1744,9 @@ async function loadPricingForm() {
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <input type="number" step="1" min="0" class="input-field" style="width:120px;padding:8px 10px;" id="pricing-input-${r.bean_id}" value="${r.price_per_gram || 0}" oninput="updatePricingPreview('${r.bean_id}')">
+            <input type="number" step="1" min="0" class="input-field" style="width:120px;padding:8px 10px;" id="pricing-input-${r.bean_id}" value="${r.price_per_gram || 0}" data-on-input="d12" data-a0="${__ha(r.bean_id)}">
             <span style="font-size:12px;color:#999;">تومان / گرم</span>
-            <button class="btn btn-view" onclick="saveBeanPrice('${r.bean_id}')">ذخیره</button>
+            <button class="btn btn-view" data-on-click="d13" data-a0="${__ha(r.bean_id)}">ذخیره</button>
           </div>
         </div>
       </div>`;
@@ -1746,7 +1818,7 @@ async function loadMessages() {
       return;
     }
     list.innerHTML = users.map(u => `
-      <div class="msg-user-item ${selectedMsgUserId === u.id ? 'selected' : ''}" onclick="selectMsgUser('${u.id}','${encAttr(u.name)}')">
+      <div class="msg-user-item ${selectedMsgUserId === u.id ? 'selected' : ''}" data-on-click="d14" data-a0="${__ha(u.id)}" data-a1="${__ha(encAttr(u.name))}">
         <div style="font-size:28px;">👤</div>
         <div style="flex:1;">
           <div class="msg-user-name">${escapeHtml(u.name) || '—'} ${unreadCount[u.id] ? `<span class="unread-dot"></span>` : ''}</div>
@@ -1768,7 +1840,7 @@ async function selectMsgUser(userId, userName) {
   selectedMsgUserId = userId;
   userName = decodeURIComponent(userName || '');
   document.querySelectorAll('.msg-user-item').forEach(i => i.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+  (window.__hEl || event.currentTarget).classList.add('selected');
 
   // mark as read
   await sb('PATCH', `messages?user_id=eq.${userId}&from_admin=eq.false`, { is_read: true }).catch(() => {});
@@ -1798,7 +1870,7 @@ function renderMsgChat(userId, msgs, userName = '') {
     </div>
     <div class="msg-chat-input">
       <textarea id="chat-input" placeholder="پیام خود را بنویسید..." rows="2"></textarea>
-      <button class="msg-send-btn" onclick="sendMessage('${userId}')">ارسال ✓</button>
+      <button class="msg-send-btn" data-on-click="d15" data-a0="${__ha(userId)}">ارسال ✓</button>
     </div>
   `;
   // scroll to bottom
@@ -1858,7 +1930,7 @@ async function openMsgModal(userId, userName, orderId) {
       <textarea class="input-field" id="modal-msg-text" placeholder="متن پیام برای مشتری..." rows="3"></textarea>
     </div>
     <div class="notif-bar" id="modal-msg-notif"></div>
-    <button class="btn btn-primary" onclick="sendMsgFromModal('${userId}','${orderId}')">ارسال پیام ✓</button>
+    <button class="btn btn-primary" data-on-click="d16" data-a0="${__ha(userId)}" data-a1="${__ha(orderId)}">ارسال پیام ✓</button>
   `;
   document.getElementById('msg-modal').style.display = 'flex';
 }
