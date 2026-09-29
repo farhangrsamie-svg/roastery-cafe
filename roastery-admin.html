@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-zw3OBkGyJ1GVYeLRa/c7hVf933Q+pf8iO7y0Bet0YmI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-iBqJlMhbi6iNchryu3w7Ebl9rB/7dd7MQ2DeRW0p+aA=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>پنل مدیریت رستری — Coffee Identity</title>
 <style>
@@ -327,7 +327,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
           <span class="nav-badge" id="nav-badge-feedback" style="display:none;">0</span>
         </div>
         <div class="nav-item" data-on-click="s9">
-          <span class="nav-icon">🔄</span> پیگیری مشتریان ناراضی
+          <span class="nav-icon">🧭</span> همراهی در کشف طعم
           <span class="nav-badge" id="nav-badge-followup" style="display:none;">0</span>
         </div>
         <div class="nav-item" data-on-click="s10">
@@ -392,6 +392,18 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             </div>
             <div id="urgent-orders">
               <div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">همه سفارش‌ها بررسی شده‌اند</div></div>
+            </div>
+          </div>
+
+          <!-- نسخه‌ی ۳۵: تولدهای این ماه + آمار سبک کارت -->
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:16px;">
+            <div class="section-card">
+              <div class="section-header"><div class="section-title" id="bday-title">🎂 تولدهای این ماه</div></div>
+              <div id="bday-list"><div style="color:#BBB;padding:16px;text-align:center;">در حال بارگذاری...</div></div>
+            </div>
+            <div class="section-card">
+              <div class="section-header"><div class="section-title">👥 سبک کارت اشتراک (تخمین جنسیت مشتریان)</div></div>
+              <div id="style-stats"><div style="color:#BBB;padding:16px;text-align:center;">در حال بارگذاری...</div></div>
             </div>
           </div>
         </div>
@@ -585,7 +597,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             <div class="stat-card">
               <div class="stat-icon">⭐</div>
               <div class="stat-num" id="feedback-avg-satisfaction">—</div>
-              <div class="stat-label">میانگین رضایت (از ۵)</div>
+              <div class="stat-label">میانگین تجربه (از ۵)</div>
             </div>
             <div class="stat-card">
               <div class="stat-icon">🏠</div>
@@ -594,7 +606,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
             </div>
           </div>
           <div class="section-card">
-            <div style="font-weight:700;margin-bottom:14px;">میانگین رضایت به تفکیک دونه</div>
+            <div style="font-weight:700;margin-bottom:14px;">میانگین تجربه به تفکیک دونه</div>
             <div id="feedback-by-bean">
               <div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>
             </div>
@@ -618,7 +630,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
                 <tr>
                   <th>تاریخ</th>
                   <th>دونه</th>
-                  <th>رضایت</th>
+                  <th>تجربه</th>
                   <th>دم‌آوری واقعی</th>
                   <th>آسیاب</th>
                   <th>توضیحات</th>
@@ -636,11 +648,12 @@ textarea.input-field { resize: vertical; min-height: 100px; }
       <div class="page" id="page-followup">
         <div class="top-bar">
           <div>
-            <div class="page-title">🔄 پیگیری مشتریان ناراضی</div>
-            <div class="page-sub">مشتریانی که بازخورد ⭐۱-۲ ثبت کردن و هنوز حل‌شده اعلام نشده — بدون تأخیر، همون لحظه اینجا دیده می‌شن</div>
+            <div class="page-title">🧭 همراهی در کشف طعم</div>
+            <div class="page-sub">مشتریانی که تجربه‌ی اولشان «غریب» یا «متفاوت از انتظار» بوده، گزارش مشکل کیفیت، و درخواست‌های «بسته‌ی کشف دوم» (۵۰ گرم طعم دیگر + مشاوره‌ی دم‌آوری؛ یک‌بار برای هر مشتری، دو سفارش اول، تا ۱۴ روز بعد از تحویل)</div>
           </div>
         </div>
         <div class="content-area">
+          <div id="discovery-list" style="margin-bottom:22px;"></div>
           <div id="followup-list">
             <div style="text-align:center;padding:40px;color:#BBB;">در حال بارگذاری...</div>
           </div>
@@ -828,9 +841,12 @@ const __H = {
   d13: function (event) { saveBeanPrice(this.dataset.a0) },
   d14: function (event) { selectMsgUser(this.dataset.a0,this.dataset.a1) },
   d15: function (event) { sendMessage(this.dataset.a0) },
-  d16: function (event) { sendMsgFromModal(this.dataset.a0,this.dataset.a1) }
+  d16: function (event) { sendMsgFromModal(this.dataset.a0,this.dataset.a1) },
+  p1: function (event) { markRefunded(this.dataset.a0) },
+  p2: function (event) { setDiscoveryStatus(this.dataset.a0, 'consulted') },
+  p3: function (event) { setDiscoveryStatus(this.dataset.a0, 'sent') }
 };
-const __HSRC = {"s1": "doAdminLogin()", "s2": "showPage('dashboard')", "s3": "showPage('orders')", "s4": "showPage('profiles')", "s5": "showPage('messages')", "s6": "showPage('customers')", "s7": "showPage('gaps')", "s8": "showPage('feedback')", "s9": "showPage('followup')", "s10": "showPage('pricing')", "s11": "showPage('survey')", "s12": "doAdminLogout()", "s13": "refreshAllWithFeedback()", "s14": "filterOrders('all', this)", "s15": "filterOrders('receipt_submitted', this)", "s16": "filterOrders('pending', this)", "s17": "filterOrders('confirmed', this)", "s18": "filterOrders('shipped', this)", "s19": "closeModal('order-modal')", "s20": "closeModal('msg-modal')", "d1": "viewOrder('${o.id}')", "d2": "updateOrderStatus('${o.id}','confirmed')", "d3": "updateOrderStatus('${o.id}','cancelled')", "d4": "updateOrderStatus('${o.id}','shipped')", "d5": "openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')", "d6": "updateOrderStatus('${order.id}','confirmed')", "d7": "updateOrderStatus('${order.id}','cancelled')", "d8": "updateOrderStatus('${order.id}','shipped')", "d9": "openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')", "d10": "openMsgModal('${u.id}','${encAttr(u.name)}',null)", "d11": "markFollowupResolved('${f.id}')", "d12": "updatePricingPreview('${r.bean_id}')", "d13": "saveBeanPrice('${r.bean_id}')", "d14": "selectMsgUser('${u.id}','${encAttr(u.name)}')", "d15": "sendMessage('${userId}')", "d16": "sendMsgFromModal('${userId}','${orderId}')"};
+const __HSRC = {"s1": "doAdminLogin()", "s2": "showPage('dashboard')", "s3": "showPage('orders')", "s4": "showPage('profiles')", "s5": "showPage('messages')", "s6": "showPage('customers')", "s7": "showPage('gaps')", "s8": "showPage('feedback')", "s9": "showPage('followup')", "s10": "showPage('pricing')", "s11": "showPage('survey')", "s12": "doAdminLogout()", "s13": "refreshAllWithFeedback()", "s14": "filterOrders('all', this)", "s15": "filterOrders('receipt_submitted', this)", "s16": "filterOrders('pending', this)", "s17": "filterOrders('confirmed', this)", "s18": "filterOrders('shipped', this)", "s19": "closeModal('order-modal')", "s20": "closeModal('msg-modal')", "d1": "viewOrder('${o.id}')", "d2": "updateOrderStatus('${o.id}','confirmed')", "d3": "updateOrderStatus('${o.id}','cancelled')", "d4": "updateOrderStatus('${o.id}','shipped')", "d5": "openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')", "d6": "updateOrderStatus('${order.id}','confirmed')", "d7": "updateOrderStatus('${order.id}','cancelled')", "d8": "updateOrderStatus('${order.id}','shipped')", "d9": "openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')", "d10": "openMsgModal('${u.id}','${encAttr(u.name)}',null)", "d11": "markFollowupResolved('${f.id}')", "d12": "updatePricingPreview('${r.bean_id}')", "d13": "saveBeanPrice('${r.bean_id}')", "d14": "selectMsgUser('${u.id}','${encAttr(u.name)}')", "d15": "sendMessage('${userId}')", "d16": "sendMsgFromModal('${userId}','${orderId}')", "p1": "markRefunded('${o.id}')", "p2": "setDiscoveryStatus('${p.id}', 'consulted')", "p3": "setDiscoveryStatus('${p.id}', 'sent')"};
 function __ha(v) {
   return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -1090,19 +1106,89 @@ async function refreshDashboard() {
     document.getElementById('stat-customers').textContent = allUsers.length;
 
     // badge در منو
-    const urgent = pending + receipts;
+    const urgent = pending + receipts + allOrders.filter(o => o.refund_status === 'pending').length;
     const badge = document.getElementById('nav-badge-orders');
     badge.textContent = urgent;
     badge.style.display = urgent > 0 ? 'inline' : 'none';
 
     // urgent orders
-    renderUrgentOrders(allOrders.filter(o => ['pending','receipt_submitted'].includes(o.status)));
+    loadBirthdaysAndStyles();
+    renderUrgentOrders(allOrders.filter(o => ['pending','receipt_submitted'].includes(o.status) || o.refund_status === 'pending'));
 
     // unread messages badge
     loadUnreadCount();
 
   } catch(e) {
     console.error('Dashboard error:', e);
+  }
+}
+
+// ── نسخه‌ی ۳۵: تولدهای این ماه (شمسی) و آمار سبک کارت اشتراک ──
+// تاریخ تولد در اپ فارسی به شمسی و در اپ انگلیسی به میلادی ذخیره می‌شود؛ سال ≥ ۱۷۰۰ یعنی میلادی.
+// بدون سال فرض می‌شود شمسی است (بیشتر کاربران فارسی‌زبان‌اند).
+const J_MONTHS = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+function jalaliParts(date) {
+  const parts = new Intl.DateTimeFormat('en-u-ca-persian', { year: 'numeric', month: 'numeric', day: 'numeric' }).formatToParts(date);
+  const g = t => Number((parts.find(p => p.type === t) || {}).value);
+  return { y: g('year'), m: g('month'), d: g('day') };
+}
+async function loadBirthdaysAndStyles() {
+  const now = jalaliParts(new Date());
+  const titleEl = document.getElementById('bday-title');
+  if (titleEl) titleEl.textContent = `🎂 تولدهای این ماه (${J_MONTHS[now.m - 1]})`;
+  // تولدها
+  try {
+    const users = await sb('GET', 'users?select=id,name,phone,birth_day,birth_month,birth_year&birth_day=not.is.null&birth_month=not.is.null&deleted_at=is.null');
+    const list = [];
+    (users || []).forEach(u => {
+      let jm = u.birth_month, jd = u.birth_day;
+      if (u.birth_year && u.birth_year >= 1700) {           // میلادی → شمسی
+        const jp = jalaliParts(new Date(new Date().getFullYear(), u.birth_month - 1, u.birth_day));
+        jm = jp.m; jd = jp.d;
+      }
+      if (jm === now.m) list.push({ ...u, jd, daysLeft: jd - now.d });
+    });
+    list.sort((a, b) => a.jd - b.jd);
+    const el = document.getElementById('bday-list');
+    el.innerHTML = !list.length
+      ? '<div class="empty-state"><div class="empty-icon">🎂</div><div class="empty-text">این ماه تولدی ثبت نشده</div></div>'
+      : list.map(u => {
+          const when = u.daysLeft === 0 ? '<b style="color:#C0392B;">امروز! 🎉</b>'
+                     : u.daysLeft > 0 ? `${u.daysLeft.toLocaleString('fa-IR')} روز دیگر`
+                     : '<span style="color:#AAA;">گذشته</span>';
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 4px;border-bottom:1px solid #F0EBE3;${u.daysLeft < 0 ? 'opacity:.55;' : ''}">
+            <div><b>${escapeHtml(u.name) || '—'}</b> <span style="color:#999;font-size:12.5px;">${escapeHtml(u.phone) || ''}</span></div>
+            <div style="font-size:12.5px;text-align:left;">${u.jd.toLocaleString('fa-IR')} ${J_MONTHS[now.m - 1]} · ${when}</div>
+          </div>`;
+        }).join('') + '<div style="font-size:11.5px;color:#999;margin-top:8px;">به این مشتری‌ها در صفحه‌ی تولد قول هدیه داده شده («یادت باشیم و براش یه هدیه بفرستیم»).</div>';
+  } catch (e) {
+    console.warn('birthdays error:', e);
+    document.getElementById('bday-list').innerHTML = '<div style="color:#BBB;padding:12px;">خطا در بارگذاری</div>';
+  }
+  // سبک کارت اشتراک — آخرین انتخاب هر کاربر
+  try {
+    const rows = await sb('GET', 'share_preferences?select=user_id,style,created_at&order=created_at.desc');
+    const latest = {};
+    (rows || []).forEach(r => { if (r.user_id && !latest[r.user_id]) latest[r.user_id] = r.style; });
+    const counts = { feminine: 0, masculine: 0, surprise: 0 };
+    Object.values(latest).forEach(st => { if (st in counts) counts[st]++; });
+    const total = counts.feminine + counts.masculine + counts.surprise;
+    const el = document.getElementById('style-stats');
+    if (!total) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">هنوز کسی کارت اشتراک نساخته</div></div>'; return; }
+    const known = counts.feminine + counts.masculine;
+    const row = (label, n, color) => {
+      const pct = Math.round(n * 100 / total);
+      return `<div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;"><span>${label}</span><span><b>${pct.toLocaleString('fa-IR')}٪</b> <span style="color:#999;">(${n.toLocaleString('fa-IR')} نفر)</span></span></div>
+        <div style="height:10px;background:#F0EBE3;border-radius:6px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:${color};"></div></div>
+      </div>`;
+    };
+    el.innerHTML = row('👩 خانومی', counts.feminine, '#C27BA0') + row('👨 مثل آقاها', counts.masculine, '#5B7FA6') + row('🎁 فرقی نمی‌کنه، غافلگیرم کن', counts.surprise, '#B8A89A')
+      + (known ? `<div style="font-size:12.5px;margin-top:10px;padding:8px 10px;background:#FAF6F0;border-radius:8px;">در میان کسانی که سبک مشخص انتخاب کرده‌اند: <b>${Math.round(counts.feminine * 100 / known).toLocaleString('fa-IR')}٪ خانم</b> و <b>${Math.round(counts.masculine * 100 / known).toLocaleString('fa-IR')}٪ آقا</b></div>` : '')
+      + `<div style="font-size:11.5px;color:#999;margin-top:8px;line-height:1.8;">⚠️ تخمین است، نه آمار دقیق جنسیت: فقط ${total.toLocaleString('fa-IR')} نفری که کارت اشتراک ساخته‌اند، و سبک کارت ممکن است با جنسیت فرق داشته باشد (مثلاً برای هدیه).</div>`;
+  } catch (e) {
+    console.warn('style stats error:', e);
+    document.getElementById('style-stats').innerHTML = '<div style="color:#BBB;padding:12px;">خطا در بارگذاری</div>';
   }
 }
 
@@ -1147,7 +1233,7 @@ function orderRow(o) {
       ${o.discount_pct_applied ? `<div style="margin-top:4px;"><span class="badge" style="background:#FFF3D6;color:#8A6D1D;">🎁 ${o.discount_pct_applied}٪ تخفیف</span></div>` : ''}
     </td>
     <td>${o.amount}g</td>
-    <td>${statusBadge(o.status)}</td>
+    <td>${statusBadge(o.status)}${o.refund_status === 'pending' ? '<div style="margin-top:4px;"><span class="badge" style="background:#FFF3D6;color:#8A6D1D;">💸 بازگشت وجه لازم</span></div>' : o.refund_status === 'done' ? '<div style="margin-top:4px;"><span class="badge" style="background:#E8F5E9;color:#2E7D32;">✔ وجه برگشت داده شد</span></div>' : ''}</td>
     <td>${dateFA}</td>
     <td>
       <div class="action-btns">
@@ -1159,6 +1245,7 @@ function orderRow(o) {
         ${o.status === 'confirmed' ? `
           <button class="btn btn-ship" data-on-click="d4" data-a0="${__ha(o.id)}">🚚 ارسال شد</button>
         ` : ''}
+        ${o.refund_status === 'pending' ? `<button class="btn btn-confirm" data-on-click="p1" data-a0="${__ha(o.id)}">💸 بازپرداخت انجام شد</button>` : ''}
         <button class="btn btn-view" data-on-click="d5" data-a0="${__ha(o.users?.id || '')}" data-a1="${__ha(encAttr(user.name))}" data-a2="${__ha(o.id)}">💬</button>
       </div>
     </td>
@@ -1201,6 +1288,18 @@ async function updateOrderStatus(orderId, status) {
     showNotif(/invalid_status_transition/.test(m) ? 'این تغییر وضعیت مجاز نیست (مثلاً سفارش لغوشده یا ارسال‌شده قابل برگشت نیست) — صفحه را تازه کنید'
             : /order_fields_locked/.test(m) ? 'این بخش از سفارش قابل ویرایش نیست'
             : 'خطا: ' + m, 'error');
+  }
+}
+
+// نسخه‌ی ۳۳: مشتری سفارش پرداخت‌شده را در ۲۴ ساعت اول لغو کرده؛ بعد از واریز دستی مبلغ به کارت مشتری
+async function markRefunded(orderId) {
+  if (!confirm('مبلغ این سفارش را به کارت مشتری برگردانده‌اید؟ (این فقط ثبت می‌کند؛ واریز باید دستی انجام شده باشد)')) return;
+  try {
+    await sb('POST', 'rpc/admin_mark_refunded', { p_order_id: orderId });
+    await refreshAll();
+    showNotif('✔ بازگشت وجه ثبت شد', 'success');
+  } catch (e) {
+    showNotif('ثبت نشد: ' + (/no_pending_refund/.test(String(e.message)) ? 'این سفارش بازگشت وجه در انتظار ندارد' : 'دوباره امتحان کنید'), 'error');
   }
 }
 
@@ -1432,7 +1531,9 @@ async function loadFollowupQueue() {
     // هر بازخورد ⭐۱-۲ که هنوز حل‌شده اعلام نشده، بلافاصله دیده می‌شه — بدون هیچ تأخیری.
     // نمایش زودهنگام به ادمین هیچ هزینه‌ای نداره؛ فقط شفافیته. وضعیت (تازه/تأیید ناراضی) رو
     // به‌صورت برچسب نشون می‌دیم تا ادمین خودش تصمیم بگیره کِی تماس بگیره، نه اینکه سیستم دیرتر نشونش بده
-    const rows = await sb('GET', `order_feedback?followup_status=neq.resolved&order=created_at.desc&select=*`);
+    // نسخه‌ی ۳۴: گزارش‌های مشکل کیفیت هم (حتی با تجربه‌ی خوب) در این صف دیده می‌شوند
+    const rows = await sb('GET', `order_feedback?or=(followup_status.in.(pending,still_unhappy),and(quality_issue.not.is.null,followup_status.is.null))&order=created_at.desc&select=*`);
+    loadDiscoveryPacks();
     const list = rows || [];
 
     const badge = document.getElementById('nav-badge-followup');
@@ -1457,15 +1558,19 @@ async function loadFollowupQueue() {
     }
 
     const STATUS_META = {
-      still_unhappy: { border:'#E85D5D', bg:'#FFF3F3', color:'#E85D5D', label:'تأیید کرده هنوز راضی نیست — نیاز به تماس' },
-      pending: { border:'#D9A441', bg:'#FFF8E8', color:'#B8860B', label:'تازه ثبت شده — منتظر واکنش مشتریه' }
+      still_unhappy: { border:'#E85D5D', bg:'#FFF3F3', color:'#E85D5D', label:'هنوز جا نیفتاده — مشاوره‌ی دم‌آوری لازم' },
+      pending: { border:'#D9A441', bg:'#FFF8E8', color:'#B8860B', label:'تازه ثبت شده — راهنمایی دم‌آوری داده شد، منتظر واکنش مشتری' },
+      quality: { border:'#C0392B', bg:'#FDECEA', color:'#C0392B', label:'⚠️ گزارش مشکل کیفیت — تا ۷ روز: جایگزین یا بازگشت وجه' }
     };
 
     listEl.innerHTML = list.map(f => {
       const u = usersMap[f.user_id] || {};
       const dateStr = new Date(f.created_at).toLocaleDateString('fa-IR', { year:'numeric', month:'long', day:'numeric' });
       const issueLabel = f.issue_reason ? (ISSUE_FA[f.issue_reason] || f.issue_reason) : '—';
-      const meta = STATUS_META[f.followup_status] || STATUS_META.pending;
+      const meta = (f.quality_issue && !f.followup_status) ? STATUS_META.quality : (STATUS_META[f.followup_status] || STATUS_META.pending);
+      const EXP = ['—','غریب و ناآشنا','متفاوت از انتظار','جالب بود','خوب','عالی'];
+      const TAG_FA = { more_sour:'ترش‌تر از انتظار', more_bitter:'تلخ‌تر از انتظار', lighter:'سبک‌تر', fuller:'پُرتر', loved_aroma:'عطرش را دوست داشت' };
+      const Q_FA = { damaged:'آسیب در ارسال', wrong_item:'دانه‌ی اشتباه', wrong_grind:'آسیاب اشتباه', stale:'کهنه یا بی‌عطر' };
       return `
         <div class="section-card" style="margin-bottom:14px;border-right:4px solid ${meta.border};">
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
@@ -1478,10 +1583,11 @@ async function loadFollowupQueue() {
           <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;font-size:13px;">
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">دونه: ${f.bean_name || '—'}</span>
             <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">مشکل: ${issueLabel}</span>
-            <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">رضایت: ⭐${f.satisfaction != null ? f.satisfaction : '—'}</span>
+            <span style="background:#F5F5F5;padding:4px 10px;border-radius:8px;">تجربه: ${f.satisfaction != null ? EXP[f.satisfaction] : '—'}</span>
+            ${(f.taste_tags || []).map(t => `<span style="background:#FFF8E8;padding:4px 10px;border-radius:8px;">${escapeHtml(TAG_FA[t] || t)}</span>`).join('')}
+            ${f.quality_issue ? `<span style="background:#FDECEA;color:#C0392B;padding:4px 10px;border-radius:8px;font-weight:600;">⚠️ ${escapeHtml(Q_FA[f.quality_issue] || f.quality_issue)}</span>` : ''}
           </div>
           ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${escapeHtml(f.notes)}</div>` : ''}
-          <div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 قول هدیه‌ی سفارش بعدی داده شده — یادت باشه موقع سفارش بعدیش اعمالش کنی</div>
           <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" data-on-click="d11" data-a0="${__ha(f.id)}">✅ پیگیری شد و حل شد</button>
         </div>
       `;
@@ -1490,6 +1596,46 @@ async function loadFollowupQueue() {
     console.warn('loadFollowupQueue error:', e);
     listEl.innerHTML = '<div style="text-align:center;padding:40px;color:#BBB;">خطا در بارگذاری</div>';
   }
+}
+
+// نسخه‌ی ۳۴: «بسته‌ی کشف دوم»
+async function loadDiscoveryPacks() {
+  const el = document.getElementById('discovery-list');
+  if (!el) return;
+  try {
+    const packs = await sb('GET', `discovery_packs?status=in.(requested,consulted)&order=created_at.asc&select=*`);
+    if (!packs || !packs.length) { el.innerHTML = ''; return; }
+    const ids = [...new Set(packs.map(p => p.user_id))];
+    const [users, orders] = await Promise.all([
+      sb('GET', `users?id=in.(${ids.join(',')})&select=id,name,phone`).catch(() => []),
+      sb('GET', `orders?id=in.(${packs.map(p => p.order_id).filter(Boolean).join(',') || '00000000-0000-0000-0000-000000000000'})&select=id,bean_name`).catch(() => []),
+    ]);
+    const um = Object.fromEntries((users || []).map(u => [u.id, u]));
+    const om = Object.fromEntries((orders || []).map(o => [o.id, o]));
+    const ST = { requested: 'درخواست شده — اول مشاوره‌ی دم‌آوری', consulted: 'مشاوره انجام شد — آماده‌ی ارسال بسته' };
+    el.innerHTML = `<div style="font-weight:700;margin-bottom:10px;">📦 بسته‌های کشف دوم (${packs.length.toLocaleString('fa-IR')})</div>` + packs.map(p => {
+      const u = um[p.user_id] || {};
+      return `<div class="section-card" style="margin-bottom:12px;border-right:4px solid #7A5AF8;">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+          <div><b>${escapeHtml(u.name) || 'نامشخص'}</b> <span style="color:#999;font-size:12.5px;">— ${escapeHtml(u.phone) || '—'}</span></div>
+          <div style="background:#F1ECFF;color:#5B3FD1;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;">${ST[p.status]}</div>
+        </div>
+        <div style="margin-top:8px;font-size:13px;color:#555;">دونه‌ی قبلی: ${escapeHtml((om[p.order_id] || {}).bean_name || '—')} · ارسال: <b>${p.delivery_pref === 'now' ? 'همین حالا' : 'همراه سفارش بعدی'}</b> · ${new Date(p.created_at).toLocaleDateString('fa-IR')}</div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${p.status === 'requested' ? `<button class="btn btn-view" data-on-click="p2" data-a0="${__ha(p.id)}">☎️ مشاوره‌ی دم‌آوری انجام شد</button>` : ''}
+          <button class="btn btn-confirm" data-on-click="p3" data-a0="${__ha(p.id)}">📦 بسته‌ی ۵۰ گرمی ارسال شد</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.warn('loadDiscoveryPacks error:', e);
+    el.innerHTML = '';
+  }
+}
+async function setDiscoveryStatus(id, status) {
+  const patch = status === 'consulted' ? { status, consulted_at: new Date().toISOString() } : { status, sent_at: new Date().toISOString() };
+  try { await sb('PATCH', `discovery_packs?id=eq.${id}`, patch); loadDiscoveryPacks(); showNotif(status === 'sent' ? '📦 ارسال بسته ثبت شد' : '☎️ مشاوره ثبت شد', 'success'); }
+  catch (e) { showNotif('ثبت نشد — دوباره امتحان کنید', 'error'); }
 }
 
 async function markFollowupResolved(feedbackId) {
@@ -1593,7 +1739,7 @@ async function loadFeedbackReport() {
 
     tbody.innerHTML = list.length ? list.map(f => {
       const dateFA = new Date(f.created_at).toLocaleDateString('fa-IR', {year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'});
-      const satStr = f.satisfaction != null ? '⭐'.repeat(f.satisfaction) : '—';
+      const satStr = f.satisfaction != null ? (['—','غریب','متفاوت','جالب','خوب','عالی'][f.satisfaction] || f.satisfaction) : '—';
       const brewStr = brewFA[f.actual_brew] || f.actual_brew || '—';
       const grindStr = grindFA[f.grind_type] || f.grind_type || '—';
       return `<tr>
