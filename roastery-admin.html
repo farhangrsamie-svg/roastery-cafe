@@ -2,9 +2,9 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-iBqJlMhbi6iNchryu3w7Ebl9rB/7dd7MQ2DeRW0p+aA=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-9BdIBD34+yKV7CwVaFHkLEJf73Xwel3QQ8cX6UspAVE=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>پنل مدیریت رستری — Coffee Identity</title>
+<title>پنل مدیریت هویت قهوه — Coffee Identity</title>
 <style>
 :root {
   --cream: #F5F0E8;
@@ -252,6 +252,12 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 
 /* ── SCREEN TOGGLE ── */
 .page { display: none; }
+@media print {
+  .sidebar, .no-print, .top-bar .page-sub, .btn { display: none !important; }
+  .main-content, .content-area { margin: 0 !important; padding: 0 !important; }
+  .section-card { break-inside: avoid; box-shadow: none !important; border: 1px solid #ccc; }
+  body { background: #fff !important; }
+}
 .page.active { display: block; }
 </style>
 <!-- کتابخانه‌ی Supabase از خود سایت بارگذاری می‌شود، با نسخه‌ی ثابت — نه از CDN بیرونی با «آخرین نسخه‌ی ۲».
@@ -272,12 +278,12 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 <div id="login-screen">
   <div class="login-wrap">
     <div class="login-box">
-      <div class="login-icon">☕</div>
-      <div class="login-title">پنل مدیریت رستری</div>
+      <img src="data:image/jpeg;base64,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" alt="Coffee Identity" style="display:block;width:120px;height:auto;margin:0 auto 14px;border-radius:16px;">
+      <div class="login-title">پنل مدیریت هویت قهوه</div>
       <div class="login-sub">Coffee Identity Admin Panel</div>
       <div class="form-group">
         <label class="input-label">نام کاربری</label>
-        <input class="input-field" id="admin-username" type="text" placeholder="admin" />
+        <input class="input-field" id="admin-username" type="text" autocomplete="username" />
       </div>
       <div class="form-group">
         <label class="input-label">رمز عبور</label>
@@ -301,39 +307,42 @@ textarea.input-field { resize: vertical; min-height: 100px; }
         <div class="sidebar-logo-sub">Roastery Admin Panel</div>
       </div>
       <div class="sidebar-nav">
-        <div class="nav-item active" data-on-click="s2">
+        <div class="nav-item active admin-only" data-on-click="s2">
           <span class="nav-icon">📊</span> داشبورد
         </div>
-        <div class="nav-item" data-on-click="s3">
+        <div class="nav-item admin-only" data-on-click="s3">
           <span class="nav-icon">📦</span> سفارش‌ها
           <span class="nav-badge" id="nav-badge-orders">0</span>
         </div>
-        <div class="nav-item" data-on-click="s4">
+        <div class="nav-item admin-only" data-on-click="s4">
           <span class="nav-icon">☕</span> پروفایل‌های قهوه
         </div>
-        <div class="nav-item" data-on-click="s5">
+        <div class="nav-item admin-only" data-on-click="s5">
           <span class="nav-icon">💬</span> پیام‌ها
           <span class="nav-badge" id="nav-badge-msgs" style="display:none;">0</span>
         </div>
-        <div class="nav-item" data-on-click="s6">
+        <div class="nav-item admin-only" data-on-click="s6">
           <span class="nav-icon">👥</span> مشتریان
         </div>
-        <div class="nav-item" data-on-click="s7">
+        <div class="nav-item admin-only" data-on-click="s7">
           <span class="nav-icon">🔍</span> شکاف‌های کاتالوگ
           <span class="nav-badge" id="nav-badge-gaps" style="display:none;">0</span>
         </div>
-        <div class="nav-item" data-on-click="s8">
+        <div class="nav-item admin-only" data-on-click="s8">
           <span class="nav-icon">💬</span> بازخورد سفارش‌ها
           <span class="nav-badge" id="nav-badge-feedback" style="display:none;">0</span>
         </div>
-        <div class="nav-item" data-on-click="s9">
+        <div class="nav-item admin-only" data-on-click="s9">
           <span class="nav-icon">🧭</span> همراهی در کشف طعم
           <span class="nav-badge" id="nav-badge-followup" style="display:none;">0</span>
         </div>
-        <div class="nav-item" data-on-click="s10">
+        <div class="nav-item" data-on-click="p4" id="nav-production">
+          <span class="nav-icon">🏭</span> برنامه‌ی تولید
+        </div>
+        <div class="nav-item admin-only" data-on-click="s10">
           <span class="nav-icon">💰</span> قیمت‌گذاری دونه‌ها
         </div>
-        <div class="nav-item" data-on-click="s11">
+        <div class="nav-item admin-only" data-on-click="s11">
           <span class="nav-icon">📝</span> نظرسنجی پایلوت
           <span class="nav-badge" id="nav-badge-survey" style="display:none;">0</span>
         </div>
@@ -661,6 +670,29 @@ textarea.input-field { resize: vertical; min-height: 100px; }
       </div>
 
       <!-- ══════ صفحه: قیمت‌گذاری دونه‌ها ══════ -->
+      <!-- نسخه‌ی ۳۷: برنامه‌ی تولید — برای ادمین و مدیر تولید (بدون اطلاعات مشتری) -->
+      <div class="page" id="page-production">
+        <div class="top-bar">
+          <div>
+            <div class="page-title">🏭 برنامه‌ی تولید</div>
+            <div class="page-sub">نوبت رست هر روز ساعت ۴:۳۰ بامداد تهران خودکار بسته می‌شود: سفارش‌های پرداخت‌تأییدشده‌ای که مهلت ۲۴ ساعته‌ی لغوشان گذشته. افت وزن رست: <b id="prod-loss">۱۸</b>٪</div>
+          </div>
+        </div>
+        <div class="content-area">
+          <div class="no-print" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px;">
+            <label style="font-size:13px;">نوبت:</label>
+            <select id="prod-batch-select" data-on-change="p8" style="padding:8px 12px;border-radius:10px;border:1px solid #E5DCCF;font-family:inherit;min-width:220px;"></select>
+            <button class="btn btn-view" data-on-click="p6">🖨️ چاپ</button>
+            <button class="btn btn-view" data-on-click="p7">📥 خروجی Excel</button>
+            <button class="btn btn-confirm admin-only" data-on-click="p5">⏱️ بستن نوبت امروز همین حالا</button>
+          </div>
+          <div class="section-card no-print" style="margin-bottom:16px;"><div class="section-header"><div class="section-title">🧭 مراحل این نوبت — مشتری‌ها در اپ (و پیامک «رست») می‌بینند</div></div><div id="prod-stages" style="padding:4px 18px 18px;"></div></div>
+          <div class="section-card"><div class="section-header"><div class="section-title">📋 گزارش ۱ — تجمیعی (مدیر تولید)</div></div><div id="prod-aggregate" style="padding:4px 18px 18px;"></div></div>
+          <div class="section-card" style="margin-top:16px;"><div class="section-header"><div class="section-title">⚙️ گزارش ۲ — تفکیکی آسیاب و بسته‌بندی</div></div><div id="prod-grind" style="padding:4px 18px 18px;"></div></div>
+          <div class="section-card no-print-optional" style="margin-top:16px;"><div class="section-header"><div class="section-title">🌱 گزارش ۳ — پیش‌بینی نیاز دانه‌ی سبز</div></div><div id="prod-forecast" style="padding:4px 18px 18px;"></div></div>
+        </div>
+      </div>
+
       <div class="page" id="page-pricing">
         <div class="top-bar">
           <div>
@@ -844,9 +876,15 @@ const __H = {
   d16: function (event) { sendMsgFromModal(this.dataset.a0,this.dataset.a1) },
   p1: function (event) { markRefunded(this.dataset.a0) },
   p2: function (event) { setDiscoveryStatus(this.dataset.a0, 'consulted') },
-  p3: function (event) { setDiscoveryStatus(this.dataset.a0, 'sent') }
+  p3: function (event) { setDiscoveryStatus(this.dataset.a0, 'sent') },
+  p4: function (event) { showPage('production') },
+  p5: function (event) { closeBatchNow() },
+  p6: function (event) { window.print() },
+  p7: function (event) { exportProductionCsv() },
+  p8: function (event) { loadProductionReport(this.value) },
+  p9: function (event) { markBatchStage(this.dataset.a0) }
 };
-const __HSRC = {"s1": "doAdminLogin()", "s2": "showPage('dashboard')", "s3": "showPage('orders')", "s4": "showPage('profiles')", "s5": "showPage('messages')", "s6": "showPage('customers')", "s7": "showPage('gaps')", "s8": "showPage('feedback')", "s9": "showPage('followup')", "s10": "showPage('pricing')", "s11": "showPage('survey')", "s12": "doAdminLogout()", "s13": "refreshAllWithFeedback()", "s14": "filterOrders('all', this)", "s15": "filterOrders('receipt_submitted', this)", "s16": "filterOrders('pending', this)", "s17": "filterOrders('confirmed', this)", "s18": "filterOrders('shipped', this)", "s19": "closeModal('order-modal')", "s20": "closeModal('msg-modal')", "d1": "viewOrder('${o.id}')", "d2": "updateOrderStatus('${o.id}','confirmed')", "d3": "updateOrderStatus('${o.id}','cancelled')", "d4": "updateOrderStatus('${o.id}','shipped')", "d5": "openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')", "d6": "updateOrderStatus('${order.id}','confirmed')", "d7": "updateOrderStatus('${order.id}','cancelled')", "d8": "updateOrderStatus('${order.id}','shipped')", "d9": "openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')", "d10": "openMsgModal('${u.id}','${encAttr(u.name)}',null)", "d11": "markFollowupResolved('${f.id}')", "d12": "updatePricingPreview('${r.bean_id}')", "d13": "saveBeanPrice('${r.bean_id}')", "d14": "selectMsgUser('${u.id}','${encAttr(u.name)}')", "d15": "sendMessage('${userId}')", "d16": "sendMsgFromModal('${userId}','${orderId}')", "p1": "markRefunded('${o.id}')", "p2": "setDiscoveryStatus('${p.id}', 'consulted')", "p3": "setDiscoveryStatus('${p.id}', 'sent')"};
+const __HSRC = {"s1": "doAdminLogin()", "s2": "showPage('dashboard')", "s3": "showPage('orders')", "s4": "showPage('profiles')", "s5": "showPage('messages')", "s6": "showPage('customers')", "s7": "showPage('gaps')", "s8": "showPage('feedback')", "s9": "showPage('followup')", "s10": "showPage('pricing')", "s11": "showPage('survey')", "s12": "doAdminLogout()", "s13": "refreshAllWithFeedback()", "s14": "filterOrders('all', this)", "s15": "filterOrders('receipt_submitted', this)", "s16": "filterOrders('pending', this)", "s17": "filterOrders('confirmed', this)", "s18": "filterOrders('shipped', this)", "s19": "closeModal('order-modal')", "s20": "closeModal('msg-modal')", "d1": "viewOrder('${o.id}')", "d2": "updateOrderStatus('${o.id}','confirmed')", "d3": "updateOrderStatus('${o.id}','cancelled')", "d4": "updateOrderStatus('${o.id}','shipped')", "d5": "openMsgModal('${o.users?.id || ''}','${encAttr(user.name)}','${o.id}')", "d6": "updateOrderStatus('${order.id}','confirmed')", "d7": "updateOrderStatus('${order.id}','cancelled')", "d8": "updateOrderStatus('${order.id}','shipped')", "d9": "openMsgModal('${user.id || ''}','${encAttr(user.name)}','${order.id}')", "d10": "openMsgModal('${u.id}','${encAttr(u.name)}',null)", "d11": "markFollowupResolved('${f.id}')", "d12": "updatePricingPreview('${r.bean_id}')", "d13": "saveBeanPrice('${r.bean_id}')", "d14": "selectMsgUser('${u.id}','${encAttr(u.name)}')", "d15": "sendMessage('${userId}')", "d16": "sendMsgFromModal('${userId}','${orderId}')", "p1": "markRefunded('${o.id}')", "p2": "setDiscoveryStatus('${p.id}', 'consulted')", "p3": "setDiscoveryStatus('${p.id}', 'sent')", "p4": "showPage('production')", "p5": "closeBatchNow()", "p6": "window.print()", "p7": "exportProductionCsv()", "p8": "loadProductionReport(this.value)", "p9": "markBatchStage('${s.key}')"};
 function __ha(v) {
   return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -971,22 +1009,196 @@ async function doAdminLogin() {
     if (error) throw error;
 
     // فقط کاربرهایی که واقعاً تو جدول public.admins هستن اجازه‌ی ورود به پنل دارن
-    const isAdmin = await sb('POST', 'rpc/is_admin', {});
-    if (!isAdmin) {
+    // نسخه‌ی ۳۷: نقش‌ها — «admin» همه‌چیز؛ «production» فقط برنامه‌ی تولید
+    const role = await sb('POST', 'rpc/staff_role', {});
+    if (role !== 'admin' && role !== 'production') {
       await supabaseClient.auth.signOut();
       throw new Error('دسترسی ادمین ندارید');
     }
-
-    currentAdmin = { username: u, name: 'مدیر رستری' };
-    localStorage.setItem('roastery_admin', JSON.stringify(currentAdmin));
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'flex';
-    document.getElementById('admin-name-display').textContent = currentAdmin.name;
-    document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    initAdmin();
+    enterPanel(role, u);
   } catch (e) {
     document.getElementById('login-error').classList.add('visible');
   }
+}
+
+let staffRole = null;
+function enterPanel(role, username) {
+  staffRole = role;
+  currentAdmin = { username, name: role === 'admin' ? 'مدیر رستری' : 'مدیر تولید' };
+  localStorage.setItem('roastery_admin', JSON.stringify(currentAdmin));
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'flex';
+  document.getElementById('admin-name-display').textContent = currentAdmin.name;
+  const dd = document.getElementById('dashboard-date');
+  if (dd) dd.textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  if (role === 'production') {
+    // مدیر تولید: فقط برنامه‌ی تولید؛ بقیه‌ی منوها و دکمه‌های ادمین پنهان (دیتابیس هم اجازه نمی‌دهد)
+    document.querySelectorAll('.admin-only').forEach(el => { el.style.display = 'none'; });
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-production').classList.add('active');
+    document.getElementById('nav-production').classList.add('active');
+    loadProductionPage();
+  } else {
+    initAdmin();
+  }
+}
+
+// ═══════ نسخه‌ی ۳۷: برنامه‌ی تولید ═══════
+const GRIND_FA = { self_ground: 'دانه‌ی کامل', roastery_ground: 'آسیاب', need_help: 'نیاز به تماس قبل از آسیاب' };
+const BREW_FA = { espressohome: 'اسپرسو', mokapot: 'موکاپات', v60: 'پوراور', frenchpress: 'فرنچ‌پرس', aeropress: 'ایروپرس', coldbrew: 'کولد برو', other: 'روش دیگر' };
+let prodState = { loss: 18, batch: null, items: [], forecast: null };
+const fmtG = g => Math.round(g).toLocaleString('fa-IR') + ' گرم';
+const faDate = d => new Date(d + 'T12:00:00').toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+async function loadProductionPage() {
+  try { const l = await sb('POST', 'rpc/get_roast_loss_pct', {}); if (l != null) prodState.loss = Number(l); } catch (_) {}
+  document.getElementById('prod-loss').textContent = prodState.loss.toLocaleString('fa-IR');
+  const sel = document.getElementById('prod-batch-select');
+  try {
+    const batches = await sb('GET', 'roast_batches?select=id,batch_date,cutoff_at,created_by&order=batch_date.desc&limit=60');
+    sel.innerHTML = (batches || []).length
+      ? batches.map(b => `<option value="${__ha(b.id)}">${escapeHtml(faDate(b.batch_date))}</option>`).join('')
+      : '<option value="">هنوز نوبتی بسته نشده</option>';
+    prodState.batches = batches || [];
+    if (batches && batches.length) await loadProductionReport(batches[0].id);
+    else renderProduction();
+  } catch (e) {
+    sel.innerHTML = '<option value="">خطا در بارگذاری</option>';
+  }
+  loadGreenForecast();
+}
+
+async function loadProductionReport(batchId) {
+  if (!batchId) return;
+  prodState.batch = (prodState.batches || []).find(b => b.id === batchId) || null;
+  try {
+    prodState.items = await sb('GET', `roast_batch_items?batch_id=eq.${batchId}&select=order_code,bean_name,amount_g,grind_preference,ground_for_brew&order=bean_name.asc,grind_preference.asc,ground_for_brew.asc,order_code.asc`) || [];
+  } catch (e) { prodState.items = []; }
+  renderProduction();
+  loadBatchStages();
+}
+
+// ═══ نسخه‌ی ۳۸: مراحل سفر دانه (رست ← استراحت ← آسیاب) برای کل نوبت ═══
+const STAGE_UI = [
+  { key: 'roasting', icon: '🔥', label: 'رست انجام شد', note: 'همه‌ی سفارش‌های نوبت — پیامک «رست» به مشتری' },
+  { key: 'resting',  icon: '😴', label: 'رفت برای استراحت', note: 'فقط سفارش‌های آسیاب‌شده' },
+  { key: 'grinding', icon: '⚙️', label: 'آسیاب شد', note: 'فقط سفارش‌های آسیاب‌شده' },
+];
+async function loadBatchStages() {
+  const el = document.getElementById('prod-stages');
+  if (!el) return;
+  if (!prodState.batch || !prodState.items.length) { el.innerHTML = '<div style="color:#999;font-size:13px;">این نوبت سفارشی ندارد.</div>'; return; }
+  let st = {};
+  try { st = await sb('POST', 'rpc/get_batch_stages', { p_batch_id: prodState.batch.id }) || {}; } catch (_) {}
+  el.innerHTML = '<div style="display:flex;gap:12px;flex-wrap:wrap;">' + STAGE_UI.map((s, i) => {
+    const done = st[s.key];
+    return `<div style="flex:1;min-width:200px;border:1px solid ${done ? '#B7D9B9' : '#E5DCCF'};background:${done ? '#F1F8F1' : '#fff'};border-radius:12px;padding:12px 14px;">
+      <div style="font-weight:700;">${s.icon} ${s.label}</div>
+      <div style="font-size:12px;color:#888;margin:4px 0 10px;">${s.note}</div>
+      ${done ? `<div style="font-size:12.5px;color:#2E7D32;">✔ ${Number(done.count).toLocaleString('fa-IR')} سفارش · ${new Date(done.at).toLocaleString('fa-IR', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long' })}</div>`
+             : `<button class="btn btn-confirm" data-on-click="p9" data-a0="${s.key}">ثبت برای کل نوبت</button>`}
+    </div>`;
+  }).join('') + '</div>';
+}
+async function markBatchStage(stage) {
+  const s = STAGE_UI.find(x => x.key === stage);
+  if (!prodState.batch || !s) return;
+  if (!confirm(`«${s.label}» برای همه‌ی سفارش‌های این نوبت ثبت شود؟`)) return;
+  try {
+    const n = await sb('POST', 'rpc/set_batch_stage', { p_batch_id: prodState.batch.id, p_stage: stage });
+    showNotif(`✔ برای ${Number(n || 0).toLocaleString('fa-IR')} سفارش ثبت شد`, 'success');
+    flushSmsQueue();
+    loadBatchStages();
+  } catch (e) { showNotif('ثبت نشد — دوباره امتحان کنید', 'error'); }
+}
+// صف پیامک را در سرور پردازش می‌کند (تا روشن شدن پیامک، فقط صف را پاک نگه می‌دارد)
+async function flushSmsQueue() {
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    await fetch(SUPABASE_URL + '/functions/v1/notify-sms', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + session.access_token }, body: '{}',
+    });
+  } catch (e) { console.warn('notify-sms:', e); }
+}
+
+function aggregateBeans() {
+  const map = {};
+  prodState.items.forEach(i => {
+    const k = i.bean_name || '—';
+    const a = map[k] || (map[k] = { bean: k, orders: 0, roasted: 0, whole: 0, ground: 0, help: 0 });
+    a.orders++; a.roasted += i.amount_g || 0;
+    if (i.grind_preference === 'self_ground') a.whole += i.amount_g || 0;
+    else if (i.grind_preference === 'roastery_ground') a.ground += i.amount_g || 0;
+    else a.help += i.amount_g || 0;
+  });
+  return Object.values(map).sort((x, y) => y.roasted - x.roasted);
+}
+
+function renderProduction() {
+  const agg = document.getElementById('prod-aggregate'), gr = document.getElementById('prod-grind');
+  if (!prodState.items.length) {
+    const msg = '<div class="empty-state"><div class="empty-icon">☕</div><div class="empty-text">در این نوبت سفارشی نیست</div></div>';
+    agg.innerHTML = msg; gr.innerHTML = msg; return;
+  }
+  const rows = aggregateBeans(), f = 1 - prodState.loss / 100;
+  const tot = rows.reduce((t, r) => ({ orders: t.orders + r.orders, roasted: t.roasted + r.roasted }), { orders: 0, roasted: 0 });
+  const head = prodState.batch ? `<div style="font-size:13px;color:#888;margin-bottom:10px;">نوبت ${escapeHtml(faDate(prodState.batch.batch_date))} · بسته‌شده: ${new Date(prodState.batch.cutoff_at).toLocaleString('fa-IR')}</div>` : '';
+  agg.innerHTML = head + `<div style="overflow-x:auto;"><table class="orders-table"><thead><tr><th>دانه</th><th>تعداد سفارش</th><th>وزن رست‌شده‌ی لازم</th><th>دانه‌ی سبز لازم</th><th>کامل</th><th>آسیاب</th><th>نیاز به تماس</th></tr></thead><tbody>`
+    + rows.map(r => `<tr><td><b>${escapeHtml(r.bean)}</b></td><td>${r.orders.toLocaleString('fa-IR')}</td><td>${fmtG(r.roasted)}</td><td><b>${fmtG(Math.ceil(r.roasted / f))}</b></td><td>${fmtG(r.whole)}</td><td>${fmtG(r.ground)}</td><td>${r.help ? '<b style="color:#C0392B;">' + fmtG(r.help) + '</b>' : '—'}</td></tr>`).join('')
+    + `<tr style="background:#FAF6F0;font-weight:700;"><td>جمع</td><td>${tot.orders.toLocaleString('fa-IR')}</td><td>${fmtG(tot.roasted)}</td><td>${fmtG(Math.ceil(tot.roasted / f))}</td><td colspan="3"></td></tr></tbody></table></div>`;
+  const byBean = {};
+  prodState.items.forEach(i => (byBean[i.bean_name || '—'] = byBean[i.bean_name || '—'] || []).push(i));
+  gr.innerHTML = Object.entries(byBean).map(([bean, list]) => `
+    <div style="margin-bottom:16px;break-inside:avoid;">
+      <div style="font-weight:700;margin-bottom:6px;">☕ ${escapeHtml(bean)}</div>
+      <table class="orders-table"><thead><tr><th>کد سفارش</th><th>وزن</th><th>نوع</th><th>روش دم (درجه‌ی آسیاب)</th></tr></thead><tbody>
+      ${list.map(i => `<tr${i.grind_preference === 'need_help' || !i.grind_preference ? ' style="background:#FFF3F3;"' : ''}><td style="font-family:monospace;direction:ltr;text-align:right;">${escapeHtml(i.order_code)}</td><td>${fmtG(i.amount_g || 0)}</td><td>${escapeHtml(GRIND_FA[i.grind_preference] || 'نامشخص — تماس')}</td><td>${i.grind_preference === 'roastery_ground' ? escapeHtml(BREW_FA[i.ground_for_brew] || i.ground_for_brew || '—') : '—'}</td></tr>`).join('')}
+      </tbody></table>
+    </div>`).join('') + '<div style="font-size:12px;color:#999;">ردیف‌های قرمز: مشتری درباره‌ی آسیاب راهنمایی خواسته — قبل از آسیاب با او تماس گرفته شود (ادمین شماره را از روی کد سفارش پیدا می‌کند).</div>';
+}
+
+async function loadGreenForecast() {
+  const el = document.getElementById('prod-forecast');
+  try {
+    const f = await sb('POST', 'rpc/get_green_forecast', {});
+    prodState.forecast = f;
+    const beans = (f && f.beans) || [];
+    if (!beans.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">🌱</div><div class="empty-text">هنوز داده‌ی کافی نیست</div></div>'; return; }
+    el.innerHTML = `<div style="overflow-x:auto;"><table class="orders-table"><thead><tr><th>دانه</th><th>میانگین روزانه (۱۴ روز)</th><th>میانگین روزانه (۳۰ روز)</th><th>روند نسبت به ۳۰ روز قبل</th><th>دانه‌ی سبز ۲ هفته‌ی آینده</th><th>دانه‌ی سبز ۴ هفته‌ی آینده</th></tr></thead><tbody>`
+      + beans.map(b => {
+          const trend = b.prev30 > 0 ? Math.round((b.d30 - b.prev30) * 100 / b.prev30) : null;
+          const tr = trend == null ? '—' : (trend > 0 ? `<span style="color:#2E7D32;">▲ ${trend.toLocaleString('fa-IR')}٪</span>` : trend < 0 ? `<span style="color:#C0392B;">▼ ${Math.abs(trend).toLocaleString('fa-IR')}٪</span>` : 'ثابت');
+          return `<tr><td><b>${escapeHtml(b.bean_name || '—')}</b></td><td>${fmtG(b.d14)}</td><td>${fmtG(b.d30)}</td><td>${tr}</td><td>${fmtG(b.green_2w_g)}</td><td><b>${fmtG(b.green_4w_g)}</b></td></tr>`;
+        }).join('') + '</tbody></table></div><div style="font-size:12px;color:#999;margin-top:8px;">بر اساس سفارش‌های پرداخت‌شده‌ی ۳۰ روز اخیر، با افت وزن رست. با جمع شدن داده‌ی بیشتر دقیق‌تر می‌شود.</div>';
+  } catch (e) {
+    el.innerHTML = '<div style="color:#BBB;padding:12px;">خطا در بارگذاری پیش‌بینی</div>';
+  }
+}
+
+async function closeBatchNow() {
+  if (staffRole !== 'admin') return;
+  if (!confirm('نوبت رست امروز همین حالا بسته شود؟ (سفارش‌های واجد شرایط تا این لحظه به نوبت امروز اضافه می‌شوند)')) return;
+  try { await sb('POST', 'rpc/close_roast_batch', {}); showNotif('✔ نوبت امروز بسته شد', 'success'); loadProductionPage(); }
+  catch (e) { showNotif('بسته نشد — دوباره امتحان کنید', 'error'); }
+}
+
+function exportProductionCsv() {
+  if (!prodState.items.length) { showNotif('این نوبت سفارشی ندارد', 'error'); return; }
+  const f = 1 - prodState.loss / 100, esc = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const lines = ['گزارش تجمیعی'];
+  lines.push(['دانه','تعداد سفارش','رست‌شده (گرم)','دانه‌ی سبز (گرم)','کامل (گرم)','آسیاب (گرم)','نیاز به تماس (گرم)'].map(esc).join(','));
+  aggregateBeans().forEach(r => lines.push([r.bean, r.orders, r.roasted, Math.ceil(r.roasted / f), r.whole, r.ground, r.help].map(esc).join(',')));
+  lines.push(''); lines.push('گزارش تفکیکی');
+  lines.push(['دانه','کد سفارش','وزن (گرم)','نوع','روش دم'].map(esc).join(','));
+  prodState.items.forEach(i => lines.push([i.bean_name, i.order_code, i.amount_g, GRIND_FA[i.grind_preference] || 'نامشخص', i.grind_preference === 'roastery_ground' ? (BREW_FA[i.ground_for_brew] || i.ground_for_brew || '') : ''].map(esc).join(',')));
+  const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'roast-batch-' + ((prodState.batch && prodState.batch.batch_date) || 'report') + '.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
 
 async function doAdminLogout() {
@@ -1004,18 +1216,13 @@ async function checkAdminAutoLogin() {
   if (!session) { localStorage.removeItem('roastery_admin'); return; }
 
   try {
-    const isAdmin = await sb('POST', 'rpc/is_admin', {});
-    if (!isAdmin) {
+    const role = await sb('POST', 'rpc/staff_role', {});
+    if (role !== 'admin' && role !== 'production') {
       await supabaseClient.auth.signOut();
       localStorage.removeItem('roastery_admin');
       return;
     }
-    currentAdmin = { username: 'admin', name: 'مدیر رستری' };
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('admin-screen').style.display = 'flex';
-    document.getElementById('admin-name-display').textContent = currentAdmin.name;
-    document.getElementById('dashboard-date').textContent = new Date().toLocaleDateString('fa-IR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-    initAdmin();
+    enterPanel(role, role === 'admin' ? 'admin' : 'production');
   } catch (e) {
     // نشست نامعتبر یا خطای شبکه؛ باید دوباره وارد بشه
   }
@@ -1037,6 +1244,7 @@ function showPage(name) {
   if (name === 'feedback') loadFeedbackReport();
   if (name === 'followup') loadFollowupQueue();
   if (name === 'pricing') loadPricingForm();
+  if (name === 'production') loadProductionPage();
   if (name === 'survey') loadSurveyReport();
 }
 
@@ -1280,6 +1488,7 @@ function filterOrders(filter, btn) {
 async function updateOrderStatus(orderId, status) {
   try {
     await sb('PATCH', `orders?id=eq.${orderId}`, { status });
+    flushSmsQueue(); // نسخه‌ی ۳۸: پیامک «پرداخت تأیید شد» / «ارسال شد» (اگر روشن باشد)
     await refreshAll();
     closeModal('order-modal');
     showNotif(status === 'confirmed' ? '✅ سفارش تأیید شد' : status === 'shipped' ? '🚚 وضعیت ارسال ثبت شد' : '❌ سفارش رد شد', status === 'cancelled' ? 'error' : 'success');
@@ -1535,6 +1744,16 @@ async function loadFollowupQueue() {
     const rows = await sb('GET', `order_feedback?or=(followup_status.in.(pending,still_unhappy),and(quality_issue.not.is.null,followup_status.is.null))&order=created_at.desc&select=*`);
     loadDiscoveryPacks();
     const list = rows || [];
+    // نسخه‌ی ۳۶: اپ قدیمی (تا بارگذاری اپ ۴۷) به مشتری «هنوز ناراضی» قول هدیه‌ی سفارش بعدی می‌دهد و
+    // coffee_profiles.gift_pending را روشن می‌کند؛ این قول‌ها نباید از دید ادمین گم شوند.
+    let giftPending = {};
+    try {
+      const pids = [...new Set(list.map(f => f.profile_id).filter(Boolean))];
+      if (pids.length) {
+        const profs = await sb('GET', `coffee_profiles?id=in.(${pids.join(',')})&gift_pending=is.true&select=id`);
+        (profs || []).forEach(p => { giftPending[p.id] = true; });
+      }
+    } catch (e) { console.warn('gift_pending lookup failed:', e); }
 
     const badge = document.getElementById('nav-badge-followup');
     if (badge) {
@@ -1588,6 +1807,7 @@ async function loadFollowupQueue() {
             ${f.quality_issue ? `<span style="background:#FDECEA;color:#C0392B;padding:4px 10px;border-radius:8px;font-weight:600;">⚠️ ${escapeHtml(Q_FA[f.quality_issue] || f.quality_issue)}</span>` : ''}
           </div>
           ${f.notes ? `<div style="margin-top:10px;font-size:13px;color:#666;background:#FAFAFA;padding:10px 12px;border-radius:8px;">${escapeHtml(f.notes)}</div>` : ''}
+          ${giftPending[f.profile_id] ? '<div style="margin-top:12px;font-size:12.5px;color:#B8860B;">🎁 نسخه‌ی قدیمی اپ به این مشتری قول هدیه‌ی سفارش بعدی داده — موقع سفارش بعدی‌اش اعمال شود</div>' : ''}
           <button class="btn-primary" style="margin-top:10px;padding:8px 16px;font-size:13px;width:auto;" data-on-click="d11" data-a0="${__ha(f.id)}">✅ پیگیری شد و حل شد</button>
         </div>
       `;
