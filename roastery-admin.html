@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-1hCBZbVuiTyyBy5d7L+pmK4UF+rupxeHaU3YgdNeWBA=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-UDRMzzGMv45JimOfF5DZi2J6xhNae9DcShYwjlmG+zg=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>پنل مدیریت هویت قهوه — Coffee Identity</title>
 <style>
@@ -1046,7 +1046,11 @@ function enterPanel(role, username) {
 
 // ═══════ نسخه‌ی ۳۷: برنامه‌ی تولید ═══════
 const GRIND_FA = { self_ground: 'دانه‌ی کامل', roastery_ground: 'آسیاب', need_help: 'نیاز به تماس قبل از آسیاب' };
-const BREW_FA = { espressohome: 'اسپرسو', mokapot: 'موکاپات', v60: 'پوراور', frenchpress: 'فرنچ‌پرس', aeropress: 'ایروپرس', coldbrew: 'کولد برو', other: 'روش دیگر' };
+// نسخه‌ی ۴۱: فهرست واحد روش‌ها + درجه‌ی آسیاب (همان اپ ۵۱)
+const BREW_FA = { espressohome: 'اسپرسو', mokapot: 'موکاپات', turkish: 'قهوه‌ی ترک', drip: 'قهوه‌ساز دمی برقی', v60: 'پوراور دستی', chemex: 'کمکس', aeropress: 'ایروپرس', frenchpress: 'فرنچ‌پرس', coldbrew: 'کولد برو', siphon: 'سایفون', other: 'روش دیگر' };
+const GRIND_SIZE_FA = { espressohome: 'ریز', mokapot: 'ریز تا متوسط‌ریز', turkish: 'خیلی ریز (پودری)', drip: 'متوسط', v60: 'متوسط‌ریز', chemex: 'متوسط‌درشت', aeropress: 'متوسط‌ریز', frenchpress: 'درشت', coldbrew: 'خیلی درشت', siphon: 'متوسط‌ریز' };
+function brewLabelFA(v) { v = String(v || ''); if (v.startsWith('other:')) return 'روش دیگر: ' + v.slice(6); return BREW_FA[v] || v || '—'; }
+function grindSizeFA(v) { v = String(v || ''); if (v.startsWith('other:') || v === 'other') return 'طبق توضیح مشتری — در صورت ابهام تماس'; return GRIND_SIZE_FA[v] || '—'; }
 let prodState = { loss: 18, batch: null, items: [], forecast: null };
 const fmtG = g => Math.round(g).toLocaleString('fa-IR') + ' گرم';
 const faDate = d => new Date(d + 'T12:00:00').toLocaleDateString('fa-IR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
@@ -1153,8 +1157,8 @@ function renderProduction() {
   gr.innerHTML = Object.entries(byBean).map(([bean, list]) => `
     <div style="margin-bottom:16px;break-inside:avoid;">
       <div style="font-weight:700;margin-bottom:6px;">☕ ${escapeHtml(bean)}</div>
-      <table class="orders-table"><thead><tr><th>شماره سفارش</th><th>وزن</th><th>نوع</th><th>روش دم (درجه‌ی آسیاب)</th></tr></thead><tbody>
-      ${list.map(i => `<tr${i.grind_preference === 'need_help' || !i.grind_preference ? ' style="background:#FFF3F3;"' : ''}><td style="font-family:monospace;direction:ltr;text-align:right;">${escapeHtml(i.order_code)}</td><td>${fmtG(i.amount_g || 0)}</td><td>${escapeHtml(GRIND_FA[i.grind_preference] || 'نامشخص — تماس')}</td><td>${i.grind_preference === 'roastery_ground' ? escapeHtml(BREW_FA[i.ground_for_brew] || i.ground_for_brew || '—') : '—'}</td></tr>`).join('')}
+      <table class="orders-table"><thead><tr><th>شماره سفارش</th><th>وزن</th><th>نوع</th><th>روش دم</th><th>درجه‌ی آسیاب</th></tr></thead><tbody>
+      ${list.map(i => `<tr${i.grind_preference === 'need_help' || !i.grind_preference ? ' style="background:#FFF3F3;"' : ''}><td style="font-family:monospace;direction:ltr;text-align:right;">${escapeHtml(i.order_code)}</td><td>${fmtG(i.amount_g || 0)}</td><td>${escapeHtml(GRIND_FA[i.grind_preference] || 'نامشخص — تماس')}</td><td>${i.grind_preference === 'roastery_ground' ? escapeHtml(brewLabelFA(i.ground_for_brew)) : '—'}</td><td>${i.grind_preference === 'roastery_ground' ? '<b>' + escapeHtml(grindSizeFA(i.ground_for_brew)) + '</b>' : (i.grind_preference === 'self_ground' ? 'آسیاب نمی‌شود' : 'تماس قبل از آسیاب')}</td></tr>`).join('')}
       </tbody></table>
     </div>`).join('') + '<div style="font-size:12px;color:#999;">ردیف‌های قرمز: مشتری درباره‌ی آسیاب راهنمایی خواسته — قبل از آسیاب با او تماس گرفته شود (ادمین شماره را از روی کد سفارش پیدا می‌کند).</div>';
 }
@@ -1191,8 +1195,8 @@ function exportProductionCsv() {
   lines.push(['دانه','تعداد سفارش','رست‌شده (گرم)','دانه‌ی سبز (گرم)','کامل (گرم)','آسیاب (گرم)','نیاز به تماس (گرم)'].map(esc).join(','));
   aggregateBeans().forEach(r => lines.push([r.bean, r.orders, r.roasted, Math.ceil(r.roasted / f), r.whole, r.ground, r.help].map(esc).join(',')));
   lines.push(''); lines.push('گزارش تفکیکی');
-  lines.push(['دانه','کد سفارش','وزن (گرم)','نوع','روش دم'].map(esc).join(','));
-  prodState.items.forEach(i => lines.push([i.bean_name, i.order_code, i.amount_g, GRIND_FA[i.grind_preference] || 'نامشخص', i.grind_preference === 'roastery_ground' ? (BREW_FA[i.ground_for_brew] || i.ground_for_brew || '') : ''].map(esc).join(',')));
+  lines.push(['دانه','شماره سفارش','وزن (گرم)','نوع','روش دم','درجه‌ی آسیاب'].map(esc).join(','));
+  prodState.items.forEach(i => lines.push([i.bean_name, i.order_code, i.amount_g, GRIND_FA[i.grind_preference] || 'نامشخص', i.grind_preference === 'roastery_ground' ? brewLabelFA(i.ground_for_brew) : '', i.grind_preference === 'roastery_ground' ? grindSizeFA(i.ground_for_brew) : ''].map(esc).join(',')));
   const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1528,7 +1532,7 @@ async function viewOrder(orderId) {
   const user = order.users || {};
   const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
   const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
-  const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+  const brewFA  = Object.assign({ espresso:'اسپرسو', instant:'قهوه فوری' }, BREW_FA);
   const acidityFA = { bright:'زنده و ترش', balanced:'متعادل', smooth:'نرم و بدون ترشی' };
   const personaFA = {
     'The Explorer': '🧭 کاوشگر',
@@ -1606,7 +1610,7 @@ async function loadProfiles() {
     }
     const tasteFA = { floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند' };
     const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
-    const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', espresso:'اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
+    const brewFA  = Object.assign({ espresso:'اسپرسو', instant:'قهوه فوری' }, BREW_FA);
     const personaFA = {
       'The Explorer': '🧭 کاوشگر',
       'The Comfort Lover': '☕ آرامش‌جو',
@@ -1878,7 +1882,7 @@ async function loadFeedbackReport() {
   tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:#BBB;">در حال بارگذاری...</td></tr>';
   byBeanEl.innerHTML = byBrewEl.innerHTML = byGrindEl.innerHTML = '<div style="text-align:center;padding:30px;color:#BBB;">در حال بارگذاری...</div>';
 
-  const brewFA = { v60:'پور اور (V60)', frenchpress:'فرنچ پرس', espressohome:'اسپرسو/موکاپات', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر/دستگاه کپسولی' };
+  const brewFA  = Object.assign({ espresso:'اسپرسو', instant:'قهوه فوری' }, BREW_FA);
   const grindFA = { manual:'دستی', electric:'برقی خانگی', electric_flat:'برقی — تیغه‌ی تخت', electric_conical:'برقی — تیغه‌ی مخروطی', espresso_built_in:'داخل دستگاه اسپرسو' };
 
   try {

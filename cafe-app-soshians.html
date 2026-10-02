@@ -30,7 +30,7 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-XY9U6rKGH2+Fa2TD7Aqwh53FyVWvkzZ433jJUy4BCSI=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-2RfYgK3gkeGMT6ajZzIy8OlzKAhcakA0B3V/tID0GBo=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>هویت قهوه — نسخه سوشیانس (تست پایلوت)</title>
 
@@ -2620,7 +2620,9 @@ If it tastes sour or sharp, the brewing probably needs a small adjustment — ou
           <div style="font-size:11.5px;color:var(--medium-brown);margin-bottom:6px;font-family:'Vazirmatn',sans-serif;">
             <span class="fa-only">روش دم‌آوری تو:</span><span class="en-only">Your brew method:</span>
           </div>
-          <select id="order-grind-method" class="input-field" style="padding:10px 14px;font-size:14px;"></select>
+          <select id="order-grind-method" class="input-field" style="padding:10px 14px;font-size:14px;" data-on-change="p13"></select>
+          <input id="order-grind-other" class="input-field" maxlength="40" style="display:none;margin-top:8px;padding:10px 14px;font-size:14px;" placeholder="روشت را بنویس (مثلاً سایفون، کلور)">
+          <div id="order-grind-size-hint" style="font-size:12px;color:var(--text-soft);margin-top:6px;"></div>
         </div>
       </div>
       <div class="amount-card" id="grind-help" data-on-click="s113" style="padding:16px 18px;">
@@ -3099,9 +3101,10 @@ const __H = {
   p9: function (event) { requestDiscoveryPack('now') },
   p10: function (event) { requestDiscoveryPack('with_next') },
   p11: function (event) { acceptTermsNow(this.closest('.confirm-overlay')) },
-  p12: function (event) { doLogout() }
+  p12: function (event) { doLogout() },
+  p13: function (event) { onOrderBrewMethodChange() }
 };
-const __HSRC = {"s1": "toggleDarkMode()", "s2": "setLang('en')", "s3": "setLang('fa')", "s4": "showDashboard()", "s5": "showMyIdentityScreen()", "s6": "showMyOrdersScreen()", "s7": "openBeanCreditWallet()", "s8": "goToAuth('register')", "s9": "goToAuth('login');return false;", "s10": "show('screen-welcome')", "s11": "switchTab('login')", "s12": "switchTab('register')", "s13": "doLogin()", "s14": "doRegister()", "s15": "selectGeneration('genz')", "s16": "selectGeneration('millennial')", "s17": "selectGeneration('genx')", "s18": "selectGeneration('boomer')", "s19": "selectGeneration('unspecified')", "s20": "openSettings()", "s21": "showBeanCreditInfo(event)", "s22": "startNewProfile()", "s23": "scrollToProfilesList()", "s24": "updateSettingsCompletion()", "s25": "selectSettingsGeneration('genz')", "s26": "selectSettingsGeneration('millennial')", "s27": "selectSettingsGeneration('genx')", "s28": "selectSettingsGeneration('boomer')", "s29": "selectSettingsGeneration('unspecified')", "s30": "updateSettingsCompletion()", "s31": "this.value=this.value.replace(/[^0-9]/g,''); updateSettingsCompletion();", "s32": "openMyMemories();return false;", "s33": "togglePasswordChangeForm();return false;", "s34": "changePassword()", "s35": "saveSettings()", "s36": "doLogout()", "s37": "continueReturningUserFlow()", "s38": "goOrderFromGate()", "s39": "deferGateOrder()", "s40": "cancelGateProfile()", "s41": "skipFeedback()", "s42": "pickFeedbackSatisfaction(1, this)", "s43": "pickFeedbackSatisfaction(2, this)", "s44": "pickFeedbackSatisfaction(3, this)", "s45": "pickFeedbackSatisfaction(4, this)", "s46": "pickFeedbackSatisfaction(5, this)", "s47": "submitOrderFeedback()", "s48": "selectLevel('beginner','whatever_available')", "s49": "selectLevel('beginner','brand_price')", "s50": "selectLevel('regular','origin')", "s51": "selectLevel('expert','processing_cupping')", "s52": "selectLevel('expert','barista_roaster')", "s53": "selectLevel('regular','none_of_these')", "s54": "pickHealth(this,'h1','normal')", "s55": "pickHealth(this,'h1','mild')", "s56": "pickHealth(this,'h1','sensitive')", "s57": "pickHealth(this,'h1','unsure')", "s58": "skipHealth()", "s59": "pickHealth(this,'h2','normal')", "s60": "pickHealth(this,'h2','mild')", "s61": "pickHealth(this,'h2','sensitive')", "s62": "pickHealth(this,'h2','unsure')", "s63": "goBack(1)", "s64": "goBack(2)", "s65": "goBack(3)", "s66": "goBack(4)", "s67": "goBack(5)", "s68": "goBack(6)", "s69": "goBackScreen7()", "s70": "pickTastePrefStep1('black')", "s71": "pickTastePrefStep1('milk')", "s72": "pickTastePrefStep2(this,'dark')", "s73": "pickTastePrefStep2(this,'milk')", "s74": "pickTastePrefStep2(this,'none')", "s75": "show('screen-7')", "s76": "go(8)", "s77": "goBack(8)", "s78": "goBack(9)", "s79": "goBack(10)", "s80": "finishQuizAndProceed()", "s81": "goBackDeep(1)", "s82": "goBackDeep(2)", "s83": "goBackDeep(3)", "s84": "goBackDeep(4)", "s85": "goBackDeep(5)", "s86": "goBackDeep(6)", "s87": "goBackFromMemory1()", "s88": "finishPhase2()", "s89": "skipMemoryQuestion()", "s90": "continueAfterBeanCreditWelcome()", "s91": "exitCompanionOnlyAndGoDashboard()", "s92": "toggleAccordion('section-bean-body')", "s93": "goToOrder(rec._runnerBean)", "s94": "showBrewAlternative()", "s95": "goToOrder(rec._brewAlt)", "s96": "toggleRoastGuide()", "s97": "toggleAccordion('r-technical-details-body')", "s98": "toggleAccordion('companion-section')", "s99": "revealMusicEmbed()", "s100": "toggleAccordion('section-journey-body')", "s101": "switchResultRadarTab('taste')", "s102": "switchResultRadarTab('sensory')", "s103": "goToOrder()", "s104": "openSharePrefsModal()", "s105": "show('screen-result')", "s106": "this.parentNode.style.display='none'", "s107": "togglePurchaseCreditApply(this.checked)", "s108": "selectAmount(125)", "s109": "selectAmount(250)", "s110": "selectGrindPref('self_ground')", "s111": "selectGrindPref('roastery_ground')", "s112": "event.stopPropagation()", "s113": "selectGrindPref('need_help')", "s114": "submitOrder()", "s115": "continueToPaymentAfterSpin()", "s116": "closeSpendConfirmModal()", "s117": "show('screen-dashboard')", "s118": "show('screen-order')", "s119": "showDashboard();return false;", "s120": "copyCardNumber()", "s121": "document.getElementById('receipt-input').click()", "s122": "handleReceiptUpload(this)", "s123": "confirmPayment()", "s124": "scrollToMessages()", "d1": "deleteMyMemory('${r.id}')", "d2": "openSettingsForEmail()", "d3": "selectSettingsAvatar('${key}')", "d4": "markMsgRead('${m.id}', this)", "d5": "viewProfileById('${p.id}')", "d6": "toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)", "d7": "viewCompanionContent('${p.id}')", "d8": "deleteProfile('${p.id}')", "d9": "showMyOrdersScreen()", "d10": "resumePaymentForOrder('${o.id}')", "d11": "startFeedbackForOrder('${o.id}')", "d12": "toggleOrderDetails('${o.id}')", "d13": "deleteOrder('${o.id}')", "d14": "this.closest('.confirm-overlay').remove()", "d15": "confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))", "d16": "viewCompanionContent('${pid}')", "d17": "toggleAccordion('acc-know-${pid}')", "d18": "toggleAccordion('acc-bean-${pid}')", "d19": "toggleAccordion('acc-brew-${pid}')", "d20": "switchDetailRadarTab('taste')", "d21": "switchDetailRadarTab('sensory')", "d22": "goToOrder(rec._runnerBean)", "d23": "setRating('${pid}',1)", "d24": "setRating('${pid}',2)", "d25": "setRating('${pid}',3)", "d26": "setRating('${pid}',4)", "d27": "setRating('${pid}',5)", "d28": "submitReview('${pid}')", "d29": "editReview('${pid}')", "d30": "reorderProfile()", "d31": "openSharePrefsModal()", "d32": "resolveFollowup('resolved')", "d33": "resolveFollowup('still_unhappy')", "d34": "startFeedbackFromDashboard()", "d35": "location.reload()", "d36": "this.closest('.confirm-overlay').remove()", "d37": "confirmDelete('${profileId}', this.closest('.confirm-overlay'))", "s125": "closeSharePrefsModal()", "s126": "selectShareStyle('feminine')", "s127": "selectShareStyle('masculine')", "s128": "selectShareStyle('surprise')", "s129": "submitSharePrefs()", "s130": "skipSharePrefs()", "s131": "closeSharePrefsModal();return false;", "s132": "if(event.target===this)closeRoastStageModal()", "s133": "closeRoastStageModal()", "s134": "goToStageContent()", "s135": "closeTipModal()", "x1": "continueToPaymentAfterSpin()", "x2": "show('screen-dashboard')", "p1": "exportMyData()", "p2": "toggleDeleteAccountForm();return false;", "p3": "deleteMyAccount()", "p4": "askCancelOrder('${o.id}')", "p5": "confirmCancelOrder('${orderId}', this.closest('.confirm-overlay'))", "p6": "toggleTasteTag(this)", "p7": "toggleQualitySection();return false;", "p8": "pickQualityIssue(this)", "p9": "requestDiscoveryPack('now')", "p10": "requestDiscoveryPack('with_next')", "p11": "acceptTermsNow(this.closest('.confirm-overlay'))", "p12": "doLogout()"};
+const __HSRC = {"s1": "toggleDarkMode()", "s2": "setLang('en')", "s3": "setLang('fa')", "s4": "showDashboard()", "s5": "showMyIdentityScreen()", "s6": "showMyOrdersScreen()", "s7": "openBeanCreditWallet()", "s8": "goToAuth('register')", "s9": "goToAuth('login');return false;", "s10": "show('screen-welcome')", "s11": "switchTab('login')", "s12": "switchTab('register')", "s13": "doLogin()", "s14": "doRegister()", "s15": "selectGeneration('genz')", "s16": "selectGeneration('millennial')", "s17": "selectGeneration('genx')", "s18": "selectGeneration('boomer')", "s19": "selectGeneration('unspecified')", "s20": "openSettings()", "s21": "showBeanCreditInfo(event)", "s22": "startNewProfile()", "s23": "scrollToProfilesList()", "s24": "updateSettingsCompletion()", "s25": "selectSettingsGeneration('genz')", "s26": "selectSettingsGeneration('millennial')", "s27": "selectSettingsGeneration('genx')", "s28": "selectSettingsGeneration('boomer')", "s29": "selectSettingsGeneration('unspecified')", "s30": "updateSettingsCompletion()", "s31": "this.value=this.value.replace(/[^0-9]/g,''); updateSettingsCompletion();", "s32": "openMyMemories();return false;", "s33": "togglePasswordChangeForm();return false;", "s34": "changePassword()", "s35": "saveSettings()", "s36": "doLogout()", "s37": "continueReturningUserFlow()", "s38": "goOrderFromGate()", "s39": "deferGateOrder()", "s40": "cancelGateProfile()", "s41": "skipFeedback()", "s42": "pickFeedbackSatisfaction(1, this)", "s43": "pickFeedbackSatisfaction(2, this)", "s44": "pickFeedbackSatisfaction(3, this)", "s45": "pickFeedbackSatisfaction(4, this)", "s46": "pickFeedbackSatisfaction(5, this)", "s47": "submitOrderFeedback()", "s48": "selectLevel('beginner','whatever_available')", "s49": "selectLevel('beginner','brand_price')", "s50": "selectLevel('regular','origin')", "s51": "selectLevel('expert','processing_cupping')", "s52": "selectLevel('expert','barista_roaster')", "s53": "selectLevel('regular','none_of_these')", "s54": "pickHealth(this,'h1','normal')", "s55": "pickHealth(this,'h1','mild')", "s56": "pickHealth(this,'h1','sensitive')", "s57": "pickHealth(this,'h1','unsure')", "s58": "skipHealth()", "s59": "pickHealth(this,'h2','normal')", "s60": "pickHealth(this,'h2','mild')", "s61": "pickHealth(this,'h2','sensitive')", "s62": "pickHealth(this,'h2','unsure')", "s63": "goBack(1)", "s64": "goBack(2)", "s65": "goBack(3)", "s66": "goBack(4)", "s67": "goBack(5)", "s68": "goBack(6)", "s69": "goBackScreen7()", "s70": "pickTastePrefStep1('black')", "s71": "pickTastePrefStep1('milk')", "s72": "pickTastePrefStep2(this,'dark')", "s73": "pickTastePrefStep2(this,'milk')", "s74": "pickTastePrefStep2(this,'none')", "s75": "show('screen-7')", "s76": "go(8)", "s77": "goBack(8)", "s78": "goBack(9)", "s79": "goBack(10)", "s80": "finishQuizAndProceed()", "s81": "goBackDeep(1)", "s82": "goBackDeep(2)", "s83": "goBackDeep(3)", "s84": "goBackDeep(4)", "s85": "goBackDeep(5)", "s86": "goBackDeep(6)", "s87": "goBackFromMemory1()", "s88": "finishPhase2()", "s89": "skipMemoryQuestion()", "s90": "continueAfterBeanCreditWelcome()", "s91": "exitCompanionOnlyAndGoDashboard()", "s92": "toggleAccordion('section-bean-body')", "s93": "goToOrder(rec._runnerBean)", "s94": "showBrewAlternative()", "s95": "goToOrder(rec._brewAlt)", "s96": "toggleRoastGuide()", "s97": "toggleAccordion('r-technical-details-body')", "s98": "toggleAccordion('companion-section')", "s99": "revealMusicEmbed()", "s100": "toggleAccordion('section-journey-body')", "s101": "switchResultRadarTab('taste')", "s102": "switchResultRadarTab('sensory')", "s103": "goToOrder()", "s104": "openSharePrefsModal()", "s105": "show('screen-result')", "s106": "this.parentNode.style.display='none'", "s107": "togglePurchaseCreditApply(this.checked)", "s108": "selectAmount(125)", "s109": "selectAmount(250)", "s110": "selectGrindPref('self_ground')", "s111": "selectGrindPref('roastery_ground')", "s112": "event.stopPropagation()", "s113": "selectGrindPref('need_help')", "s114": "submitOrder()", "s115": "continueToPaymentAfterSpin()", "s116": "closeSpendConfirmModal()", "s117": "show('screen-dashboard')", "s118": "show('screen-order')", "s119": "showDashboard();return false;", "s120": "copyCardNumber()", "s121": "document.getElementById('receipt-input').click()", "s122": "handleReceiptUpload(this)", "s123": "confirmPayment()", "s124": "scrollToMessages()", "d1": "deleteMyMemory('${r.id}')", "d2": "openSettingsForEmail()", "d3": "selectSettingsAvatar('${key}')", "d4": "markMsgRead('${m.id}', this)", "d5": "viewProfileById('${p.id}')", "d6": "toggleFavorite('${p.id}', ${p.is_favorite ? 'true' : 'false'}, this)", "d7": "viewCompanionContent('${p.id}')", "d8": "deleteProfile('${p.id}')", "d9": "showMyOrdersScreen()", "d10": "resumePaymentForOrder('${o.id}')", "d11": "startFeedbackForOrder('${o.id}')", "d12": "toggleOrderDetails('${o.id}')", "d13": "deleteOrder('${o.id}')", "d14": "this.closest('.confirm-overlay').remove()", "d15": "confirmDeleteOrder('${orderId}', this.closest('.confirm-overlay'))", "d16": "viewCompanionContent('${pid}')", "d17": "toggleAccordion('acc-know-${pid}')", "d18": "toggleAccordion('acc-bean-${pid}')", "d19": "toggleAccordion('acc-brew-${pid}')", "d20": "switchDetailRadarTab('taste')", "d21": "switchDetailRadarTab('sensory')", "d22": "goToOrder(rec._runnerBean)", "d23": "setRating('${pid}',1)", "d24": "setRating('${pid}',2)", "d25": "setRating('${pid}',3)", "d26": "setRating('${pid}',4)", "d27": "setRating('${pid}',5)", "d28": "submitReview('${pid}')", "d29": "editReview('${pid}')", "d30": "reorderProfile()", "d31": "openSharePrefsModal()", "d32": "resolveFollowup('resolved')", "d33": "resolveFollowup('still_unhappy')", "d34": "startFeedbackFromDashboard()", "d35": "location.reload()", "d36": "this.closest('.confirm-overlay').remove()", "d37": "confirmDelete('${profileId}', this.closest('.confirm-overlay'))", "s125": "closeSharePrefsModal()", "s126": "selectShareStyle('feminine')", "s127": "selectShareStyle('masculine')", "s128": "selectShareStyle('surprise')", "s129": "submitSharePrefs()", "s130": "skipSharePrefs()", "s131": "closeSharePrefsModal();return false;", "s132": "if(event.target===this)closeRoastStageModal()", "s133": "closeRoastStageModal()", "s134": "goToStageContent()", "s135": "closeTipModal()", "x1": "continueToPaymentAfterSpin()", "x2": "show('screen-dashboard')", "p1": "exportMyData()", "p2": "toggleDeleteAccountForm();return false;", "p3": "deleteMyAccount()", "p4": "askCancelOrder('${o.id}')", "p5": "confirmCancelOrder('${orderId}', this.closest('.confirm-overlay'))", "p6": "toggleTasteTag(this)", "p7": "toggleQualitySection();return false;", "p8": "pickQualityIssue(this)", "p9": "requestDiscoveryPack('now')", "p10": "requestDiscoveryPack('with_next')", "p11": "acceptTermsNow(this.closest('.confirm-overlay'))", "p12": "doLogout()", "p13": "onOrderBrewMethodChange()"};
 function __ha(v) {
   return String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
@@ -3625,6 +3628,37 @@ const LEVEL_WEIGHTS = {
 };
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
+// ═══ نسخه‌ی ۵۱: فهرست واحد روش‌های دم‌آوری (تأیید فرهنگ، ۲ اکتبر) — یک منبع برای آزمون، سفارش، بازخورد ═══
+// grind: درجه‌ی آسیاب برای واحد آسیاب (همان در پنل ادمین). کد قدیمی 'instant' و 'siphon' دیگر پیشنهاد نمی‌شوند.
+const BREW_METHODS = [
+  { v:'espressohome', icon:'☕', fa:'دستگاه اسپرسوساز (خانگی یا حرفه‌ای)', faShort:'اسپرسو', en:'Espresso machine (home or pro)', enShort:'Espresso', grind:'ریز', grindEn:'Fine' },
+  { v:'mokapot',      icon:'🏺', fa:'موکاپات (قهوه‌جوش روگازی)', faShort:'موکاپات', en:'Moka pot (stovetop)', enShort:'Moka pot', grind:'ریز تا متوسط‌ریز', grindEn:'Fine to medium-fine' },
+  { v:'turkish',      icon:'🫖', fa:'قهوه‌ی ترک (جذوه)', faShort:'قهوه‌ی ترک', en:'Turkish coffee (cezve)', enShort:'Turkish', grind:'خیلی ریز (پودری)', grindEn:'Extra fine (powder)' },
+  { v:'drip',         icon:'☕', fa:'قهوه‌ساز دمی برقی (فیلتری)', faShort:'دمی برقی', en:'Electric drip / filter machine', enShort:'Drip machine', grind:'متوسط', grindEn:'Medium' },
+  { v:'v60',          icon:'💧', fa:'پوراور دستی (وی۶۰، کالیتا، اوریگامی)', faShort:'پوراور', en:'Manual pour-over (V60, Kalita, Origami)', enShort:'Pour-over', grind:'متوسط‌ریز', grindEn:'Medium-fine' },
+  { v:'chemex',       icon:'🧪', fa:'کمکس', faShort:'کمکس', en:'Chemex', enShort:'Chemex', grind:'متوسط‌درشت', grindEn:'Medium-coarse' },
+  { v:'aeropress',    icon:'⚗️', fa:'ایروپرس', faShort:'ایروپرس', en:'AeroPress', enShort:'AeroPress', grind:'متوسط‌ریز', grindEn:'Medium-fine' },
+  { v:'frenchpress',  icon:'🍵', fa:'فرنچ‌پرس', faShort:'فرنچ‌پرس', en:'French press', enShort:'French press', grind:'درشت', grindEn:'Coarse' },
+  { v:'coldbrew',     icon:'🧊', fa:'کولد برو (دم سرد)', faShort:'کولد برو', en:'Cold brew', enShort:'Cold brew', grind:'خیلی درشت', grindEn:'Extra coarse' },
+  { v:'guide',        icon:'🧭', fa:'هنوز روش مشخصی ندارم — راهنمایی‌ام کن', faShort:'نیاز به راهنمایی', en:"I don't have a method yet — guide me", enShort:'Needs guidance', grind:'دانه‌ی کامل + پیشنهاد روش', grindEn:'Whole bean + method advice' },
+  { v:'other',        icon:'✏️', fa:'روش دیگری دارم', faShort:'روش دیگر', en:'I use another method', enShort:'Other method', grind:'طبق توضیح مشتری', grindEn:'As described by customer' },
+];
+const BREW_ORDER = {
+  beginner: ['espressohome','mokapot','turkish','drip','frenchpress','v60','chemex','aeropress','coldbrew','guide','other'],
+  regular:  ['espressohome','v60','mokapot','drip','turkish','frenchpress','aeropress','chemex','coldbrew','guide','other'],
+  expert:   ['v60','espressohome','chemex','aeropress','frenchpress','mokapot','turkish','drip','coldbrew','guide','other'],
+};
+function brewOptionsFor(level) {
+  return (BREW_ORDER[level] || BREW_ORDER.regular).map(v => { const m = BREW_METHODS.find(x => x.v === v); return { v, fa: m.fa, en: m.en, icon: m.icon }; });
+}
+// سازگاری دانه با روش‌های تازه، بر اساس نزدیک‌ترین روشی که داده‌ی brewFit دارد
+const BREW_FIT_KEY = { drip: 'v60', chemex: 'v60', turkish: 'mokapot', siphon: 'v60', instant: null, guide: null };
+function brewFitOf(bean, brew) {
+  if (!bean || !bean.brewFit || !brew) return 0;
+  const key = Object.prototype.hasOwnProperty.call(BREW_FIT_KEY, brew) ? BREW_FIT_KEY[brew] : brew;
+  return key ? (bean.brewFit[key] || 0) : 0;
+}
+
 const QUESTIONS = {
   taste: {
     title: {
@@ -3743,9 +3777,9 @@ const QUESTIONS = {
       regular:  { fa:'روش دم‌آوری مستقیماً روی نحوه استخراج طعم اثر می‌ذاره.', en:'Brew method directly affects flavor extraction; it does not affect your bean match.' }
     },
     options: {
-      beginner: [ {v:'espressohome', fa:'دستگاه اسپرسوساز خانگی', en:'Home espresso machine', icon:'☕'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot', icon:'🏺'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press', icon:'🍵'}, {v:'instant', fa:'قهوه فوری یا کپسولی', en:'Instant or capsule coffee', icon:'🥤'}, {v:'other', fa:'روش دیگه‌ای استفاده می‌کنم', en:'I use another method', icon:'➕'} ],
-      regular:  [ {v:'espressohome', fa:'اسپرسو', en:'Espresso', icon:'☕'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot', icon:'🏺'}, {v:'v60', fa:'پوراور (وی۶۰ یا کمکس)', en:'Pour-over (V60 / Chemex)', icon:'💧'}, {v:'frenchpress', fa:'فرنچ‌پرس', en:'French press', icon:'🍵'}, {v:'aeropress', fa:'ایروپرس', en:'AeroPress', icon:'⚗️'}, {v:'other', fa:'روش دیگه‌ای استفاده می‌کنم', en:'I use another method', icon:'➕'} ],
-      expert:   [ {v:'espressohome', fa:'اسپرسو', en:'Espresso', icon:'☕'}, {v:'mokapot', fa:'موکاپات', en:'Moka pot', icon:'🏺'}, {v:'v60', fa:'پوراور (وی۶۰ یا کالیتا)', en:'Pour-over (V60 / Kalita)', icon:'💧'}, {v:'frenchpress', fa:'غوطه‌وری (فرنچ‌پرس یا ایروپرس)', en:'Immersion (French Press / AeroPress)', icon:'🍵'}, {v:'coldbrew', fa:'کولد برو', en:'Cold Brew', icon:'🧊'}, {v:'siphon', fa:'سایفون', en:'Siphon', icon:'🧪'}, {v:'other', fa:'روش دیگه‌ای استفاده می‌کنم', en:'I use another method', icon:'➕'} ]
+      beginner: brewOptionsFor('beginner'),
+      regular:  brewOptionsFor('regular'),
+      expert:   brewOptionsFor('expert'),
     }
   },
   // محور جدید — «معمولی یا خاص»؛ محور اصلیه (نه فاز۲)، از قدم اول برای هر ۳ سطح پرسیده می‌شه
@@ -5907,8 +5941,8 @@ const tasteFA = { fruity:'میوه‌ای و ترش', choc_nutty:'شکلاتی �
 const tasteEN = { fruity:'Fruity & Tart', choc_nutty:'Chocolate & Nutty', floral:'Floral & Fragrant', spicy:'Spicy' };
 const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
 const bodyEN  = { light:'Light', medium:'Medium', full:'Full' };
-const brewFA  = { v60:'پور اور', frenchpress:'فرنچ پرس', mokapot:'موکاپات', espressohome:'دستگاه اسپرسو', aeropress:'ایروپرس', coldbrew:'کولد برو', other:'سایر' };
-const brewEN  = { v60:'Pour Over', frenchpress:'French Press', mokapot:'Moka Pot', espressohome:'Espresso Machine', aeropress:'AeroPress', coldbrew:'Cold Brew', other:'Other' };
+const brewFA  = Object.assign({ siphon:'سایفون', instant:'قهوه فوری' }, Object.fromEntries(BREW_METHODS.map(m => [m.v, m.faShort])));
+const brewEN  = Object.assign({ siphon:'Siphon', instant:'Instant' }, Object.fromEntries(BREW_METHODS.map(m => [m.v, m.enShort])));
 const tastePrefFA = { black_dark:'خالص + شکلات تلخ', black_milk:'خالص + شکلات شیری', milk_dark:'با شیر + شکلات تلخ', milk_milk:'با شیر + شکلات شیری' };
 const tastePrefEN = { black_dark:'Black + Dark Chocolate', black_milk:'Black + Milk Chocolate', milk_dark:'With Milk + Dark Chocolate', milk_milk:'With Milk + Milk Chocolate' };
 const acidityFA = { low:'ملایم', medium:'متعادل', bright:'زنده و ترش' };
@@ -7092,15 +7126,8 @@ function renderFeedbackGrindSection(grindPreference) {
 
 // گزینه‌های روش دم‌آوری مخصوص فرم بازخورد — کاربر تا این‌جا دونه‌ی کامل خریده، پس
 // «قهوه فوری/کپسولی» که تو کوییز اصلی برای مبتدی هست، اینجا اصلاً معنی نداره
-const FEEDBACK_BREW_OPTIONS = [
-  { v:'espressohome', fa:'اسپرسو', en:'Espresso', icon:'☕' },
-  { v:'mokapot', fa:'موکاپات', en:'Moka pot', icon:'🏺' },
-  { v:'v60', fa:'پوراور (وی۶۰، کمکس، کالیتا و مشابه)', en:'Pour-over (V60, Chemex, Kalita, etc.)', icon:'💧' },
-  { v:'frenchpress', fa:'فرنچ‌پرس', en:'French press', icon:'🍵' },
-  { v:'aeropress', fa:'ایروپرس', en:'AeroPress', icon:'⚗️' },
-  { v:'coldbrew', fa:'کولد برو', en:'Cold Brew', icon:'🧊' },
-  { v:'other', fa:'روش دیگه', en:'Other method', icon:'➕' }
-];
+// سفارش و بازخورد: همان فهرست واحد، بدون «راهنمایی‌ام کن» (در سفارش، گزینه‌ی «مطمئن نیستم» جداگانه هست)
+const FEEDBACK_BREW_OPTIONS = BREW_METHODS.filter(m => m.v !== 'guide').map(m => ({ v: m.v, fa: m.fa, en: m.en, icon: m.icon }));
 
 // نسخه‌ی ۴۵: برچسب‌های طعم و گزارش مشکل کیفیت
 let feedbackTasteTags = new Set();
@@ -7756,14 +7783,14 @@ function setQuestionBackground(qNum) {
 }
 
 function findBrewAlternative(winner) {
-  if (!ans.brew || !winner.brewFit) return null;
+  if (!ans.brew || !winner.brewFit || BREW_FIT_KEY[ans.brew] === null) return null;
   const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
   // آستانه‌ی «خوب کافیه» نسبت به بهترین دونه‌ی کاتالوگ رو همین روش دم‌آوری محاسبه می‌شه، نه یه عدد ثابت —
   // چون بعضی روش‌ها (coldbrew, other) کلاً تو کاتالوگ سقف پایینی دارن (هیچ دونه‌ای فوق‌العاده نیست)
   // و بعضی (v60) سقف بالایی دارن؛ یه آستانه‌ی مطلق ثابت (قبلاً ۶ و ۷) برای هر دو کار نمی‌کرد و
   // باعث می‌شد جایگزین برای ۴ از ۷ روش دم‌آوری هیچ‌وقت نشون داده نشه
-  const maxForMethod = Math.max(...pool.map(b => (b.brewFit ? b.brewFit[ans.brew] : 0) || 0));
-  const compat = winner.brewFit[ans.brew] ?? 5;
+  const maxForMethod = Math.max(...pool.map(b => brewFitOf(b, ans.brew)));
+  const compat = brewFitOf(winner, ans.brew) || 5;
   if (compat >= maxForMethod - 1) return null; // به بهترین گزینه‌ی موجود کاتالوگ به‌اندازه‌ی کافی نزدیکه
 
   // دنبال بهترین دونهٔ جایگزین: هم به ذائقه نزدیک، هم با دستگاه مشتری سازگارتر از winner فعلی
@@ -7774,7 +7801,7 @@ function findBrewAlternative(winner) {
     tasteScore += (b.s[ans.mood]     || 0) * 1.5;
     tasteScore += (b.s[ans.acidity]   || 0) * 1.5;
     tasteScore += (b.s[ans.tastepref] || 0) * 1.5;
-    const brewCompat = b.brewFit ? (b.brewFit[ans.brew] || 0) : 0;
+    const brewCompat = brewFitOf(b, ans.brew);
     return { bean: b, tasteScore, brewCompat };
   }).filter(c => c.brewCompat >= maxForMethod - 1 && c.brewCompat > compat);
 
@@ -8161,7 +8188,17 @@ function defaultOrderBrewMethod() {
   const candidate = fromProfile || (ans && ans.brew) || null;
   return FEEDBACK_BREW_OPTIONS.some(o => o.v === candidate) ? candidate : '';
 }
+// نسخه‌ی ۵۱: نمایش درجه‌ی آسیاب + کادر «روش دیگر»
+function onOrderBrewMethodChange() {
+  const sel = document.getElementById('order-grind-method');
+  const other = document.getElementById('order-grind-other');
+  const hint = document.getElementById('order-grind-size-hint');
+  const m = BREW_METHODS.find(x => x.v === (sel && sel.value));
+  if (other) other.style.display = (sel && sel.value === 'other') ? 'block' : 'none';
+  if (hint) hint.textContent = m && m.v !== 'other' ? (currentLang === 'en' ? 'Grind: ' + m.grindEn : 'درجه‌ی آسیاب: ' + m.grind) : '';
+}
 function orderGrindMethodLabel(v) {
+  if (String(v || '').startsWith('other:')) return 'روش دیگر: ' + String(v).slice(6);
   const o = FEEDBACK_BREW_OPTIONS.find(x => x.v === v);
   return o ? o.fa : '';
 }
@@ -8173,10 +8210,12 @@ function selectGrindPref(pref) {
   document.getElementById('grind-help').classList.toggle('selected', pref === 'need_help');
   const wrap = document.getElementById('grind-method-wrap');
   if (wrap) wrap.style.display = pref === 'roastery_ground' ? 'block' : 'none';
+  if (pref === 'roastery_ground') onOrderBrewMethodChange();
   renderOrderLeadTime();
   if (pref === 'roastery_ground') {
     const sel = document.getElementById('order-grind-method');
     if (sel && !sel.value) sel.value = defaultOrderBrewMethod();
+    onOrderBrewMethodChange();
   }
 }
 
@@ -8207,6 +8246,11 @@ async function submitOrder() {
   if (selectedGrindPref === 'roastery_ground') {
     grindMethodValue = (document.getElementById('order-grind-method') || {}).value || '';
     if (!grindMethodValue) return showErr(errEl, en ? 'Please choose the brew method the beans should be ground for' : 'روش دم‌آوری‌ای که آسیاب برایش انجام می‌شه رو انتخاب کن');
+    if (grindMethodValue === 'other') {
+      const otherTxt = ((document.getElementById('order-grind-other') || {}).value || '').replace(/[<>]/g, '').trim().slice(0, 40);
+      if (!otherTxt) return showErr(errEl, en ? 'Please write your brew method so we can grind correctly' : 'روش دم‌آوری‌ات را بنویس تا درست آسیاب کنیم');
+      grindMethodValue = 'other:' + otherTxt;
+    }
   }
   // بدون قیمت واقعی از دیتابیس، سفارش ثبت نمی‌شه — وگرنه با عدد پیش‌فرض (~یک‌دهم قیمت واقعی) ثبت می‌شد
   if (!currentPriceIsFromDB) return showErr(errEl, en ? 'The price of this bean is not available right now. Please try again in a moment.' : 'قیمت این دونه الان در دسترس نیست. چند لحظه‌ی دیگه دوباره امتحان کن.');
@@ -9858,7 +9902,8 @@ async function render(r, isHistoricalView = false) {
   // نه برای بقیه‌ی روش‌ها (که نبود جایگزین یعنی واقعاً همین دونه بهترین گزینه‌ی موجوده)
   if (brewNoAltNote) {
     const noAltMessages = {
-      other:   { fa: 'چون قهوه‌ی فوری/کپسولی با دونه‌های تک‌خاستگاه اینجا خیلی فرق داره، فعلاً نمی‌تونیم جایگزین دقیقی پیشنهاد بدیم — ولی دونه‌ی پیشنهادی هنوز کاملاً بر اساس ذائقه‌ی واقعی خودته.', en: "Since instant/capsule coffee is quite different from single-origin beans here, we can't offer a precise alternative yet — but your recommended bean is still fully based on your real taste." },
+      other:   { fa: 'چون روش دم‌آوری‌ات در فهرست ما نیست، فعلاً نمی‌تونیم جایگزین دقیقی پیشنهاد بدیم — ولی دونه‌ی پیشنهادی هنوز کاملاً بر اساس ذائقه‌ی واقعی خودته. موقع سفارش، روشت رو بنویس تا درست آسیاب کنیم.', en: "Since your brew method isn't on our list, we can't suggest a precise alternative yet — but the recommended bean is still based entirely on your taste. When ordering, write your method so we can grind it right." },
+      guide:   { fa: 'هنوز روش دم‌آوری مشخصی نداری — اشکالی نداره! دونه‌ی پیشنهادی بر اساس ذائقه‌ی خودته؛ موقع سفارش «مطمئن نیستم؛ راهنمایی می‌خوام» رو بزن تا تیم ما بهترین روش رو با تو انتخاب کنه.', en: "You don't have a brew method yet — that's fine! The recommended bean is based on your taste; when ordering, choose 'Not sure — guide me' and our team will help you pick the best method." },
       coldbrew:{ fa: 'چون داده‌ی کافی برای کولد برو تو کاتالوگ نداریم، فعلاً نمی‌تونیم جایگزین دقیقی پیشنهاد بدیم — ولی دونه‌ی پیشنهادی هنوز کاملاً بر اساس ذائقه‌ی واقعی خودته. اگه تو «توضیحات» بیشتر بگی، دفعه‌های بعد بهتر می‌تونیم راهنماییت کنیم.', en: "Since we don't yet have enough catalog data for Cold Brew, we can't offer a precise alternative yet — but your recommended bean is still fully based on your real taste. Tell us more in \"notes\" and we'll guide you better next time." },
       siphon:  { fa: 'چون هنوز داده‌ی دقیقی برای سازگاری دونه‌ها با سایفون جمع‌آوری نکردیم، فعلاً نمی‌تونیم جایگزین دقیقی پیشنهاد بدیم — ولی دونه‌ی پیشنهادی هنوز کاملاً بر اساس ذائقه‌ی واقعی خودته. اگه تو «توضیحات» بیشتر بگی، دفعه‌های بعد بهتر می‌تونیم راهنماییت کنیم.', en: "Since we haven't yet collected precise data on bean compatibility with Siphon, we can't offer a precise alternative yet — but your recommended bean is still fully based on your real taste. Tell us more in \"notes\" and we'll guide you better next time." },
     };
