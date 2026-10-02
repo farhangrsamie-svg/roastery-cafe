@@ -30,7 +30,7 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-60OCYOvwtS1gF0/GirJ5jIsHITZhnlDuhyZyBFRmMAk=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-BA4sQkaAg+u+bdp+r8bTCrKVShUE6P3tpOPn7g10V48=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>هویت قهوه — نسخه سوشیانس (تست پایلوت)</title>
 
@@ -5842,6 +5842,13 @@ async function checkForUsablePurchaseCredit() {
   const banner = document.getElementById('bc-voucher-banner');
   if (!banner || !currentUser) return;
   availablePurchaseCreditToman = 0;
+  // نسخه‌ی ۵۴: قبل از گرفتن اعتبار از سرور، بنر و تیک ریست و قیمت دوباره نمایش داده می‌شود
+  // (قبلاً اگر کاربر زودتر تیک می‌زد، تیک بی‌صدا برمی‌گشت ولی قیمتِ تخفیف‌خورده روی صفحه می‌ماند)
+  banner.style.display = 'none';
+  const cb0 = document.getElementById('bc-voucher-checkbox');
+  if (cb0) cb0.checked = false;
+  window._purchaseCreditWillBeApplied = false;
+  renderOrderPrices();
   try {
     const rows = await sb('GET', `purchase_credits?user_id=eq.${currentUser.id}&remaining=gt.0&expires_at=gt.${new Date().toISOString()}&select=remaining`);
     const total = (rows || []).reduce((s, r) => s + (r.remaining || 0), 0);
@@ -5849,8 +5856,6 @@ async function checkForUsablePurchaseCredit() {
       availablePurchaseCreditToman = total;
       document.getElementById('bc-voucher-pct-fa').innerHTML = tomanHtml(total);
       document.getElementById('bc-voucher-pct-en').textContent = total.toLocaleString('en-US') + ' Toman';
-      document.getElementById('bc-voucher-checkbox').checked = false;
-      window._purchaseCreditWillBeApplied = false;
       banner.style.display = 'block';
     } else {
       banner.style.display = 'none';
@@ -5859,6 +5864,7 @@ async function checkForUsablePurchaseCredit() {
     console.warn('checkForUsablePurchaseCredit error:', e);
     banner.style.display = 'none';
   }
+  renderOrderPrices();
 }
 function togglePurchaseCreditApply(checked) {
   window._purchaseCreditWillBeApplied = checked;
@@ -8084,7 +8090,11 @@ function computeFinalPrice(original, discountPct) {
 // اعتبار خرید (مبلغ ثابت تومانی، حاصل قرعه‌ی خرج‌کردن) — نه بیشتر از موجودی قابل‌مصرف، نه بیشتر از قیمت سفارش
 let availablePurchaseCreditToman = 0;
 function orderPurchaseCreditToman() {
-  if (!window._purchaseCreditWillBeApplied || !selectedAmount) return 0;
+  // نسخه‌ی ۵۴: منبع حقیقت خود تیک روی صفحه است (نه فقط متغیر) — تا نمایش قیمت و چیزی که واقعاً ثبت می‌شود یکی باشند
+  const cb = document.getElementById('bc-voucher-checkbox');
+  const banner = document.getElementById('bc-voucher-banner');
+  const on = cb ? (cb.checked && banner && banner.style.display !== 'none') : window._purchaseCreditWillBeApplied;
+  if (!on || !selectedAmount) return 0;
   return Math.min(availablePurchaseCreditToman, priceForAmount(selectedAmount));
 }
 // قیمت هر مقدار همون لحظه‌ی انتخاب، و مبلغ نهایی (با تخفیف بین‌کردیت اگه تیک خورده)
@@ -8299,8 +8309,12 @@ async function submitOrder() {
         const applyResult = await callBeanCredit('apply', { order_id: pendingOrderId, amount: wantedCredit });
         appliedPurchaseCreditForPayment = applyResult.applied || 0;
       } catch (e) {
-        // مصرف اعتبار خرید شکست خورد — سفارش که خودش ثبت شده رو معطل نمی‌کنیم، فقط بدون تخفیف ادامه می‌دیم
+        // مصرف اعتبار خرید شکست خورد — سفارش که خودش ثبت شده رو معطل نمی‌کنیم، ولی به کاربر می‌گوییم
         console.warn('apply purchase credit error:', e);
+      }
+      if (!appliedPurchaseCreditForPayment) {
+        alert(en ? "Your purchase credit couldn't be applied to this order. The order is placed at full price — you can cancel it from 'My orders' and order again, or contact us."
+                 : 'اعتبار خریدت روی این سفارش اعمال نشد. سفارش با قیمت کامل ثبت شد — می‌تونی از «سفارش‌های من» لغوش کنی و دوباره ثبت کنی، یا با ما تماس بگیری.');
       }
     }
     window._purchaseCreditWillBeApplied = false;
