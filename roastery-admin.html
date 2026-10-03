@@ -2,7 +2,7 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-UDRMzzGMv45JimOfF5DZi2J6xhNae9DcShYwjlmG+zg=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-DfW7Il2qZE0MYtKPMb6XkJfG3JTSL/K0MlOvlHraiC4=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>پنل مدیریت هویت قهوه — Coffee Identity</title>
 <style>
@@ -833,7 +833,7 @@ textarea.input-field { resize: vertical; min-height: 100px; }
 
 <script>
 /* ── نسخه‌ی ۴۰: سیاست امنیت محتوا (CSP) ──
-   هیچ کد درون‌خطی (onclick="…") در صفحه نمانده؛ همه‌ی کلیک‌ها از این جدول و یک شنونده‌ی مرکزی اجرا می‌شوند.
+   هیچ کد درون‌خطی (onclick=…) در صفحه نمانده؛ همه‌ی کلیک‌ها از این جدول و یک شنونده‌ی مرکزی اجرا می‌شوند.
    عنصرها فقط یک کلید دارند: data-on-click="s12". مقدارهای متغیر (مثل شناسه‌ی سفارش) در data-a0، data-a1 … .
    ⚠️ هر تغییری در این اسکریپت‌ها هش CSP بالای صفحه را عوض می‌کند — بعد از ویرایش حتماً csp_rehash اجرا شود،
    وگرنه مرورگر هیچ اسکریپتی را اجرا نمی‌کند و اپ کاملاً از کار می‌افتد. */
@@ -1530,10 +1530,11 @@ async function viewOrder(orderId) {
   }
 
   const user = order.users || {};
-  const tasteFA = { floral:'گلی و میوه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
+  // نسخه‌ی ۴۲: همان کلیدهای اپ (fruity/choc_nutty/floral/spicy)؛ کلیدهای قدیمی فقط برای داده‌ی قدیمی
+  const tasteFA = { fruity:'میوه‌ای و ترش', choc_nutty:'شکلاتی و آجیلی', floral:'گلی و معطر', spicy:'ادویه‌ای', sweet:'شیرین و ملایم', chocolatey:'شکلاتی و آجیلی', bold:'تند و چوبی' };
   const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
   const brewFA  = Object.assign({ espresso:'اسپرسو', instant:'قهوه فوری' }, BREW_FA);
-  const acidityFA = { bright:'زنده و ترش', balanced:'متعادل', smooth:'نرم و بدون ترشی' };
+  const acidityFA = { low:'ملایم', medium:'متعادل', bright:'زنده و ترش', balanced:'متعادل', smooth:'نرم و بدون ترشی' };
   const personaFA = {
     'The Explorer': '🧭 کاوشگر',
     'The Comfort Lover': '☕ آرامش‌جو',
@@ -1608,7 +1609,7 @@ async function loadProfiles() {
       tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">☕</div><div class="empty-text">پروفایلی یافت نشد</div></div></td></tr>';
       return;
     }
-    const tasteFA = { floral:'گلی', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند' };
+    const tasteFA = { fruity:'میوه‌ای', choc_nutty:'شکلاتی', floral:'گلی', spicy:'ادویه‌ای', sweet:'شیرین', chocolatey:'شکلاتی', bold:'تند' };
     const bodyFA  = { light:'سبک', medium:'متوسط', full:'غنی' };
     const brewFA  = Object.assign({ espresso:'اسپرسو', instant:'قهوه فوری' }, BREW_FA);
     const personaFA = {
