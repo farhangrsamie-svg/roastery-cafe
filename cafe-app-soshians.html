@@ -30,7 +30,7 @@
 <html lang="fa">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-8UO7XETn+sC9GLDVQFprCpA/hQkS+WsfYTpV6lOzawU=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-w/siZ5v8Jgg/DgdvaA66UHDrc0NLHgAFvYsLZe8aMpE=' 'sha256-cICCgayRJmK2g/k3tUraTsnw/ntDNpzJ9UlkN0JqU+8=' 'sha256-sMVVVjzMUL9MmaCUPcR2iUDZIa3p+9KNMfeQrGtLpqI=' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.1/dist/umd/supabase.js; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://qoxmkuivwpbdzmajplus.supabase.co; connect-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co wss://qoxmkuivwpbdzmajplus.supabase.co; media-src 'self' https://qoxmkuivwpbdzmajplus.supabase.co; frame-src https://open.spotify.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>هویت قهوه — نسخه سوشیانس (تست پایلوت)</title>
 
@@ -3622,11 +3622,7 @@ function toneEmoji() {
 }
 
 // جدول وزن‌دهی پویا — طبق سند Adaptive Quiz Design v1.3
-const LEVEL_WEIGHTS = {
-  beginner: { taste:25, acidity:10, bitterness:20, body:20, mood:10, moment:0, brew:5, rarity:10, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:8, dtr:0 },
-  regular:  { taste:20, acidity:15, bitterness:15, body:15, mood:12, moment:0, brew:10, rarity:12, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:9, dtr:0 },
-  expert:   { taste:15, acidity:20, bitterness:10, body:15, mood:12, moment:0, brew:15, rarity:12, context:12, ritual:12, evolution:12, finish_preference:10, sensory_attention:10, intensity:15, processing:14, dtr:12 }
-};
+// نسخه‌ی ۵۶: جدول وزن‌دهی سطح‌ها به سرور منتقل شد (Edge Function recommend)
 
 // هفت سؤال اصلی × سه سطح — دقیقاً طبق سند v1.3
 // ═══ نسخه‌ی ۵۱: فهرست واحد روش‌های دم‌آوری (تأیید فرهنگ، ۲ اکتبر) — یک منبع برای آزمون، سفارش، بازخورد ═══
@@ -3666,13 +3662,7 @@ const BREW_ORDER = {
 function brewOptionsFor(level) {
   return (BREW_ORDER[level] || BREW_ORDER.regular).map(v => { const m = BREW_METHODS.find(x => x.v === v); return { v, fa: m.fa, en: m.en, icon: m.icon }; });
 }
-// سازگاری دانه با روش‌های تازه، بر اساس نزدیک‌ترین روشی که داده‌ی brewFit دارد
-const BREW_FIT_KEY = { drip: 'v60', chemex: 'v60', turkish: 'mokapot', siphon: 'v60', instant: null, guide: null };
-function brewFitOf(bean, brew) {
-  if (!bean || !bean.brewFit || !brew) return 0;
-  const key = Object.prototype.hasOwnProperty.call(BREW_FIT_KEY, brew) ? BREW_FIT_KEY[brew] : brew;
-  return key ? (bean.brewFit[key] || 0) : 0;
-}
+// نسخه‌ی ۵۶: سازگاری دانه با دستگاه (brewFit) فقط روی سرور است
 
 const QUESTIONS = {
   taste: {
@@ -6117,34 +6107,7 @@ function weightedModeOf(items) {
   return best;
 }
 
-function computeCombinedPersona(weighted) {
-  // weighted: [{ profile, weight }]
-  const keys = Object.keys(PERSONAS);
-  const totals = {};
-  let weightSum = 0;
-  keys.forEach(k => totals[k] = 0);
-  weighted.forEach(({ profile: p, weight }) => {
-    const a = { taste: p.flavor, body: p.body, state: p.mood, acidity: p.acidity, tastepref: p.tastepref };
-    weightSum += weight;
-    keys.forEach(key => {
-      const ps = PERSONAS[key].s;
-      let score = 0;
-      score += (ps[a.taste]     || 0) * 3.0;
-      score += (ps['body_' + a.body] || 0) * 2.5;
-      score += (ps[a.state]     || 0) * 1.5;
-      score += (ps[a.acidity]   || 0) * 1.5;
-      score += (ps[a.tastepref] || 0) * 1.5;
-      totals[key] += score * weight;
-    });
-  });
-  let bestKey = null, bestAvg = -Infinity; // قبلاً -1 بود — همون باگی که تو determinePersonaFrom بود
-  keys.forEach(key => {
-    const avg = totals[key] / (weightSum || 1);
-    if (avg > bestAvg) { bestAvg = avg; bestKey = key; }
-  });
-  if (!bestKey) bestKey = keys[0]; // لایه‌ی محافظتی — هرگز undefined برنگردون
-  return PERSONAS[bestKey];
-}
+// نسخه‌ی ۵۶: پرسونای ترکیبی داشبورد ← combinedPersonaFromServer()
 
 function computeCombinedRadarBean(weighted) {
   const axes = ['fruity', 'floral', 'choc_nutty', 'spicy'];
@@ -6184,7 +6147,7 @@ async function renderDashboardIdentity(profiles) {
   const weighted = profiles.map(p => ({ profile: p, weight: 1 + (orderCounts[p.id] || 0) }));
   const totalOrders = Object.values(orderCounts).reduce((a, b) => a + b, 0);
 
-  const persona = computeCombinedPersona(weighted);
+  const persona = await combinedPersonaFromServer(weighted);
   const radarBean = computeCombinedRadarBean(weighted);
 
   document.getElementById('dash-identity-radar').innerHTML = radarBean
@@ -6549,14 +6512,13 @@ async function viewCompanionContent(id) {
   ans.dtr = p.dtr || null;
   currentLevel = p.experience_level || 'regular';
   currentProfileId = p.id;
-  currentPersona = determinePersona();
+  currentPersona = personaFromStored(p); // تا جواب سرور برسد (و اگر نرسید)
   const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
   rec = matchedBean ? { ...matchedBean, _matchPct: 90 } : {
     name: beanName, detail: beanDetail, origin: '', flavors: [],
     roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
   };
-  try { rec._runnerBean = recommend()._runnerBean; } catch (e) {}
-  try { rec._brewAlt = findBrewAlternative(rec); } catch (e) {}
+  await enrichRestoredRec(true);
 
   await render(rec, true); // true = این یه پروفایل قدیمیه، شمارش دوباره +۱ نشه
   show('screen-result');
@@ -6594,7 +6556,7 @@ function exitCompanionOnlyAndGoDashboard() {
   showDashboard();
 }
 
-function viewProfile(p) {
+async function viewProfile(p) {
   if (typeof p === 'string') return;
   const beanFull = p.recommended_bean || '—';
   const beanName = beanFull.split('(')[0].trim();
@@ -6614,13 +6576,13 @@ function viewProfile(p) {
   ans.dtr = p.dtr || null;
   currentLevel = p.experience_level || 'regular';
   currentProfileId = p.id;
-  currentPersona = determinePersona();
+  currentPersona = personaFromStored(p); // تا جواب سرور برسد (و اگر نرسید)
   const matchedBean = BEANS.find(b => beanFull.startsWith(b.name));
   rec = matchedBean ? { ...matchedBean, _matchPct: 90 } : {
     name: beanName, detail: beanDetail, origin: '', flavors: [],
     roast: '', brew: '', temp: '', ratio: '', desc: '', roastInfo: null, _matchPct: 90
   };
-  try { rec._runnerBean = recommend()._runnerBean; } catch (e) {}
+  await enrichRestoredRec(false);
 
   document.getElementById('detail-bean-name').textContent = beanName;
   document.getElementById('detail-bean-origin').textContent = beanDetail;
@@ -6952,9 +6914,9 @@ function reorderProfile() {
 }
 
 // وقتی کاربر تو صفحه‌ی «گیت سفارش» دکمه‌ی سفارش رو می‌زنه — پروفایل معلق رو بازسازی می‌کنه و می‌بره صفحه‌ی سفارش
-function goOrderFromGate() {
+async function goOrderFromGate() {
   if (!pendingGateProfile) { showDashboard(); return; }
-  viewProfile(pendingGateProfile); // rec و ans رو از رو همین پروفایل بازسازی می‌کنه
+  await viewProfile(pendingGateProfile); // rec و ans رو از رو همین پروفایل بازسازی می‌کنه
   goToOrder(rec);
 }
 
@@ -7812,33 +7774,7 @@ function setQuestionBackground(qNum) {
   el.innerHTML = pick;
 }
 
-function findBrewAlternative(winner) {
-  if (!ans.brew || !winner.brewFit || BREW_FIT_KEY[ans.brew] === null) return null;
-  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
-  // آستانه‌ی «خوب کافیه» نسبت به بهترین دونه‌ی کاتالوگ رو همین روش دم‌آوری محاسبه می‌شه، نه یه عدد ثابت —
-  // چون بعضی روش‌ها (coldbrew, other) کلاً تو کاتالوگ سقف پایینی دارن (هیچ دونه‌ای فوق‌العاده نیست)
-  // و بعضی (v60) سقف بالایی دارن؛ یه آستانه‌ی مطلق ثابت (قبلاً ۶ و ۷) برای هر دو کار نمی‌کرد و
-  // باعث می‌شد جایگزین برای ۴ از ۷ روش دم‌آوری هیچ‌وقت نشون داده نشه
-  const maxForMethod = Math.max(...pool.map(b => brewFitOf(b, ans.brew)));
-  const compat = brewFitOf(winner, ans.brew) || 5;
-  if (compat >= maxForMethod - 1) return null; // به بهترین گزینه‌ی موجود کاتالوگ به‌اندازه‌ی کافی نزدیکه
-
-  // دنبال بهترین دونهٔ جایگزین: هم به ذائقه نزدیک، هم با دستگاه مشتری سازگارتر از winner فعلی
-  const candidates = pool.filter(b => b.id !== winner.id).map(b => {
-    let tasteScore = 0;
-    tasteScore += (b.s[ans.taste]     || 0) * 3.0;
-    tasteScore += (b.s['body_' + ans.body] || 0) * 2.5;
-    tasteScore += (b.s[ans.mood]     || 0) * 1.5;
-    tasteScore += (b.s[ans.acidity]   || 0) * 1.5;
-    tasteScore += (b.s[ans.tastepref] || 0) * 1.5;
-    const brewCompat = brewFitOf(b, ans.brew);
-    return { bean: b, tasteScore, brewCompat };
-  }).filter(c => c.brewCompat >= maxForMethod - 1 && c.brewCompat > compat);
-
-  if (candidates.length === 0) return null;
-  candidates.sort((a, b) => b.tasteScore - a.tasteScore);
-  return candidates[0].bean;
-}
+// نسخه‌ی ۵۶: جایگزین بر اساس دستگاه دم‌آوری روی سرور محاسبه می‌شود (rec._brewAlt)
 
 function showBrewAlternative() {
   if (!rec || !rec._brewAlt) return;
@@ -7918,9 +7854,8 @@ function showLoading() {
   const startTime = Date.now();
   (async () => {
     try {
-      rec = recommend();
-      rec._brewAlt = findBrewAlternative(rec);
-      currentPersona = determinePersona();
+      rec = await recommendFromServer(); // نسخه‌ی ۵۶: موتور روی سرور
+      currentPersona = personaByKey(rec._personaKey) || determinePersona();
       await render(rec);
       await saveProfile(rec);
       const elapsed = Date.now() - startTime;
@@ -8417,224 +8352,48 @@ function showErr(el, msg) {
 ═══════════════════════════════════════════ */
 const BEANS = [
   { id:'colombia_tolima', name:'Colombia Tolima', detail:'Caturra · Washed', origin:'Colombia · ~1850 m', region:'Tolima', regionFA:'تولیما', farm:null, harvestYear:null, flavors:['Tangerine','Nuts','Apricot'], roast:'Medium', brew:'Espresso', temp:'91 °C', ratio:'1g : 2g', roastInfo:{charge:'187.6°C',drop:'197.8°C',dtr:'20.2%',time:'12:30'}, desc:'A bright, balanced Colombian with tangerine and toasted nuts.', descFA:'یک کلمبیایی متعادل و شاداب، با نارنگی و مغزهای برشته.', storyFA:'از منطقه‌ی تولیما، در دل کوهستان‌های کلمبیا؛ فرآوری Washed سنتی، شفافیت و تعادل این دونه رو حفظ می‌کنه.', story:"From the Tolima region, deep in Colombia's mountains; traditional Washed processing keeps this bean's clarity and balance.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/colombia_tolima.webp', artTitle:'Flower Clouds', artArtistFA:'اودیلون رودون', musicTrack:'Eye in the Sky', musicArtist:'Alan Parsons Project', musicTrackId:'39qYD4J4BKvZMQgxfXl5bv',
-    s:{
-      fruity:6, choc_nutty:7, floral:2, spicy:1,
-      low:1, medium:4, bright:9,
-      light:8, medium_bt:4, dark:1,
-      body_light:2, body_medium:6, body_full:8,
-      focus:6, relax:7, sensory:5, social:6,
-      morning:6, midday:8, afternoon:6,
-      black_dark:6, black_milk:7, milk_dark:6, milk_milk:7,
-      home_alone:7, work_focus:6, social:6, on_the_go:6,
-      routine:8, mixed:6, explorer:3,
-      guided:7, self_taught:5, analytical:5,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:5, texture:7, aftertaste:8, balance:7,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3, processing_experimental:3,
-      dtr_short:2, dtr_medium:5, dtr_long:9,
-      rarity_everyday:8, rarity_curious:5, rarity_rare:2
-    },
-    brewFit:{ v60:8, frenchpress:6, mokapot:6, espressohome:6, aeropress:7, coldbrew:5, other:6 }
+    s:{"fruity":6,"floral":2,"choc_nutty":7,"spicy":1,"body_full":8,"bright":9,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:7, sonic:{"pitch":7.6923076923076925,"consonance":7.6923076923076925,"tempo":7.857142857142858,"richness":6.875}, mokaCaution:false
   },
   { id:'ethiopia_guji', name:'Ethiopia Guji Hambela', detail:'Natural', origin:'Ethiopia · ~1850 m', region:'Guji', regionFA:'گوجی', farm:null, harvestYear:null, flavors:['Dried Apricot','Caramel','Green Apple'], roast:'Medium', brew:'Espresso', temp:'90 °C', ratio:'1g : 2g', roastInfo:{charge:'202°C',drop:'201°C',dtr:'17%',time:'13:11'}, desc:'A fruit-forward natural Ethiopian with dried apricot and caramel sweetness.', descFA:'یک اتیوپیایی Natural با میوه‌ی خشک و شیرینی کارامل.', storyFA:'از منطقه‌ی گوجی، یکی از مناطق نوظهور اتیوپی؛ فرآوری Natural، شیرینی میوه‌ای دونه رو تشدید می‌کنه.', story:"From the Guji zone, one of Ethiopia's emerging regions; Natural processing intensifies the bean's fruity sweetness.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/ethiopia_guji.webp', artTitle:'The Hay Wain', artArtistFA:'جان کنستبل', musicTrack:'Rhayader Goes To Town', musicArtist:'Camel', musicTrackId:'07wbIsFWkJSfkbVFSsp7Ne',
-    s:{
-      fruity:9, choc_nutty:3, floral:5, spicy:1,
-      low:3, medium:6, bright:5,
-      light:6, medium_bt:5, dark:1,
-      body_light:3, body_medium:8, body_full:2,
-      focus:4, relax:6, sensory:9, social:5,
-      morning:8, midday:6, afternoon:4,
-      black_dark:7, black_milk:7, milk_dark:5, milk_milk:5,
-      home_alone:5, work_focus:4, social:5, on_the_go:4,
-      routine:4, mixed:6, explorer:6,
-      guided:5, self_taught:6, analytical:6,
-      finish_short:2, finish_medium:4, finish_long:8,
-      aroma:9, texture:4, aftertaste:4, balance:5,
-      processing_washed:3, processing_natural:9, processing_anaerobic:4, processing_aerobic_ferment:5, processing_experimental:5,
-      dtr_short:5, dtr_medium:9, dtr_long:5,
-      rarity_everyday:5, rarity_curious:6, rarity_rare:4
-    },
-    brewFit:{ v60:8, frenchpress:7, mokapot:4, espressohome:5, aeropress:7, coldbrew:6, other:6 }
+    s:{"fruity":9,"floral":5,"choc_nutty":3,"spicy":1,"body_full":2,"bright":5,"dark":1,"finish_long":8}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:4, sonic:{"pitch":7.083333333333334,"consonance":7.083333333333334,"tempo":5.7142857142857135,"richness":4.615384615384616}, mokaCaution:true
   },
   { id:'peru_huancayo', name:'Peru Huancayo', detail:'Caturra · Washed', origin:'Peru · ~1800 m', region:'Huancayo', regionFA:'هوانکایو', farm:null, harvestYear:null, flavors:['Almonds','Hazelnut','Caramel'], roast:'Medium', brew:'Espresso', temp:'91.5 °C', ratio:'1g : 2g', roastInfo:{charge:'182°C',drop:'195.5°C',dtr:'19.18%',time:'13:12'}, desc:'A gentle, nutty Peruvian — easy, comforting, and reliably smooth.', descFA:'یک پرویی ملایم و آجیلی — راحت، آرامش‌بخش و همیشه روان.', storyFA:'از هوانکایو، در دل رشته‌کوه آند؛ کشاورزی خرد در ارتفاع، دونه‌ای متعادل و بی‌ادعا تولید می‌کنه.', story:'From Huancayo, deep in the Andes; smallholder farming at altitude produces a balanced, unpretentious bean.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/peru_huancayo.webp', artTitle:'Wanderer above the Sea of Fog', artArtistFA:'کاسپار داوید فریدریش', musicTrack:'Soldier Of Fortune', musicArtist:'Deep Purple', musicTrackId:'60ifqqPhbselSwXyGrGyMK',
-    s:{
-      fruity:2, choc_nutty:9, floral:1, spicy:1,
-      low:5, medium:6, bright:2,
-      light:4, medium_bt:6, dark:1,
-      body_light:3, body_medium:8, body_full:1,
-      focus:5, relax:8, sensory:3, social:4,
-      morning:5, midday:8, afternoon:7,
-      black_dark:3, black_milk:5, milk_dark:6, milk_milk:8,
-      home_alone:8, work_focus:6, social:5, on_the_go:5,
-      routine:8, mixed:5, explorer:2,
-      guided:7, self_taught:4, analytical:4,
-      finish_short:4, finish_medium:9, finish_long:3,
-      aroma:4, texture:5, aftertaste:5, balance:8,
-      processing_washed:9, processing_natural:3, processing_anaerobic:1, processing_aerobic_ferment:3, processing_experimental:3,
-      dtr_short:3, dtr_medium:8, dtr_long:6,
-      rarity_everyday:9, rarity_curious:4, rarity_rare:1
-    },
-    brewFit:{ v60:6, frenchpress:7, mokapot:7, espressohome:7, aeropress:6, coldbrew:6, other:6 }
+    s:{"fruity":2,"floral":1,"choc_nutty":9,"spicy":1,"body_full":1,"bright":2,"dark":1,"finish_long":3}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:3, sonic:{"pitch":6.363636363636363,"consonance":6.363636363636363,"tempo":3.846153846153846,"richness":4.166666666666666}, mokaCaution:false
   },
   { id:'narino_peach', name:'Colombia Nariño — Peach & Mango', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', region:'Nariño', regionFA:'نارینیو', farm:null, harvestYear:null, flavors:['Peach','Mango','Ripe Cherry','Cola'], roast:'Medium–Dark', brew:'V60 (Pour Over)', temp:'89 °C', ratio:'1g : 14g', roastInfo:{charge:'189.7°C',drop:'197.7°C',dtr:'19%',time:'13:24'}, desc:'A juicy, tropical micro-lot — peach, mango and ripe cherry in a lively, syrupy cup.', descFA:'یک لات کوچک آبمیوه‌ای و گرمسیری — هلو، انبه و گیلاس رسیده در فنجانی زنده و پرشیره.', storyFA:'تخمیر هوازی طولانی، شیرینی و پیچیدگی میوه‌ای این لات رو به‌شدت بالا برده — یک تجربه‌ی متفاوت از کلمبیای معمول.', story:"Extended aerobic fermentation pushes this lot's sweetness and fruit complexity way up — a very different experience from typical Colombian coffee.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_peach.webp', artTitle:'Impression, Sunrise', artArtistFA:'کلود مونه', musicTrack:'Dawn Chorus', musicArtist:'Thom Yorke', musicTrackId:'3bXH9y487cnLfA6VWXefaB',
-    s:{
-      fruity:9, choc_nutty:3, floral:4, spicy:1,
-      low:2, medium:6, bright:8,
-      light:8, medium_bt:4, dark:1,
-      body_light:2, body_medium:6, body_full:8,
-      focus:5, relax:6, sensory:9, social:6,
-      morning:7, midday:7, afternoon:5,
-      black_dark:6, black_milk:7, milk_dark:6, milk_milk:6,
-      home_alone:5, work_focus:4, social:6, on_the_go:3,
-      routine:2, mixed:6, explorer:9,
-      guided:4, self_taught:8, analytical:6,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:8, texture:4, aftertaste:6, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:5, dtr_medium:9, dtr_long:5,
-      rarity_everyday:3, rarity_curious:7, rarity_rare:6
-    },
-    brewFit:{ v60:9, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
+    s:{"fruity":9,"floral":4,"choc_nutty":3,"spicy":1,"body_full":8,"bright":8,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:7, sonic:{"pitch":7.6923076923076925,"consonance":7.6923076923076925,"tempo":6.875,"richness":6.875}, mokaCaution:true
   },
   { id:'narino_cacao', name:'Colombia Nariño — Cacao & Vanilla', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', region:'Nariño', regionFA:'نارینیو', farm:null, harvestYear:null, flavors:['Cacao','Toffee','Vanilla','Cookie','Yellow Apple'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'190.5°C',drop:'204.1°C',dtr:'14%',time:'11:06'}, desc:'A dessert-like micro-lot — cacao, toffee and vanilla with a honeyed, milky texture.', descFA:'یک لات دسری — کاکائو، تافی و وانیل با بافتی عسلی و شیری.', storyFA:'همون فرآوری تخمیر هوازی، ولی با پروفایلی کاملاً متفاوت — نشون می‌ده چقدر فرآوری می‌تونه هویت یک مبدأ رو دگرگون کنه.', story:"The same aerobic fermentation, but a completely different profile — showing how much processing can transform an origin's identity.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_cacao.webp', artTitle:'Self-Portrait', artArtistFA:'رامبراند', musicTrack:'The Thrill Is Gone', musicArtist:'B.B. King', musicTrackId:'4NQfrmGs9iQXVQI9IpRhjM',
-    s:{
-      fruity:3, choc_nutty:9, floral:2, spicy:2,
-      low:3, medium:8, bright:5,
-      light:8, medium_bt:4, dark:1,
-      body_light:2, body_medium:8, body_full:3,
-      focus:5, relax:9, sensory:6, social:7,
-      morning:5, midday:7, afternoon:8,
-      black_dark:6, black_milk:8, milk_dark:6, milk_milk:9,
-      home_alone:8, work_focus:5, social:7, on_the_go:5,
-      routine:5, mixed:4, explorer:5,
-      guided:6, self_taught:6, analytical:5,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:6, texture:4, aftertaste:8, balance:4,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:9, dtr_medium:5, dtr_long:2,
-      rarity_everyday:3, rarity_curious:7, rarity_rare:6
-    },
-    brewFit:{ v60:6, frenchpress:7, mokapot:8, espressohome:9, aeropress:6, coldbrew:6, other:6 }
+    s:{"fruity":3,"floral":2,"choc_nutty":9,"spicy":2,"body_full":3,"bright":5,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:4, sonic:{"pitch":7.6923076923076925,"consonance":7.6923076923076925,"tempo":5.625,"richness":5.384615384615385}, mokaCaution:false
   },
   { id:'colombia_geisha', name:'Colombia Geisha', detail:'Natural Anaerobic', origin:'Colombia · ~1920 m', region:null, regionFA:null, farm:null, harvestYear:null, flavors:['Lavender','Lemon Candy','Mint'], roast:'Medium', brew:'Pour Over', temp:'88 °C', ratio:'1g : 14g', roastInfo:{charge:'189°C',drop:'198°C',dtr:'15%',time:'12:21'}, desc:'A rare anaerobic Geisha — lavender, lemon candy and mint in an impossibly delicate cup.', descFA:'یک گیشای نادر با فرآوری anaerobic — اسطوخودوس، آبنبات لیمویی و نعنا در فنجانی به‌شدت ظریف.', storyFA:'گیشا گران‌ترین واریته‌ی تجاری قهوه‌ی دنیاست؛ این نسخه‌ی کلمبیایی با فرآوری anaerobic، طعمی می‌سازه که شبیه هیچ قهوه‌ی دیگه‌ای نیست.', story:"Geisha is the world's most expensive commercial coffee variety; this Colombian take, with anaerobic processing, creates a flavor unlike any other coffee.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/colombia_geisha.webp', artTitle:'Almond Blossoms', artArtistFA:'ون‌گوگ', musicTrack:'Cherry Blossoms', musicArtist:'Suri X', musicTrackId:'55jjbhOwalO7cSI29TlUSx',
-    s:{
-      fruity:6, choc_nutty:0, floral:10, spicy:1,
-      low:2, medium:6, bright:8,
-      light:6, medium_bt:4, dark:1,
-      body_light:4, body_medium:8, body_full:3,
-      focus:6, relax:5, sensory:10, social:6,
-      morning:8, midday:5, afternoon:3,
-      black_dark:7, black_milk:6, milk_dark:3, milk_milk:3,
-      home_alone:6, work_focus:3, social:6, on_the_go:3,
-      routine:1, mixed:4, explorer:10,
-      guided:3, self_taught:6, analytical:9,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:10, texture:5, aftertaste:7, balance:4,
-      processing_washed:1, processing_natural:4, processing_anaerobic:9, processing_aerobic_ferment:5, processing_experimental:9,
-      dtr_short:8, dtr_medium:6, dtr_long:3,
-      rarity_everyday:1, rarity_curious:4, rarity_rare:9
-    },
-    brewFit:{ v60:10, frenchpress:3, mokapot:2, espressohome:3, aeropress:8, coldbrew:5, other:6 }
+    s:{"fruity":6,"floral":10,"choc_nutty":0,"spicy":1,"body_full":3,"bright":8,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:4, sonic:{"pitch":7.272727272727273,"consonance":7.272727272727273,"tempo":6.875,"richness":4.666666666666667}, mokaCaution:true
   },
   { id:'sidamo_honey', name:'Ethiopia Sidamo — Honey', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', region:'Sidamo', regionFA:'سیدامو', farm:null, harvestYear:null, flavors:['Milk Honey','Black Grape Gum','Honeycomb'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (both)', ratio:'1g : 1.8g (espresso) / 1g : 12g (pour over)', roastInfo:{charge:'186°C',drop:'197.4°C',dtr:'16.9%',time:'14:45'}, desc:'A honeyed Ethiopian heirloom — milk honey, black grape gum, and honeycomb sweetness.', descFA:'یک اتیوپیایی هیرلوم عسلی — شیرعسل، آدامس انگور سیاه و شیرینی موم عسل.', storyFA:'واریته‌ی هیرلوم اتیوپی هزاران ژنوتیپ وحشی داره؛ فرآوری تخمیر هوازی این نمونه رو به سمت شیرینی عسلی و عمیق برده.', story:"Ethiopia's Heirloom variety carries thousands of wild genotypes; aerobic fermentation pushes this lot toward deep, honeyed sweetness.", artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/sidamo_honey.webp', artTitle:'Wheatfield with Crows', artArtistFA:'ون‌گوگ', musicTrack:'Solace', musicArtist:'Estas Tonne', musicTrackId:'0enZLtW0Njd57JESU9QRuy',
-    s:{
-      fruity:8, choc_nutty:4, floral:5, spicy:1,
-      low:5, medium:7, bright:3,
-      light:8, medium_bt:4, dark:1,
-      body_light:3, body_medium:8, body_full:5,
-      focus:4, relax:9, sensory:7, social:6,
-      morning:5, midday:7, afternoon:7,
-      black_dark:6, black_milk:8, milk_dark:5, milk_milk:8,
-      home_alone:7, work_focus:5, social:7, on_the_go:5,
-      routine:5, mixed:7, explorer:5,
-      guided:6, self_taught:6, analytical:5,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:7, texture:6, aftertaste:8, balance:6,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:5, dtr_medium:9, dtr_long:5,
-      rarity_everyday:3, rarity_curious:7, rarity_rare:6
-    },
-    brewFit:{ v60:7, frenchpress:5, mokapot:4, espressohome:5, aeropress:8, coldbrew:6, other:6 }
+    s:{"fruity":8,"floral":5,"choc_nutty":4,"spicy":1,"body_full":5,"bright":3,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:5, sonic:{"pitch":7.6923076923076925,"consonance":7.6923076923076925,"tempo":4.333333333333334,"richness":5.625}, mokaCaution:true
   },
   { id:'sidamo_floral', name:'Ethiopia Sidamo — Floral', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Ethiopia · 1850–1950 m', region:'Sidamo', regionFA:'سیدامو', farm:null, harvestYear:null, flavors:['Jasmine','Rose Petal','Lily'], roast:'Medium', brew:'Immersion / Cold Brew', temp:'Room temperature', ratio:'1g : 14g', roastInfo:{charge:'178.5°C',drop:'195.2°C',dtr:'21%',time:'14:15'}, desc:'A tea-like floral Ethiopian — jasmine, rose petal and lily in a delicate, silky cup.', descFA:'یک اتیوپیایی گلی و مانند چای — یاسمن، برگ گل رز و گل مریم در فنجانی ظریف و ابریشمی.', storyFA:'همون منطقه، همون واریته‌ی نزدیک، ولی فرآوری متفاوت این‌بار طرف طیف گلی رو به‌جای عسلی برجسته کرده.', story:'Same region, closely related variety — but different processing this time highlights the floral side instead of the honeyed one.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/sidamo_floral.webp', artTitle:'Still Life of White Roses', artArtistFA:'هانری فانتن-لاتور', musicTrack:'Parvaz', musicArtist:'کیهان کلهر (با Brooklyn Rider)', musicTrackId:'31tMWtbHw047H0Zc2Y3bZw',
-    s:{
-      fruity:3, choc_nutty:0, floral:10, spicy:1,
-      low:3, medium:8, bright:5,
-      light:6, medium_bt:6, dark:1,
-      body_light:6, body_medium:4, body_full:2,
-      focus:4, relax:6, sensory:9, social:5,
-      morning:7, midday:5, afternoon:4,
-      black_dark:6, black_milk:6, milk_dark:3, milk_milk:3,
-      home_alone:6, work_focus:5, social:5, on_the_go:4,
-      routine:3, mixed:5, explorer:6,
-      guided:4, self_taught:5, analytical:7,
-      finish_short:2, finish_medium:4, finish_long:9,
-      aroma:7, texture:4, aftertaste:7, balance:5,
-      processing_washed:3, processing_natural:5, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:2, dtr_medium:5, dtr_long:9,
-      rarity_everyday:3, rarity_curious:7, rarity_rare:6
-    },
-    brewFit:{ v60:9, frenchpress:3, mokapot:2, espressohome:3, aeropress:7, coldbrew:5, other:6 }
+    s:{"fruity":3,"floral":10,"choc_nutty":0,"spicy":1,"body_full":2,"bright":5,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:4, sonic:{"pitch":6.923076923076923,"consonance":6.923076923076923,"tempo":5.625,"richness":3.333333333333334}, mokaCaution:true
   },
   { id:'yemen_heirloom', name:'Yemen Heirloom — Berry', detail:'Heirloom · Dry + Aerobic Fermentation', origin:'Yemen · 1940 m', region:null, regionFA:null, farm:null, harvestYear:null, flavors:['Berry','Dried Berry','Dried Fig','Sour Cherry'], roast:'Medium', brew:'V60 (Pour Over) / Espresso', temp:'91 °C (pour over) / 90 °C (espresso)', ratio:'1g : 14g (pour over) / 1g : 2g (espresso)', roastInfo:{charge:'190°C',drop:'202°C',dtr:'18%',time:'13:31'}, desc:'A rare Yemeni heirloom lot — berry, dried fig and sour cherry in a juicy, long-finishing cup.', descFA:'یک لات کمیاب و اصیل از یمن — بری، انجیر خشک و کیلاس آلبالو در فنجانی آبمیوه‌ای با پس‌مزه‌ی طولانی.', storyFA:'واریته‌ی بومی یمن (Heirloom) با فرآوری تخمیر هوازی — پیچیدگی و اسیدیته‌ی بالایی داره که بیشتر به مذاق قهوه‌دوست‌های حرفه‌ای می‌شینه.', story:'A native Yemeni heirloom variety with aerobic fermentation — its complexity and high acidity make it a favorite among coffee professionals.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/yemen_heirloom.webp', artTitle:'Basket of Fruit', artArtistFA:'کاراواجو', musicTrack:'Ishraq', musicArtist:'نصیر شمه', musicTrackId:'3b04juU2ye6ipfczkpyKyK',
-    s:{
-      fruity:9, choc_nutty:1, floral:2, spicy:2,
-      low:1, medium:4, bright:9,
-      light:8, medium_bt:3, dark:1,
-      body_light:3, body_medium:6, body_full:7,
-      focus:5, relax:4, sensory:9, social:4,
-      morning:7, midday:6, afternoon:5,
-      black_dark:6, black_milk:5, milk_dark:4, milk_milk:4,
-      home_alone:7, work_focus:4, social:4, on_the_go:3,
-      routine:1, mixed:4, explorer:9,
-      guided:2, self_taught:6, analytical:9,
-      finish_short:1, finish_medium:3, finish_long:9,
-      aroma:9, texture:5, aftertaste:9, balance:4,
-      processing_washed:1, processing_natural:4, processing_anaerobic:5, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:6, dtr_medium:7, dtr_long:3,
-      rarity_everyday:1, rarity_curious:5, rarity_rare:9
-    },
-    brewFit:{ v60:9, frenchpress:4, mokapot:4, espressohome:7, aeropress:7, coldbrew:5, other:6 }
+    s:{"fruity":9,"floral":2,"choc_nutty":1,"spicy":2,"body_full":7,"bright":9,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:6, sonic:{"pitch":7.916666666666666,"consonance":7.916666666666666,"tempo":7.857142857142858,"richness":6.25}, mokaCaution:true
   },
   { id:'narino_gum', name:'Colombia Nariño — Gum', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', region:'Nariño', regionFA:'نارینیو', farm:null, harvestYear:null, flavors:['Gum','Sweet Peach','Coconut'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'191°C',drop:'204°C',dtr:'15%',time:'12:01'}, desc:'A playful, novel micro-lot — bubblegum, sweet summer peach and coconut in a tea-like cup.', descFA:'یک لات بازیگوش و غیرمنتظره — آدامس، هلوی شیرین تابستانی و نارگیل در فنجانی چای‌مانند.', storyFA:'همون فرآوری تخمیر هوازی نارینیو، ولی با یه پروفایل کاملاً فانتزی — برای کسایی که دنبال یه تجربه‌ی متفاوت و بازیگوشن.', story:'The same Nariño aerobic fermentation, but with a completely fantastical profile — for those seeking something playful and different.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_gum.webp', artTitle:'Summer', artArtistFA:'جوزپه آرچیمبولدو', musicTrack:'Haunt', musicArtist:'Echos', musicTrackId:'7quP1y4NsoLR1RloIWTk3M',
-    s:{
-      fruity:8, choc_nutty:2, floral:3, spicy:1,
-      low:3, medium:7, bright:4,
-      light:8, medium_bt:3, dark:1,
-      body_light:6, body_medium:6, body_full:2,
-      focus:4, relax:6, sensory:8, social:6,
-      morning:6, midday:6, afternoon:5,
-      black_dark:5, black_milk:6, milk_dark:5, milk_milk:6,
-      home_alone:5, work_focus:3, social:7, on_the_go:5,
-      routine:2, mixed:6, explorer:8,
-      guided:4, self_taught:7, analytical:5,
-      finish_short:1, finish_medium:3, finish_long:9,
-      aroma:8, texture:4, aftertaste:8, balance:5,
-      processing_washed:1, processing_natural:4, processing_anaerobic:4, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:7, dtr_medium:6, dtr_long:3,
-      rarity_everyday:2, rarity_curious:9, rarity_rare:6
-    },
-    brewFit:{ v60:7, frenchpress:4, mokapot:6, espressohome:9, aeropress:6, coldbrew:6, other:6 }
+    s:{"fruity":8,"floral":3,"choc_nutty":2,"spicy":1,"body_full":2,"bright":4,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:3, sonic:{"pitch":7.916666666666666,"consonance":7.916666666666666,"tempo":5.357142857142858,"richness":3.571428571428571}, mokaCaution:false
   },
   { id:'narino_coconut', name:'Colombia Nariño — Coconut', detail:'Caturra · Dry + Aerobic Fermentation', origin:'Colombia · 1800–1850 m', region:'Nariño', regionFA:'نارینیو', farm:null, harvestYear:null, flavors:['Coconut','Green Apple','Cacao-like Sweetness'], roast:'Medium', brew:'Espresso / Pour Over', temp:'90 °C (espresso) / 89 °C (pour over)', ratio:'1g : 2g (espresso) / 1g : 14g (pour over)', roastInfo:{charge:'190.4°C',drop:'202°C',dtr:'16%',time:'12:23'}, desc:'A rich, playful sister lot to Gum — coconut, green apple and cacao-like sweetness in a heavier, oily-bodied cup.', descFA:'خواهر پرمایه‌تر Gum — نارگیل، سیب سبز و شیرینی شبیه کاکائو در فنجانی سنگین‌تر و با احساس دهانی روغنی.', storyFA:'همون خانواده‌ی نارینیوی تخمیر هوازی، ولی با بدنه‌ی سنگین‌تر و شیرینی عمیق‌تر — برای دوستداران طعم‌های فانتزی و آدامس.', story:'Same aerobic-fermented Nariño family, but with a heavier body and deeper sweetness — for lovers of fantasy, gum-like flavors.', artUrl:'https://qoxmkuivwpbdzmajplus.supabase.co/storage/v1/object/public/bean-media/narino_coconut.webp', artTitle:'The Fruit Basket (Reversible Head)', artArtistFA:'جوزپه آرچیمبولدو', musicTrack:'Imminence', musicArtist:'Sleep Dealer', musicTrackId:'1i89zilJfsrF7qlbxSuuWR',
-    s:{
-      fruity:6, choc_nutty:7, floral:2, spicy:1,
-      low:3, medium:7, bright:4,
-      light:8, medium_bt:3, dark:1,
-      body_light:2, body_medium:6, body_full:9,
-      focus:4, relax:6, sensory:8, social:5,
-      morning:6, midday:6, afternoon:5,
-      black_dark:5, black_milk:6, milk_dark:5, milk_milk:6,
-      home_alone:5, work_focus:3, social:6, on_the_go:4,
-      routine:2, mixed:6, explorer:8,
-      guided:4, self_taught:7, analytical:5,
-      finish_short:1, finish_medium:3, finish_long:9,
-      aroma:8, texture:6, aftertaste:8, balance:5,
-      processing_washed:1, processing_natural:4, processing_anaerobic:4, processing_aerobic_ferment:9, processing_experimental:9,
-      dtr_short:7, dtr_medium:6, dtr_long:3,
-      rarity_everyday:2, rarity_curious:8, rarity_rare:6
-    },
-    brewFit:{ v60:7, frenchpress:4, mokapot:6, espressohome:9, aeropress:6, coldbrew:6, other:6 }
+    s:{"fruity":6,"floral":2,"choc_nutty":7,"spicy":1,"body_full":9,"bright":4,"dark":1,"finish_long":9}, // فقط اعداد نمودار رادار (همان که به کاربر نشان داده می‌شود)
+    intensity:7, sonic:{"pitch":7.916666666666666,"consonance":7.916666666666666,"tempo":5.357142857142858,"richness":7.0588235294117645}, mokaCaution:false
   },
 ];
 
@@ -8652,268 +8411,117 @@ const PERSONAS = {
     fa: 'کاوشگر', en: 'The Explorer',
     tagFa: 'همیشه دنبال یک تجربهٔ تازه', tagEn: 'Always chasing a new experience',
     descFa: 'کنجکاوی موتور محرکته؛ دونه‌های غیرمعمول و روش‌های دم‌آوری جدید رو به تکرار ترجیح می‌دی.',
-    descEn: 'Curiosity drives you — unusual beans and new brew methods beat repeating the familiar.',
-    s: {
-      fruity:6, choc_nutty:3, floral:8, spicy:5,
-      low:2, medium:5, bright:8,
-      light:6, medium_bt:5, dark:5,
-      body_light:6, body_medium:5, body_full:5,
-      focus:7, relax:2, sensory:9, social:5,
-      morning:6, midday:6, afternoon:5,
-      black_dark:8, black_milk:6, milk_dark:5, milk_milk:4,
-      home_alone:4, work_focus:3, social:8, on_the_go:8,
-      routine:1, mixed:4, explorer:10,
-      guided:3, self_taught:8, analytical:6
-    }
+    descEn: 'Curiosity drives you — unusual beans and new brew methods beat repeating the familiar.'
   },
   comfort: {
     icon: '☕', color: '#C77B6B', color2: '#6B3F2A', colorLight: '#F2C3B8',
     fa: 'آرامش‌جو', en: 'The Comfort Lover',
     tagFa: 'قهوه یعنی یک لحظهٔ گرم و آشنا', tagEn: 'Coffee means a warm, familiar moment',
     descFa: 'برات قهوه بیش از هر چیز باید آرامش‌بخش و آشنا باشه؛ طعم‌های شیرین و ملایم رو به هیجان ترجیح می‌دی.',
-    descEn: 'Coffee is comfort first — sweet, gentle flavors over intensity.',
-    s: {
-      fruity:3, choc_nutty:8, floral:2, spicy:1,
-      low:6, medium:6, bright:2,
-      light:2, medium_bt:6, dark:4,
-      body_light:3, body_medium:6, body_full:8,
-      focus:2, relax:10, sensory:4, social:6,
-      morning:4, midday:6, afternoon:8,
-      black_dark:4, black_milk:7, milk_dark:6, milk_milk:9,
-      home_alone:9, work_focus:5, social:6, on_the_go:3,
-      routine:9, mixed:5, explorer:2,
-      guided:8, self_taught:4, analytical:3
-    }
+    descEn: 'Coffee is comfort first — sweet, gentle flavors over intensity.'
   },
   bold: {
     icon: '⚡', color: '#B85C4A', color2: '#6B3F2A', colorLight: '#F0BBA8',
     fa: 'جسور', en: 'The Bold Drinker',
     tagFa: 'قهوه باید حس حضورش رو نشون بده', tagEn: 'Coffee should make its presence known',
     descFa: 'طعم‌های قوی و پرقدرت رو دوست داری و از قهوه انرژی و تمرکز واقعی می‌خوای.',
-    descEn: 'You want coffee that makes its presence known — strong, intense, energising.',
-    s: {
-      fruity:1, choc_nutty:7, floral:0, spicy:6,
-      low:8, medium:4, bright:2,
-      light:0, medium_bt:4, dark:10,
-      body_light:1, body_medium:4, body_full:9,
-      focus:9, relax:2, sensory:5, social:4,
-      morning:8, midday:6, afternoon:3,
-      black_dark:8, black_milk:5, milk_dark:7, milk_milk:4,
-      home_alone:6, work_focus:9, social:4, on_the_go:6,
-      routine:7, mixed:4, explorer:4,
-      guided:5, self_taught:6, analytical:6
-    }
+    descEn: 'You want coffee that makes its presence known — strong, intense, energising.'
   },
   creative: {
     icon: '💡', color: '#C99A4A', color2: '#6B3F2A', colorLight: '#F5D98A',
     fa: 'خلاق', en: 'The Creative Mood',
     tagFa: 'قهوه بخشی از فرآیند فکریته', tagEn: 'Coffee is part of your thinking process',
     descFa: 'قهوه همراه لحظه‌های تمرکز و ایده‌پردازیته؛ طعم‌های پیچیده و لایه‌دار رو می‌پسندی.',
-    descEn: 'Coffee accompanies your focus and ideas — layered, complex flavors appeal to you.',
-    s: {
-      fruity:7, choc_nutty:3, floral:9, spicy:4,
-      low:2, medium:5, bright:9,
-      light:7, medium_bt:4, dark:2,
-      body_light:8, body_medium:5, body_full:2,
-      focus:6, relax:6, sensory:10, social:4,
-      morning:6, midday:6, afternoon:5,
-      black_dark:7, black_milk:7, milk_dark:4, milk_milk:4,
-      home_alone:7, work_focus:6, social:6, on_the_go:5,
-      routine:3, mixed:6, explorer:8,
-      guided:4, self_taught:7, analytical:8
-    }
+    descEn: 'Coffee accompanies your focus and ideas — layered, complex flavors appeal to you.'
   },
   weekend: {
     icon: '🌤️', color: '#D98F5C', color2: '#7a4f3a', colorLight: '#F7CBA8',
     fa: 'آخرهفته‌ای', en: 'The Weekend Sipper',
     tagFa: 'قهوه یعنی وقت‌گذرانی بی‌عجله', tagEn: 'Coffee means unhurried time together',
     descFa: 'قهوه‌تو کنار دوستات و بدون عجله می‌خوری؛ لذت‌بردن برات مهم‌تر از پیچیدگیه.',
-    descEn: 'You sip slowly with friends — enjoyment matters more than complexity.',
-    s: {
-      fruity:4, choc_nutty:7, floral:3, spicy:1,
-      low:5, medium:7, bright:3,
-      light:3, medium_bt:7, dark:3,
-      body_light:4, body_medium:6, body_full:6,
-      focus:2, relax:9, sensory:5, social:9,
-      morning:3, midday:7, afternoon:7,
-      black_dark:4, black_milk:6, milk_dark:6, milk_milk:8,
-      home_alone:5, work_focus:2, social:9, on_the_go:6,
-      routine:5, mixed:7, explorer:5,
-      guided:7, self_taught:5, analytical:3
-    }
+    descEn: 'You sip slowly with friends — enjoyment matters more than complexity.'
   }
 };
 
-// میانگین هر کلید سیگنال روی همه‌ی دونه‌های فعال — برای امتیازدهی نسبی (نه مطلق)
-// بدون این کار، دونه‌هایی که همه‌جا امتیاز «نسبتاً بالا» دارن (نه فقط تو نقطه‌قوت خودشون)
-// همیشه برنده می‌شدن، حتی وقتی پاسخ کاربر اصلاً به نفعشون نبود.
-function computeAxisAverages() {
-  const pool = BEANS.filter(b => AVAILABLE.includes(b.id));
-  const sums = {}, counts = {};
-  pool.forEach(b => {
-    for (const k in b.s) {
-      sums[k] = (sums[k] || 0) + b.s[k];
-      counts[k] = (counts[k] || 0) + 1;
-    }
-  });
-  const avgs = {};
-  for (const k in sums) avgs[k] = sums[k] / counts[k];
-  return avgs;
+// ═══ نسخه‌ی ۵۶ (مرحله‌ی ۹ کارشناس): موتور پیشنهاد فقط روی سرور است ═══
+// امتیازهای حسی کامل دانه‌ها، brewFit، وزن‌ها، بردار پرسوناها و الگوریتم در Edge Function «recommend» هستند.
+// اپ فقط پاسخ‌ها را می‌فرستد و شناسه‌ی دانه/پرسونا را می‌گیرد؛ اطلاعات نمایشی (نام، منشأ، طعم، رادار) همین‌جا می‌ماند.
+const RECOMMEND_FN_URL = SUPABASE_URL + '/functions/v1/recommend';
+const RECOMMEND_ANSWER_KEYS = ['taste','body','acidity','bitterness','mood','moment','tastepref','brew','rarity','context','ritual','evolution','finish_preference','sensory_attention','processing','dtr'];
+function recommendAnswersPayload() {
+  const a = {};
+  RECOMMEND_ANSWER_KEYS.forEach(k => { const v = ans[k]; a[k] = (typeof v === 'string' && /^[a-z0-9_]{1,24}$/.test(v)) ? v : null; });
+  const it = Number(ans.intensity);
+  a.intensity = Number.isInteger(it) && it >= 1 && it <= 12 ? it : null;
+  return a;
 }
-const AXIS_AVG = computeAxisAverages();
-
-// محاسبه‌ی امتیاز یک موجودیت (دانه یا پرسونا) بر اساس بردار پاسخ کاربر و جدول وزن‌دهی سطح
-// هر مقدار نسبت به میانگین همان کلید در کل کاتالوگ سنجیده می‌شه (امتیاز نسبی، نه مطلق)
-function computeAxisScore(entityS, a, weights) {
-  const rel = (key) => (key && entityS[key] !== undefined ? entityS[key] - (AXIS_AVG[key] || 0) : 0);
-  let score = 0;
-  score += rel(a.taste) * (weights.taste / 10);
-  score += rel('body_' + a.body) * (weights.body / 10);
-  score += rel(a.acidity) * (weights.acidity / 10);
-  const bKey = a.bitterness === 'medium' ? 'medium_bt' : a.bitterness;
-  score += rel(bKey) * (weights.bitterness / 10);
-  score += rel(a.mood) * (weights.mood / 10);
-  score += rel(a.moment) * (weights.moment / 10);
-  // ترکیب شیر/شکلات: خارج از جدول رسمی ۷بُعدی سند، فقط برای ظرافت اضافه نگه داشته می‌شه
-  score += rel(a.tastepref) * 1.0;
-  // محور «معمولی یا خاص» — پیشوند 'rarity_' چون مقادیرش (everyday/curious/rare) با کلید محورهای دیگه تداخل نداره
-  const rarityKey = a.rarity ? 'rarity_' + a.rarity : null;
-  score += rel(rarityKey) * (weights.rarity / 10);
-  // فاز ۲ — محورهای عمیق‌تر (فقط وقتی کاربر برگشتی این‌ها رو پاسخ داده باشه مقدار دارن)
-  score += rel(a.context) * (weights.context / 10);
-  score += rel(a.ritual) * (weights.ritual / 10);
-  score += rel(a.evolution) * (weights.evolution / 10);
-  // پس‌مزه: پیشوند 'finish_' چون مقدار 'medium' با کلید اسیدیته/تلخی/بدنه تداخل داره
-  const finishKey = a.finish_preference ? 'finish_' + a.finish_preference : null;
-  score += rel(finishKey) * (weights.finish_preference / 10);
-  // توجه حسی: مقادیرش (aroma/texture/aftertaste/balance) با هیچ کلید دیگه‌ای تداخل ندارن
-  score += rel(a.sensory_attention) * (weights.sensory_attention / 10);
-  // فرآوری: فقط سطح متخصص (وزنش تو بقیه‌ی سطوح صفره) — پیشوند برای جلوگیری از تداخل احتمالی کلید
-  // 'experimental' مقدار ساده‌شده‌ی beginner/regular برای هر دوی anaerobic و aerobic_ferment هست
-  // (چون این تفکیک ظریف برای غیرمتخصص معنا نداره)؛ رو کلید مشتق‌شده‌ی processing_experimental امتیاز می‌گیره
-  const processingKey = a.processing ? 'processing_' + a.processing : null;
-  score += rel(processingKey) * (weights.processing / 10);
-  // نسبت توسعه‌ی رست (DTR): فقط سطح متخصص
-  const dtrKey = a.dtr ? 'dtr_' + a.dtr : null;
-  score += rel(dtrKey) * (weights.dtr / 10);
-  return score;
-}
-
-// چندتا از ترجیحاتی که کاربر واقعاً جواب داده، با این دونه هم‌جهت بودن — برای توضیح صادقانه‌ی
-// درصد تطابق («۸۷٪ یعنی ۷ مورد از ۸ ترجیح اصلی‌ت با این دونه هماهنگه»)؛ همون منطق rel() که تو
-// computeAxisScore هست رو دوباره استفاده می‌کنیم، فقط این‌بار به‌جای جمع‌وزنی، شمارش مثبت/کل می‌کنیم
-function computeMatchBreakdown(entityS, a) {
-  const rel = (key) => (key && entityS[key] !== undefined ? entityS[key] - (AXIS_AVG[key] || 0) : 0);
-  const bKey = a.bitterness === 'medium' ? 'medium_bt' : a.bitterness;
-  const rarityKey = a.rarity ? 'rarity_' + a.rarity : null;
-  const finishKey = a.finish_preference ? 'finish_' + a.finish_preference : null;
-  const processingKey = a.processing ? 'processing_' + a.processing : null;
-  const dtrKey2 = a.dtr ? 'dtr_' + a.dtr : null;
-  const checks = [
-    a.taste ? rel(a.taste) : null,
-    a.body ? rel('body_' + a.body) : null,
-    a.acidity ? rel(a.acidity) : null,
-    a.bitterness ? rel(bKey) : null,
-    a.mood ? rel(a.mood) : null,
-    a.moment ? rel(a.moment) : null,
-    a.tastepref ? rel(a.tastepref) : null,
-    a.rarity ? rel(rarityKey) : null,
-    a.context ? rel(a.context) : null,
-    a.ritual ? rel(a.ritual) : null,
-    a.evolution ? rel(a.evolution) : null,
-    a.finish_preference ? rel(finishKey) : null,
-    a.sensory_attention ? rel(a.sensory_attention) : null,
-    a.processing ? rel(processingKey) : null,
-    a.dtr ? rel(dtrKey2) : null,
-  ].filter(v => v !== null);
-  const total = checks.length;
-  const matched = checks.filter(v => v > 0).length;
-  return { matched, total };
-}
-
-function determinePersonaFrom(a) {
-  const weights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
-  let bestKey = null, bestScore = -Infinity; // قبلاً -1 بود — اگه همه‌ی پرسوناها امتیاز منفی‌تر از -1 می‌گرفتن،
-                                              // هیچ‌کدوم انتخاب نمی‌شد و persona undefined می‌موند (کرش «reading icon»)
-  for (const key in PERSONAS) {
-    const score = computeAxisScore(PERSONAS[key].s, a, weights);
-    if (score > bestScore) { bestScore = score; bestKey = key; }
+async function callRecommend(payload) {
+  const headers = { 'Content-Type': 'application/json', 'apikey': SUPABASE_KEY };
+  try { const { data: { session } } = await supabaseClient.auth.getSession(); if (session) headers['Authorization'] = 'Bearer ' + session.access_token; } catch (e) {}
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 12000);
+  let res;
+  try {
+    res = await fetch(RECOMMEND_FN_URL, { method: 'POST', cache: 'no-store', signal: controller.signal, headers, body: JSON.stringify(payload) });
+  } catch (e) {
+    if (e.name === 'AbortError') { const te = new Error(currentLang === 'en' ? 'Request timed out. Please try again.' : 'ارتباط با سرور خیلی طول کشید. دوباره امتحان کن.'); te.userFacing = true; throw te; }
+    throw e;
+  } finally { clearTimeout(timeoutId); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) {
+    const err = new Error(res.status === 429
+      ? (currentLang === 'en' ? 'Too many tries in a short time. Please wait a little and try again.' : 'در مدت کوتاهی خیلی تلاش شد. کمی صبر کن و دوباره امتحان کن.')
+      : (currentLang === 'en' ? 'Could not build your result right now. Please try again.' : 'الان نتونستیم نتیجه‌ات رو بسازیم. دوباره امتحان کن.'));
+    err.userFacing = true; err.code = data.error || ('http_' + res.status);
+    throw err;
   }
-  // لایه‌ی محافظتی: حتی اگه به هر دلیل غیرمنتظره‌ای بازم چیزی انتخاب نشد، اولین پرسونا رو برگردون
-  // تا اپ کرش نکنه — بهتره یه پرسونای غیردقیق نشون بدیم تا این‌که کل صفحه‌ی نتیجه خراب بشه
-  if (!bestKey) bestKey = Object.keys(PERSONAS)[0];
-  return { ...PERSONAS[bestKey], key: bestKey };
+  return data;
 }
-function determinePersona() {
-  return determinePersonaFrom(ans);
+function beanById(id) { return id ? (BEANS.find(b => b.id === id) || null) : null; }
+function personaByKey(k) { return (k && PERSONAS[k]) ? { ...PERSONAS[k], key: k } : null; }
+// پرسونای ذخیره‌شده در پروفایل (نام انگلیسی) — جایگزین وقتی سرور در دسترس نیست
+function personaFromStored(p) {
+  const k = Object.keys(PERSONAS).find(key => PERSONAS[key].en === (p && p.persona));
+  return personaByKey(k);
 }
+function determinePersona() { return currentPersona || personaByKey(Object.keys(PERSONAS)[0]); }
 
-/* ═══════════════════════════════════════════
-   RECOMMENDATION ENGINE — وزن‌دهی سطح‌محور + قانون Override
-═══════════════════════════════════════════ */
-// آستانه‌ی فیلتر سخت‌گیرانه: فقط دونه‌هایی وارد رقابت نهایی می‌شن که حداقل این نسبت از
-// بهترین نمره‌ی همون محور (رو کل کاتالوگ) رو داشته باشن. مبتدی/معمولی حس فیزیکی رست/تلخی
-// رو فوری می‌فهمن، پس این محور «قطعی» می‌شه، نه فقط یکی از چند سیگنال وزنی.
-// متخصص چند محور کلیدی رو هم‌زمان دقیق می‌فهمه، پس فیلتر رو چندتا محور با هم اعمال می‌شه.
-const HARD_FILTER_RATIO = 0.7;
-
-function axisKeyFor(axis, val) {
-  if (!val) return null;
-  if (axis === 'bitterness') return val === 'medium' ? 'medium_bt' : val;
-  if (axis === 'body') return 'body_' + val;
-  if (axis === 'finish_preference') return 'finish_' + val;
-  return val;
+// پایان آزمون: پیشنهاد کامل از سرور
+async function recommendFromServer() {
+  const r = await callRecommend({ op: 'quiz', level: currentLevel, answers: recommendAnswersPayload() });
+  const bean = beanById(r.bean_id);
+  if (!bean) { const e = new Error(currentLang === 'en' ? 'Could not build your result right now. Please try again.' : 'الان نتونستیم نتیجه‌ات رو بسازیم. دوباره امتحان کن.'); e.userFacing = true; throw e; }
+  const runner = beanById(r.runner_id), runner2 = beanById(r.runner2_id);
+  return { ...bean,
+    _matchPct: r.match_pct, _runnerBean: runner, _runner1: runner ? runner.name : null, _runner2: runner2 ? runner2.name : null,
+    _catalogGap: !!r.catalog_gap, _catalogGapDetail: r.catalog_gap_detail || '',
+    _brewAlt: beanById(r.brew_alt_id), _breakdown: r.breakdown || null, _personaKey: r.persona };
 }
-
-// مجموعه‌ی id دونه‌هایی که رو یه محور خاص، به‌اندازه‌ی کافی نزدیک به خواسته‌ی کاربرن (نسبت به بهترین نمره‌ی همون محور رو کل کاتالوگ)
-function idsCloseOnAxis(pool, axis, val) {
-  const key = axisKeyFor(axis, val);
-  if (!key) return null; // این محور جواب نداده، فیلتر نمی‌کنیم
-  const scores = pool.map(b => b.s[key] || 0);
-  const max = Math.max(...scores);
-  if (max <= 0) return null;
-  const ids = new Set(pool.filter(b => (b.s[key] || 0) >= max * HARD_FILTER_RATIO).map(b => b.id));
-  return ids.size ? ids : null;
+// بازکردن پروفایل قدیمی: پرسونا، جایگزین طعمی و شمارش ترجیح‌ها از سرور؛ اگر نشد، صفحه بدون این‌ها باز می‌شود
+async function enrichRestoredRec(withBrewAlt) {
+  try {
+    const r = await callRecommend({ op: 'restore', level: currentLevel, bean_id: (rec && rec.id) || null, answers: recommendAnswersPayload() });
+    const ps = personaByKey(r.persona);
+    if (ps) currentPersona = ps;
+    rec._runnerBean = beanById(r.runner_id);
+    rec._breakdown = r.breakdown || null;
+    if (withBrewAlt) rec._brewAlt = beanById(r.brew_alt_id);
+  } catch (e) { console.warn('recommend (restore) unavailable:', e.code || e.message); }
 }
-
-// آستانه‌ی «شکاف مطلق کاتالوگ»: اگه حتی بهترین دونه‌ی کاتالوگ رو یه محور، زیر این نمره باشه،
-// یعنی خواسته‌ی کاربر رو کاتالوگ فعلی اصلاً پاسخ نمی‌ده (نه اینکه فقط بهترین گزینه‌ی نسبی باشه)
-const ABSOLUTE_GAP_THRESHOLD = 5;
-
-function absoluteGapCheck(pool, axis, val) {
-  const key = axisKeyFor(axis, val);
-  if (!key) return null;
-  const max = Math.max(...pool.map(b => b.s[key] || 0));
-  if (max < ABSOLUTE_GAP_THRESHOLD) return axis + ':' + val + ' (بهترین نمره‌ی کاتالوگ: ' + max + '/10)';
-  return null;
-}
-
-function applyHardFilter(pool) {
-  // تلخی/رست اول و همیشه فیلتر می‌شه — برای هر سه سطح، بدون استثنا.
-  // این حسی‌ترین و فوری‌ترین سیگناله؛ حتی متخصص هم نباید هیچ‌وقت رو این محور نادیده گرفته بشه.
-  const bitternessGap = absoluteGapCheck(pool, 'bitterness', ans.bitterness);
-  const bitternessIds = idsCloseOnAxis(pool, 'bitterness', ans.bitterness);
-  const bitternessPool = bitternessIds ? pool.filter(b => bitternessIds.has(b.id)) : pool;
-
-  if (currentLevel === 'expert') {
-    // متخصص: طعم + اسیدیته هم باید هم‌زمان نزدیک باشن — ولی فقط داخل همون زیرمجموعه‌ای
-    // که از قبل با تلخی سازگاره (نه کل کاتالوگ)، تا تلخی هیچ‌وقت کامل نادیده گرفته نشه
-    const axes = ['taste', 'acidity'];
-    const gaps = [bitternessGap, ...axes.map(axis => absoluteGapCheck(bitternessPool, axis, ans[axis]))].filter(Boolean);
-    const idSets = axes.map(axis => idsCloseOnAxis(bitternessPool, axis, ans[axis])).filter(Boolean);
-    if (!idSets.length) return { pool: bitternessPool, noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
-    let intersection = idSets[0];
-    for (let i = 1; i < idSets.length; i++) {
-      intersection = new Set([...intersection].filter(id => idSets[i].has(id)));
-    }
-    if (intersection.size > 0) {
-      return { pool: bitternessPool.filter(b => intersection.has(b.id)), noStrongMatch: false, catalogGap: gaps.length > 0, catalogGapDetail: gaps.join(' | ') };
-    }
-    // طعم/اسیدیته هم‌زمان جور نشدن — fallback فقط به همون زیرمجموعه‌ی سازگار با تلخی (نه کل کاتالوگ)
-    return { pool: bitternessPool, noStrongMatch: true, catalogGap: true, catalogGapDetail: gaps.length ? gaps.join(' | ') : 'طعم و اسیدیته هم‌زمان با تلخی سازگار نبودن' };
-  }
-  // مبتدی/معمولی: فقط همون فیلتر تلخی کافیه
-  return { pool: bitternessPool, noStrongMatch: false, catalogGap: !!bitternessGap, catalogGapDetail: bitternessGap || '' };
+// پرسونای ترکیبی داشبورد
+async function combinedPersonaFromServer(weighted) {
+  const tok = v => (typeof v === 'string' && /^[a-z0-9_]{1,24}$/.test(v)) ? v : null;
+  try {
+    if (!weighted.length || weighted.length > 50) throw new Error('size');
+    const r = await callRecommend({ op: 'combined', items: weighted.map(({ profile: p, weight }) => ({
+      flavor: tok(p.flavor), body: tok(p.body), mood: tok(p.mood), acidity: tok(p.acidity), tastepref: tok(p.tastepref), weight: Math.max(1, Math.min(1000, Math.round(weight))) })) });
+    if (PERSONAS[r.persona]) return PERSONAS[r.persona];
+  } catch (e) { console.warn('recommend (combined) unavailable:', e.code || e.message); }
+  // جایگزین: پرسونای ذخیره‌شده‌ای که بیشترین وزن را دارد
+  const totals = {};
+  weighted.forEach(({ profile: p, weight }) => { const ps = personaFromStored(p); if (ps) totals[ps.key] = (totals[ps.key] || 0) + weight; });
+  let best = null, bt = 0; for (const k in totals) if (totals[k] > bt) { bt = totals[k]; best = k; }
+  return best ? PERSONAS[best] : null;
 }
 
 /* ═══════════════════════════════════════════
@@ -9031,21 +8639,8 @@ function getMusicRespectNote(rec, pick) {
 // پروفایل صوتی هدف رو مستقیم از شیمی واقعی دونه مشتق می‌کنه (نه از حدس یا mood انتزاعی) —
 // از همون داده‌ی اسیدیته/تلخی/بدنه که قبلاً تو s{} هر دونه هست
 function computeBeanSonicTarget(bean) {
-  const s = (bean && bean.s) || {};
-  function weightedPos(low, mid, high) {
-    const sum = (low||0) + (mid||0) + (high||0);
-    if (!sum) return 5; // خنثی اگه داده‌ای نبود
-    return (((low||0)*1 + (mid||0)*2 + (high||0)*3) / sum - 1) / 2 * 10; // نرمال به ۰-۱۰
-  }
-  const bitternessLevel = weightedPos(s.light, s.medium_bt, s.dark);
-  const acidityLevel = weightedPos(s.low, s.medium, s.bright);
-  const bodyLevel = weightedPos(s.body_light, s.body_medium, s.body_full);
-  return {
-    pitch: 10 - bitternessLevel,      // تلخی بالا → زیر پایین‌تر (Crisinel & Spence 2010)
-    consonance: 10 - bitternessLevel, // تلخی بالا → ناسازگاری هارمونیک بیشتر
-    tempo: acidityLevel,              // اسیدیته/روشنی بالا → تمپوی سریع‌تر
-    richness: bodyLevel               // بدنه‌ی سنگین‌تر → تیمبر غنی‌تر
-  };
+  // نسخه‌ی ۵۶: هدف صوتی هر دانه ازپیش محاسبه شده (همان فرمول Crisinel & Spence)؛ بردار کامل دانه دیگر در اپ نیست
+  return (bean && bean.sonic) || { pitch: 5, consonance: 5, tempo: 5, richness: 5 };
 }
 
 function pickMusicForUser(rec) {
@@ -9084,12 +8679,8 @@ function revealMusicEmbed() {
 }
 
 function computeBeanIntensity(bean) {
-  const s = bean.s || {};
-  const bodyPart = s.body_full || 0;
-  const darkPart = ((s.medium_bt || 0) + (s.dark || 0)) / 2;
-  const raw = bodyPart * 0.5 + darkPart * 0.5; // تقریباً رو مقیاس ۰ تا ۱۰
-  const scaled = 1 + (raw / 10) * 11; // نگاشت به ۱ تا ۱۲
-  return Math.max(1, Math.min(12, Math.round(scaled)));
+  // نسخه‌ی ۵۶: شدت ۱ تا ۱۲ ازپیش محاسبه شده (بدنه + تیرگی)؛ دانه‌ی ناشناخته = ۱ مثل قبل
+  return (bean && bean.intensity) || 1;
 }
 
 // کامنت لحظه‌ای که موقع کشیدن اسلایدر شدت نشون داده می‌شه
@@ -9109,64 +8700,7 @@ const INTENSITY_COMMENTS = [
   { fa: 'نهایت شدت، فقط برای حرفه‌ای‌های قهوه', en: 'Maximum intensity — for the boldest palates' }
 ];
 
-function recommend() {
-  let pool = BEANS.filter(b => AVAILABLE.includes(b.id));
-
-  // دونه‌های «فقط حرفه‌ای» — بر اساس توصیف صریح خودِ رستری (پیچیدگی/اسیدیته‌ی بالا که نیاز به ذائقه‌ی
-  // کالیبره‌شده داره)، برای کاربر مبتدی از استخر رقابت حذف می‌شن. این یه فیلتر قطعیه، نه وزنی —
-  // چون سیگنال rarity به‌تنهایی (یه کلیک رو «خاص») نشونه‌ی واقعی آماده‌بودن ذائقه نیست، فقط یه آرزوست
-  const BEGINNER_EXCLUDED = ['yemen_heirloom', 'colombia_geisha'];
-  if (currentLevel === 'beginner') {
-    pool = pool.filter(b => !BEGINNER_EXCLUDED.includes(b.id));
-  }
-
-  const baseWeights = LEVEL_WEIGHTS[currentLevel] || LEVEL_WEIGHTS.regular;
-
-  const { pool: filteredPool, noStrongMatch, catalogGap, catalogGapDetail } = applyHardFilter(pool);
-  pool = filteredPool;
-  // نکته: این‌ها فقط برای لاگ/گزارش‌گیری داخلیه (طبق تصمیم برند)، هیچ پیامی به کاربر نشون داده نمی‌شه
-  if (noStrongMatch) console.info('[internal] no strong multi-axis match for expert — fell back to full catalog');
-  if (catalogGap) console.info('[internal] catalog gap detected:', catalogGapDetail);
-
-  // قانون Override: انتخاب «با شیر» → وزن اسیدیته ۳۰٪ کاهش می‌یابد
-  const isMilk = ans.tastepref === 'milk_dark' || ans.tastepref === 'milk_milk';
-  const weights = isMilk ? { ...baseWeights, acidity: baseWeights.acidity * 0.7 } : baseWeights;
-
-  const scored = pool.map(b => {
-    let score = computeAxisScore(b.s, ans, weights);
-    // شدت (Intensity): محور عددی مستقل — نه categorical مثل بقیه، پس با فاصله محاسبه می‌شه نه lookup
-    // هرچی فاصله‌ی شدت ترجیحی کاربر با شدت واقعی این دونه کمتر باشه، امتیاز بیشتری می‌گیره
-    if (ans.intensity) {
-      const beanIntensity = computeBeanIntensity(b);
-      const distance = Math.abs(ans.intensity - beanIntensity);
-      score += -(distance) * (weights.intensity || 0) / 10;
-    }
-    // Override: دانه‌های خاستگاه کلمبیا (معادل امروزیِ برزیل/کلمبیای سند اصلی) اولویت می‌گیرند
-    if (isMilk && b.origin.includes('Colombia')) score *= 1.15;
-    return { ...b, _score: score };
-  });
-
-  scored.sort((a, b) => b._score - a._score);
-  const best = scored[0];
-
-  // درصد تطابق: نسبی به بقیه‌ی کاتالوگ (softmax) نه یه سقف مطلق فرضی
-  // temperature بالاتر یعنی برنده‌ی واضح، درصد بالاتری می‌گیره
-  const TEMP = 0.6;
-  const maxScore = Math.max(...scored.map(s => s._score));
-  const expScores = scored.map(s => Math.exp((s._score - maxScore) * TEMP));
-  const sumExp = expScores.reduce((a, b) => a + b, 0);
-  best._matchPct = Math.min(97, Math.max(35, Math.round((expScores[0] / sumExp) * 100)));
-
-  best._runnerBean = scored[1] || null;
-  best._runner1 = scored[1]?.name || null;
-  best._runner2 = scored[2]?.name || null;
-
-  // برای ذخیره‌ی بی‌صدا تو دیتابیس (saveProfile) — هیچ‌جا به کاربر نمایش داده نمی‌شه
-  best._catalogGap = !!catalogGap;
-  best._catalogGapDetail = catalogGapDetail || '';
-
-  return best;
-}
+// نسخه‌ی ۵۶: recommend() به سرور منتقل شد ← recommendFromServer()
 
 /* ═══════════════════════════════════════════
    SHARE CARD (Instagram Story format 1080×1920)
@@ -9565,9 +9099,7 @@ function getHealthCautionText(rec) {
 // هشدار سازگاری موکاپات: طبق دانش تخصصی، موکاپات (فشار بخار + آب داغ) دونه‌های گلی/ظریف/پراسید رو
 // بیش‌ازحد استخراج می‌کنه و باعث تلخی/ترشی می‌شه — این نکته فقط وقتی نشون داده می‌شه که واقعاً لازمه
 function getMokaPotCautionText(rec) {
-  if (!rec || ans.brew !== 'mokapot' || !rec.brewFit) return null;
-  const compat = rec.brewFit.mokapot;
-  if (compat == null || compat > 4) return null; // سازگاری قابل‌قبوله، نیازی به هشدار نیست
+  if (!rec || ans.brew !== 'mokapot' || !rec.mokaCaution) return null; // نسخه‌ی ۵۶: پرچم ازپیش‌محاسبه‌شده (سازگاری ≤ ۴)
   const en = currentLang === 'en';
   return en
     ? "This bean is delicate and floral — moka pot's high heat and pressure can pull out bitterness or sourness. If you're not trying the suggested alternative, brew with lower heat and a shorter time on the stove."
@@ -9726,8 +9258,8 @@ async function render(r, isHistoricalView = false) {
   // توضیح صادقانه‌ی درصد تطابق — به‌جای یه عدد تنها، بگیم دقیقاً چندتا از ترجیح‌های واقعی کاربر
   // با این دونه هم‌جهت بودن (نه یه شعار، یه شمارش واقعی از همون امتیازهای زیرین)
   const breakdownEl = document.getElementById('r-match-breakdown');
-  if (breakdownEl && r.s) {
-    const { matched, total } = computeMatchBreakdown(r.s, ans);
+  if (breakdownEl && r._breakdown) {
+    const { matched, total } = r._breakdown; // نسخه‌ی ۵۶: شمارش از سرور
     if (total > 0) {
       breakdownEl.innerHTML =
         `<span class="fa-only">یعنی ${matched.toLocaleString('fa-IR')} مورد از ${total.toLocaleString('fa-IR')} ترجیح اصلی‌ت با این دونه هماهنگه</span>` +
