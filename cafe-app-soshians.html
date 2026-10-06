@@ -367,9 +367,9 @@ alt="Coffee Identity" style="width:76px;height:auto;margin-bottom:8px;">
 <select id="settings-birth-year" style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--light-caramel);background:var(--tint);color:var(--dark-brown);font-family:'Vazirmatn','Arial',sans-serif;" data-on-change="s30"></select>
 </div>
 <label style="font-size:12.5px;color:var(--medium-brown);font-weight:600;display:block;margin-bottom:6px;"><span class="fa-only">آدرس پیش‌فرض تحویل</span><span class="en-only">Default delivery address</span></label>
-<textarea class="input-field" id="settings-address" rows="3" style="margin-bottom:12px;resize:vertical;" data-on-input="s24"></textarea>
+<textarea class="input-field" id="settings-address" autocomplete="street-address" rows="3" style="margin-bottom:12px;resize:vertical;" data-on-input="s24"></textarea>
 <label style="font-size:12.5px;color:var(--medium-brown);font-weight:600;display:block;margin-bottom:6px;"><span class="fa-only">کدپستی</span><span class="en-only">Postal code</span></label>
-<input type="text" class="input-field" id="settings-postal" maxlength="10" inputmode="numeric" style="margin-bottom:8px;direction:ltr;text-align:right;" data-on-input="s31">
+<input type="text" class="input-field" id="settings-postal" autocomplete="postal-code" maxlength="10" inputmode="numeric" style="margin-bottom:8px;direction:ltr;text-align:right;" data-on-input="s31">
 <div id="settings-save-msg" class="success-msg" style="display:none;"></div>
 </div>
 <div style="max-width:320px;margin:24px auto 0;">
@@ -1423,7 +1423,7 @@ allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-pictur
 <span class="en-only">Delivery Address</span>
 <span class="fa-only">آدرس تحویل</span>
 </label>
-<textarea class="textarea-field" id="order-address" placeholder="آدرس کامل خود را وارد کنید..."></textarea>
+<textarea class="textarea-field" id="order-address" autocomplete="street-address" placeholder="آدرس کامل خود را وارد کنید..."></textarea>
 <div id="order-address-hint" style="display:none;font-size:11.5px;color:var(--medium-brown);margin-top:6px;font-family:'Vazirmatn',sans-serif;">
 <span class="fa-only">آدرس از اطلاعات قبلی‌ت پر شد — اگه عوض شده، ویرایشش کن</span>
 <span class="en-only">Filled from your saved details — edit it if it has changed</span>
