@@ -1,54 +1,86 @@
-const CACHE_NAME = 'ghahvato-shell-v2'; // نسخه بالا رفت تا کش قدیمی همه‌ی کاربرها پاک بشه
-const ASSETS_TO_CACHE = [
-  './cafe-app-fa-final.html',
-  './cafe-app-soshians.html',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon-32.png'
+// Coffee Identity — Service Worker نسخه‌ی ۳ (مرحله‌ی ۵ امنیت، ۸ اکتبر ۲۰۲۶)
+// قاعده‌ها:
+//  • فقط فایل‌های عمومی و ثابتِ همین دامنه که در فهرست مجاز هستند کش می‌شوند (پوسته‌ی اپ، manifest، آیکون‌ها، کتابخانه).
+//  • هیچ پاسخ API، حساب، سفارش، BeanCredit، رسید یا صفحه‌ی ادمین کش نمی‌شود — آن درخواست‌ها اصلاً از SW رد نمی‌شوند.
+//  • نام کش به دامنه و نسخه وابسته است؛ با تغییر دامنه یا نسخه، کش قدیمی پاک می‌شود.
+//  • پیام CLEAR_CACHES (هنگام خروج/حذف حساب) همه‌ی کش‌ها را پاک می‌کند.
+const VERSION = 'v3';
+const CACHE_NAME = 'ci-shell-' + self.location.hostname + '-' + VERSION;
+const SCOPE_PATH = new URL(self.registration.scope).pathname; // مثلاً /roastery-cafe/ یا /
+
+// فهرست مجاز (نسبت به scope). فقط همین‌ها کش می‌شوند.
+const PRECACHE = [
+  'cafe-app-soshians.html',
+  'manifest.json',
+  'icons/icon-192.png',
+  'icons/icon-512.png',
+  'icons/maskable-icon-512.png',
+  'icons/apple-touch-icon.png',
+  'icons/favicon-32.png'
 ];
+const RUNTIME_ALLOW = [
+  /^cafe-app-soshians\.html$/,
+  /^manifest\.json$/,
+  /^icons\/[a-z0-9-]+\.png$/,
+  /^supabase-js-[0-9.]+\.js$/
+];
+// هرگز از SW رد نشوند (نه کش، نه پاسخ از کش)
+const NEVER = [/^roastery-admin/i, /admin/i, /PRIVATE|readable/i];
+
+function relPath(url) {
+  return url.pathname.startsWith(SCOPE_PATH) ? url.pathname.slice(SCOPE_PATH.length) : null;
+}
+function isAllowed(url) {
+  if (url.origin !== self.location.origin) return false;
+  if (url.search) return false;               // نشانی با پارامتر کش نمی‌شود
+  const p = relPath(url);
+  if (p === null) return false;
+  if (NEVER.some((r) => r.test(p))) return false;
+  return RUNTIME_ALLOW.some((r) => r.test(p));
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS_TO_CACHE))
-      .catch(() => {}) // اگه یکی از فایل‌ها موقع نصب پیدا نشد، کل نصب رو خراب نکنه
+      .then((cache) => Promise.all(PRECACHE.map((p) => cache.add(p).catch(() => {}))))
   );
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
-    )
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim())
   );
-  self.clients.claim();
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_CACHES') {
+    event.waitUntil(caches.keys().then((keys) => Promise.all(keys.map((k) => caches.delete(k)))));
+  }
 });
 
 self.addEventListener('fetch', (event) => {
-  const url = new URL(event.request.url);
+  const req = event.request;
+  if (req.method !== 'GET') return;            // فقط GET
+  const url = new URL(req.url);
+  if (!isAllowed(url)) return;                 // هر چیز دیگر (Supabase، ادمین، CDN، ...) مستقیم از شبکه، بدون کش
+  if (req.headers.get('authorization')) return;
 
-  // درخواست‌های Supabase و Apps Script هیچ‌وقت کش نمی‌شن — همیشه باید زنده و به‌روز باشن
-  if (url.hostname.includes('supabase.co') || url.hostname.includes('script.google.com')) {
-    return;
-  }
-  // فقط GET قابل کش‌شدنه
-  if (event.request.method !== 'GET') return;
-
-  // نکته‌ی مهم: قبلاً این "Cache First" بود (اول کش، حتی اگه قدیمی بود) — یعنی کاربر همیشه
-  // یه نسخه عقب‌تر از آخرین آپدیت رو می‌دید، حتی با ریفرش سخت (Ctrl+Shift+R). الان "Network First"ه:
-  // همیشه اول سعی می‌کنه از شبکه بگیره (یعنی همیشه آخرین نسخه)، فقط وقتی واقعاً آفلاینه سراغ کش می‌ره.
+  // Network First: همیشه آخرین نسخه؛ کش فقط برای حالت آفلاین
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        if (response && response.ok && url.origin === location.origin) {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+    fetch(req)
+      .then((res) => {
+        if (res && res.ok && res.type === 'basic') {
+          const cc = res.headers.get('cache-control') || '';
+          if (!/no-store|private/i.test(cc)) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(req, clone)).catch(() => {});
+          }
         }
-        return response;
+        return res;
       })
-      .catch(() => caches.match(event.request)) // فقط وقتی شبکه قطعه (آفلاین)، برو سراغ کش
+      .catch(() => caches.match(req))
   );
 });
